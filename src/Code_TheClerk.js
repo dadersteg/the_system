@@ -105,13 +105,14 @@ function executeEngine(mode) {
 
 function processAndLog(batch, rules, logSheet, mode) {
     console.log(`   > Extracting: ${batch.map(b => b.name).join(", ")}`);
+    const batchLogs = [];
     // 1. EXTRACTION WITH ERROR CATCHING
     let validFiles = [];
     batch.forEach(f => {
         const extData = extractContentV3(f);
         if (extData.error) {
             console.error(`   [SKIP] Extraction error for ${f.name}: ${extData.error}`);
-            logSheet.appendRow([`https://drive.google.com/open?id=${f.id}`, f.name, f.desc, "[EXTRACTION FAILED]", "N/A", "N/A", "System Error during reading", extData.error, "N/A", 0, 0, "EXTRACTION_ERROR", f.sourceFolderId]);
+            batchLogs.push([`https://drive.google.com/open?id=${f.id}`, f.name, f.desc, "[EXTRACTION FAILED]", "N/A", "N/A", "System Error during reading", extData.error, "N/A", 0, 0, "EXTRACTION_ERROR", f.sourceFolderId]);
             moveToReview(f.id, extData.error);
         } else {
             f.parts = extData.part;
@@ -120,7 +121,10 @@ function processAndLog(batch, rules, logSheet, mode) {
     });
 
 
-    if (validFiles.length === 0) return;
+    if (validFiles.length === 0) {
+        if (batchLogs.length > 0) logSheet.getRange(logSheet.getLastRow() + 1, 1, batchLogs.length, batchLogs[0].length).setValues(batchLogs);
+        return;
+    }
 
 
     // 2. SEND VALID FILES TO GEMINI
@@ -140,23 +144,31 @@ function processAndLog(batch, rules, logSheet, mode) {
                 if (mode === "STANDARD") file.moveTo(DriveApp.getFolderById(FOLDERS.STND_DEST));
 
 
-                logSheet.appendRow([file.getUrl(), f.name, f.desc, finalName, data.path_code, data.context_id, data.summary, data.description, data.reasoning, tpf, 0, `${mode} Success`, f.sourceFolderId]);
+                batchLogs.push([file.getUrl(), f.name, f.desc, finalName, data.path_code, data.context_id, data.summary, data.description, data.reasoning, tpf, 0, `${mode} Success`, f.sourceFolderId]);
                 console.log(`   [OK] Processed: ${finalName}`);
             } catch (e) {
-                logSheet.appendRow([`https://drive.google.com/open?id=${f.id}`, f.name, f.desc, "[SYSTEM ERROR]", "N/A", "N/A", "Update Failed", e.message, "N/A", 0, 0, "SYSTEM_ERROR", f.sourceFolderId]);
+                batchLogs.push([`https://drive.google.com/open?id=${f.id}`, f.name, f.desc, "[SYSTEM ERROR]", "N/A", "N/A", "Update Failed", e.message, "N/A", 0, 0, "SYSTEM_ERROR", f.sourceFolderId]);
                 moveToReview(f.id, e.message);
             }
         });
     } else {
         // Retry logic
         if (validFiles.length > 1) {
+            if (batchLogs.length > 0) {
+                logSheet.getRange(logSheet.getLastRow() + 1, 1, batchLogs.length, batchLogs[0].length).setValues(batchLogs);
+                batchLogs.length = 0;
+            }
             validFiles.forEach(single => processAndLog([single], rules, logSheet, mode));
         } else {
             const f = validFiles[0];
             console.error(`   [API REJECTED] ${f.name}: ${aiResult.message}`);
-            logSheet.appendRow([`https://drive.google.com/open?id=${f.id}`, f.name, f.desc, "[REJECTED]", "N/A", "N/A", "API Error", aiResult.message, "Review Required", 0, 0, "API_ERROR", f.sourceFolderId]);
+            batchLogs.push([`https://drive.google.com/open?id=${f.id}`, f.name, f.desc, "[REJECTED]", "N/A", "N/A", "API Error", aiResult.message, "Review Required", 0, 0, "API_ERROR", f.sourceFolderId]);
             moveToReview(f.id, aiResult.message);
         }
+    }
+
+    if (batchLogs.length > 0) {
+        logSheet.getRange(logSheet.getLastRow() + 1, 1, batchLogs.length, batchLogs[0].length).setValues(batchLogs);
     }
 }
 
