@@ -16,7 +16,7 @@ The System is designed to create a "Second Brain" that separates memory from exe
   * Notes are for Thinking: Used for drafting and thinking.
   * Drive is for Knowledge: Permanent storage of reference material.
 * 1.2. One Source of Truth: Never rely on memory. If an action exists, it must be captured in Google Tasks immediately.
-* 1.3. The Structure is Absolute: All items must adhere to the Life Organisation System (LOS) Hierarchy defined in Categorisation.
+* 1.3. The Structure is Absolute: All items must adhere to the Life Organisation System (LOS) Hierarchy defined in `TS - Categorisation.md`.
 ## 2. The Information Pipeline
 
 All inputs must pass through the Triage Gateway. The goal is to convert "Noise" into "Structured Data" inside Google Tasks.
@@ -119,7 +119,7 @@ The System requires maintenance to ensure the "Funnel" does not clog.
   * The Mandate: Atlas analyzes both sources to identify where subjective feelings (qualitative) correlate with objective targets (quantitative) over the larger time period.
   * Pattern Recognition: Identify if "bad days" in the narrative correlate with "Below Target" metrics in the data.
 * Phase 3: Realignment
-  * Action: Compare the synthesis findings against long-term objectives in the Goals, Methods and Habits file.
+  * Action: Compare the synthesis findings against long-term objectives in the `Goals, Methods and Habits.md` file.
   * Outcome: Identify if current Level 4 Habits are moving the needle on Level 1 and Level 2 Goals, or if the System structure requires adjustment to stay purposeful.
 
 
@@ -156,15 +156,16 @@ The Analyst. Provides strategic reflection by synthesizing qualitative journals 
 
 This section governs how files are named, stored, and shared to solve the "Relationship vs. Location" problem.
 
-### 6.1. The Principle of Inheritance
+### 6.1. The Principle of Inheritance (The "Local Name" Rule)
 
-We avoid redundant data entry. The Folder provides the global context; the File provides the local context.
+We avoid redundant data entry and visual clutter. The Folder hierarchy naturally provides the global context; therefore, folder names must be minimalist.
 
-* Folder Naming: MUST use the Full LOS Code.
-  * Example: 01 04 02 House
-* File Naming: Uses the L4 Context ID (if applicable) + Descriptive Name.
-  * Example: 202510 M - Moving Contract.pdf
-  * Incorrect: 01 04 02 202510 M - Moving Contract.pdf (Redundant).
+* **Folder Naming (The "Local Name" Rule):** Folders and Labels must OMIT the parent numerical prefixes. Only use the specific textual name of that node. 
+  * *Correct Example:* `04 Finances` > `Purchase` > `Instructions`
+  * *Incorrect Example:* `01 04 00 Finances` > `01 04 01 Purchase` > `01 04 01 Instructions` (Massively redundant).
+* **File Naming:** Uses the Identifier Logic defined in the Master Asset Naming Protocol (e.g., L4 Context ID or L3 Functional Name + Descriptive Name).
+  * *Example:* `202510 M - Moving Contract.pdf`
+  * *Incorrect:* `01 04 02 202510 M - Moving Contract.pdf` (Numerical LOS codes are PROHIBITED in filenames).
 ### 6.2. The "Symlink" Strategy (Shortcuts)
 
 A file must have one "Master Home" but can appear in multiple locations.
@@ -188,7 +189,7 @@ Since "Labels" are not available, use the Description field for tagging.
 This section ensures that performance data is compatible with the Vantage analytical layer.
 
 * The Principle of Traceability: Any file or note intended for performance auditing must be linked to a URN (Unique Reference Number).
-* URN Syntax: Use the exact YYYY-X-XXX format as defined in the Goals, Methods and Habits database.
+* URN Syntax: Use the exact YYYY-X-XXX format as defined in the `Goals, Methods and Habits.md` database.
 * Metadata Application: * Right Click File > File Information > Details.
   * Enter the relevant URN hashtag (e.g., #2026-M-001) in the Description field.
 * Vantage Readiness: Ensure that CSV exports or PDF statements are placed in the correct L4 Context folder before triggering a Vantage audit to maintain the relational mapping between the metric and the LOS path.

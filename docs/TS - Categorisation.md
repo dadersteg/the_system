@@ -73,7 +73,9 @@ The immutable skeleton of the system.
 
 ### 02 00 00 Work
 
-* **02 01 00 [YYYYMM] [Company Name]** (Example: 202605 Playmetech / Quantum 21)
+* **02 01 00 [YYYYMM] [Company Name]** 
+
+Current 02 01 00 202605 Playmetech / Quantum 21
 
 * **02 02 00 Career Management**
 
@@ -153,7 +155,7 @@ The immutable skeleton of the system.
 
 | **Instructions** | Manuals and user guides. |
 
-| **Passes/Tickets** | Active travel/event documents. |
+| **Passes & Tickets** | Active travel/event documents. |
 
 | **Receipts** | General purchase receipts. |
 
