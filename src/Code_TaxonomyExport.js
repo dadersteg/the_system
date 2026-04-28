@@ -33,31 +33,59 @@ function exportTaxonomy() {
   mdContent += "*Note: Limited to a depth of 3 and max 200 folders to prevent server timeouts.*\n\n";
   
   try {
-    const root = DriveApp.getRootFolder();
-    const MAX_DEPTH = 4;
-    let count = 0;
+    const MY_DRIVE_ID = DriveApp.getRootFolder().getId();
+    const allFolders = {}; 
     
-    function fetchFolders(folder, depth, prefix) {
-      if (depth > MAX_DEPTH) return;
-      if (count >= 200) return; 
+    let pageToken = null;
+    do {
+      const response = Drive.Files.list({
+        q: "mimeType = 'application/vnd.google-apps.folder' and trashed = false and 'me' in owners",
+        fields: "nextPageToken, files(id, name, parents)",
+        pageToken: pageToken,
+        pageSize: 1000
+      });
       
-      const folders = folder.getFolders();
-      // Directly stream to avoid memory/sorting errors that cause "Server Error"
-      while (folders.hasNext()) {
-        if (count >= 200) break;
-        const subFolder = folders.next();
-        mdContent += `${prefix}- ${subFolder.getName()}\n`;
-        count++;
-        fetchFolders(subFolder, depth + 1, prefix + "  ");
+      const files = response.files || [];
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        allFolders[f.id] = { 
+          id: f.id, 
+          name: f.name, 
+          parent: (f.parents && f.parents.length > 0) ? f.parents[0] : null, 
+          children: [] 
+        };
+      }
+      pageToken = response.nextPageToken;
+    } while (pageToken);
+
+    // Build children arrays
+    for (const id in allFolders) {
+      const folder = allFolders[id];
+      if (folder.parent && allFolders[folder.parent]) {
+        allFolders[folder.parent].children.push(folder);
       }
     }
-    
-    mdContent += "- My Drive\n";
-    fetchFolders(root, 1, "  ");
-    
-    if (count >= 200) {
-      mdContent += "\n*... (Truncated to 200 folders to prevent script timeout)*\n";
+
+    // Sort children alphabetically
+    for (const id in allFolders) {
+      allFolders[id].children.sort((a, b) => a.name.localeCompare(b.name));
     }
+
+    const MAX_DEPTH = 4;
+    function printTree(folderId, depth, prefix) {
+      if (depth > MAX_DEPTH) return;
+      const folder = allFolders[folderId];
+      if (!folder) return;
+      
+      for (let i = 0; i < folder.children.length; i++) {
+        const child = folder.children[i];
+        mdContent += `${prefix}- ${child.name}\n`;
+        printTree(child.id, depth + 1, prefix + "  ");
+      }
+    }
+
+    mdContent += "- My Drive\n";
+    printTree(MY_DRIVE_ID, 1, "  ");
     
   } catch (e) {
     mdContent += `Error fetching Drive Folders: ${e.message}\n`;
