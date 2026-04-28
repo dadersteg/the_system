@@ -64,7 +64,7 @@ function executeEngine(mode) {
                         const f = files.next();
                         allFiles.push({ id: f.getId(), name: f.getName(), mime: f.getMimeType(), desc: f.getDescription() || "", sourceFolderId: id });
                     }
-                } catch (e) { }
+                } catch (e) { console.error("Error fetching files from folder " + id + ": " + e.message); }
             });
         } else {
             const processedIds = new Set(log.getDataRange().getValues().map(r => String(r[0]).includes("id=") ? r[0].split('id=')[1] : null));
@@ -255,7 +255,7 @@ function getArchiveFilesRecursive(folderId, processedSet, limit) {
                 const s = subs.next();
                 if (s.getName() !== "[File Review]") stack.push(s.getId());
             }
-        } catch (e) { }
+        } catch (e) { console.error("Error in getArchiveFilesRecursive for folder " + id + ": " + e.message); }
     }
     return list;
 }
@@ -273,4 +273,4 @@ function getLockedName(ai, f) {
 
 
 function loadKnowledgeDocs() { return [DocumentApp.openById(DOC_IDS.INSTRUCTIONS).getBody().getText(), DocumentApp.openById(DOC_IDS.CATEGORISATION).getBody().getText(), DocumentApp.openById(DOC_IDS.PROTOCOL).getBody().getText()].join("\n\n"); }
-function moveToReview(id, msg) { try { const f = DriveApp.getFileById(id); f.setDescription("FAILED: " + msg); f.moveTo(DriveApp.getFolderById(FOLDERS.REVIEW)); } catch (e) { } }
+function moveToReview(id, msg) { try { const f = DriveApp.getFileById(id); f.setDescription("FAILED: " + msg); f.moveTo(DriveApp.getFolderById(FOLDERS.REVIEW)); } catch (e) { console.error("Error in moveToReview for ID " + id + ": " + e.message); } }
