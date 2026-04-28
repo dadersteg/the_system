@@ -34,16 +34,27 @@ function exportTaxonomy() {
   
   try {
     const MY_DRIVE_ID = DriveApp.getRootFolder().getId();
-    const allFolders = {}; 
+    const allFolders = {
+      [MY_DRIVE_ID]: { id: MY_DRIVE_ID, name: "My Drive", parent: null, children: [] }
+    }; 
     
     let pageToken = null;
     do {
-      const response = Drive.Files.list({
-        q: "mimeType = 'application/vnd.google-apps.folder' and trashed = false and 'me' in owners",
-        fields: "nextPageToken, files(id, name, parents)",
-        pageToken: pageToken,
-        pageSize: 1000
-      });
+      let response = null;
+      for (let retries = 0; retries < 3; retries++) {
+        try {
+          response = Drive.Files.list({
+            q: "mimeType = 'application/vnd.google-apps.folder' and trashed = false and 'me' in owners",
+            fields: "nextPageToken, files(id, name, parents)",
+            pageToken: pageToken,
+            pageSize: 100 // Reduced from 1000 to prevent 'Empty response' from huge payloads
+          });
+          break; // success
+        } catch (e) {
+          if (retries === 2) throw e;
+          Utilities.sleep(2000);
+        }
+      }
       
       const files = response.files || [];
       for (let i = 0; i < files.length; i++) {
@@ -95,25 +106,31 @@ function exportTaxonomy() {
   // 3. Save as Markdown File (Using Advanced Drive Service)
   // ==========================================
   try {
-    const fileName = "System_Taxonomy_Export_" + new Date().getTime() + ".md";
+    const fileName = "System_Taxonomy_Export.md";
     const blob = Utilities.newBlob(mdContent, 'text/plain', fileName);
-    const resource = {
-      name: fileName,
-      mimeType: 'text/plain',
-      parents: [TARGET_FOLDER_ID]
-    };
     
     try {
-      const file = Drive.Files.create(resource, blob);
-      Logger.log("Saved directly to target folder.");
-      Logger.log("File URL: https://drive.google.com/file/d/" + file.id);
+      const q = "name = '" + fileName + "' and '" + TARGET_FOLDER_ID + "' in parents and trashed = false";
+      const existingFiles = Drive.Files.list({q: q, fields: "files(id)"}).files;
+      
+      if (existingFiles && existingFiles.length > 0) {
+        const fileId = existingFiles[0].id;
+        const file = Drive.Files.update({}, fileId, blob);
+        Logger.log("Updated existing file. URL: https://drive.google.com/file/d/" + file.id);
+      } else {
+        const resource = {
+          name: fileName,
+          mimeType: 'text/plain',
+          parents: [TARGET_FOLDER_ID]
+        };
+        const file = Drive.Files.create(resource, blob);
+        Logger.log("Created new file. URL: https://drive.google.com/file/d/" + file.id);
+      }
     } catch (innerError) {
-      // Fallback if the folder ID is restricted or fails
       Logger.log("Target folder failed, saving to Root Drive instead. Error: " + innerError.message);
-      delete resource.parents; // Saves to root
-      const file = Drive.Files.create(resource, blob);
-      Logger.log("Export complete!");
-      Logger.log("File URL: https://drive.google.com/file/d/" + file.id);
+      const resourceRoot = { name: fileName, mimeType: 'text/plain' };
+      const file = Drive.Files.create(resourceRoot, blob);
+      Logger.log("Export complete! URL: https://drive.google.com/file/d/" + file.id);
     }
   } catch (e) {
     Logger.log("Error saving file to Drive: " + e.message);

@@ -23,5 +23,12 @@
   "runtimeVersion": "V8",
   "executionApi": {
     "access": "ANYONE"
-  }
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/drive",
+    "https://mail.google.com/",
+    "https://www.googleapis.com/auth/tasks",
+    "https://www.googleapis.com/auth/documents"
+  ]
 }
