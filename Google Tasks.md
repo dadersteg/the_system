@@ -1,0 +1,350 @@
+# Google Tasks
+
+*Last Updated: Tue, 28 Apr 2026 23:18:13 GMT*
+
+
+## Importer
+
+- [ ] **Daniel, your Revolut People's content is ready!**
+  - **AI Context:** Revolut People's content is ready. Review content for professional use, possibly related to past employment or career assets.
+  - **Category:** 02 02 00 Career Management
+- [ ] **Create the "ministry of gentlemanly workflows" **
+  - **AI Context:** Create the 'ministry of gentlemanly workflows' as a new productivity framework for task execution and personal system development.
+  - **Category:** 01 01 01 Task Management
+- [ ] **SMS - From:  AXA Health - April 28, 2026 at 02:50PM**
+  - **AI Context:** AXA Health sent specialist names and authorization number. Book an appointment with one of the provided specialists for treatment.
+  - **Category:** 01 02 01 Physical Health
+- [ ] **Set up Notebook LM for assets  Use budget for spending and monthly costs Allocate money to pockets to avoid money being spent  Allocate money to savings for infrequent transfers  Allocate money to pockets for infrequent card purchases or subscriptions  ** *(Due: 2026-04-28)*
+  - **AI Context:** Set up Notebook LM for comprehensive financial management, including budgeting for spending, monthly costs, savings, and purchases/subscriptions.
+  - **Category:** 01 04 00 Finances
+- [ ] **pre-mortem analysis**
+  - **AI Context:** Perform a pre-mortem analysis, likely inspired by an AI newsletter, to identify potential project failures and mitigation strategies.
+  - **Category:** 01 05 01 Projects > AI
+- [ ] **Here are your tickets to The Best in Stand Up - Thursday 30th April**
+  - **AI Context:** Confirmation for two Premium Tickets to 'The Best in Stand Up' on April 30th, including venue, seat, and payment details. Attached PDF for info.
+  - **Category:** 01 04 01 Purchase > Passes & Tickets
+- [ ] **Add details about TM on the categorisation doc **
+  - **AI Context:** Add detailed explanations about Task Management (TM) to the existing categorisation document, as an assigned action item.
+  - **Category:** 01 01 01 Task Management > The System (TS)
+- [ ] **Update the Email Label Prompt**
+  - **AI Context:** Update the 'Email Label Prompt' document, which defines the system identity for professional email organization.
+  - **Category:** 01 01 01 Task Management > The System (TS)
+- [ ] **[Product Update] New Workspace Intelligence admin controls for Google Workspace starting Apr 22, 2026**
+  - **AI Context:** Review new admin controls and features for Google Workspace Intelligence, an AI system that powers Gemini, starting April 22, 2026.
+  - **Category:** 01 05 01 Projects > AI
+- [ ] **How AI is rewriting engineering interviews**
+  - **AI Context:** Review a programming newsletter covering OpenAI's Privacy Filter, workspace agents, and AI's impact on engineering interviews.
+  - **Category:** 01 05 03 Collections
+- [ ] **Liverpool FC Booking Confirmation**
+  - **AI Context:** Confirmation for Liverpool FC match day hospitality tickets for May 9, 2026, including seat, cost, and pass distribution instructions.
+  - **Category:** 01 04 01 Purchase > Passes & Tickets
+- [ ] **Add a random question to the journal**
+  - **AI Context:** Add a random question to the journal as part of personal reflection.
+  - **Category:** 01 03 02 Reflection
+- [ ] **Get started with Google Antigravity**
+  - **AI Context:** Review welcome email to "Google Antigravity" service and begin setup, integrating it as a new project or system component.
+  - **Category:** 01 05 01 Projects
+- [ ] **You've unenrolled from Advanced Protection**
+  - **AI Context:** Notification of unenrollment from Advanced Protection; review suggested steps for re-enrollment or alternative Google account security.
+  - **Category:** 01 01 00 Personal Admin
+- [ ] **Your order is ready to collect - 6725793070**
+  - **AI Context:** Argos order for a Strata 60L storage box is ready for collection at Pimlico Argos (inside Sainsbury's) by April 29th.
+  - **Category:** 01 04 01 Purchase
+- [ ] **Harmonise email filters, with google drive with categorisation doc**
+  - **AI Context:** Harmonize email filters and Google Drive settings with the existing categorisation document for consistent system organization.
+  - **Category:** 01 01 01 Task Management > The System (TS)
+- [ ] **Contract and Next Steps**
+  - **AI Context:** Review a contract and determine the necessary next steps for action or signature.
+  - **Category:** 01 01 02 Contracts > Signature
+- [ ] **Register Ninja Grill**
+  - **AI Context:** Register the newly acquired Ninja Grill product for warranty and administrative purposes.
+  - **Category:** 01 04 01 Purchase
+- [ ] **🚅Big news! We are now at Gare du Nord**
+  - **AI Context:** Alltheway now offers luggage transfer services to/from Gare du Nord for SNCF & Eurostar trains, with a 15% discount code.
+  - **Category:** 01 05 03 Collections > Useful/Helpful
+- [ ] **Confirm identity for a UK passporte**
+  - **AI Context:** Confirm Mikkel Birkeso's identity online for a UK passport application by providing your passport details.
+  - **Category:** 01 01 00 Personal Admin
+- [ ] **Book apointment with ENT Doctor** *(Due: 2026-04-21)*
+  - **AI Context:** Book an appointment with an ENT Doctor for a medical consultation.
+  - **Category:** 01 02 01 Physical Health
+- [ ] **Set up Clasp**
+  - **AI Context:** Initiate the setup process for the "Clasp" system or tool for personal use.
+  - **Category:** 01 05 01 Projects
+- [ ] **Set up Antigravity **
+  - **AI Context:** Initiate the setup process for the "Antigravity" system or service.
+  - **Category:** 01 05 01 Projects
+- [ ] **https://www.instagram.com/p/DXThFmTCkkg/**
+  - **AI Context:** Review or interact with the provided Instagram post link for personal interest or reference.
+  - **Category:** 01 05 03 Collections
+- [ ] **Plan the staycation **
+  - **AI Context:** Plan the upcoming staycation project.
+  - **Category:** 01 05 01 Projects > 202604-202605 Staycation
+
+## ToDo
+
+- [ ] **01 05 01 > Assess IFTTT Pro 🚀**
+  - **AI Context:** Assess the IFTTT Pro trial, including enabling Applets and exploring exclusive Pro services for workflow automation.
+  - **Category:** 01 05 01 Projects
+- [ ] **01 04 00 Payslips > Update Password / Get access to ADP** *(Due: 2026-04-25)*
+  - **AI Context:** Update the password and gain necessary access to ADP for managing payslips.
+  - **Category:** 01 04 00 Finances > Payslips
+- [ ] **01 02 00 GP > Give details to GP** *(Due: 2026-04-23)*
+  - **Notes:** Autism, Phimosis belgrave.medical@nhs.net
+  - **AI Context:** Provide the General Practitioner (GP) with medical details, including information about Autism and Phimosis.
+  - **Category:** 01 02 00 Health
+- [ ] **01 04 01 > Upgrade Office > Repair old keyboard** *(Due: 2026-04-23)*
+  - **AI Context:** Repair an old keyboard as part of the ongoing home office upgrade project.
+  - **Category:** 01 05 01 Projects > Update Office
+- [ ] **01 02 00 202505 > BT > Follow up on blood test results with GP and endocrinologist**
+  - **Notes:** Discuss high cholesterol, high SHBG, and elevated liver enzymes in the context of my hyperthyroid history. Ask about post-treatment hypothyroidism. Also, need to investigate the high FSH level.
+  - **AI Context:** Follow up with GP & endocrinologist on blood test results (high cholesterol, SHBG, liver enzymes, FSH) & hyper/hypothyroidism history.
+  - **Category:** 01 02 01 Physical Health
+- [ ] **01 03 00 Personal Growth > Read "A System for Living on Principle" and draft principles** *(Due: 2026-04-20)*
+  - **AI Context:** Read 'A System for Living on Principle' and draft personal principles as part of ongoing personal growth.
+  - **Category:** 01 03 01 Principles, Goals, Methods...
+- [ ] **01 03 00 Reflection > Review Goals and Master Memo "Cheat Sheet"** *(Due: 2026-04-20)*
+  - **Notes:** The goals and the cheat sheet does not fit the minimialstic / simplisitc approach   Make cheat  even simpler. Intoduce a minium acceptable day. Too many habits and data points to track. Should be simplfiied. The methods/habits can still be there (with the numbers to guide). However, the focus should be on a sub-goal. That can be easily checked and tracked. If it not progressing an RCA can be done. Which could look into habits/methods .
+  - **AI Context:** Review and simplify existing goals and the 'Master Memo Cheat Sheet' to embrace a minimalistic, simplified tracking approach.
+  - **Category:** 01 03 02 Reflection
+- [ ] **01 04 02 > Update and document all storage boxes in flat**
+  - **AI Context:** Update and thoroughly document the contents of all storage boxes located within the flat.
+  - **Category:** 01 04 02 House > SW1V 4QE
+- [ ] **01 05 02 > CG > Joint Admin & Tech > Set up POP / IMAP (Carry)**
+  - **AI Context:** Set up POP/IMAP for Carry's email as part of joint administrative and technology tasks.
+  - **Category:** 01 05 02 Relationships > CMA
+- [ ] **01 03 00 > Research 'A System for Power Napping'**
+  - **AI Context:** Research 'A System for Power Napping' to enhance personal energy and effectiveness through improved rest methods.
+  - **Category:** 01 03 01 Principles, Goals, Methods...
+- [ ] **01 05 01 AI > Update taskmaster so it can edit Google Tasks**
+  - **AI Context:** Update the 'taskmaster' system component to enable the editing functionality for Google Tasks, specifically for the AI project.
+  - **Category:** 01 05 01 Projects > AI
+- [ ] **01 05 01 TS > Review and simplify categorisastion**
+  - **AI Context:** Review and simplify the existing categorization system to improve the architecture and maintenance of 'The System' (TS).
+  - **Category:** 01 01 01 Task Management > The System (TS)
+- [ ] **01 05 01  TS > Update System Protocol to list all relevant Gems** *(Due: 2026-04-20)*
+  - **AI Context:** Update the 'System Protocol' document to include a comprehensive list of all relevant 'Gems' for system architecture.
+  - **Category:** 01 01 01 Task Management > The System (TS)
+- [ ] **01 04 01 > Office upgrade > Buy MacMini > Your trade-in is in the works.**
+  - **AI Context:** Apple Trade In initiated for MacBook Air to fund MacMini purchase for office upgrade; prepare device for return and await refund.
+  - **Category:** 01 04 01 Purchase
+- [ ] **01 04 01 > Insurance > Health Insurance**
+  - **Notes:** What do with Axa?
+  - **AI Context:** Evaluate next steps and strategy regarding Axa Health Insurance policy management.
+  - **Category:** 01 04 00 Finances > Insurance
+- [ ] **01 05 01 20260509 LFC-CFC  > Fixture Change - Liverpool v Chelsea** *(Due: 2026-05-09)*
+  - **AI Context:** Liverpool vs Chelsea fixture moved to 12:30 PM, May 9, 2026, due to TV selection. Your existing booking is automatically transferred. No action needed, but note the new time.
+  - **Category:** 01 05 01 Projects
+- [ ] **01 04 01 > Upgrade Office**
+  - **AI Context:** Upgrade office. This likely involves planning and execution for office improvements.
+  - **Category:** 01 05 01 Projects > Update Office
+- [ ] **02 01 03 > Return Computer > TSE-21018 Laptop Return — Daniel Adersteg (2217)** *(Due: 2026-05-20)*
+  - **AI Context:** Process laptop return for Daniel Adersteg (TSE-21018) as part of offboarding.
+  - **Category:** 02 01 00 Work
+- [ ] **02 01 03 > Admin > Return Computer** *(Due: 2026-05-18)*
+  - **AI Context:** Handle the administrative process for returning a work computer.
+  - **Category:** 02 01 00 Work
+- [ ] **01 05 01 20260509 LFC-CFC  > Booking Confirmation: 20814442** *(Due: 2026-05-09)*
+  - **AI Context:** Your Avanti West Coast train booking (20814442) for London to Liverpool on May 9, 2026, is confirmed. E-tickets are attached.
+  - **Category:** 01 04 01 Purchase > Passes & Tickets
+- [ ] **01 05 01 TS > Fix email filters.**
+  - **AI Context:** Resolve and correct existing email filtering rules for better system management.
+  - **Category:** 01 01 01 Task Management > The System (TS)
+- [ ] **01 05 01 AI > Set up an AI Executive Assistant**
+  - **AI Context:** Initiate the setup process for an AI Executive Assistant.
+  - **Category:** 01 05 01 Projects > AI
+- [ ] **01 05 01 AI > Review the "MarkItDown"-repo on GitHub** *(Due: 2026-05-18)*
+  - **Notes:** https://github.com/microsoft/markitdown.git
+  - **AI Context:** Review the "MarkItDown" GitHub repository (microsoft/markitdown.git), potentially from an AI newsletter, to explore its functionalities.
+  - **Category:** 01 05 01 Projects > AI
+- [ ] **01 05 01 202606 P&E > Travel Logistics
+** *(Due: 2026-04-30)*
+  - **Notes:** Book Flights
+  - **AI Context:** Book flights for the "P&E" event/project in June 2026.
+  - **Category:** 01 05 01 Projects
+- [ ] **01 05 01 20260509 LFC-CFC > Booking Confirmation** *(Due: 2026-05-09)*
+  - **AI Context:** Match day hospitality booking (38630788) for Liverpool vs Chelsea on May 9, 2026 (KO 15:00) is confirmed. Total paid: £568.00.
+  - **Category:** 01 04 01 Purchase
+- [ ] **01 04 01 > Add Google One back to subscriptions** *(Due: 2026-09-01)*
+  - **AI Context:** Re-subscribe to Google One by September 2025, as assigned in the "01 04 Personal Finances" document.
+  - **Category:** 01 04 00 Finances
+- [ ] **01 04 01 B&S > Add Uber One back to subscriptions if not included in Ultra** *(Due: 2026-09-01)*
+  - **AI Context:** Re-add Uber One to subscriptions, provided it's not already covered by an "Ultra" plan.
+  - **Category:** 01 04 00 Finances
+- [ ] **01 05 02 CG > Joint Admin & Tech > Update digital signature with new name** *(Due: 2026-09-30)*
+  - **AI Context:** Update digital signature to reflect a new name, likely for joint administrative and tech matters with CG.
+  - **Category:** 01 05 02 Relationships > CMA
+- [ ] **01 05 01 > AI > Review Antigravity Instructions Video** *(Due: 2026-04-30)*
+  - **Notes:** https://x.com/DavidOndrej1/status/2009759790281461781?s=20
+  - **AI Context:** Watch and review the "Antigravity Instructions Video" from the provided X.com link, related to an AI initiative.
+  - **Category:** 01 05 01 Projects > AI
+- [ ] **01 04 00 Finances > Carry > Open UK Revolut Account** *(Due: 2026-04-30)*
+  - **AI Context:** Assist Carry in opening a UK Revolut account as a financial task.
+  - **Category:** 01 04 00 Finances
+- [ ] **01 05 01 202608 M&N > Confirmation** *(Due: 2026-08-14)*
+  - **AI Context:** Hotel Gässlingen double room booking (Ref: 88965) for Aug 14-16, 2026, is confirmed. Total paid: SEK 6,390.00.
+  - **Category:** 01 04 01 Purchase
+- [ ] **01 05 01 202608 M&N > Confirmation** *(Due: 2026-08-15)*
+  - **AI Context:** Your booking for Hotel Gässlingen / Skanörs Gästgifvaregård is confirmed; review the attached confirmation.
+  - **Category:** 01 04 01 Purchase
+- [ ] **01 05 01 202606 P&E > Bokningsbekräftelse - ZL37YT31YG -  Strandvillan Ljunghusen** *(Due: 2026-06-14)*
+  - **AI Context:** Strandvillan Ljunghusen booking (ZL37YT31YG) for June 12-14, 2026 (2 adults), is confirmed and fully paid (SEK 5,285).
+  - **Category:** 01 04 01 Purchase
+- [ ] **01 05 01 202606 P&E > Event Details** *(Due: 2026-06-14)*
+  - **AI Context:** Confirmation of RSVP for Emilia & Pontus's event in Falsterbo on June 13, 2026. Keep for reference, includes accommodation & schedule links.
+  - **Category:** 01 05 01 Projects
+- [ ] **01 05 01 TS (The System)**
+  - **AI Context:** Manage "The System" (TS), covering LOS maintenance, architecture, and prompt engineering.
+  - **Category:** 01 01 01 Task Management > The System (TS)
+- [ ] **01 05 01 202606 P&E** *(Due: 2026-06-14)*
+  - **AI Context:** Focus on planning and executing tasks related to the "P&E" project scheduled for June 2026.
+  - **Category:** 01 05 01 Projects
+
+## ToDo (01 04 00 Finance) / (01 04 00 Tax)
+
+- [ ] **01 04 00 > HL SIPP: Strategic Re-evaluation of Limit Ladders (Pre-Aviva £50k Injection)** *(Due: 2026-05-20)*
+  - **AI Context:** Re-evaluate the strategic limit ladders for the HL SIPP, anticipating a £50k injection from Aviva.
+  - **Category:** 01 04 00 Finances > Pension
+- [ ] **01 04 00 > Investing > Invest remaining cash in SIPP** *(Due: 2026-04-12)*
+  - **AI Context:** Invest remaining cash funds into the SIPP (Self-Invested Personal Pension) account.
+  - **Category:** 01 04 00 Finances > Investing
+- [ ] **01 04 00 > Event: Refill Rent pocket from Ex-Gratia 16,000** *(Due: 2026-06-15)*
+  - **AI Context:** Transfer £16,000 from the ex-gratia payment to refill the rent allocation pocket.
+  - **Category:** 01 04 00 Finances
+- [ ] **01 04 00 Tax > Consolidate 25/26 Document Pack for TFA - P60, P11D, Interest, CSV**
+  - **Notes:** Consolidate trade history from Revolut, Kraken, etc. for the 2025/26 tax year.
+  - **AI Context:** Consolidate all 2025/26 tax documents (P60, P11D, interest, trade history CSVs) for TFA.
+  - **Category:** 01 04 00 Finances > Tax
+- [ ] **01 04 00 Finance > Overview > Build a folder with detailing assets for Notebook LM**
+  - **AI Context:** Create a detailed asset folder for Notebook LM, providing an overview of finances.
+  - **Category:** 01 04 00 Finances
+- [ ] **01 04 00 Finance > Budget > Review approach/method**
+  - **AI Context:** Review and potentially revise the current budgeting approach and methodology.
+  - **Category:** 01 04 00 Finances
+- [ ] **01 04 00 > Tax > 25/26 Self-Assessment > Daniel** *(Due: 2026-11-29)*
+  - **AI Context:** Complete Daniel's Self-Assessment tax return for the 2025/2026 tax year.
+  - **Category:** 01 04 00 Finances > Tax
+- [ ] **01 04 00 > Tax > 25/26 Self-Assessment > Carry** *(Due: 2026-11-29)*
+  - **AI Context:** Complete Carry's Self-Assessment tax return for the 2025/2026 tax year.
+  - **Category:** 01 04 00 Finances > Tax
+- [ ] **01 04 00 > [Admin] Initiate Aviva to HL SIPP transfer (post-£22,089.58 injection)** *(Due: 2026-07-01)*
+  - **AI Context:** Initiate the transfer of funds from Aviva to the HL SIPP, following a £22,089.58 injection.
+  - **Category:** 01 04 00 Finances > Pension
+- [ ] **01 04 00 > [Admin] Audit final Revolut payslip (£30k ex-gratia / £22,089.58 pension)** *(Due: 2026-06-30)*
+  - **AI Context:** Audit the final Revolut payslip, accounting for £30k ex-gratia payment and £22,089.58 pension.
+  - **Category:** 01 04 00 Finances > Payslips
+- [ ] **01 04 00 Finances > Budget > Add CSN**
+  - **AI Context:** Incorporate CSN (Centrala studiestödsnämnden, student finance) into the budget.
+  - **Category:** 01 04 00 Finances
+- [ ] **01 04 00 Finances > Budget > Review for 2026**
+  - **AI Context:** Conduct a comprehensive review of the budget for the 2026 financial year.
+  - **Category:** 01 04 00 Finances
+- [ ] **01 04 00 > Tax > 25/26 Self-Assessment > Conversation with TFA**
+  - **AI Context:** Hold a discussion with TFA regarding the 2025/2026 Self-Assessment tax return.
+  - **Category:** 01 04 00 Finances > Tax
+- [ ] **01 04 00 Finances > Budget > Add Tax Insurance**
+  - **AI Context:** Add tax insurance to the budget.
+  - **Category:** 01 04 00 Finances
+- [ ] **01 04 00 Finances > Set up £1.25-1.5k Direct Debit to HL SIPP** *(Due: 2026-06-01)*
+  - **AI Context:** Establish a monthly direct debit of £1,250-£1,500 to the HL SIPP (Self-Invested Personal Pension) account.
+  - **Category:** 01 04 00 Finances > Pension
+- [ ] **01 04 00 > Tax > 26/27 Return > Receipt from Inside Success Union CIC £50.00** *(Due: 2027-04-30)*
+  - **AI Context:** Record a digital receipt (#25903) for a £50.00 payment to Inside Success Union CIC, for the 2026/27 tax return.
+  - **Category:** 01 04 00 Finances > Tax
+- [ ] **01 04 00 > Receive £30k refund and top up SIPP (Mop-up ANI)** *(Due: 2027-01-31)*
+  - **AI Context:** Receive a £30,000 refund and use it to top up the SIPP, as part of "Mop-up ANI."
+  - **Category:** 01 04 00 Finances > Pension
+
+## ToDo (01 05 01 2027 W)
+
+- [ ] **01 05 01 2027 W > Contract and Next Steps > Convo**
+  - **AI Context:** Discuss the contract and next steps for the 2027 Wedding Celebration project.
+  - **Category:** 01 05 01 Projects > 2027 W
+- [ ] **01 05 01 2027 W > Make a Gem for the wedding planning.** *(Due: 2026-04-20)*
+  - **Notes:** https://gemini.google.com/gem/ee1bde269984/b0c45264768faedf
+  - **AI Context:** Create a Gemini "Gem" (https://gemini.google.com/gem/ee1bde269984/b0c45264768faedf) for wedding planning, part of the 2027 Wedding project.
+  - **Category:** 01 05 01 Projects > 2027 W
+- [ ] **01 05 01 2027 W > Engagement Ring > Cash**
+  - **AI Context:** Initiate obtaining cash for the engagement ring, a key step within the 2027 Wedding Celebration project.
+  - **Category:** 01 05 01 Projects / 2027 W
+- [ ] **01 05 01 2027 W > Engagement Ring**
+  - **AI Context:** Advance the process for securing the engagement ring, part of the overall 2027 Wedding Celebration project.
+  - **Category:** 01 05 01 Projects / 2027 W
+
+## Backlog
+
+- [ ] **01 05 01 AI > How to cut your Gemini API bill in half**
+  - **Notes:** Flex cuts your Gemini costs by 50% by using Google’s spare capacity. You'll trade a 1 to 15 minute delay for massive savings, like Flash-Lite at just $0.125 per million input tokens.
+  - **AI Context:** Learn to halve Gemini API costs via Flex by leveraging Google's spare capacity, trading a slight delay for significant savings. A strategy for AI project optimization.
+  - **Category:** 01 05 01 Projects / AI
+- [ ] **01 05 00 Star Wars > Temple of the Jedi Order **
+  - **AI Context:** Engage with the Temple of the Jedi Order: consider an Initiate Program sponsor and participate in study halls.
+  - **Category:** 01 05 03 Collections / Star Wars
+- [ ] **01 05 01 > Liverpool > Exclusive: Jurgen Klopp interview	**
+  - **AI Context:** Read the exclusive interview with Jurgen Klopp covering his new role, post-Liverpool life, and corporate experiences.
+  - **Category:** 01 05 03 Collections / Liverpool FC
+- [ ] **01 05 01 AI > Check how Gemini Projects/Notebook works**
+  - **AI Context:** Investigate and understand the functionality of Gemini Projects/Notebooks within the AI initiative.
+  - **Category:** 01 05 01 Projects / AI
+- [ ] **01 05 01 AI > How to Use Chrome’s New AI-Powered ‘Skills’**
+  - **AI Context:** Explore and learn how to effectively use Chrome’s new AI-powered 'Skills' for enhanced productivity and browsing, relevant to AI initiatives.
+  - **Category:** 01 05 01 Projects / AI
+- [ ] **01 04 02 SW1V 4QE > Revisit energy tariff (Simply Tracker Mar27)** *(Due: 2027-03-01)*
+  - **AI Context:** Re-evaluate the energy tariff (Simply Tracker Mar27) for the SW1V 4QE residence to ensure optimal rates.
+  - **Category:** 01 04 02 House / SW1V 4QE
+- [ ] **02 02 00 > Track and/or check in with OLIX**
+  - **AI Context:** Track the progress and/or check in with OLIX as part of ongoing career management activities.
+  - **Category:** 02 02 00 Career Management
+- [ ] **01 05 02 > CM > Create Gem for Carry business idea**
+  - **AI Context:** Create a new system entry ("Gem") to document and progress Carry Martens Adersteg's business idea.
+  - **Category:** 01 05 02 Relationships / CMA
+- [ ] **01 05 01 TS > Review AI Inbox for Gmail (UK Availability)**
+  - **AI Context:** Review Gmail's new AI Inbox feature, specifically verifying its availability and functionality in the UK, for system maintenance.
+  - **Category:** 01 01 01 Task Management / The System (TS)
+- [ ] **01 05 01 > AI > Gemini Agent: Multi-step tasks, handled**
+  - **Notes:** When does it come to UK?
+  - **AI Context:** Determine the UK availability of Gemini Agent for handling multi-step tasks within the AI project context.
+  - **Category:** 01 05 01 Projects / AI
+- [ ] **01 03 00 > A System for Self-Mastery [The Four Agreements]**
+  - **AI Context:** Review "The Four Agreements" as a system for self-mastery, focusing on principles to reduce suffering and enhance personal peace and growth.
+  - **Category:** 01 03 01 Principles, Goals, Methods...
+- [ ] **01 02 00 > Learn 4-7-8 breathing for sleep**
+  - **AI Context:** Learn the 4-7-8 breathing method to quickly fall asleep and alleviate stress, effectively switching the nervous system to sleep mode.
+  - **Category:** 01 02 01 Physical Health
+- [ ] **01 05 00 Other > Waymo**
+  - **AI Context:** Review the Waymo welcome update on their autonomous driving technology, service expansion, and mission for safer, accessible transportation.
+  - **Category:** 01 05 03 Collections
+- [ ] **01 03 00 Personal Growth > Review "A System for The Ideal Morning [Habit Mapping]**
+  - **AI Context:** Review "A System for The Ideal Morning [Habit Mapping]" to design and optimize the first hour of the day for personal success and growth.
+  - **Category:** 01 03 01 Principles, Goals, Methods...
+- [ ] **01 05 01 Liverpool > Allison My story**
+  - **Notes:** Bit more detail from [an article on the website](https://www.liverpoolfc.com/news/coming-soon-watch-alisson-my-story-new-lfc-original-series):
+  - **AI Context:** Watch Alisson Becker's "My Story," a new Liverpool FC original series, available on the club's website for interest.
+  - **Category:** 01 05 03 Collections / Liverpool FC
+- [ ] **01 05 01 DC > Move reading list from Goodreads to Google Interests**
+  - **AI Context:** Migrate the existing reading list from Goodreads to Google Interests as part of a digital declutter project.
+  - **Category:** 01 05 01 Projects / Declutter
+
+## Recurring
+
+- [ ] **01 01 01 TM > Daily Review** *(Due: 2026-04-29)*
+  - **AI Context:** Execute the daily review process as a fundamental task management activity.
+  - **Category:** 01 01 01 Task Management
+- [ ] **01 03 00 R > 1 Day** *(Due: 2026-04-29)*
+  - **AI Context:** Conduct the daily (1-day) reflection for personal growth, assessing immediate experiences and learning.
+  - **Category:** 01 03 02 Reflection
+- [ ] **01 01 01 TM > Weekly Review** *(Due: 2026-04-26)*
+  - **AI Context:** Execute the weekly review process as a fundamental task management activity.
+  - **Category:** 01 01 01 Task Management
+- [ ] **01 01 01 TM > Monthly Review of Backlog** *(Due: 2026-04-26)*
+  - **AI Context:** Conduct a monthly review of the task backlog to manage and prioritize outstanding items effectively.
+  - **Category:** 01 01 01 Task Management
+- [ ] **01 03 00 R > 90 Day** *(Due: 2026-04-26)*
+  - **AI Context:** Conduct the 90-day reflection for personal growth, reviewing long-term progress and strategic alignment.
+  - **Category:** 01 03 02 Reflection
+- [ ] **01 03 00 R > 14 Day** *(Due: 2026-04-22)*
+  - **AI Context:** Conduct the 14-day (bi-weekly) reflection for personal growth, reviewing recent achievements and challenges.
+  - **Category:** 01 03 02 Reflection
+- [ ] **01 03 00 R > 1 Day > Add a questions about mistakes** *(Due: 2026-04-20)*
+  - **AI Context:** Integrate specific questions about mistakes into the daily reflection process, inspired by the "Lessons Learned Journal" concept.
+  - **Category:** 01 03 02 Reflection
