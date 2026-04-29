@@ -71,6 +71,13 @@ function extractTasksWithConversationDetails() {
 
   console.log(`Total tasks to process: ${allTasksToExport.length}. Batching for Gemini AI...`);
   
+  // Extract existing properly formatted task titles to use as naming context
+  const existingTaskContext = allTasksToExport
+    .filter(item => /^\d{2}\s\d{2}\s\d{2}/.test(item.task.title || ""))
+    .map(item => item.task.title)
+    .slice(0, 100) // Pass up to 100 existing titles to guide AI naming
+    .join("\n");
+  
   // Process Gemini AI in batches to avoid 6-minute execution limit
   const aiResultsMap = {};
   
@@ -86,7 +93,7 @@ function extractTasksWithConversationDetails() {
     }));
 
     console.log(`Sending batch ${Math.floor(i / CONFIG.geminiBatchSize) + 1} of ${Math.ceil(allTasksToExport.length / CONFIG.geminiBatchSize)} to Gemini...`);
-    const batchResults = batchAnalyzeTasksWithGemini(geminiInputBatch);
+    const batchResults = batchAnalyzeTasksWithGemini(geminiInputBatch, existingTaskContext);
     Object.assign(aiResultsMap, batchResults);
   }
 
@@ -107,23 +114,44 @@ function extractTasksWithConversationDetails() {
     // Auto-population logic for revisions
     let titleRevised = "";
     let notesRevised = "";
+    let taskListRevised = "";
 
     const hasLOSPrefix = /^\d{2}\s\d{2}\s\d{2}/.test(task.title || "");
-    if (!hasLOSPrefix && aiData.proposedCategory && aiData.proposedCategory !== "N/A" && aiData.proposedCategory !== "") {
-      titleRevised = `${aiData.proposedCategory} - ${task.title || "No Title"}`;
+    if (!hasLOSPrefix) {
+      if (aiData.proposedTitle && aiData.proposedTitle !== "") {
+        titleRevised = aiData.proposedTitle;
+      } else if (aiData.proposedCategory && aiData.proposedCategory !== "N/A" && aiData.proposedCategory !== "") {
+        titleRevised = `${aiData.proposedCategory} > ${task.title || "No Title"}`;
+      }
     }
 
     if ((!task.notes || task.notes.trim() === "") && aiData.emailSummary && aiData.emailSummary !== "N/A" && aiData.emailSummary !== "") {
       notesRevised = aiData.emailSummary;
     }
 
+    // Task List routing for "Importer"
+    if (taskList.title.toLowerCase() === "importer") {
+      taskListRevised = "ToDo"; // Default route
+      if (aiData.proposedCategory && aiData.proposedCategory !== "N/A") {
+        const excludedLists = ["todo", "importer", "my tasks"];
+        const candidateLists = taskLists.filter(l => !excludedLists.includes(l.title.toLowerCase()));
+        
+        for (const list of candidateLists) {
+          if (aiData.proposedCategory.toLowerCase().includes(list.title.toLowerCase())) {
+            taskListRevised = list.title;
+            break;
+          }
+        }
+      }
+    }
+
     results.push([
       urn, 
-      taskList.title, "",               // Task List + Revised Placeholder
-      task.title || "No Title", titleRevised, // Task Title + Revised
-      task.notes || "", notesRevised,   // Notes + Revised
-      status,                           // Status
-      formattedDate, "",                // Date + Revised Placeholder
+      taskList.title, taskListRevised,          // Task List + Revised
+      task.title || "No Title", titleRevised,   // Task Title + Revised
+      task.notes || "", notesRevised,           // Notes + Revised
+      status, "",                               // Status + Revised
+      formattedDate, "",                        // Date + Revised Placeholder
       emailInfo.labels, 
       emailInfo.firstSender, emailInfo.firstBody,
       emailInfo.lastSender, emailInfo.lastBody, 
@@ -149,7 +177,7 @@ function getExportHeaders() {
     "Task List", "Task List (Revised)", 
     "Task Title", "Task (Revised)", 
     "Notes", "Notes (Revised)", 
-    "Status", 
+    "Status", "Status (Revised)",
     "Date", "Deadline (Revised)", 
     "Email Labels",
     "First Msg (Sender)", "First Msg (Body Preview)", 
@@ -225,7 +253,22 @@ function processTaskEmailLinks(task) {
 
           if (thread) {
             const messages = thread.getMessages();
-            emailInfo.labels = thread.getLabels().map(l => l.getName()).join(", ");
+            
+            // Filter out System & Operational tags (and routing aliases) so they don't pollute AI context
+            const excludedPrefixes = ["00 ", "99 "];
+            const excludedAliases = [
+              "danieladersteg@hotmail.com", "danieladerstegov@hotmail.com",
+              "daniel@martens-adersteg.com", "d.a.xov@live.se", "erik.patrik555@gmail.com"
+            ];
+            
+            emailInfo.labels = thread.getLabels()
+              .map(l => l.getName())
+              .filter(name => {
+                const isSystemTag = excludedPrefixes.some(prefix => name.startsWith(prefix));
+                const isAlias = excludedAliases.some(alias => name.toLowerCase().includes(alias.toLowerCase()));
+                return !isSystemTag && !isAlias;
+              })
+              .join(", ");
             
             const getFullPreview = (msg) => {
               const body = (msg.getPlainBody() || msg.getSnippet() || "").replace(/\s+/g, " ").trim();
@@ -288,10 +331,13 @@ function getTaxonomyDocument() {
  * @param {Array<{id: string, title: string, notes: string, firstMessage: string, lastMessage: string}>} tasksBatch 
  * @returns {Object} Map of taskId -> { emailSummary, proposedCategory }
  */
-function batchAnalyzeTasksWithGemini(tasksBatch) {
+function batchAnalyzeTasksWithGemini(tasksBatch, existingTaskContext = "") {
   if (!tasksBatch || tasksBatch.length === 0) return {};
 
-  const apiKey = PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY");
+  const props = PropertiesService.getScriptProperties();
+  const apiKey = props.getProperty("GEMINI_API_KEY") || props.getProperty("gemini_api_key");
+  const modelId = props.getProperty("GEMINI_MODEL") || props.getProperty("gemini_model") || "gemini-3.1-flash-lite-preview";
+  
   if (!apiKey) {
     console.warn("No GEMINI_API_KEY found in Script Properties.");
     return {};
@@ -308,12 +354,23 @@ Please analyze the following list of tasks provided as JSON.
 
 For each task, provide:
 1. "emailSummary": Deliver a concise summary (MAXIMUM 200 characters). 
+   - CRITICAL: If the task title and notes are already self-explanatory and the email body adds no crucial new context, return an empty string (""). Do NOT repeat the title.
    - Follow the Pyramid Principle and BLUF (Bottom Line Up Front).
    - Get straight to the point. DO NOT use filler words like "The task is about" or "This email is...".
-   - You have been provided with the task notes, the first and last message of the email thread (if applicable), and any existing Gmail labels. Synthesize the core intent or required action.
+   - You have been provided with the task notes, the first and last message of the email thread (if applicable), and any existing Gmail labels. Synthesize only the *additional* core intent or required action.
 2. "proposedCategory": A proposed category strictly based on the FULL LOS Taxonomy provided below.
    - Choose the MOST SPECIFIC fitting category (e.g., an L4 context or L3 category).
    - IMPORTANT: Heavily weigh any provided "emailLabels" when determining the category, as they often directly map to an LOS category.
+3. "proposedTitle": A proposed, fully-formatted task title.
+   - You MUST strictly apply the format: \`[LOS Code] [Context ID] > [Action Verb] [Object]\`
+   - Example: \`01 04 02 House > Pay the monthly electricity bill\`
+   - Use the FULL LOS TAXONOMY to identify the deepest, most accurate \`[LOS Code] [Context ID]\` (especially L4 projects if applicable).
+   - Ensure the pure task component begins with a strong Action Verb (e.g., Review, Draft, Call, Buy).
+   - If the original title already PERFECTLY matches this \`[LOS Code] [Context ID] > [Action Verb] [Object]\` syntax, return an empty string ("").
+
+=== EXISTING TASK NAMING CONVENTIONS ===
+${existingTaskContext}
+========================================
 
 === FULL LOS TAXONOMY ===
 ${taxonomy}
@@ -327,12 +384,12 @@ Respond STRICTLY in valid JSON format as an array of objects matching the input 
   {
     "id": "...",
     "emailSummary": "...",
-    "proposedCategory": "..."
+    "proposedCategory": "...",
+    "proposedTitle": "..."
   }
 ]`;
   // ==========================================
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
   const payload = {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: { responseMimeType: "application/json" }
@@ -432,11 +489,14 @@ function syncRevisionsToTasks() {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const data = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
 
+  const taskListIdx = headers.indexOf("Task List");
+  const taskListRevIdx = headers.indexOf("Task List (Revised)");
   const titleIdx = headers.indexOf("Task Title");
   const titleRevIdx = headers.indexOf("Task (Revised)");
   const notesIdx = headers.indexOf("Notes");
   const notesRevIdx = headers.indexOf("Notes (Revised)");
   const statusIdx = headers.indexOf("Status");
+  const statusRevIdx = headers.indexOf("Status (Revised)");
   const dateIdx = headers.indexOf("Date");
   const deadlineRevIdx = headers.indexOf("Deadline (Revised)");
   const taskIdIdx = headers.indexOf("Task ID");
@@ -448,23 +508,42 @@ function syncRevisionsToTasks() {
     return;
   }
 
+  // Fetch all task lists to map names to IDs for potential list migration
+  const allTaskLists = fetchTaskLists() || [];
+  const listNameToIdMap = {};
+  allTaskLists.forEach(l => listNameToIdMap[l.title.toLowerCase()] = l.id);
+
   let updateCount = 0;
 
   data.forEach((row, i) => {
-    const taskId = row[taskIdIdx];
-    const taskListId = row[taskListIdIdx];
+    let taskId = row[taskIdIdx];
+    let taskListId = row[taskListIdIdx];
     
     if (!taskId || !taskListId) return;
 
     let hasUpdates = false;
+    let listMigrated = false;
+    let newTaskListId = taskListId;
+    
     const resource = {};
 
     const newTitle = row[titleRevIdx];
     const newNotes = row[notesRevIdx];
     const newDeadline = row[deadlineRevIdx];
+    const newTaskListTitle = row[taskListRevIdx];
     const currentStatus = row[statusIdx];
+    const revisedStatus = row[statusRevIdx];
     const originalStatus = row[originalStatusIdx];
     
+    if (newTaskListTitle && newTaskListTitle.toString().trim() !== "") {
+      const targetListId = listNameToIdMap[newTaskListTitle.toString().toLowerCase().trim()];
+      if (targetListId && targetListId !== taskListId) {
+        newTaskListId = targetListId;
+        hasUpdates = true;
+        listMigrated = true;
+      }
+    }
+
     if (newTitle && newTitle.toString().trim() !== "") {
       resource.title = newTitle;
       hasUpdates = true;
@@ -483,35 +562,104 @@ function syncRevisionsToTasks() {
       }
     }
 
-    if (currentStatus !== originalStatus && (currentStatus === "completed" || currentStatus === "needsAction")) {
-      resource.status = currentStatus;
+    let effectiveStatus = currentStatus;
+    if (revisedStatus && revisedStatus.toString().trim() !== "") {
+      const parsedStatus = revisedStatus.toString().trim().toLowerCase();
+      if (parsedStatus === "completed" || parsedStatus === "done" || parsedStatus === "x") {
+        effectiveStatus = "completed";
+      } else if (parsedStatus === "needsaction" || parsedStatus === "todo" || parsedStatus === "open") {
+        effectiveStatus = "needsAction";
+      }
+    }
+
+    if (effectiveStatus !== originalStatus && (effectiveStatus === "completed" || effectiveStatus === "needsAction")) {
+      resource.status = effectiveStatus;
       hasUpdates = true;
     }
 
     if (hasUpdates) {
       try {
-        Tasks.Tasks.patch(resource, taskListId, taskId);
-        
         const rowNum = i + 2;
-        
-        // Mark as synced by clearing the revised columns
-        if (newTitle) sheet.getRange(rowNum, titleRevIdx + 1).clearContent();
-        if (newNotes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
-        if (newDeadline) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
-        
-        // Update the original data columns to reflect the new state
-        if (newTitle) sheet.getRange(rowNum, titleIdx + 1).setValue(newTitle);
-        if (newNotes) sheet.getRange(rowNum, notesIdx + 1).setValue(newNotes);
-        if (newDeadline) sheet.getRange(rowNum, dateIdx + 1).setValue(newDeadline);
-        
-        // Update the original status column if status was changed
-        if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+
+        if (listMigrated) {
+          const oldTask = Tasks.Tasks.get(taskListId, taskId);
+          
+          if (oldTask.links && oldTask.links.length > 0) {
+            console.log(`Task ${taskId} contains native links. Skipping list migration to protect links.`);
+            // Fallback to normal in-place patch to preserve the links
+            Tasks.Tasks.patch(resource, taskListId, taskId);
+            
+            // Clear revised columns
+            if (newTitle) sheet.getRange(rowNum, titleRevIdx + 1).clearContent();
+            if (newNotes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
+            if (newDeadline) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
+            // Clear the task list revised column since we rejected the move
+            sheet.getRange(rowNum, taskListRevIdx + 1).clearContent();
+            
+            if (resource.title) sheet.getRange(rowNum, titleIdx + 1).setValue(resource.title);
+            if (resource.notes) sheet.getRange(rowNum, notesIdx + 1).setValue(resource.notes);
+            if (resource.due) sheet.getRange(rowNum, dateIdx + 1).setValue(resource.due);
+            if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+            
+            if (resource.title) sheet.getRange(rowNum, titleRevIdx + 1).clearContent();
+            if (resource.notes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
+            if (resource.due) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
+            if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
+          } else {
+            // Safe to migrate (no links to destroy)
+            if (resource.title) oldTask.title = resource.title;
+            if (resource.notes) oldTask.notes = resource.notes;
+            if (resource.due) oldTask.due = resource.due;
+            if (resource.status) oldTask.status = resource.status;
+            
+            delete oldTask.id;
+            delete oldTask.etag;
+            delete oldTask.position;
+            delete oldTask.updated;
+
+            const migratedTask = Tasks.Tasks.insert(oldTask, newTaskListId);
+            Tasks.Tasks.remove(taskListId, taskId);
+            
+            sheet.getRange(rowNum, taskIdIdx + 1).setValue(migratedTask.id);
+            sheet.getRange(rowNum, taskListIdIdx + 1).setValue(newTaskListId);
+            
+            const actualNewListTitle = allTaskLists.find(l => l.id === newTaskListId)?.title || newTaskListTitle;
+            sheet.getRange(rowNum, taskListIdx + 1).setValue(actualNewListTitle);
+            sheet.getRange(rowNum, taskListRevIdx + 1).clearContent();
+            
+            if (resource.title) sheet.getRange(rowNum, titleIdx + 1).setValue(resource.title);
+            if (resource.notes) sheet.getRange(rowNum, notesIdx + 1).setValue(resource.notes);
+            if (resource.due) sheet.getRange(rowNum, dateIdx + 1).setValue(resource.due);
+            if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+            
+            if (resource.title) sheet.getRange(rowNum, titleRevIdx + 1).clearContent();
+            if (resource.notes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
+            if (resource.due) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
+            if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
+          }
+        } else {
+          // Normal in-place patch
+          Tasks.Tasks.patch(resource, taskListId, taskId);
+          
+          // Mark as synced by clearing the revised columns
+          if (newTitle) sheet.getRange(rowNum, titleRevIdx + 1).clearContent();
+          if (newNotes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
+          if (newDeadline) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
+          if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
+          
+          // Update the original data columns to reflect the new state
+          if (newTitle) sheet.getRange(rowNum, titleIdx + 1).setValue(newTitle);
+          if (newNotes) sheet.getRange(rowNum, notesIdx + 1).setValue(newNotes);
+          if (newDeadline) sheet.getRange(rowNum, dateIdx + 1).setValue(newDeadline);
+          
+          // Update the original status column if status was changed
+          if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+        }
 
         updateCount++;
-        // Small delay to avoid Tasks API rate limits during bulk updates
         Utilities.sleep(100); 
       } catch (e) {
-        console.error(`Failed to patch task ${taskId}: ${e.message}`);
+        console.error(`Failed to sync task ${taskId}: ${e.message}`);
       }
     }
   });

@@ -1,0 +1,23 @@
+2026/04/29-16:25:55.297 7ef2e9 Reusing MANIFEST /Users/daniel/Documents/Code/the_system/.wwebjs_auth/session-TS_whatsapp_session/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/04/29-16:25:55.297 7ef2e9 Recovering log #241
+2026/04/29-16:25:55.319 7ef2e9 Reusing old log /Users/daniel/Documents/Code/the_system/.wwebjs_auth/session-TS_whatsapp_session/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000241.log 
+2026/04/29-16:25:57.728 7ef2f7 Level-0 table #254: started
+2026/04/29-16:25:57.744 7ef2f7 Level-0 table #254: 1066774 bytes OK
+2026/04/29-16:25:57.744 7ef2f7 Delete type=0 #241
+2026/04/29-16:25:57.749 7ef2eb Compacting 1@1 + 6@2 files
+2026/04/29-16:25:57.785 7ef2eb Generated table #255@1: 70290 keys, 2238370 bytes
+2026/04/29-16:25:57.800 7ef2eb Generated table #256@1: 7713 keys, 2154036 bytes
+2026/04/29-16:25:57.814 7ef2eb Generated table #257@1: 2848 keys, 2146021 bytes
+2026/04/29-16:25:57.832 7ef2eb Generated table #258@1: 10042 keys, 2160829 bytes
+2026/04/29-16:25:57.864 7ef2eb Generated table #259@1: 28614 keys, 2254381 bytes
+2026/04/29-16:25:57.882 7ef2eb Generated table #260@1: 7829 keys, 2131751 bytes
+2026/04/29-16:25:57.884 7ef2eb Generated table #261@1: 215 keys, 68250 bytes
+2026/04/29-16:25:57.884 7ef2eb Compacted 1@1 + 6@2 files => 13153638 bytes
+2026/04/29-16:25:57.884 7ef2eb compacted to: files[ 0 0 10 0 0 0 0 ]
+2026/04/29-16:25:57.884 7ef2eb Delete type=2 #248
+2026/04/29-16:25:57.884 7ef2eb Delete type=2 #254
+2026/04/29-16:25:57.884 7ef2eb Delete type=2 #243
+2026/04/29-16:25:57.884 7ef2eb Delete type=2 #247
+2026/04/29-16:25:57.884 7ef2eb Delete type=2 #246
+2026/04/29-16:25:57.884 7ef2eb Delete type=2 #244
+2026/04/29-16:25:57.884 7ef2eb Delete type=2 #245

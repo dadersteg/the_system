@@ -28,26 +28,32 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 
 ### Phase B: Google Tasks Reconciliation MVP (Parallel Workstream) [📍 CURRENT PHASE]
 *Frontloading the ability to review, edit, and categorize existing tasks while the rest of the system is built.*
-*   **[ ] Task B.1:** Refactor `Code_Tasks.js` into production-ready code (clean architecture, strict commenting, error handling).
-*   **[ ] Task B.2:** Build a bi-directional spreadsheet sync (Export Google Tasks to Sheets, and Ingest manual Sheet edits back into Google Tasks).
-*   **[ ] Task B.3:** Integrate the Gemini API to automatically summarize any emails linked to the tasks.
-*   **[ ] Task B.4:** Integrate the Gemini API to autonomously categorize the tasks within the spreadsheet.
+*   **[x] Task B.1:** Refactor `Code_Tasks.js` into production-ready code (clean architecture, strict commenting, error handling).
+*   **[x] Task B.2:** Build a bi-directional spreadsheet sync (Export Google Tasks to Sheets, and Ingest manual Sheet edits back into Google Tasks).
+*   **[x] Task B.3:** Integrate the Gemini API to automatically summarize any emails linked to the tasks.
+*   **[x] Task B.4:** Integrate the Gemini API to autonomously categorize the tasks within the spreadsheet.
+*   **[ ] Task B.5:** Timeboxing MVP: Add functionality to the sync that allows assigning an "Estimated Duration" to a task in the spreadsheet and automatically creating a corresponding Calendar Event block.
 
 ### Phase C: Set Up the Funnel (Data Ingestion)
 *Ensuring all incoming data ends up in one place.*
-*   **[ ] Task C.1:** Build the functionality to capture external messages (WhatsApp, SMS, Telegram) and route them into the system (e.g., into Gmail or Google Tasks).
-*   **[ ] Task C.2:** Guarantee all incoming "noise" is funneled into a single triage gateway ready for The Clerk to process.
+*   **[x] Task C.1:** Build the functionality to capture external messages (WhatsApp, SMS, Telegram) and route them into the system (e.g., into Gmail or Google Tasks).
+*   **[x] Task C.2:** Guarantee all incoming "noise" is funneled into a single triage gateway ready for The Clerk to process.
+*   **[ ] Task C.3:** Information Curation (Daily Brief): Develop a scalable, scheduled AI pipeline (e.g., fetching specific RSS feeds) to ingest high-volume information and synthesize it into a tailored, single "Morning Briefing" email to prevent triage fatigue.
 
 ### Phase D: Task Analysis & Synthesis (The Doer)
 *Extracting the signal from the noise (High Priority).*
-*   **[ ] Task D.1:** Automate the analysis/synthesis of the data funnel to proactively identify action items.
-*   **[ ] Task D.2:** Handle Google Tasks integration: Build the pipeline where Task Master proposes actions and reliably pushes the approved items into the Google Tasks API.
-
+*   **[ ] Task D.1:** Incoming Triage (The Clerk): Automate The Clerk to actively categorize, label, and intelligently rename all *new* incoming emails and files to match the LOS Taxonomy.
+*   **[ ] Task D.2:** Historical Backfill Audit: Build a slow-burn background script to retroactively scan, label, and rename the existing bloated inbox and Drive files to align with the new taxonomy without hitting API rate limits.
+*   **[ ] Task D.3:** Action Identification: Automate the analysis of the categorized data funnel to proactively identify and extract action items.
+*   **[ ] Task D.4:** Handle Google Tasks integration: Build the pipeline where Task Master proposes actions and reliably pushes the approved items into the Google Tasks API.
+*   **[ ] Task D.5:** Capacity Context (Calendar): Build a pipeline allowing Task Master to read upcoming Calendar events to calculate "Free Capacity" before assigning tasks to prevent over-scheduling.
+*   **[ ] Task D.6:** Continuous Inbox Pruning: Create an automated maintenance routine to actively identify and delete old, irrelevant emails (e.g., expired 2FA codes, old calendar updates) to maintain inbox health.
 ### Phase E: Reflection & Auditing
 *Semi-automating the strategic review cycle.*
 *   **[ ] Task E.1:** Build the Vantage Extraction Pipeline to read receipts/stats and produce the "Performance Audit Table."
 *   **[ ] Task E.2:** Semi-automate the reflection process using Atlas to cross-reference the Audit Table with your subjective journaling to ensure alignment with your goals.
-
+*   **[ ] Task E.3:** Time Auditing (Calendar): Develop a script to extract historical Calendar events, calculate total hours spent per "Category" (based on LOS Taxonomy), and feed this objective data into the Vantage Audit.
+*   **[ ] Task E.4:** Taxonomy Maintenance: Automate a periodic review where the System Architect scans recent Google Drive files and Google Tasks to identify emerging categories, deprecate finished projects, and propose updates to `TS - Categorisation.md`.
 ### Phase F: Autonomous Execution
 *Moving beyond management to actual "doing."*
 *   **[ ] Task F.1:** Automate the actual task execution. Develop an agent that can actively work through Google Tasks and perform the physical/digital work required, rather than just organizing it.
