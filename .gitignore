@@ -7,3 +7,10 @@ System_Taxonomy_Export_*.md
 .env
 *.session
 __pycache__/
+
+# whatsapp-web.js
+.wwebjs_auth/
+.wwebjs_cache/
+
+# Scratch folder
+scratch/
