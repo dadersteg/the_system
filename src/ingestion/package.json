@@ -1,0 +1,30 @@
+{
+  "name": "the_system",
+  "version": "1.0.0",
+  "description": "\"The System\" is an AI-powered Executive Suite functioning as a comprehensive \"Second Brain.\" Its primary goal is to unburden the mind by managing the administrative friction of daily life—triage, file categorization, task processing, and reflective planning. By handling the noise, The System allows the user to focus purely on meaningful execution and strategic growth.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dadersteg/the_system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dadersteg/the_system/issues"
+  },
+  "homepage": "https://github.com/dadersteg/the_system#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "nodemailer": "^8.0.7",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.34.7"
+  }
+}
