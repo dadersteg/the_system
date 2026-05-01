@@ -1022,7 +1022,7 @@ function syncRevisionsToTasks() {
  * @param {any[][]} results The rows containing extracted task data
  */
 function exportTasksToMarkdownDrive(results) {
-  const TARGET_FOLDER_ID = PropertiesService.getScriptProperties().getProperty("DRIVE_ROOT_FOLDER_ID");
+  const TARGET_FOLDER_ID = PropertiesService.getScriptProperties().getProperty("WORKSPACE_FOLDER_ID");
   const fileName = "Google Tasks.md";
   
   let mdContent = `# Google Tasks\n\n`;
