@@ -257,7 +257,8 @@ function getExistingTasksForLinks(ss, links) {
   }
 
   // 2. Read Completed Tasks from "Completed Tasks" log
-  const completedSheet = ss.getSheetByName("Completed Tasks");
+  const COMPLETED_LOG_GID = "1559346038";
+  const completedSheet = ss.getSheets().find(s => s.getSheetId().toString() === COMPLETED_LOG_GID);
   if (completedSheet) {
     const data = completedSheet.getDataRange().getValues();
     if (data.length > 1) {
