@@ -1110,7 +1110,6 @@ function syncCompletedTasksLog() {
   
   taskLists.forEach(list => {
     let pageToken = null;
-    let hasCompletedTasks = false;
     do {
       try {
         const response = Tasks.Tasks.list(list.id, {
@@ -1123,7 +1122,6 @@ function syncCompletedTasksLog() {
         if (response.items) {
           response.items.forEach(task => {
             if (task.status === "completed") {
-              hasCompletedTasks = true;
               // Log to spreadsheet if it hasn't been logged yet
               if (!existingIds.has(task.id)) {
                 let link = "";
@@ -1139,6 +1137,14 @@ function syncCompletedTasksLog() {
                 existingIds.add(task.id);
                 addedCount++;
               }
+              
+              // Hard wipe the task from the Google Tasks backend
+              try {
+                Tasks.Tasks.remove(list.id, task.id);
+                Utilities.sleep(150); // Rate-limit protection
+              } catch (e) {
+                console.error(`Failed to wipe completed task ${task.id}: ${e.message}`);
+              }
             }
           });
         }
@@ -1148,17 +1154,6 @@ function syncCompletedTasksLog() {
         pageToken = null;
       }
     } while (pageToken);
-    
-    // Batch wipe all completed tasks from the Google Tasks UI for this list
-    if (hasCompletedTasks) {
-      try {
-        Tasks.Tasks.clear(list.id);
-        console.log(`Cleared UI for completed tasks in list: ${list.title}`);
-        Utilities.sleep(500); // Rate limit protection between lists
-      } catch (e) {
-        console.error(`Failed to clear completed tasks for list ${list.title}: ${e.message}`);
-      }
-    }
   });
   
   console.log(`Synced ${addedCount} new completed tasks to the log.`);
