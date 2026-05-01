@@ -176,7 +176,7 @@ function extractTasksWithConversationDetails() {
       };
     });
 
-    console.log(`Sending batch ${Math.floor(i / CONFIG.geminiBatchSize) + 1} of ${Math.ceil(allTasksToExport.length / CONFIG.geminiBatchSize)} to Gemini...`);
+    console.log(`Sending batch ${Math.floor(i / CONFIG.geminiBatchSize) + 1} of ${Math.ceil(newTasksForGemini.length / CONFIG.geminiBatchSize)} to Gemini...`);
     const batchResults = batchAnalyzeTasksWithGemini(geminiInputBatch, existingTaskContext);
     Object.assign(aiResultsMap, batchResults);
   }
