@@ -961,7 +961,10 @@ function syncRevisionsToTasks() {
           if (resource.title) sheet.getRange(rowNum, titleIdx + 1).setValue(resource.title);
           if (resource.notes) sheet.getRange(rowNum, notesIdx + 1).setValue(resource.notes);
           if (resource.due) sheet.getRange(rowNum, dateIdx + 1).setValue(resource.due);
-          if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+          if (resource.status) {
+            sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+            sheet.getRange(rowNum, statusIdx + 1).setValue(resource.status);
+          }
           
           if (resource.title) {
             if (losCodeRevIdx !== -1) sheet.getRange(rowNum, losCodeRevIdx + 1).clearContent();
@@ -993,7 +996,10 @@ function syncRevisionsToTasks() {
           if (newDeadline) sheet.getRange(rowNum, dateIdx + 1).setValue(newDeadline);
           
           // Update the original status column if status was changed
-          if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+          if (resource.status) {
+            sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+            sheet.getRange(rowNum, statusIdx + 1).setValue(resource.status);
+          }
           
           const currentTitle = resource.title || originalTitle;
           console.log(`[SUCCESS] Patched task ID: ${taskId} | Title: "${currentTitle}" | In place.`);
