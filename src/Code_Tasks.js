@@ -1117,19 +1117,30 @@ function syncCompletedTasksLog() {
         
         if (response.items) {
           response.items.forEach(task => {
-            if (task.status === "completed" && !existingIds.has(task.id)) {
-              let link = "";
-              if (task.links) {
-                const emailLinkObj = task.links.find(l => l.type === "email");
-                if (emailLinkObj) link = emailLinkObj.link;
-              } else if (task.notes) {
-                const match = task.notes.match(/https?:\/\/[^\s]+/);
-                if (match) link = match[0];
+            if (task.status === "completed") {
+              // Log to spreadsheet if it hasn't been logged yet
+              if (!existingIds.has(task.id)) {
+                let link = "";
+                if (task.links) {
+                  const emailLinkObj = task.links.find(l => l.type === "email");
+                  if (emailLinkObj) link = emailLinkObj.link;
+                } else if (task.notes) {
+                  const match = task.notes.match(/https?:\/\/[^\s]+/);
+                  if (match) link = match[0];
+                }
+                
+                completedSheet.appendRow([task.id, task.title, task.notes || "", link, task.completed || task.updated]);
+                existingIds.add(task.id);
+                addedCount++;
               }
               
-              completedSheet.appendRow([task.id, task.title, task.notes || "", link, task.completed || task.updated]);
-              existingIds.add(task.id);
-              addedCount++;
+              // Wipe the task from the Google Tasks Front-End
+              try {
+                Tasks.Tasks.remove(list.id, task.id);
+                Utilities.sleep(100); // Rate-limit protection
+              } catch (e) {
+                console.error(`Failed to wipe completed task ${task.id}: ${e.message}`);
+              }
             }
           });
         }
