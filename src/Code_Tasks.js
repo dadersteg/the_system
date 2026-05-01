@@ -866,12 +866,14 @@ function syncRevisionsToTasks() {
       }
     }
 
-    if (newTitle && newTitle.toString().trim() !== "") {
+    const originalTitle = row[titleIdx] ? row[titleIdx].toString().trim() : "";
+    if (newTitle && newTitle.toString().trim() !== "" && newTitle.toString().trim() !== originalTitle) {
       resource.title = newTitle;
       hasUpdates = true;
     }
     
-    if (newNotes && newNotes.toString().trim() !== "") {
+    const originalNotes = row[notesIdx] ? row[notesIdx].toString().trim() : "";
+    if (newNotes && newNotes.toString().trim() !== "" && newNotes.toString().trim() !== originalNotes) {
       resource.notes = newNotes;
       hasUpdates = true;
     }
@@ -879,8 +881,17 @@ function syncRevisionsToTasks() {
     if (newDeadline && newDeadline.toString().trim() !== "") {
       const parsedDate = new Date(newDeadline);
       if (!isNaN(parsedDate.getTime())) {
-        resource.due = parsedDate.toISOString();
-        hasUpdates = true;
+        const newDueIso = parsedDate.toISOString();
+        const oldDueIso = row[dateIdx] ? new Date(row[dateIdx]).toISOString() : "";
+        
+        // Strip time portion to compare just the YYYY-MM-DD since tasks API only cares about the date
+        const newDueStr = newDueIso.substring(0, 10);
+        const oldDueStr = oldDueIso ? oldDueIso.substring(0, 10) : "";
+        
+        if (newDueStr !== oldDueStr) {
+          resource.due = newDueIso;
+          hasUpdates = true;
+        }
       }
     }
 
