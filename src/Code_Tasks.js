@@ -970,8 +970,9 @@ function syncRevisionsToTasks() {
           if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
           
           const currentTitle = resource.title || originalTitle;
-          console.log(`[SUCCESS] Migrated task ID: ${taskId} | Title: "${currentTitle}" | To list: '${actualNewListTitle}'`);
-          if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Migrated to '${actualNewListTitle}' successfully.`);
+          const statusStr = resource.status ? ` | Status: ${resource.status}` : "";
+          console.log(`[SUCCESS] Migrated task ID: ${taskId} | Title: "${currentTitle}"${statusStr} | To list: '${actualNewListTitle}'`);
+          if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Migrated to '${actualNewListTitle}' successfully.${statusStr}`);
         } else {
            // Normal in-place patch
           executeWithRetry(() => Tasks.Tasks.patch(resource, taskListId, taskId));
@@ -997,8 +998,9 @@ function syncRevisionsToTasks() {
           }
           
           const currentTitle = resource.title || originalTitle;
-          console.log(`[SUCCESS] Patched task ID: ${taskId} | Title: "${currentTitle}" | In place.`);
-          if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Synced changes successfully.`);
+          const statusStr = resource.status ? ` | Status: ${resource.status}` : "";
+          console.log(`[SUCCESS] Patched task ID: ${taskId} | Title: "${currentTitle}"${statusStr} | In place.`);
+          if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Synced changes successfully.${statusStr}`);
         }
 
         updateCount++;
