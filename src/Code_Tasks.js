@@ -595,9 +595,8 @@ function batchAnalyzeTasksWithGemini(tasksBatch, existingTaskContext = "") {
 1. "emailSummary": Deliver a concise summary (MAXIMUM 200 characters). 
    - Follow the Pyramid Principle and BLUF (Bottom Line Up Front).
    - Get straight to the point. DO NOT use filler words like "The task is about" or "This email is...".
-   - You have been provided with the task notes, the first and last message of the email thread (if applicable), and any existing Gmail labels. Synthesize only the *additional* core intent or required action.
    - If the task originated from an email, summarize the email context.
-   - If the task did NOT originate from an email (manually created), analyze the original task title and notes. If they contain specific context (like dates, instructions, or raw braindump text) that might be lost when you standardize the 'proposedActionTitle', you MUST extract that context and put it here.
+   - If the task did NOT originate from an email (manually created), synthesize a high-value summary of the original task title and notes. Do not just copy and paste the raw text. Intelligently structure any dates, specific instructions, or context that might be lost from the title standardization so it actively ADDS clarity and actionable information to the task.
 2. "proposedCategory": A proposed category strictly based on the FULL LOS Taxonomy provided below.
    - Choose the MOST SPECIFIC fitting category (e.g., an L4 context or L3 category).
    - IMPORTANT: Heavily weigh any provided "emailLabels" when determining the category.
@@ -1145,8 +1144,8 @@ function syncCompletedTasksLog() {
               
               // Hard wipe the task from the Google Tasks backend
               try {
-                Tasks.Tasks.remove(list.id, task.id);
-                Utilities.sleep(150); // Rate-limit protection
+                executeWithRetry(() => Tasks.Tasks.remove(list.id, task.id));
+                Utilities.sleep(500); // Rate-limit protection to avoid hitting quota
               } catch (e) {
                 console.error(`Failed to wipe completed task ${task.id}: ${e.message}`);
               }
