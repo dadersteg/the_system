@@ -604,8 +604,8 @@ function batchAnalyzeTasksWithGemini(tasksBatch, existingTaskContext = "") {
    - You MUST strictly apply the format: \`[Action Verb] [Object]\`
    - Example 1: \`Pay the monthly electricity bill\`
    - Example 2: \`Book flights for Liverpool FC match\`
-   - You MUST invent a strong Action Verb (e.g., Review, Read, Pay, Process) for the task if one is missing from the original title. Do NOT just append the raw subject.
-   - STRICT NO-JUNK RULE: If the task/email describes an automated notification, 2FA code, receipt, direct debit notice, or standard delivery update, you MUST return "N/A" for the action title unless it explicitly requires human intervention (e.g., a payment failed or explicitly asks for a reply).
+   - You MUST invent a strong Action Verb (e.g., Review, Read, Pay, Process, Track) for the task if one is missing from the original title. Do NOT just append the raw subject.
+   - THE JUNK VS TRACKING RULE: Do NOT put pure junk (2FA codes, login alerts, spam) in the same bracket as important transactional data. Pure junk must NEVER generate an action title; return "N/A" for pure junk. However, important events like high-value deliveries or incoming bills SHOULD be extracted as passive tracking items (e.g., "Track: Delivery of MacBook expected on Tuesday" or "Reference: Electricity bill due on 15th").
    - You MUST generate this field. Do NOT return an empty string.`;
   }
 
