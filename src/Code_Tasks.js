@@ -1095,11 +1095,6 @@ function syncCompletedTasksLog() {
   const taskLists = fetchTaskLists();
   if (!taskLists) return;
   
-  // Fetch tasks updated in the last 7 days to catch any native completions
-  const updatedMinDate = new Date();
-  updatedMinDate.setDate(updatedMinDate.getDate() - 7);
-  const updatedMin = updatedMinDate.toISOString();
-  
   let addedCount = 0;
   
   taskLists.forEach(list => {
@@ -1109,7 +1104,6 @@ function syncCompletedTasksLog() {
         const response = Tasks.Tasks.list(list.id, {
           showCompleted: true,
           showHidden: true,
-          updatedMin: updatedMin,
           maxResults: 100,
           pageToken: pageToken
         });
