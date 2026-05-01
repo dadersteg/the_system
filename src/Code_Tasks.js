@@ -213,6 +213,25 @@ function extractTasksWithConversationDetails() {
       deadlineRevised = existing.deadlineRevised || "";
     }
 
+    // Ensure all tasks, including manually created ones, have the correct D.13 metadata structure
+    let currentNotes = notesRevised ? notesRevised : (task.notes || "");
+    if (!currentNotes.includes("[DEADLINE:")) {
+      const deadline = formattedDate || "None";
+      const metaBlock = `[DEADLINE: ${deadline}] | [DURATION: N/A] | [GOAL: TBD]`;
+      
+      const linkMatch = currentNotes.match(/https?:\/\/[^\s]+/);
+      let link = "";
+      if (linkMatch) {
+         link = linkMatch[0];
+         currentNotes = currentNotes.replace(link, "").trim();
+      }
+      
+      const summary = currentNotes.trim();
+      notesRevised = `${summary}\n\n${metaBlock}\n\n${link}`.trim();
+    } else {
+      notesRevised = currentNotes;
+    }
+
     // Attempt to validate the current title against the taxonomy sheet
     let isLOSValid = false;
     let systemComment = "";
@@ -586,6 +605,7 @@ function batchAnalyzeTasksWithGemini(tasksBatch, existingTaskContext = "") {
    - Example 1: \`Pay the monthly electricity bill\`
    - Example 2: \`Book flights for Liverpool FC match\`
    - You MUST invent a strong Action Verb (e.g., Review, Read, Pay, Process) for the task if one is missing from the original title. Do NOT just append the raw subject.
+   - STRICT NO-JUNK RULE: If the task/email describes an automated notification, 2FA code, receipt, direct debit notice, or standard delivery update, you MUST return "N/A" for the action title unless it explicitly requires human intervention (e.g., a payment failed or explicitly asks for a reply).
    - You MUST generate this field. Do NOT return an empty string.`;
   }
 
@@ -1050,4 +1070,76 @@ function exportTasksToMarkdownDrive(results) {
   } catch (e) {
     console.error("Failed to save Markdown to Drive: " + e.message);
   }
+}
+
+/**
+ * Maintains a persistent log of completed tasks in a separate sheet.
+ * This ensures that the Harmonizer knows about completed tasks and doesn't re-add them.
+ */
+function syncCompletedTasksLog() {
+  const ss = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  let completedSheet = ss.getSheetByName("Completed Tasks");
+  
+  if (!completedSheet) {
+    completedSheet = ss.insertSheet("Completed Tasks");
+    completedSheet.appendRow(["Task ID", "Task Title", "Notes", "Email Link", "Completed Date"]);
+    completedSheet.getRange("A1:E1").setFontWeight("bold");
+    completedSheet.setFrozenRows(1);
+  }
+  
+  const existingData = completedSheet.getDataRange().getValues();
+  const existingIds = new Set();
+  for (let i = 1; i < existingData.length; i++) {
+    existingIds.add(existingData[i][0]);
+  }
+  
+  const taskLists = fetchTaskLists();
+  if (!taskLists) return;
+  
+  // Fetch tasks updated in the last 7 days to catch any native completions
+  const updatedMinDate = new Date();
+  updatedMinDate.setDate(updatedMinDate.getDate() - 7);
+  const updatedMin = updatedMinDate.toISOString();
+  
+  let addedCount = 0;
+  
+  taskLists.forEach(list => {
+    let pageToken = null;
+    do {
+      try {
+        const response = Tasks.Tasks.list(list.id, {
+          showCompleted: true,
+          showHidden: true,
+          updatedMin: updatedMin,
+          maxResults: 100,
+          pageToken: pageToken
+        });
+        
+        if (response.items) {
+          response.items.forEach(task => {
+            if (task.status === "completed" && !existingIds.has(task.id)) {
+              let link = "";
+              if (task.links) {
+                const emailLinkObj = task.links.find(l => l.type === "email");
+                if (emailLinkObj) link = emailLinkObj.link;
+              } else if (task.notes) {
+                const match = task.notes.match(/https?:\/\/[^\s]+/);
+                if (match) link = match[0];
+              }
+              
+              completedSheet.appendRow([task.id, task.title, task.notes || "", link, task.completed || task.updated]);
+              existingIds.add(task.id);
+              addedCount++;
+            }
+          });
+        }
+        pageToken = response.nextPageToken;
+      } catch(e) {
+        console.error(`Failed to fetch completed tasks for list ${list.title}: ${e.message}`);
+        pageToken = null;
+      }
+    } while (pageToken);
+  });
+  
+  console.log(`Synced ${addedCount} new completed tasks to the log.`);
 }

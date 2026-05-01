@@ -227,34 +227,60 @@ function getExistingTasksForLinks(ss, links) {
   const map = {};
   links.forEach(l => map[l] = []);
   
+  // 1. Read Active Tasks from TM - Email and Tasks
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === PIPELINE_CONFIG.tasksDatabaseGid);
-  if (!sheet) return map;
-  
-  const data = sheet.getDataRange().getValues();
-  if (data.length <= 2) return map;
-  
-  const headers = data[0]; 
-  const linkIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "email link");
-  const titleIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "task title");
-  const statusIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "status");
-  const catIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "los code (revised)");
-  
-  if (linkIdx === -1) return map;
-  
-  for (let i = 2; i < data.length; i++) {
-    const row = data[i];
-    const rowLink = row[linkIdx];
-    if (rowLink && map[rowLink] !== undefined) {
-      const status = row[statusIdx].toString().toLowerCase();
-      // Only care about active tasks for deduplication
-      if (status !== 'completed' && status !== 'done' && status !== 'x') {
-        map[rowLink].push({
-          title: row[titleIdx],
-          category: row[catIdx]
-        });
+  if (sheet) {
+    const data = sheet.getDataRange().getValues();
+    if (data.length > 2) {
+      const headers = data[0]; 
+      const linkIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "email link");
+      const titleIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "task title");
+      const statusIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "status");
+      const catIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "los code (revised)");
+      
+      if (linkIdx !== -1) {
+        for (let i = 2; i < data.length; i++) {
+          const row = data[i];
+          const rowLink = row[linkIdx];
+          if (rowLink && map[rowLink] !== undefined) {
+            const status = row[statusIdx].toString().toLowerCase();
+            if (status !== 'completed' && status !== 'done' && status !== 'x') {
+              map[rowLink].push({
+                title: row[titleIdx],
+                category: row[catIdx]
+              });
+            }
+          }
+        }
       }
     }
   }
+
+  // 2. Read Completed Tasks from "Completed Tasks" log
+  const completedSheet = ss.getSheetByName("Completed Tasks");
+  if (completedSheet) {
+    const data = completedSheet.getDataRange().getValues();
+    if (data.length > 1) {
+      const headers = data[0];
+      const linkIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "email link");
+      const titleIdx = headers.findIndex(h => h.toString().trim().toLowerCase() === "task title");
+      
+      if (linkIdx !== -1) {
+        for (let i = 1; i < data.length; i++) {
+          const row = data[i];
+          const rowLink = row[linkIdx];
+          if (rowLink && map[rowLink] !== undefined) {
+            // Include it so the Harmonizer knows it's already done
+            map[rowLink].push({
+              title: "[ALREADY COMPLETED] " + row[titleIdx],
+              category: "N/A"
+            });
+          }
+        }
+      }
+    }
+  }
+
   return map;
 }
 
