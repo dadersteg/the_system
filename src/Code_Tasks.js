@@ -824,6 +824,7 @@ function syncRevisionsToTasks() {
   const taskIdIdx = headers.indexOf("Task ID");
   const taskListIdIdx = headers.indexOf("Task List ID");
   const originalStatusIdx = headers.indexOf("Original Status");
+  const sysCommentIdx = headers.indexOf("System Comment");
 
   if (taskIdIdx === -1 || taskListIdIdx === -1) {
     console.error("Task ID or Task List ID columns missing. Cannot sync.");
@@ -969,8 +970,11 @@ function syncRevisionsToTasks() {
           if (resource.notes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
           if (resource.due) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
           if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
+          
+          console.log(`[SUCCESS] Migrated task ${taskId} to list '${actualNewListTitle}'`);
+          if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Migrated to '${actualNewListTitle}' successfully.`);
         } else {
-          // Normal in-place patch
+           // Normal in-place patch
           executeWithRetry(() => Tasks.Tasks.patch(resource, taskListId, taskId));
           
           // Mark as synced by clearing the revised columns (but keep the user formula in Task (Revised) alone)
@@ -989,12 +993,16 @@ function syncRevisionsToTasks() {
           
           // Update the original status column if status was changed
           if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+          
+          console.log(`[SUCCESS] Patched task ${taskId} in place.`);
+          if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Synced changes successfully.`);
         }
 
         updateCount++;
         Utilities.sleep(100); 
       } catch (e) {
-        console.error(`Failed to sync task ${taskId}: ${e.message}`);
+        console.error(`[ERROR] Failed to sync task ${taskId}: ${e.message}`);
+        if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Error: ${e.message}`);
       }
     }
   }
