@@ -596,7 +596,8 @@ function batchAnalyzeTasksWithGemini(tasksBatch, existingTaskContext = "") {
    - Follow the Pyramid Principle and BLUF (Bottom Line Up Front).
    - Get straight to the point. DO NOT use filler words like "The task is about" or "This email is...".
    - You have been provided with the task notes, the first and last message of the email thread (if applicable), and any existing Gmail labels. Synthesize only the *additional* core intent or required action.
-   - If the task did NOT originate from an email (no email labels or snippets provided), you MUST leave this field as an empty string (""). Do NOT hallucinate or repeat summaries from other tasks.
+   - If the task originated from an email, summarize the email context.
+   - If the task did NOT originate from an email (manually created), analyze the original task title and notes. If they contain specific context (like dates, instructions, or raw braindump text) that might be lost when you standardize the 'proposedActionTitle', you MUST extract that context and put it here.
 2. "proposedCategory": A proposed category strictly based on the FULL LOS Taxonomy provided below.
    - Choose the MOST SPECIFIC fitting category (e.g., an L4 context or L3 category).
    - IMPORTANT: Heavily weigh any provided "emailLabels" when determining the category.
