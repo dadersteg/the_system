@@ -1078,13 +1078,12 @@ function exportTasksToMarkdownDrive(results) {
  */
 function syncCompletedTasksLog() {
   const ss = SpreadsheetApp.openById(CONFIG.spreadsheetId);
-  let completedSheet = ss.getSheetByName("Completed Tasks");
+  const COMPLETED_LOG_GID = "1559346038";
   
+  let completedSheet = ss.getSheets().find(s => s.getSheetId().toString() === COMPLETED_LOG_GID);
   if (!completedSheet) {
-    completedSheet = ss.insertSheet("Completed Tasks");
-    completedSheet.appendRow(["Task ID", "Task Title", "Notes", "Email Link", "Completed Date"]);
-    completedSheet.getRange("A1:E1").setFontWeight("bold");
-    completedSheet.setFrozenRows(1);
+    console.error(`Error: Completed Tasks log sheet with GID ${COMPLETED_LOG_GID} not found.`);
+    return;
   }
   
   const existingData = completedSheet.getDataRange().getValues();
