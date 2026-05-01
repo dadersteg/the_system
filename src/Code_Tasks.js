@@ -971,7 +971,8 @@ function syncRevisionsToTasks() {
           if (resource.due) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
           if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
           
-          console.log(`[SUCCESS] Migrated task ${taskId} to list '${actualNewListTitle}'`);
+          const currentTitle = resource.title || originalTitle;
+          console.log(`[SUCCESS] Migrated task ID: ${taskId} | Title: "${currentTitle}" | To list: '${actualNewListTitle}'`);
           if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Migrated to '${actualNewListTitle}' successfully.`);
         } else {
            // Normal in-place patch
@@ -994,14 +995,16 @@ function syncRevisionsToTasks() {
           // Update the original status column if status was changed
           if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
           
-          console.log(`[SUCCESS] Patched task ${taskId} in place.`);
+          const currentTitle = resource.title || originalTitle;
+          console.log(`[SUCCESS] Patched task ID: ${taskId} | Title: "${currentTitle}" | In place.`);
           if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Synced changes successfully.`);
         }
 
         updateCount++;
         Utilities.sleep(100); 
       } catch (e) {
-        console.error(`[ERROR] Failed to sync task ${taskId}: ${e.message}`);
+        const currentTitle = resource.title || originalTitle;
+        console.error(`[ERROR] Failed to sync task ID: ${taskId} | Title: "${currentTitle}" | Error: ${e.message}`);
         if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Error: ${e.message}`);
       }
     }
