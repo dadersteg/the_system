@@ -917,68 +917,40 @@ function syncRevisionsToTasks() {
         if (listMigrated) {
           const oldTask = executeWithRetry(() => Tasks.Tasks.get(taskListId, taskId));
           
-          if (oldTask.links && oldTask.links.length > 0) {
-            console.log(`Task ${taskId} contains native links. Skipping list migration to protect links.`);
-            // Fallback to normal in-place patch to preserve the links
-            executeWithRetry(() => Tasks.Tasks.patch(resource, taskListId, taskId));
-            
-            // Clear revised columns (but leave formula alone)
-            if (newTitle) {
-              if (losCodeRevIdx !== -1) sheet.getRange(rowNum, losCodeRevIdx + 1).clearContent();
-              if (actionTitleRevIdx !== -1) sheet.getRange(rowNum, actionTitleRevIdx + 1).clearContent();
-            }
-            if (newNotes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
-            if (newDeadline) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
-            // Clear the task list revised column since we rejected the move
-            sheet.getRange(rowNum, taskListRevIdx + 1).clearContent();
-            
-            if (resource.title) sheet.getRange(rowNum, titleIdx + 1).setValue(resource.title);
-            if (resource.notes) sheet.getRange(rowNum, notesIdx + 1).setValue(resource.notes);
-            if (resource.due) sheet.getRange(rowNum, dateIdx + 1).setValue(resource.due);
-            if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
-            
-            if (resource.title) {
-              if (losCodeRevIdx !== -1) sheet.getRange(rowNum, losCodeRevIdx + 1).clearContent();
-              if (actionTitleRevIdx !== -1) sheet.getRange(rowNum, actionTitleRevIdx + 1).clearContent();
-            }
-            if (resource.notes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
-            if (resource.due) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
-            if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
-          } else {
-            // Safe to migrate (no links to destroy)
-            if (resource.title) oldTask.title = resource.title;
-            if (resource.notes) oldTask.notes = resource.notes;
-            if (resource.due) oldTask.due = resource.due;
-            if (resource.status) oldTask.status = resource.status;
-            
-            delete oldTask.id;
-            delete oldTask.etag;
-            delete oldTask.position;
-            delete oldTask.updated;
+          if (resource.title) oldTask.title = resource.title;
+          if (resource.notes) oldTask.notes = resource.notes;
+          if (resource.due) oldTask.due = resource.due;
+          if (resource.status) oldTask.status = resource.status;
+          
+          delete oldTask.id;
+          delete oldTask.etag;
+          delete oldTask.position;
+          delete oldTask.updated;
+          delete oldTask.links; // Links are read-only and will cause insert to fail
+          delete oldTask.selfLink;
 
-            const migratedTask = executeWithRetry(() => Tasks.Tasks.insert(oldTask, newTaskListId));
-            executeWithRetry(() => Tasks.Tasks.remove(taskListId, taskId));
-            
-            sheet.getRange(rowNum, taskIdIdx + 1).setValue(migratedTask.id);
-            sheet.getRange(rowNum, taskListIdIdx + 1).setValue(newTaskListId);
-            
-            const actualNewListTitle = allTaskLists.find(l => l.id === newTaskListId)?.title || newTaskListTitle;
-            sheet.getRange(rowNum, taskListIdx + 1).setValue(actualNewListTitle);
-            sheet.getRange(rowNum, taskListRevIdx + 1).clearContent();
-            
-            if (resource.title) sheet.getRange(rowNum, titleIdx + 1).setValue(resource.title);
-            if (resource.notes) sheet.getRange(rowNum, notesIdx + 1).setValue(resource.notes);
-            if (resource.due) sheet.getRange(rowNum, dateIdx + 1).setValue(resource.due);
-            if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
-            
-            if (resource.title) {
-              if (losCodeRevIdx !== -1) sheet.getRange(rowNum, losCodeRevIdx + 1).clearContent();
-              if (actionTitleRevIdx !== -1) sheet.getRange(rowNum, actionTitleRevIdx + 1).clearContent();
-            }
-            if (resource.notes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
-            if (resource.due) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
-            if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
+          const migratedTask = executeWithRetry(() => Tasks.Tasks.insert(oldTask, newTaskListId));
+          executeWithRetry(() => Tasks.Tasks.remove(taskListId, taskId));
+          
+          sheet.getRange(rowNum, taskIdIdx + 1).setValue(migratedTask.id);
+          sheet.getRange(rowNum, taskListIdIdx + 1).setValue(newTaskListId);
+          
+          const actualNewListTitle = allTaskLists.find(l => l.id === newTaskListId)?.title || newTaskListTitle;
+          sheet.getRange(rowNum, taskListIdx + 1).setValue(actualNewListTitle);
+          sheet.getRange(rowNum, taskListRevIdx + 1).clearContent();
+          
+          if (resource.title) sheet.getRange(rowNum, titleIdx + 1).setValue(resource.title);
+          if (resource.notes) sheet.getRange(rowNum, notesIdx + 1).setValue(resource.notes);
+          if (resource.due) sheet.getRange(rowNum, dateIdx + 1).setValue(resource.due);
+          if (resource.status) sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
+          
+          if (resource.title) {
+            if (losCodeRevIdx !== -1) sheet.getRange(rowNum, losCodeRevIdx + 1).clearContent();
+            if (actionTitleRevIdx !== -1) sheet.getRange(rowNum, actionTitleRevIdx + 1).clearContent();
           }
+          if (resource.notes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
+          if (resource.due) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
+          if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
         } else {
           // Normal in-place patch
           executeWithRetry(() => Tasks.Tasks.patch(resource, taskListId, taskId));
