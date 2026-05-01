@@ -836,15 +836,10 @@ function syncRevisionsToTasks() {
   const listNameToIdMap = {};
   allTaskLists.forEach(l => listNameToIdMap[l.title.toLowerCase()] = l.id);
 
-  const MAX_REVISIONS = 5; // TEMPORARY PROCESS LIMIT
   let updateCount = 0;
 
   for (let i = 0; i < data.length; i++) {
     const row = data[i];
-    if (updateCount >= MAX_REVISIONS) {
-      console.log(`Reached temporary process limit of ${MAX_REVISIONS} revisions. Stopping early.`);
-      break;
-    }
     let taskId = row[taskIdIdx];
     let taskListId = row[taskListIdIdx];
     
