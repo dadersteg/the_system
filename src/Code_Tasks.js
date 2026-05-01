@@ -917,10 +917,22 @@ function syncRevisionsToTasks() {
         if (listMigrated) {
           const oldTask = executeWithRetry(() => Tasks.Tasks.get(taskListId, taskId));
           
+          // Preserve the native email link by moving it to the notes before deleting the read-only links array
+          let nativeLinkUrl = "";
+          if (oldTask.links && oldTask.links.length > 0) {
+             const emailLinkObj = oldTask.links.find(l => l.type === "email");
+             if (emailLinkObj) nativeLinkUrl = emailLinkObj.link;
+          }
+          
           if (resource.title) oldTask.title = resource.title;
           if (resource.notes) oldTask.notes = resource.notes;
           if (resource.due) oldTask.due = resource.due;
           if (resource.status) oldTask.status = resource.status;
+          
+          // Ensure the native link is embedded in the notes so it survives the migration
+          if (nativeLinkUrl && (!oldTask.notes || !oldTask.notes.includes(nativeLinkUrl))) {
+             oldTask.notes = oldTask.notes ? oldTask.notes + "\n\n" + nativeLinkUrl : nativeLinkUrl;
+          }
           
           delete oldTask.id;
           delete oldTask.etag;
