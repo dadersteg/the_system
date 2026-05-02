@@ -19,10 +19,12 @@ The LOS uses a four-level hierarchical structure: L1 > L2 > L3 > L4.
 
 
 ### 1.1. The Standard Identifier
-
 The combination of the L1-L3 Code and the L4 Context ID forms the Standard Identifier. This identifier is used as a prefix for items within the LOS. Specific applications may use different separators following the identifier.
 
-
+### 1.2. Physical Storage vs. Aggregation Views (Shortcuts)
+Because Google Drive enforces a single-parent hierarchy, the LOS utilizes **Shortcuts** to emulate multi-tagging. 
+*   **Primary Context (Physical Storage):** A file physically lives in the folder where it is most contextually relevant for active work (e.g., a signed lease lives in `01 05 01 Projects / The Move`).
+*   **Aggregation Views [AGGREGATOR]:** Folders tagged as `[AGGREGATOR]` are used for cross-cutting master lists (e.g., all contracts across all projects). The Drive Clerk will place a Google Drive *Shortcut* in these folders, pointing to the original file.
 
 ---
 
@@ -40,7 +42,7 @@ The immutable skeleton of the system.
 
    * 01 01 01 Task Management 
 
-   * 01 01 02 Contracts
+   * 01 01 02 Contracts [AGGREGATOR]
 
 * **01 02 00 Health**
 
@@ -50,7 +52,7 @@ The immutable skeleton of the system.
 
 * **01 03 00 Personal Growth**
 
-    * 01 03 01 Principles, Goals, Methods...
+    * 01 03 01 Principles, Goals & Methods
 
     * 01 03 02 Reflection
 
@@ -58,7 +60,7 @@ The immutable skeleton of the system.
 
 * **01 04 00 Finances**
 
-    * 01 04 01 Purchase
+    * 01 04 01 Purchase [AGGREGATOR]
 
     * 01 04 02 House
 
@@ -68,16 +70,18 @@ The immutable skeleton of the system.
 
     * 01 05 02 Relationships
 
-    * 01 05 03 Collections (Interests & Passive Reference)
+    * 01 05 03 Collections
 
 
 ### 02 00 00 Work
 
-* **02 01 00 [YYYYMM] [Company Name]** 
+* **02 01 00 Employment** 
 
-Current 02 01 00 202605 Playmetech / Quantum 21
+    * 02 01 01 Quantum 21
 
 * **02 02 00 Career Management**
+
+* **02 03 00 Collections**
 
 
 ### 03 00 00 Studies
@@ -110,6 +114,12 @@ Current 02 01 00 202605 Playmetech / Quantum 21
 
 **Rule:** Files generally reside in folders named simply by the Context (e.g., "75006"). The L1-L3 code is applied via **Metadata/Description** for searchability.
 
+### 3.1. Sub-Context Hierarchies (L5+) - "The Flesh"
+While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 and below represent the flexible "Flesh".**
+*   **The Drop Zone:** Automated agents (The Clerk) will only ever route files to the root of an L4 context folder. 
+*   **Human Flexibility:** If an L4 folder becomes cluttered, you are free to manually create L5 subfolders (e.g., `Reference Material`, `Invoices`, `Drafts`). 
+*   **Rule of Thumb:** L5 folders should be generic groupings. If you need to create a highly specific L5 folder, it likely needs to be escalated to a brand new L4 project node. Never place an L4 node inside another L4 node.
+
 
 ### 01 01 01 Task Management (Standing Contexts)
 
@@ -124,6 +134,12 @@ Current 02 01 00 202605 Playmetech / Quantum 21
 | :--- | :--- |
 | **Signature** | Active documents pending signature or recently executed. |
 
+### 01 02 01 Physical Health (Standing Contexts)
+
+| Code | Description |
+| :--- | :--- |
+| **Medical Appointments & Tests** | Ongoing medical appointments, blood tests (BT), and health tracking. |
+
 ### 01 04 00 Finances (Standing Contexts)
 
 | Code | Description |
@@ -131,6 +147,8 @@ Current 02 01 00 202605 Playmetech / Quantum 21
 | :--- | :--- |
 
 | **Banking** | Standard accounts and bank statements. |
+
+| **Budgeting & Planning** | Financial planning, budgets, and subscriptions. |
 
 | **Crypto** | Cryptocurrency holdings. |
 
@@ -178,6 +196,14 @@ Current 02 01 00 202605 Playmetech / Quantum 21
 
 | **AI** | Artificial Intelligence initiatives. |
 
+| **20260509 LFC-CFC** | **Project: Trip to Liverpool.** Liverpool FC vs Chelsea FC game. |
+
+| **20260510-20260514 Lisbon** | **Project: Trip to Lisbon.** May 10-14, 2026. |
+
+| **202606 P&E** | **Project: Wedding for Pontus & Emilia.** June 2026. |
+
+| **202608 M&N** | **Project: Wedding for Mimmi & Nils.** August 2026. |
+
 | **Clothes** | Wardrobe management. |
 
 | **Cooking** | Recipes and meal planning. |
@@ -188,11 +214,8 @@ Current 02 01 00 202605 Playmetech / Quantum 21
 
 | **202604-202605 Staycation** | Project: Staycation/spend quality time with Carry during my gardening leave |  
 
-| **01 05 01 > Update Office** | Project: Home office setup and improvements. |
+| **Upgrade Office** | Project: Home office setup and improvements. |
 
-| **202601 M** | The Move (Jan 2026 - Project view). |
-
-| **20260411 Housewarming C&D** | Project: Housewarming event planning. |
 
 | **Colab Notebooks** | Active coding/notebook projects. |
 
@@ -203,11 +226,11 @@ Current 02 01 00 202605 Playmetech / Quantum 21
 
 | :--- | :--- |
 
-| **Alexander / Gabriel** | Brothers. |
+| **Alexander & Gabriel** | Brothers. |
 
 | **CMA** | Carry Martens Adersteg. |
 
-| **Mamma och Pappa** | Parents. |
+| **Mamma & Pappa** | Parents. |
 
 
 ### 01 05 03 Collections (Passive)
@@ -230,15 +253,41 @@ Current 02 01 00 202605 Playmetech / Quantum 21
 
 | **History** | Actual world history, historical events, and general reference. |
 
+| **Newsletters** | Subscribed newsletters and general reading material. |
+
 ---
 
+### 02 01 01 Quantum 21
+
+*Active employment (also referred to as Playmetech). Categories mimic the 01 Private L2 structure.*
+
+| Code | Description |
+| :--- | :--- |
+| **01 Professional Admin** | Work-related admin, IT setup, policies. (Cross-links to Personal Admin). |
+| **02 Team & Operations** | 1-on-1s, team building, internal processes, and company culture. |
+| **03 Professional Growth** | Upskilling, training, and performance reviews relevant to Q21. |
+| **04 Finances** | Work-related expenses, benefits, and payslips. (Cross-links to Personal Finance). |
+| **05 Projects** | Active Q21 work projects (metadata, notes, non-confidential docs). |
+
 ### 02 02 00 Career Management (Standing Contexts)
+
+*Includes standing contexts as well as active job opportunities using the YYYYMM format.*
 
 | Code | Description |
 | :--- | :--- |
 | **CVs & Cover Letters** | Active resumes and application templates. |
 | **Grades & Certificates** | Proof of employment, transcripts, and certifications. |
-| **Job Descriptions** | Saved roles and prospective job descriptions. |
+| **202603 Airwallex** | **Active Application:** Job application and interview process. |
+| **202604 Deel** | **Active Application:** Job application and interview process. |
+| **202603 OLIX** | **Active Application:** Job application and interview process. |
+
+---
+
+### 02 03 00 Collections (Standing Contexts)
+
+| Code | Description |
+| :--- | :--- |
+| **Newsletters** | Professional and work-related newsletters. |
 
 ---
 
@@ -249,23 +298,23 @@ The `99` suffix at the L3 level designates a record as "Archived." These files a
 
 ## 01 XX 99 Personal Archive
 
-- **01 01 99 Archive Admin:** Expired contracts, old ID copies, former address records.
+- **01 01 99 Archive:** Expired contracts, old ID copies, former address records.
 
-- **01 02 99 Archive Health:** Old prescriptions, settled medical bills, completed therapy records.
+- **01 02 99 Archive:** Old prescriptions, settled medical bills, completed therapy records.
 
-- **01 03 99 Archive Wealth:** Statements from closed accounts, old tax returns (>7 years).
+- **01 03 99 Archive:** Old reflection journals, deprecated goals, past frameworks.
 
-- **01 04 99 Archive Purchase:** Receipts for discarded items, old utility bills, expired warranties.
+- **01 04 99 Archive:** Statements from closed accounts, old tax returns (>7 years), receipts for discarded items.
 
-- **01 05 99 Archive Projects:** Documentation from completed or abandoned L4 projects.
+- **01 05 99 Archive:** Documentation from completed or abandoned L4 projects, old relationships, past interests.
 
 ## 02 XX 99 Work Archive
 
-- **02 01 99 Archive Employment:** Historical records from former employers and companies (e.g., Deloitte, Revolut).
+- **02 01 99 Archive:** Historical records from former employers and companies (e.g., Deloitte, Revolut).
 
 ### 03 00 99 Studies Archive
 
-- **03 01 99 Archive Studies:** Historical course materials, old notes, and past assignments.
+- **03 00 99 Archive:** Historical course materials, old notes, and past assignments.
 
 
 ### 4.1. Archive (L4)
@@ -283,6 +332,30 @@ The `99` suffix at the L3 level designates a record as "Archived." These files a
 | 01 05 01 | **Blackjack** | Hobby/Skill development. | **Closed** |
 | 01 05 01 | **2025 09 Visa** | Carry's Visa Application. | **Closed** |
 | 01 05 01 | **2025 Xmas** | **Project: Christmas 2025.** Gifts, logistics, events, and food planning. | **Closed** |
+| 01 05 01 | **202601 M** | The Move (Jan 2026 - Project view). | **Closed** |
+| 01 05 01 | **20260411 Housewarming C&D** | Project: Housewarming event planning. | **Closed** |
+| 02 01 99 | **201102 S&P** | Historical Employment | **Closed** |
+| 02 01 99 | **201108 Sveriges Ingenjörer** | Historical Employment | **Closed** |
+| 02 01 99 | **201312 Nova 100** | Historical Employment | **Closed** |
+| 02 01 99 | **201406 Brooklyn OpCo** | Historical Employment | **Closed** |
+| 03 00 99 | **Stockholms Nation** | Historical Studies | **Closed** |
+| 03 00 99 | **Uppsala University** | Historical Studies | **Closed** |
+| 02 01 99 | **201508 Deloitte** | Historical Employment | **Closed** |
+| 02 01 99 | **201611 Efficio** | Historical Employment | **Closed** |
+| 02 01 99 | **201908 Inverto** | Historical Employment | **Closed** |
+| 02 01 99 | **201911 Revolut** | Historical Employment | **Closed** |
+| 01 05 99 | **20200605-20200608 Lisbon** | Historical Project | **Closed** |
+| 01 05 99 | **20200611 Nice** | Historical Project | **Closed** |
+| 01 05 99 | **20200730-20200809 Tokyo** | Historical Project | **Closed** |
+| 01 05 99 | **20200812-20200816 - Stockholm** | Historical Project | **Closed** |
+| 01 05 99 | **20200829-20200902 Mykonos** | Historical Project | **Closed** |
+| 01 05 99 | **20200925-20200927 D&L 30th** | Historical Project | **Closed** |
+| 01 05 99 | **20210708 Bröllop** | Historical Project | **Closed** |
+| 01 05 99 | **20220610-20220610 R & H** | Historical Project | **Closed** |
+| 01 05 99 | **Alex** | Historical Project | **Closed** |
+| 01 05 99 | **Amy** | Historical Project | **Closed** |
+| 01 05 99 | **Daff** | Historical Project | **Closed** |
+| 01 05 99 | **Körkort** | Historical Project | **Closed** |
 
 ## 5. System & Operational Tags
 
@@ -297,7 +370,9 @@ These tags are used strictly for triage, automation pipelines, and system mainte
 * **99 Google Comments:** Automated notifications from Google Docs/Drive that require a quick read but no permanent storage.
 * **99 Label_Reviewed:** A vital system flag applied by the Apps Scripts to indicate an item has been successfully processed and should not be analyzed again in the next batch.
 * **99 SMS:** Funnel endpoint for incoming routed SMS messages awaiting processing or task extraction.
-* **99 Temp / To be deleted:** Temporary storage and the purge queue. Items that are needed briefly or marked for the next automated/manual trash cycle.
+* **99 Telegram:** Funnel endpoint for incoming routed Telegram messages awaiting processing or task extraction.
+* **99 WhatsApp:** Funnel endpoint for incoming routed WhatsApp messages awaiting processing or task extraction.
+* **99 To be deleted:** Temporary storage and the purge queue. Items that are needed briefly or marked for the next automated/manual trash cycle.
 
 ### Routing Tags (Legacy & Alias Emails)
 Operational tags applied to emails forwarded or routed from secondary addresses to ensure source traceability.

@@ -330,7 +330,11 @@ You are receiving raw actions extracted from email threads.
 YOUR MODIFIED OBJECTIVES:
 1. DEDUPLICATE RUTHLESSLY: Compare "newActions" against "existingTasks". If a new action is covered by an existing task, or is extremely similar in intent, DISCARD IT. Do not create duplicates.
 2. CONSOLIDATE & MERGE: If multiple new actions relate to the exact same core event or underlying objective (e.g., "Review Revolut update" and "Process Revolut Ledgy update"), you MUST consolidate them into ONE single concrete action. DO NOT generate multiple tasks for the same logical unit of work.
-3. DISCARD NOISE (The "No Junk" Rule): "Archive [Invoice]" or "Filing [Receipt]" are NOT actionable tasks. Automated notifications and invoices are already filed by the system. Do NOT create tasks for archiving, filing, or "noting" emails/receipts. Drop them entirely by returning an empty array.
+3. DISCARD NOISE & NON-ACTIONS (The "No Junk" Rule): You are strictly forbidden from creating tasks for:
+   - Automated invoices or receipts that are paid via direct debit/automatically charged.
+   - Casual link sharing (e.g., a YouTube, TikTok, or Twitter link dropped in a chat).
+   - "Archive [Invoice]" or "Filing [Receipt]". Automated notifications are already filed by the system. 
+   If an action falls into these categories, drop it entirely by returning an empty array.
 4. CATEGORIZE: For each valid new task, assign the most specific category. If a relevant category exists, you MUST use an exact string match from the "Concat (Path)" property found in the FULL LOS TAXONOMY below. If no category fits, output "N/A".
 5. FORMAT: Titles MUST be structured as "[Action Verb] [Object]". Example: "Pay electricity bill". If the action is passive (waiting on someone/something), prefix it with "Track:" or "Follow up:".
 6. METADATA: Estimate a "deadline" (Format: YYYY-MM-DD). If a deadline must exist but cannot be determined, output "TBC". If no deadline is set, output "None". If it is truly a task where a deadline is inapplicable, output "N/A". Estimate a "duration" (Format: e.g. "15m", "1h", or "N/A").

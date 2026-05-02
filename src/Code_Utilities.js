@@ -618,10 +618,16 @@ function setupSystemTriggers() {
     .everyMinutes(1)
     .create();
     
-  // 3. Task Execution Pipeline - Every 15 Minutes
+  // 3. Task Execution Pipeline (Harmonizer) - Every 15 Minutes
   ScriptApp.newTrigger("runTaskExecutionPipeline")
     .timeBased()
     .everyMinutes(15)
+    .create();
+    
+  // 4. Task Master Engine (D.5-D.7) - Every 1 Hour
+  ScriptApp.newTrigger("runTaskMasterEngine")
+    .timeBased()
+    .everyHours(1)
     .create();
     
   // 4. Manual Revisions Sync (Email) - Every 1 Hour
