@@ -1,0 +1,4 @@
+Keyword,Concat Path,Summary,Description,Static Filename,Aggregator Paths
+"[Text to match (e.g., 'revolut_statement')]","[Full taxonomy path (e.g., '01 04 01 Purchase')]","[Optional context summary]","[Drive metadata string (e.g., '01 04 01 Purchase #Finance')]","[Leave blank to keep original name, or specify static name]","[Comma-separated list of EXACT FULL PATHs for [AGGREGATOR] shortcuts, or leave blank]"
+"screenshot","01 05 01 TS","Visual memo for review.","0X 0Y ZW","",""
+"invoice_","01 04 01 Purchase","Auto-categorized invoice.","01 04 01 Purchase #Finance","",""

@@ -624,6 +624,18 @@ function setupSystemTriggers() {
     .everyMinutes(15)
     .create();
     
+  // 3b. Bi-Directional Task Export - Every 15 Minutes
+  ScriptApp.newTrigger("extractTasksWithConversationDetails")
+    .timeBased()
+    .everyMinutes(15)
+    .create();
+
+  // 3c. Bi-Directional Task Import (Spreadsheet to Tasks) - Every 15 Minutes
+  ScriptApp.newTrigger("syncRevisionsToTasks")
+    .timeBased()
+    .everyMinutes(15)
+    .create();
+    
   // 4. Task Master Engine (D.5-D.7) - Every 1 Hour
   ScriptApp.newTrigger("runTaskMasterEngine")
     .timeBased()
@@ -649,4 +661,118 @@ function setupSystemTriggers() {
     .create();
     
   console.log("SUCCESS: All system triggers have been provisioned according to the master schedule.");
+}
+
+// ==========================================
+// 10. CENTRALIZED AI UTILITY (GEMINI)
+// ==========================================
+function callGemini(promptText, modelName, systemInstruction, schema) {
+  const apiKey = PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY");
+  if (!apiKey) return { error: "Missing GEMINI_API_KEY" };
+  
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+  
+  const payload = {
+    systemInstruction: { parts: [{ text: systemInstruction }] },
+    contents: [{ parts: [{ text: promptText }] }],
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: schema,
+      temperature: 0.1
+    }
+  };
+  
+  const options = {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  
+  let delay = 2000;
+  for (let i = 0; i < 4; i++) {
+    try {
+      const response = UrlFetchApp.fetch(url, options);
+      const statusCode = response.getResponseCode();
+      
+      if (statusCode === 200) {
+        const json = JSON.parse(response.getContentText());
+        const resultText = json.candidates[0].content.parts[0].text;
+        return JSON.parse(resultText);
+      } else if (statusCode === 429 || statusCode >= 500) {
+        Utilities.sleep(delay);
+        delay *= 2;
+      } else {
+        return { error: `HTTP ${statusCode}: ${response.getContentText()}` };
+      }
+    } catch(e) {
+      if (i === 3) return { error: e.message };
+      Utilities.sleep(delay);
+      delay *= 2;
+    }
+  }
+}
+
+// ==========================================
+// 11. TESTING & SETUP UTILITIES
+// ==========================================
+
+/**
+ * Run this function once from the Apps Script editor to get all your Task List IDs.
+ * Check the Execution Log to copy your BACKLOG_LIST_ID and TO_BE_DELETED_LIST_ID.
+ */
+function getMyTaskListIds() {
+  const lists = Tasks.Tasklists.list().items;
+  console.log("=== YOUR GOOGLE TASK LIST IDs ===");
+  lists.forEach(list => {
+    console.log(`${list.title}: ${list.id}`);
+  });
+  console.log("=================================");
+}
+
+/**
+ * Safe Dry-Run for Task Master. 
+ * Extracts data, hits the Gemini API, and updates the Markdown One-Pager, 
+ * but skips moving or updating any real Google Tasks.
+ */
+function testTaskMasterDryRun() {
+  console.log("Starting DRY RUN of Task Master...");
+  const now = new Date();
+  const capacityData = extractCalendarCapacity(now);
+  const taskData = extractTasksBacklog();
+  const goalsData = getSystemGoals();
+  
+  const payload = {
+    currentTime: now.toISOString(),
+    goals: goalsData,
+    capacity: capacityData,
+    tasks: taskData
+  };
+  
+  console.log("Fetching AI recommendations...");
+  const aiResponse = callTaskMasterAI(payload);
+  if (!aiResponse) return;
+  
+  console.log("=== AI RECOMMENDED TASK UPDATES (SKIPPED) ===");
+  console.log(JSON.stringify(aiResponse.taskUpdates, null, 2));
+  
+  console.log("=== ONE-PAGER PRIORITY OUTPUT ===");
+  console.log(aiResponse.onePagerMarkdown);
+  
+  updateOnePagerMarkdown(aiResponse.onePagerMarkdown);
+  console.log("Dry run complete. Check Google Drive for the One-Pager.");
+}
+
+/**
+ * Run this function once to automatically provision the necessary Script Properties 
+ * for the Task Master engine using the IDs you extracted.
+ */
+function provisionTaskMasterProperties() {
+  const props = PropertiesService.getScriptProperties();
+  
+  props.setProperty("BACKLOG_LIST_ID", "RVVPcGdsYkQ2WV90bzhOcA");
+  props.setProperty("TO_BE_DELETED_LIST_ID", "QWkyNE1sdlVXMzMwbjhFQw");
+  props.setProperty("TASK_MASTER_PROMPT_ID", "18fdicBfyIpc_2sOujMz_e1_n04XsB2D9");
+  
+  console.log("SUCCESS: Task Master Script Properties have been locked in!");
 }

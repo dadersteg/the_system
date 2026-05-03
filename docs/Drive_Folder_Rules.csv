@@ -1,0 +1,3 @@
+Folder ID,Concat Path,Summary,Description,Static Filename,Aggregator Paths
+"[Google Drive Folder ID]","[Full taxonomy path (e.g., '01 04 01 Purchase')]","[Optional context summary]","[Drive metadata string (e.g., '01 04 01 Purchase #Finance')]","[Leave blank to keep original name, or specify static name]","[Comma-separated list of EXACT FULL PATHs for [AGGREGATOR] shortcuts, or leave blank]"
+"123456789ExampleFolderID","01 04 01 Purchase","Auto-scanned receipt via Integration.","01 04 01 Purchase #Finance","","01 04 01 Purchase > Purchase Receipts [AGGREGATOR]"
