@@ -166,14 +166,10 @@ You must return a valid JSON object. You are PROHIBITED from omitting any keys. 
 
 - `filename`: The newly generated name (including extension).
 
-- `path_code`: The 6-digit code or placeholder (e.g., "01 04 00" or "01 0Y ZW").
-
-- `context_id`: The L4 name or "Unknown".
-
+- `concat_path`: The EXACT FULL PATH string from the `Concat (Path)` field in the provided JSON taxonomy (e.g., "01 04 02 > House > SW1V 4QE"). If you cannot confidently categorize it, return "Unknown".
+- `aggregator_paths`: An array of EXACT FULL PATH strings for any `[AGGREGATOR]` nodes the file ALSO belongs to (e.g., "01 04 01 Purchase > Purchase Receipts [AGGREGATOR]"). If the file does not belong in any aggregator, or if the primary `concat_path` is already an aggregator, return an empty array `[]`.
 - `summary`: A precise 1-2 sentence overview of the document's specific content and purpose.
-
 - `description`: The full string for the Drive description field: `[6-Digit Code] [Context ID] #[Tags]`
-
 - `reasoning`: A concise explanation of which Gravity protocol was applied.
 
 
@@ -182,19 +178,12 @@ You must return a valid JSON object. You are PROHIBITED from omitting any keys. 
 - **Scenario:** An Amex PDF mentioning "Wedding Venue Deposit".
 
   - **Output:** {
-
     "filename": "2027 W - Venue Deposit Amex.pdf",
-
-    "path_code": "01 05 01",
-
-    "context_id": "2027 W",
-
+    "concat_path": "01 05 01 > Projects > 2027 W",
+    "aggregator_paths": ["01 04 01 Purchase > Purchase Receipts [AGGREGATOR]"],
     "summary": "Credit card statement showing a successful deposit payment to the wedding venue for the 2027 event.",
-
     "description": "01 05 01 2027 W #Wedding #Amex #Deposit",
-
     "reasoning": "Project Gravity ('2027 W') detected in content; overrides financial domain."
-
   }
 
 
@@ -203,19 +192,12 @@ You must return a valid JSON object. You are PROHIBITED from omitting any keys. 
   - **Output:**
 
   {
-
-    "filename": "Masterclass - Subscription Receipt 2026.pdf",
-
-    "path_code": "01 0Y ZW",
-
-    "context_id": "Unknown",
-
+    "filename": "Unknown - Masterclass Subscription Receipt 2026.pdf",
+    "concat_path": "Unknown",
+    "aggregator_paths": [],
     "summary": "Annual subscription invoice for an online learning platform (Masterclass) for 2026.",
-
     "description": "01 0Y ZW Masterclass #Learning #Subscription",
-
     "reasoning": "Uncertainty Protocol: Subject 'Masterclass' identified, but specific L3 code is missing from LOS."
-
   }
 
 

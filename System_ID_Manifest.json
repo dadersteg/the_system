@@ -1,0 +1,123 @@
+{
+  "spreadsheet": {
+    "id": "1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4",
+    "tabs": [
+      {
+        "name": "Email 02 Rules based on subject",
+        "gid": "631446789"
+      },
+      {
+        "name": "Email 02 > Rules based on sender",
+        "gid": "1679876125"
+      },
+      {
+        "name": "Email 02 Rules based on recciver",
+        "gid": "1799689202"
+      },
+      {
+        "name": "Email 05 Log",
+        "gid": "2131515996"
+      },
+      {
+        "name": "Sheet14",
+        "gid": "1317123493"
+      },
+      {
+        "name": "Email 05 Labels (Current)",
+        "gid": "1007497112"
+      },
+      {
+        "name": "Google Task 02 Review",
+        "gid": "1580572397"
+      },
+      {
+        "name": "Sheet11",
+        "gid": "275991319"
+      },
+      {
+        "name": "ALL 05 LOS Taxonomy",
+        "gid": "1287896098"
+      },
+      {
+        "name": "Drive 05 Log",
+        "gid": "809034738"
+      },
+      {
+        "name": "Drive 05 Session Log",
+        "gid": "1657749758"
+      },
+      {
+        "name": "All 05 Available Models",
+        "gid": "1704335578"
+      },
+      {
+        "name": "99 Email Filters (Archived)",
+        "gid": "1215327450"
+      },
+      {
+        "name": "Drive 05 Folder Structure",
+        "gid": "536537641"
+      },
+      {
+        "name": "Drive 05 Reset Log",
+        "gid": "1835375017"
+      }
+    ]
+  },
+  "docs_folder": {
+    "id": "13Nvsav_Gt1zTXjPH0crBMdERN9HkN2pc",
+    "files": [
+      {
+        "name": "project_plan.md",
+        "id": "1iPdM3zATOu8tKu1aMoBh04sNqEKHVdMW",
+        "mimeType": "text/markdown"
+      },
+      {
+        "name": "Google Tasks.md",
+        "id": "1GvX0INYyuto_h5KEjN_52o7bx11Qcdu8",
+        "mimeType": "text/plain"
+      },
+      {
+        "name": ".gitignore",
+        "id": "1Zapkb2wDGu20rtdPwlgALXLDQcwRsho4",
+        "mimeType": "application/octet-stream"
+      },
+      {
+        "name": "TS_telethon_session.session",
+        "id": "1IJ7vaPwgyEYyTJLtes8l6sApJy6dr4Mb",
+        "mimeType": "application/octet-stream"
+      },
+      {
+        "name": ".claspignore",
+        "id": "1-vTNH_aSwHZJtMwYP_FMBD6qk8f5mtGk",
+        "mimeType": "application/octet-stream"
+      },
+      {
+        "name": ".env.example",
+        "id": "11EtrqfDszRY1WzpQDrsVvXYfwPTA9xWW",
+        "mimeType": "application/octet-stream"
+      },
+      {
+        "name": ".env",
+        "id": "110V-lROrorXXaWq561S1nsCsy7q9Xov2",
+        "mimeType": "application/octet-stream"
+      },
+      {
+        "name": "README.md",
+        "id": "1g5bUPg-FCE8U2uYPdHi6k3Nf7Hz2wIDz",
+        "mimeType": "text/markdown"
+      },
+      {
+        "name": "client_secret.json",
+        "id": "1MJsRMjqoiqmKDVxN6V7dpjt8YLVZ3uLf",
+        "mimeType": "application/json"
+      },
+      {
+        "name": ".clasp.json",
+        "id": "1vTfYuShj2R8iyR1B-Bwrs4VdTIEKX2VH",
+        "mimeType": "application/json"
+      }
+    ]
+  },
+  "generatedAt": "2026-04-30T09:41:42.000Z"
+}

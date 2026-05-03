@@ -332,8 +332,8 @@ YOUR MODIFIED OBJECTIVES:
 2. CONSOLIDATE & MERGE: If multiple new actions relate to the exact same core event or underlying objective (e.g., "Review Revolut update" and "Process Revolut Ledgy update"), you MUST consolidate them into ONE single concrete action. DO NOT generate multiple tasks for the same logical unit of work.
 3. DISCARD NOISE & NON-ACTIONS (The "No Junk" Rule): You are strictly forbidden from creating tasks for:
    - Automated invoices or receipts that are paid via direct debit/automatically charged.
-   - Casual link sharing (e.g., a YouTube, TikTok, or Twitter link dropped in a chat).
    - "Archive [Invoice]" or "Filing [Receipt]". Automated notifications are already filed by the system. 
+   - Casual link sharing WITHOUT explicit action requests. A YouTube or article link shared with just "check this out" is NOT a task. ONLY keep it if there is a clear, explicit request (e.g., "Review this for the Q3 project").
    If an action falls into these categories, drop it entirely by returning an empty array.
 4. CATEGORIZE: For each valid new task, assign the most specific category. If a relevant category exists, you MUST use an exact string match from the "Concat (Path)" property found in the FULL LOS TAXONOMY below. If no category fits, output "N/A".
 5. FORMAT: Titles MUST be structured as "[Action Verb] [Object]". Example: "Pay electricity bill". If the action is passive (waiting on someone/something), prefix it with "Track:" or "Follow up:".
