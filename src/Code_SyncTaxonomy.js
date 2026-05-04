@@ -4,7 +4,7 @@
  */
 
 function syncTaxonomyToSheet() {
-  const sheetId = PropertiesService.getScriptProperties().getProperty("MASTER_SHEET_ID");
+  const sheetId = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
   const targetGid = 1287896098;
 
   const files = DriveApp.getFilesByName("TS - Categorisation.md");

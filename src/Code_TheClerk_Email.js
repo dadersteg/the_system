@@ -8,15 +8,15 @@
 // --- CONFIGURATION ---
 const SCRIPT_PROPS = PropertiesService.getScriptProperties();
 
-const MODEL_NAME = SCRIPT_PROPS.getProperty('GEMINI_MODEL') || SCRIPT_PROPS.getProperty('gemini_model') || 'gemini-3-flash-preview';
-const RETRO_MODEL_NAME = SCRIPT_PROPS.getProperty('GEMINI_RETRO_MODEL') || 'gemini-3.1-flash-lite-preview';
-const API_KEY = SCRIPT_PROPS.getProperty('GEMINI_API_KEY');
+const MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL;
+const RETRO_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_RETRO_MODEL;
+const API_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
 
 // Drive File ID for the AI Prompt provided by the user.
-const DOC_ID = SCRIPT_PROPS.getProperty('PROMPT_DOC_ID') || '19a2eEMdxmwhNbLXAYdgyJhWDYg-4abkJ';
-const TAXONOMY_JSON_ID = SCRIPT_PROPS.getProperty('TAXONOMY_JSON_ID') || '199ChTlYe3xKsybllcJ3BXYUIEs8cxvWq';
+const DOC_ID = SYSTEM_CONFIG.DOCS.PROMPT_TASKMASTER_OLD;
+const TAXONOMY_JSON_ID = '199ChTlYe3xKsybllcJ3BXYUIEs8cxvWq';
 
-const SHEET_ID = SCRIPT_PROPS.getProperty("MASTER_SHEET_ID");
+const SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
 
 const AUDIT_GID = '1007497112'; // Label Management Tab
 const ALIAS_GID = '1799689202'; // Alias Whitelist Tab
@@ -50,12 +50,7 @@ function runTheClerkEmailOngoing() {
   executeTriageEngine(replyQuery, 100, false);
 }
 
-function runTheClerkEmailRetro() {
-  getLabelIdByName(PROCESSED_FLAG);
-  getLabelIdByName(TEMP_DELETE_LABEL);
-  // By targeting older_than:14d we ensure we're not touching the current inbox flow
-  executeTriageEngine(`-label:"${PROCESSED_FLAG}" older_than:14d`, 10, true);
-}
+// Removed runTheClerkEmailRetro as it is handled by the unified Code_BatchRetro.js
 
 function executeTriageEngine(searchQuery, searchLimit, isRetro) {
   const threads = GmailApp.search(searchQuery, 0, searchLimit); 
@@ -74,7 +69,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro) {
   const props = PropertiesService.getScriptProperties();
   let threadState = {};
   if (!isRetro) {
-    const stateStr = props.getProperty("THREAD_STATE");
+    const stateStr = SYSTEM_CONFIG.STATE.THREAD_STATE;
     threadState = stateStr ? JSON.parse(stateStr) : {};
   }
 

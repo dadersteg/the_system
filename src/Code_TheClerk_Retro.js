@@ -4,7 +4,7 @@
  */
 
 const BATCH_CONFIG = {
-  maxBatchSize: 1000,
+  maxBatchSize: 5, // Set to 5 for testing. Increase to 1000 when ready to process the backlog.
   geminiModel: "gemini-3.0-flash", // Update to whichever model you are using
   qaSheetHeaders: ["Type", "ID", "Original Name/Subject", "Proposed Name", "Original Path", "Proposed Path/Labels", "Summary", "Status"],
 };
@@ -15,8 +15,8 @@ const BATCH_CONFIG = {
 
 function initiateDriveBatchRetro() {
   const props = PropertiesService.getScriptProperties();
-  const apiKey = props.getProperty("GEMINI_API_KEY");
-  const folderId = props.getProperty("RETRO_DRIVE_FOLDER_ID"); // Root of your backlog
+  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
+  const folderId = SYSTEM_CONFIG.ROOTS.DRIVE_RETRO_ROOT_ID; // Root of your backlog
   
   if (!apiKey || !folderId) throw new Error("Missing API Key or Retro Folder ID");
 
@@ -106,9 +106,9 @@ function initiateDriveBatchRetro() {
 
 function pollBatchJobStatus() {
   const props = PropertiesService.getScriptProperties();
-  const apiKey = props.getProperty("GEMINI_API_KEY");
-  const jobName = props.getProperty("ACTIVE_BATCH_JOB");
-  const manifestStr = props.getProperty("ACTIVE_BATCH_MANIFEST");
+  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
+  const jobName = SYSTEM_CONFIG.STATE.ACTIVE_BATCH_JOB;
+  const manifestStr = SYSTEM_CONFIG.STATE.ACTIVE_BATCH_MANIFEST;
 
   if (!jobName) return; // No active job
 
@@ -145,7 +145,7 @@ function pollBatchJobStatus() {
     });
 
     // Write to Spreadsheet
-    const ssId = props.getProperty("MASTER_SHEET_ID");
+    const ssId = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
     const ss = SpreadsheetApp.openById(ssId);
     const dateStr = Utilities.formatDate(new Date(), "GMT", "yyyy-MM-dd");
     let sheet = ss.getSheetByName(`Batch QA [${dateStr}]`);
@@ -176,7 +176,7 @@ function pollBatchJobStatus() {
 
 function executeApprovedBatchItems() {
   const props = PropertiesService.getScriptProperties();
-  const ssId = props.getProperty("MASTER_SHEET_ID");
+  const ssId = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
   const ss = SpreadsheetApp.openById(ssId);
   
   // Find all QA Sheets
@@ -193,7 +193,9 @@ function executeApprovedBatchItems() {
     const summaryIdx = headers.indexOf("Summary");
 
     for (let i = 1; i < data.length; i++) {
-      if (data[i][statusIdx] === "APPROVED") {
+      // Execute automatically! No need for the user to manually change to 'APPROVED'.
+      // If the user manually edits the proposed name/path before this runs, it will use their edits.
+      if (data[i][statusIdx] === "PENDING" || data[i][statusIdx] === "APPROVED") {
         const type = data[i][typeIdx];
         const itemId = data[i][idIdx];
         const newName = data[i][propNameIdx];

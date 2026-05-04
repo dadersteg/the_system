@@ -6,8 +6,11 @@ import datetime
 import hashlib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 from email.utils import formataddr, formatdate, make_msgid
 from email.header import Header
+import mimetypes
 from dotenv import load_dotenv
 
 load_dotenv() # Loads variables from the .env file
@@ -23,9 +26,18 @@ GMAIL_APP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD')
 
 client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
 
-def send_to_gmail(sender_name, message_text, thread_name):
-    if not message_text:
-        return # Skip empty messages (e.g., just a photo without a caption)
+# --- BUFFERING LOGIC ---
+message_buffer = {}
+BUFFER_DELAY_SECONDS = 5 * 60
+
+def send_to_gmail(compiled_text, thread_name, attachments=None):
+    if attachments is None:
+        attachments = []
+        
+    if not compiled_text and not attachments:
+        return 
+        
+    text_to_print = compiled_text if compiled_text else "[Media Attached]"
         
     msg = MIMEMultipart()
     
@@ -48,20 +60,49 @@ def send_to_gmail(sender_name, message_text, thread_name):
     msg['References'] = deterministic_id
     msg['In-Reply-To'] = deterministic_id
     
-    # Add a timestamp and sender name to the body so it's readable when Gmail threads multiple messages together
-    current_time = datetime.datetime.now().strftime("%H:%M")
-    formatted_body = f"[{current_time}] {sender_name}:\n\n{message_text}"
+    msg.attach(MIMEText(text_to_print, 'plain', 'utf-8'))
     
-    msg.attach(MIMEText(formatted_body, 'plain', 'utf-8'))
+    for att in attachments:
+        maintype, subtype = ('application', 'octet-stream')
+        if att.get('mimetype') and '/' in att['mimetype']:
+            maintype, subtype = att['mimetype'].split('/', 1)
+            
+        part = MIMEBase(maintype, subtype)
+        part.set_payload(att['content'])
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f"attachment; filename=\"{att['filename']}\"")
+        msg.attach(part)
     
     try:
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
         server.send_message(msg)
         server.quit()
-        print(f"Forwarded message from {sender_name} to Gmail.")
+        print(f"Forwarded buffered messages for [{thread_name}] to Gmail.")
     except Exception as e:
         print(f"Failed to send email: {e}")
+
+async def flush_buffer(thread_name):
+    await asyncio.sleep(BUFFER_DELAY_SECONDS)
+    
+    buffer_data = message_buffer.get(thread_name)
+    if not buffer_data:
+        return
+        
+    messages = buffer_data['messages']
+    attachments = buffer_data.get('attachments', [])
+    
+    # Remove from active tracking immediately so new messages start a new buffer
+    del message_buffer[thread_name]
+    
+    if not messages and not attachments:
+        return
+        
+    compiled_text = "\n\n---\n\n".join(messages)
+    
+    # Run the synchronous email sending in an executor to avoid blocking the asyncio loop
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, send_to_gmail, compiled_text, thread_name, attachments)
 
 @client.on(events.NewMessage())
 async def handler(event):
@@ -90,7 +131,56 @@ async def handler(event):
             last = getattr(sender, 'last_name', '') or ''
             sender_name = f"{first} {last}".strip() or getattr(sender, 'username', 'Unknown')
     
-    send_to_gmail(sender_name, event.raw_text, thread_name)
+    message_text = event.raw_text
+    attachments = []
+    
+    if event.message.media:
+        try:
+            media_bytes = await event.message.download_media(bytes)
+            if media_bytes:
+                filename = None
+                mime_type = 'application/octet-stream'
+                
+                if hasattr(event.message.media, 'document'):
+                    mime_type = event.message.media.document.mime_type
+                    for attr in event.message.media.document.attributes:
+                        if hasattr(attr, 'file_name'):
+                            filename = attr.file_name
+                            break
+                elif hasattr(event.message.media, 'photo'):
+                    mime_type = 'image/jpeg'
+                    
+                if not filename:
+                    ext = mimetypes.guess_extension(mime_type) or '.bin'
+                    filename = f"telegram_media{ext}"
+                    
+                attachments.append({
+                    'filename': filename,
+                    'content': media_bytes,
+                    'mimetype': mime_type
+                })
+        except Exception as err:
+            print(f"Failed to download media: {err}")
+
+    if not message_text and not attachments:
+        return # Skip completely empty
+        
+    current_time = datetime.datetime.now().strftime("%H:%M")
+    if message_text:
+        message_snippet = f"[{current_time}] {sender_name}:\n{message_text}"
+    else:
+        message_snippet = f"[{current_time}] {sender_name}:\n[Media Attached]"
+    
+    if thread_name not in message_buffer:
+        message_buffer[thread_name] = {
+            'messages': [],
+            'attachments': [],
+            'task': asyncio.create_task(flush_buffer(thread_name))
+        }
+        
+    message_buffer[thread_name]['messages'].append(message_snippet)
+    message_buffer[thread_name]['attachments'].extend(attachments)
+    print(f"Buffered message for [{thread_name}] (Sending to Gmail in 5 mins...)")
 
 if __name__ == '__main__':
     print("Starting LOS Telegram Bridge...")

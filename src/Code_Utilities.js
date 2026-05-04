@@ -116,7 +116,7 @@ function checkAndRename(folder, outputData) {
 // ==========================================
 function exportWorkspaceTaxonomy() {
   let mdContent = "# The System: Workspace Actual Taxonomy\n\n";
-  const EXPORT_FOLDER_ID = UTIL_PROPS.getProperty("WORKSPACE_FOLDER_ID");
+  const EXPORT_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
   
   // 1. Fetch Gmail Labels
   mdContent += "## 1. Gmail Labels\n\n";
@@ -201,8 +201,8 @@ function exportWorkspaceTaxonomy() {
 // 3. SYSTEM ID MANIFEST EXPORTER
 // ==========================================
 function exportSystemManifest() {
-  const SPREADSHEET_ID = UTIL_PROPS.getProperty("MASTER_SHEET_ID");
-  const TARGET_FOLDER_ID = UTIL_PROPS.getProperty("WORKSPACE_FOLDER_ID"); 
+  const SPREADSHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
+  const TARGET_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
   
   const manifest = {
     spreadsheet: {
@@ -268,7 +268,7 @@ function exportSystemManifest() {
 // 4. TEMPORARY SCRIPT: BACKFILL DATE COLUMNS
 // ==========================================
 function backfillDatesInLog() {
-  const SPREADSHEET_ID = UTIL_PROPS.getProperty("MASTER_SHEET_ID");
+  const SPREADSHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
   const LOG_GID = "2131515996";
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === LOG_GID);
@@ -337,7 +337,7 @@ function backfillDatesInLog() {
 // ==========================================
 function recoverMemoryState() {
   const props = PropertiesService.getScriptProperties();
-  const stateStr = props.getProperty("THREAD_STATE");
+  const stateStr = SYSTEM_CONFIG.STATE.THREAD_STATE;
   const threadState = stateStr ? JSON.parse(stateStr) : {};
   
   // Find threads recently processed that have the flag
@@ -363,7 +363,7 @@ function recoverMemoryState() {
 // 6. UTILITY: CLEAN UP EMAILS FOR RE-ASSESSMENT
 // ==========================================
 function cleanLabelsFromSheetUrls() {
-  const SHEET_ID = UTIL_PROPS.getProperty("MASTER_SHEET_ID");
+  const SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
   const CLEANUP_GID = '1593358623';
   
   const ss = SpreadsheetApp.openById(SHEET_ID);
@@ -447,7 +447,7 @@ function syncDriveFoldersFromTaxonomy() {
   const root = DriveApp.getRootFolder();
   
   // Retrieve batch state
-  let startIndex = parseInt(UTIL_PROPS.getProperty("TAXONOMY_SYNC_INDEX") || "0", 10);
+  let startIndex = parseInt(SYSTEM_CONFIG.STATE.TAXONOMY_SYNC_INDEX, 10);
   if (startIndex >= taxonomy.length) {
     console.log("Sync already completed in a previous run. Resetting index to 0.");
     startIndex = 0;
@@ -667,7 +667,7 @@ function setupSystemTriggers() {
 // 10. CENTRALIZED AI UTILITY (GEMINI)
 // ==========================================
 function callGemini(promptText, modelName, systemInstruction, schema) {
-  const apiKey = PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY");
+  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
   if (!apiKey) return { error: "Missing GEMINI_API_KEY" };
   
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
@@ -763,16 +763,3 @@ function testTaskMasterDryRun() {
   console.log("Dry run complete. Check Google Drive for the One-Pager.");
 }
 
-/**
- * Run this function once to automatically provision the necessary Script Properties 
- * for the Task Master engine using the IDs you extracted.
- */
-function provisionTaskMasterProperties() {
-  const props = PropertiesService.getScriptProperties();
-  
-  props.setProperty("BACKLOG_LIST_ID", "RVVPcGdsYkQ2WV90bzhOcA");
-  props.setProperty("TO_BE_DELETED_LIST_ID", "QWkyNE1sdlVXMzMwbjhFQw");
-  props.setProperty("TASK_MASTER_PROMPT_ID", "18fdicBfyIpc_2sOujMz_e1_n04XsB2D9");
-  
-  console.log("SUCCESS: Task Master Script Properties have been locked in!");
-}
