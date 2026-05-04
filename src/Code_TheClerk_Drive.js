@@ -9,7 +9,7 @@
 // --- 1. CONFIGURATION ---
 const DRIVE_PROPS = PropertiesService.getScriptProperties();
 const DRIVE_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
-const DRIVE_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL;
+const DRIVE_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH;
 const DRIVE_RETRO_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_RETRO_MODEL;
 
 const DRIVE_MASTER_SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
@@ -44,7 +44,9 @@ const DRIVE_FOLDERS = {
 
 // --- 2. ENGINES ---
 
-function runTheClerkDriveOngoing() { executeEngine("ONGOING", DRIVE_MODEL_NAME); }
+function runTheClerkDriveOngoing() { 
+  executeEngine("ONGOING", DRIVE_MODEL_NAME); 
+}
 
 function executeEngine(mode, currentModel) {
     const lock = LockService.getScriptLock();

@@ -7,8 +7,9 @@ const SYSTEM_CONFIG = {
   // 1. SENSITIVE SECRETS (Fetched dynamically from Script Properties)
   SECRETS: {
     GEMINI_API_KEY: PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY"),
-    GEMINI_MODEL: PropertiesService.getScriptProperties().getProperty("GEMINI_MODEL") || "gemini-3.1-flash-lite-preview",
-    GEMINI_RETRO_MODEL: PropertiesService.getScriptProperties().getProperty("GEMINI_RETRO_MODEL") || "gemini-3.0-flash",
+    GEMINI_MODEL_PRO: PropertiesService.getScriptProperties().getProperty("GEMINI_MODEL_PRO") || "gemini-pro-latest",
+    GEMINI_MODEL_FLASH: PropertiesService.getScriptProperties().getProperty("GEMINI_MODEL_FLASH") || "gemini-flash-lite-latest",
+    GEMINI_RETRO_MODEL: PropertiesService.getScriptProperties().getProperty("GEMINI_RETRO_MODEL") || "gemini-flash-latest",
   },
   
   // 2. ROOT SYSTEM IDs (Fetched from Script Properties to prevent leaking)
@@ -20,14 +21,16 @@ const SYSTEM_CONFIG = {
   
   // 3. STRUCTURAL IDs (Hardcoded here so they are easily version-controlled in GitHub)
   DOCS: {
-    TASK_MASTER_PROMPT_ID: "18fdicBfyIpc_2sOujMz_e1_n04XsB2D9",
+    TASK_MASTER_PROMPT_ID: "11Q8GQQ33KroFw8SNTQ6ioyDvnNq4j6ar",
     TAXONOMY_DOC_ID: "1CWiCihx-aR9U-UBh04F6XjITfB8aSxrf",
-    PROMPT_TASKMASTER_OLD: "1_qa0MsqPL6KLea8UJkwBzw2KzWO9WNNe",
+    PROMPT_VANTAGE: "1Cw4KXmJ7cN114YFub9voVhlzEL_EEF1D",
     PERSONAL_GOALS_FILE_ID: "", 
     WORK_GOALS_FILE_ID: ""      
   },
   
   TASKS: {
+    IMPORTER_LIST_ID: "MDI4NDE2MzU3Nzc0OTkzOTU4NzQ6MDow",
+    TODO_LIST_ID: "RWNzLU50Qmp1QUZpalhqSg",
     BACKLOG_LIST_ID: "RVVPcGdsYkQ2WV90bzhOcA",
     TO_BE_DELETED_LIST_ID: "QWkyNE1sdlVXMzMwbjhFQw"
   },

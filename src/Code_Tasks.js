@@ -9,6 +9,10 @@
  * - Context-aware categorization using the workspace LOS taxonomy
  */
 
+function START_AI_TASK_MASTER() {
+  runTaskMasterEngine();
+}
+
 const CONFIG = {
   includeCompleted: false, 
   includeHidden: false,    
@@ -23,6 +27,7 @@ const CONFIG = {
  * and export the data to the target Spreadsheet with interleaved revision columns.
  */
 function extractTasksWithConversationDetails() {
+  return; // EMERGENCY DISABLE
   const exportTs = Utilities.formatDate(new Date(), "GMT", "yyyyMMdd-HHmmss");
   const ss = SpreadsheetApp.openById(CONFIG.spreadsheetId);
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === CONFIG.targetGid);
@@ -593,7 +598,7 @@ function batchAnalyzeTasksWithGemini(tasksBatch, existingTaskContext = "") {
 
   const props = PropertiesService.getScriptProperties();
   const apiKey = props.getProperty("GEMINI_API_KEY") || props.getProperty("gemini_api_key");
-  const modelId = props.getProperty("GEMINI_MODEL") || props.getProperty("gemini_model") || "gemini-3.1-flash-lite-preview";
+  const modelId = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH;
   
   if (!apiKey) {
     console.warn("No GEMINI_API_KEY found in Script Properties.");
@@ -862,7 +867,7 @@ function syncRevisionsToTasks() {
     let taskId = row[taskIdIdx];
     let taskListId = row[taskListIdIdx];
     
-    if (!taskId || !taskListId) return;
+    if (!taskId || !taskListId) continue;
 
     let hasUpdates = false;
     let listMigrated = false;
@@ -915,7 +920,7 @@ function syncRevisionsToTasks() {
     }
     
     if (hasUpdates) {
-      resource.notes = finalNotes;
+      resource.notes = finalNotes.replace(/\[+$/, "").trim();
     }
 
     if (newDeadline && newDeadline.toString().trim() !== "") {

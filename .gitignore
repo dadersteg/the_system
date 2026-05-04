@@ -1,6 +1,7 @@
 node_modules/
 .DS_Store
 client_secret.json
+creds.json
 System_Taxonomy_Export_*.md
 .clasp.json
 
