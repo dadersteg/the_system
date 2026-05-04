@@ -98,6 +98,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
 
   let processedCount = 0;
   const batchLogs = [];
+  const cleanupBuffer = [];
   const PROCESS_LIMIT = 15; // Max AI calls per run to prevent 6-min timeout
 
   for (let index = 0; index < threads.length; index++) {
@@ -243,7 +244,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
       console.log(` > Flagged for deletion: ${subject}`);
     }
     
-    executeAtomicCleanup(thread, finalConfig);
+    cleanupBuffer.push({ thread: thread, config: finalConfig });
 
     // 7. Granular Log Entry
     const summaryLog = aiMatch.summary || "";
@@ -288,6 +289,12 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
 
   if (batchLogs.length > 0) {
     writeBatchLogEntries(batchLogs, isRetro);
+  }
+
+  if (cleanupBuffer.length > 0) {
+    cleanupBuffer.forEach(item => {
+      executeAtomicCleanup(item.thread, item.config);
+    });
   }
 }
 
