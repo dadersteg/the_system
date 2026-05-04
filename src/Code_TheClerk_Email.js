@@ -11,24 +11,22 @@
  */
 
 // --- CONFIGURATION ---
-const SCRIPT_PROPS = PropertiesService.getScriptProperties();
-
 const MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH;
 const RETRO_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_RETRO_MODEL;
 const API_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
 
 // Drive File ID for the AI Prompt provided by the user.
 const DOC_ID = SYSTEM_CONFIG.DOCS.PROMPT_TASKMASTER_OLD;
-const TAXONOMY_JSON_ID = '199ChTlYe3xKsybllcJ3BXYUIEs8cxvWq';
+const TAXONOMY_JSON_ID = SYSTEM_CONFIG.DOCS.TAXONOMY_JSON_ID;
 
 const SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
 
-const AUDIT_GID = '1007497112'; // Label Management Tab
-const ALIAS_GID = '1799689202'; // Alias Whitelist Tab
-const LOG_GID = '2131515996';   // Granular Execution Log (Ongoing)
-const RETRO_LOG_GID = '67786861';       // Retro Execution Log (Leave blank to auto-create)
-const SUBJECT_GID = '631446789'; // Subject Rules Tab
-const SENDER_GID = '1679876125'; // Sender Rules Tab
+const AUDIT_GID = SYSTEM_CONFIG.SHEET_GIDS.LABEL_MANAGEMENT; // Label Management Tab
+const ALIAS_GID = SYSTEM_CONFIG.SHEET_GIDS.ALIAS_WHITELIST; // Alias Whitelist Tab
+const LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG;   // Granular Execution Log (Ongoing)
+const RETRO_LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_RETRO_LOG;       // Retro Execution Log (Leave blank to auto-create)
+const SUBJECT_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_SUBJECT_RULES; // Subject Rules Tab
+const SENDER_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_SENDER_RULES; // Sender Rules Tab
 
 // System Labels
 const PROCESSED_FLAG = '99 Label_Reviewed'; 
