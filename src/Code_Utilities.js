@@ -711,6 +711,7 @@ function callGemini(promptText, modelName, systemInstruction, schema) {
       delay *= 2;
     }
   }
+  return { error: "Exhausted retries due to 429/500 errors" };
 }
 
 // ==========================================

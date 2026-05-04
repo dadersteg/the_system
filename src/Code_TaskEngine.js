@@ -20,7 +20,7 @@ const PIPELINE_CONFIG = {
   taxonomyDocId: "1CWiCihx-aR9U-UBh04F6XjITfB8aSxrf"
 };
 
-const TM_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_PRO;
+const TM_MODEL_NAME = "gemini-1.5-flash";
 
 function getTaskMasterSystemPrompt() {
   const cache = CacheService.getScriptCache();
@@ -398,7 +398,8 @@ function runTaskMasterEngine() {
        currentTime: new Date().toISOString(),
        capacity: getCalendarCapacity(),
        goals: getSystemGoals(),
-       tasks: rawTasks // Pass all tasks for the global summary
+       allTasksContext: rawTasks,
+       tasksToRoute: rawTasks // During One-Pager generation, we allow it to see everything.
      };
      const summaryResult = executeTaskMasterGemini(onePagerPayload, true);
      if (summaryResult && summaryResult.onePagerMarkdown) {
@@ -420,7 +421,8 @@ function runTaskMasterEngine() {
     currentTime: new Date().toISOString(),
     capacity: capacity,
     goals: goals,
-    tasks: batchTasks
+    allTasksContext: rawTasks,
+    tasksToRoute: batchTasks
   };
   
   console.log(`Payload built. Starting Gemini Pro AI processing...`);
@@ -469,8 +471,25 @@ function getCalendarCapacity() {
 }
 
 function getSystemGoals() {
-  // Can be linked to a Google Doc or kept static.
-  return "1. Financial Independence 2. Health Optimization 3. System Development";
+  const cache = CacheService.getScriptCache();
+  const cachedGoals = cache.get("SYSTEM_GOALS_V1");
+  if (cachedGoals) return cachedGoals;
+
+  try {
+    const personalId = SYSTEM_CONFIG.DOCS.PERSONAL_GOALS_FILE_ID;
+    const workId = SYSTEM_CONFIG.DOCS.WORK_GOALS_FILE_ID;
+    
+    let goalsText = "=== PERSONAL GOALS ===\n";
+    goalsText += DriveApp.getFileById(personalId).getBlob().getDataAsString();
+    goalsText += "\n\n=== WORK GOALS ===\n";
+    goalsText += DriveApp.getFileById(workId).getBlob().getDataAsString();
+    
+    cache.put("SYSTEM_GOALS_V1", goalsText.substring(0, 100000), 21600); // Cache for 6 hours
+    return goalsText;
+  } catch (e) {
+    console.error("Failed to fetch System Goals: " + e.message);
+    return "1. Financial Independence 2. Health Optimization 3. System Development";
+  }
 }
 
 function executeTaskMasterGemini(payloadObj, isSummaryOnly = false) {
@@ -511,7 +530,10 @@ function executeTaskMasterGemini(payloadObj, isSummaryOnly = false) {
   };
 
   const result = callGemini(JSON.stringify(payloadObj), TM_MODEL_NAME, systemInstruction, schema);
-  if (result.error) return null;
+  if (!result || result.error) {
+     console.error("AI Routing failed with error:", result ? result.error : "Unknown/Undefined");
+     return null;
+  }
   return result;
 }
 
