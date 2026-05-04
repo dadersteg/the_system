@@ -1,0 +1,101 @@
+PAST gemini-project-487511
+DEBUG                2026-05-04T07:51:55 unknown         Found 0 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T07:51:55 unknown         Found 49 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T07:52:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:52:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:53:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:53:51 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:54:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:54:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:55:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:55:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:56:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:56:50 unknown         [FOUND] 0 files.    
+ERROR                2026-05-04T07:57:07 runTaskMasterEngine Exceeded maximum execution time
+DEBUG                2026-05-04T07:57:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:57:51 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:58:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:58:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:59:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:59:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:00:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:00:47 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:01:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:01:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:01:55 unknown         Found 0 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:01:56 unknown         Found 49 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:02:22 unknown         [EMAIL] No new actions found to process.
+DEBUG                2026-05-04T08:02:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:02:51 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:03:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:03:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:04:46 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:04:54 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:05:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:05:53 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:06:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:06:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:07:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:07:47 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:08:46 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:08:52 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:09:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:09:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:10:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:10:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:11:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:11:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:11:55 unknown         Found 0 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:11:55 unknown         Found 49 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:12:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:12:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:13:26 unknown         Manual Revisions Complete. Updated 0 threads across all logs.
+DEBUG                2026-05-04T08:13:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:13:56 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:14:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:14:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:15:45 unknown         Starting Legacy Tasks Cleanup...
+ERROR                2026-05-04T08:16:03 unknown         Failed to update task cW45TjUtdlJIX25GN0phQQ: API call to tasks.tasks.update failed with error: Quota Exceeded
+ERROR                2026-05-04T08:16:03 unknown         Failed to update task b2NSblFCY2VnU3I5ZFdEcg: API call to tasks.tasks.update failed with error: Quota Exceeded
+ERROR                2026-05-04T08:16:03 unknown         Failed to update task ZE5tY3J1SlpFeGdWWDRzTg: API call to tasks.tasks.update failed with error: Quota Exceeded
+ERROR                2026-05-04T08:16:03 unknown         Failed to update task aVREWDBTcExScEZQdHMxOA: API call to tasks.tasks.update failed with error: Quota Exceeded
+DEBUG                2026-05-04T08:16:03 unknown         Legacy Cleanup Complete! Fixed 97 tasks.
+DEBUG                2026-05-04T08:16:04 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:16:09 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:16:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:16:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:17:21 unknown         Starting Legacy Tasks Cleanup...
+DEBUG                2026-05-04T08:17:36 unknown         Legacy Cleanup Complete! Fixed 61 tasks.
+DEBUG                2026-05-04T08:17:38 unknown         [EMAIL] No new actions found to process.
+DEBUG                2026-05-04T08:17:47 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:17:55 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:18:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:18:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:19:46 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:19:56 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:20:56 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:21:14 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:21:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:21:51 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:21:57 unknown         Starting Legacy Tasks Cleanup...
+DEBUG                2026-05-04T08:22:12 unknown         Legacy Cleanup Complete! Fixed 60 tasks.
+DEBUG                2026-05-04T08:22:12 unknown         Found 0 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:22:12 unknown         Found 49 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:22:54 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:23:14 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:23:46 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:23:52 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:24:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:24:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:25:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:25:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:26:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:26:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:27:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:27:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:28:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:28:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:29:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:29:51 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:30:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:30:50 unknown         [FOUND] 0 files.    

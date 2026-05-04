@@ -8,7 +8,7 @@
 // --- CONFIGURATION ---
 const SCRIPT_PROPS = PropertiesService.getScriptProperties();
 
-const MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL;
+const MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH;
 const RETRO_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_RETRO_MODEL;
 const API_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
 
@@ -37,6 +37,12 @@ let labelIdMap = null;
 // =============================================================================
 
 function runTheClerkEmailOngoing() {
+  try {
+    runLegacyCleanup();
+  } catch(e) {
+    console.error("Cleanup error:", e.message);
+  }
+  
   getLabelIdByName(PROCESSED_FLAG);
   getLabelIdByName(TEMP_DELETE_LABEL);
   

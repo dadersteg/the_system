@@ -1,0 +1,101 @@
+PAST gemini-project-487511
+DEBUG                2026-05-04T07:31:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:31:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:31:55 unknown         Found 0 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T07:31:55 unknown         Found 49 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T07:32:21 unknown         [EMAIL] No new actions found to process.
+DEBUG                2026-05-04T07:32:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:32:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:33:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:33:53 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:34:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:34:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:35:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:35:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:36:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:36:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:37:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:37:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:38:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:38:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:39:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:39:47 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:40:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:40:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:41:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:41:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:41:55 unknown         Found 0 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T07:41:55 unknown         Found 49 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T07:42:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:42:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:43:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:43:55 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:44:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:44:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:45:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:45:52 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:46:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:46:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:47:22 unknown         [EMAIL] No new actions found to process.
+DEBUG                2026-05-04T07:47:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:47:51 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:48:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:48:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:49:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:49:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:50:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:50:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:51:07 unknown         Initializing Task Master Engine...
+DEBUG                2026-05-04T07:51:09 unknown         Extracted 107 active tasks and 97 upcoming events.
+DEBUG                2026-05-04T07:51:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:51:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:51:55 unknown         Found 0 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T07:51:55 unknown         Found 49 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T07:52:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:52:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:53:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:53:51 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:54:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:54:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:55:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:55:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:56:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:56:50 unknown         [FOUND] 0 files.    
+ERROR                2026-05-04T07:57:07 runTaskMasterEngine Exceeded maximum execution time
+DEBUG                2026-05-04T07:57:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:57:51 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:58:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:58:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T07:59:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T07:59:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:00:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:00:47 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:01:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:01:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:01:55 unknown         Found 0 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:01:56 unknown         Found 49 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:02:22 unknown         [EMAIL] No new actions found to process.
+DEBUG                2026-05-04T08:02:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:02:51 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:03:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:03:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:04:46 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:04:54 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:05:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:05:53 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:06:45 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:06:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:07:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:07:47 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:08:46 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:08:52 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:09:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:09:48 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:10:44 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:10:50 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:11:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:11:49 unknown         [FOUND] 0 files.    
+DEBUG                2026-05-04T08:11:55 unknown         Found 0 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:11:55 unknown         Found 49 threads. Syncing with gemini-3.1-flash-lite-preview.
+DEBUG                2026-05-04T08:12:43 unknown         >>> [ONGOING START] v26.0 using gemini-3.1-flash-lite-preview
+DEBUG                2026-05-04T08:12:48 unknown         [FOUND] 0 files.    
