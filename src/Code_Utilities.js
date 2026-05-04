@@ -3,16 +3,15 @@
  * Useful background scripts for maintaining and auditing the workspace.
  */
 
-const UTIL_PROPS = PropertiesService.getScriptProperties();
-const TARGET_FOLDER_ID = UTIL_PROPS.getProperty("WORKSPACE_FOLDER_ID");
+const TARGET_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
 if (!TARGET_FOLDER_ID) throw new Error("Missing Script Property: WORKSPACE_FOLDER_ID");
-const MASTER_SHEET_ID = UTIL_PROPS.getProperty("MASTER_SHEET_ID");
+const MASTER_SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
 
 // ==========================================
 // 1. DIRECTORY MAPPER (Google Drive)
 // ==========================================
 function executeFolderMapping() {
-  const MAPPER_GID = "536537641";
+  const MAPPER_GID = SYSTEM_CONFIG.SHEET_GIDS.MAPPER;
 
   const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === MAPPER_GID);
@@ -58,7 +57,7 @@ function traverseAndLog(parentFolder, depth, currentPath, outputData) {
 // 2. ARCHIVE RESETTER
 // ==========================================
 function executeDoneReset() {
-  const RESET_GID = "1835375017";
+  const RESET_GID = SYSTEM_CONFIG.SHEET_GIDS.RESET;
   const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === RESET_GID);
   if (!sheet) throw new Error(`Could not find sheet with GID ${RESET_GID}`);
@@ -269,7 +268,7 @@ function exportSystemManifest() {
 // ==========================================
 function backfillDatesInLog() {
   const SPREADSHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
-  const LOG_GID = "2131515996";
+  const LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG;
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === LOG_GID);
   
@@ -364,7 +363,7 @@ function recoverMemoryState() {
 // ==========================================
 function cleanLabelsFromSheetUrls() {
   const SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
-  const CLEANUP_GID = '1593358623';
+  const CLEANUP_GID = SYSTEM_CONFIG.SHEET_GIDS.CLEANUP;
   
   const ss = SpreadsheetApp.openById(SHEET_ID);
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === CLEANUP_GID);
