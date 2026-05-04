@@ -14,10 +14,10 @@
 
 const PIPELINE_CONFIG = {
   spreadsheetId: SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID,
-  emailLogGid: "2131515996",
-  driveLogGid: "809034738",
-  tasksDatabaseGid: "1580572397", // TM - Email and Tasks
-  taxonomyDocId: "1CWiCihx-aR9U-UBh04F6XjITfB8aSxrf"
+  emailLogGid: SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG,
+  driveLogGid: SYSTEM_CONFIG.SHEET_GIDS.DRIVE_LOG,
+  tasksDatabaseGid: SYSTEM_CONFIG.SHEET_GIDS.TASK_REVIEW, // TM - Email and Tasks
+  taxonomyDocId: SYSTEM_CONFIG.DOCS.TAXONOMY_DOC_ID
 };
 
 const TM_MODEL_NAME = "gemini-1.5-flash";
@@ -386,12 +386,13 @@ function runTaskMasterEngine() {
   // --------------------------------------------------------
   const BATCH_SIZE = 15;
   const props = PropertiesService.getScriptProperties();
-  let currentIndex = parseInt(props.getProperty("TASK_MASTER_INDEX") || "0", 10);
+  let currentIndex = parseInt(SYSTEM_CONFIG.TASKS.TASK_MASTER_INDEX, 10);
   
   if (currentIndex >= rawTasks.length) {
      console.log(`Finished processing all tasks. Resetting index to 0 and generating final Priority One-Pager.`);
      currentIndex = 0;
      props.setProperty("TASK_MASTER_INDEX", "0");
+     SYSTEM_CONFIG.TASKS.TASK_MASTER_INDEX = "0";
      
      // Only generate One Pager at the END of a full sweep
      const onePagerPayload = {

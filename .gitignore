@@ -16,3 +16,4 @@ __pycache__/
 
 # Scratch folder
 scratch/
+tmp_logs*.txt

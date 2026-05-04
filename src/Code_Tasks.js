@@ -17,8 +17,8 @@ const CONFIG = {
   includeCompleted: false, 
   includeHidden: false,    
   charLimit: 2000,         
-  spreadsheetId: PropertiesService.getScriptProperties().getProperty("MASTER_SHEET_ID"),
-  targetGid: "1580572397",
+  spreadsheetId: SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID,
+  targetGid: SYSTEM_CONFIG.SHEET_GIDS.TASK_REVIEW,
   geminiBatchSize: 40      // Max tasks per Gemini prompt to avoid timeouts
 };
 
@@ -538,7 +538,7 @@ function processTaskEmailLinks(task, allowedAliases = []) {
 }
 
 /**
- * Fetches the taxonomy from the Google Drive file (ID: 1CWiCihx-aR9U-UBh04F6XjITfB8aSxrf).
+ * Fetches the taxonomy from the Google Drive file.
  * Uses a basic cache to avoid redundant fetches during execution.
  */
 let cachedTaxonomy = null;
@@ -550,13 +550,13 @@ let cachedTaxonomy = null;
 function getTaxonomyDocument() {
   if (cachedTaxonomy) return cachedTaxonomy;
   try {
-    const fileId = "1CWiCihx-aR9U-UBh04F6XjITfB8aSxrf"; // Hardcoded to the Taxonomy ID the user uses
+    const fileId = SYSTEM_CONFIG.DOCS.TAXONOMY_DOC_ID;
     const file = DriveApp.getFileById(fileId);
     cachedTaxonomy = file.getBlob().getDataAsString();
     return cachedTaxonomy;
   } catch (e) {
     try {
-      const doc = DocumentApp.openById("1CWiCihx-aR9U-UBh04F6XjITfB8aSxrf");
+      const doc = DocumentApp.openById(SYSTEM_CONFIG.DOCS.TAXONOMY_DOC_ID);
       cachedTaxonomy = doc.getBody().getText();
       return cachedTaxonomy;
     } catch (e2) {
@@ -571,7 +571,7 @@ function getTaxonomyDocument() {
  * @returns {string|null} The text content of the prompt document, or null if undefined.
  */
 function getTaskMasterPrompt() {
-  const docId = PropertiesService.getScriptProperties().getProperty("PROMPT_TASKMASTER_DOC_ID") || "1_qa0MsqPL6KLea8UJkwBzw2KzWO9WNNe";
+  const docId = SYSTEM_CONFIG.DOCS.PROMPT_TASKMASTER_DOC_ID;
   if (docId) {
     try {
       try {
@@ -596,8 +596,7 @@ function getTaskMasterPrompt() {
 function batchAnalyzeTasksWithGemini(tasksBatch, existingTaskContext = "") {
   if (!tasksBatch || tasksBatch.length === 0) return {};
 
-  const props = PropertiesService.getScriptProperties();
-  const apiKey = props.getProperty("GEMINI_API_KEY") || props.getProperty("gemini_api_key");
+  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
   const modelId = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH;
   
   if (!apiKey) {
@@ -1065,7 +1064,7 @@ function syncRevisionsToTasks() {
  * @param {any[][]} results The rows containing extracted task data
  */
 function exportTasksToMarkdownDrive(results) {
-  const TARGET_FOLDER_ID = PropertiesService.getScriptProperties().getProperty("WORKSPACE_FOLDER_ID");
+  const TARGET_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
   const fileName = "Google Tasks.md";
   
   let mdContent = `# Google Tasks\n\n`;
@@ -1136,7 +1135,7 @@ function exportTasksToMarkdownDrive(results) {
  */
 function syncCompletedTasksLog() {
   const ss = SpreadsheetApp.openById(CONFIG.spreadsheetId);
-  const COMPLETED_LOG_GID = "1559346038";
+  const COMPLETED_LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.COMPLETED_TASKS_LOG;
   
   let completedSheet = ss.getSheets().find(s => s.getSheetId().toString() === COMPLETED_LOG_GID);
   if (!completedSheet) {
