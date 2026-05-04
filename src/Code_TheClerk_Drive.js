@@ -1,6 +1,6 @@
 /**
 * THE CLERK: VERSION 26.0 (THE TRUTH ENGINE)
-* - Split-Model Architecture (Standard triage uses fast model, Archive uses high-capacity).
+* - Split-Model Architecture (Both engines now default to Flash-Lite for cost-efficiency, but can be overridden via Script Properties).
 * - Deterministic Override Rules (Spreadsheet Fast-Path).
 * - Robust Error Handling & Retry Logic.
 * - Strict Taxonomy Alignment.
@@ -8,11 +8,11 @@
 
 // --- 1. CONFIGURATION ---
 const DRIVE_PROPS = PropertiesService.getScriptProperties();
-const DRIVE_KEY = DRIVE_PROPS.getProperty("gemini_api_key") || DRIVE_PROPS.getProperty("GEMINI_API_KEY");
-const DRIVE_MODEL_NAME = DRIVE_PROPS.getProperty("GEMINI_MODEL") || DRIVE_PROPS.getProperty("gemini_model") || "gemini-3.1-flash-lite-preview";
-const DRIVE_RETRO_MODEL_NAME = DRIVE_PROPS.getProperty("GEMINI_RETRO_MODEL") || "gemini-3-flash";
+const DRIVE_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
+const DRIVE_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL;
+const DRIVE_RETRO_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_RETRO_MODEL;
 
-const DRIVE_MASTER_SHEET_ID = DRIVE_PROPS.getProperty("MASTER_SHEET_ID");
+const DRIVE_MASTER_SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
 const DRIVE_LOG_GID = "809034738";
 const DRIVE_SESSION_LOG_GID = "1657749758";
 const DRIVE_RULES_SHEET_ID = DRIVE_PROPS.getProperty("DRIVE_RULES_SHEET_ID") || DRIVE_MASTER_SHEET_ID;
@@ -45,7 +45,6 @@ const DRIVE_FOLDERS = {
 // --- 2. ENGINES ---
 
 function runTheClerkDriveOngoing() { executeEngine("ONGOING", DRIVE_MODEL_NAME); }
-function runTheClerkDriveRetro() { executeEngine("RETRO", DRIVE_RETRO_MODEL_NAME); }
 
 function executeEngine(mode, currentModel) {
     const lock = LockService.getScriptLock();
@@ -63,21 +62,25 @@ function executeEngine(mode, currentModel) {
         let allFiles = [];
 
         // Search Phase
-        if (mode === "ONGOING") {
-            DRIVE_FOLDERS.STND_SOURCES.forEach(id => {
-                try {
-                    const folder = DriveApp.getFolderById(id);
-                    const files = folder.getFiles();
-                    while (files.hasNext() && allFiles.length < DRIVE_TOTAL_FILES_LIMIT) {
-                        const f = files.next();
-                        allFiles.push({ id: f.getId(), name: f.getName(), mime: f.getMimeType(), desc: f.getDescription() || "", sourceFolderId: id });
-                    }
-                } catch (e) { console.error("Error fetching files from folder " + id + ": " + e.message); }
-            });
-        } else {
-            const processedIds = new Set(log.getDataRange().getValues().map(r => String(r[0]).includes("id=") ? r[0].split('id=')[1] : null));
-            allFiles = getArchiveFilesRecursive(DRIVE_FOLDERS.ARCHIVE_ROOT, processedIds, DRIVE_TOTAL_FILES_LIMIT);
-        }
+        DRIVE_FOLDERS.STND_SOURCES.forEach(id => {
+            try {
+                const folder = DriveApp.getFolderById(id);
+                const folderPath = getFullFolderPath(folder);
+                const files = folder.getFiles();
+                while (files.hasNext() && allFiles.length < DRIVE_TOTAL_FILES_LIMIT) {
+                    const f = files.next();
+                    allFiles.push({ 
+                        id: f.getId(), 
+                        name: f.getName(), 
+                        mime: f.getMimeType(), 
+                        desc: f.getDescription() || "", 
+                        sourceFolderId: id,
+                        folderPath: folderPath,
+                        dateCreated: Utilities.formatDate(f.getDateCreated(), "GMT", "yyyy-MM-dd")
+                    });
+                }
+            } catch (e) { console.error("Error fetching files from folder " + id + ": " + e.message); }
+        });
 
         console.log(`[FOUND] ${allFiles.length} files.`);
         if (allFiles.length === 0) return;
@@ -225,33 +228,28 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules) {
             file.setName(finalName);
             file.setDescription(`${data.description}\n\nSummary: ${data.summary}`);
             
-            let sourceFolderPath = f.sourceFolderId;
-            if (mode === "RETRO") {
-                try { sourceFolderPath = getFullFolderPath(DriveApp.getFolderById(f.sourceFolderId)); } catch(e) {}
-            }
+            let sourceFolderPath = f.folderPath || f.sourceFolderId;
 
             let moved = false;
-            let targetFolderId = "Root";
-            let targetFolderPath = "My Drive";
-            if (data.context_id && data.context_id !== "Unknown") {
-                const folders = DriveApp.getFoldersByName(data.context_id);
-                if (folders.hasNext()) {
-                    const targetFolder = folders.next();
-                    file.moveTo(targetFolder);
-                    targetFolderId = targetFolder.getId();
-                    targetFolderPath = getFullFolderPath(targetFolder);
-                    moved = true;
-                }
-            }
+            let targetFolderId = f.sourceFolderId; // Default to staying in place
+            let targetFolderPath = sourceFolderPath;
             
-            if (!moved) {
-                if (mode === "RETRO") {
-                    const retroReviewFolder = DriveApp.getFolderById(DRIVE_FOLDERS.REVIEW_RETRO);
-                    file.moveTo(retroReviewFolder);
-                    targetFolderId = retroReviewFolder.getId();
-                    targetFolderPath = getFullFolderPath(retroReviewFolder);
-                    console.log(`   [WARNING] Target folder '${data.context_id}' not found. Moved to Retro Review.`);
-                } else {
+            if (mode === "ONGOING") {
+                targetFolderId = "Root";
+                targetFolderPath = "My Drive";
+                
+                if (data.context_id && data.context_id !== "Unknown") {
+                    const folders = DriveApp.getFoldersByName(data.context_id);
+                    if (folders.hasNext()) {
+                        const targetFolder = folders.next();
+                        file.moveTo(targetFolder);
+                        targetFolderId = targetFolder.getId();
+                        targetFolderPath = getFullFolderPath(targetFolder);
+                        moved = true;
+                    }
+                }
+                
+                if (!moved) {
                     const reviewFolder = DriveApp.getFolderById(DRIVE_FOLDERS.REVIEW);
                     file.moveTo(reviewFolder);
                     targetFolderId = reviewFolder.getId();
@@ -264,8 +262,8 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules) {
             let shortcutsCreated = [];
             let aggPaths = data.aggregator_paths || [];
             
-            // Only create shortcuts if the primary routing succeeded
-            if (moved && Array.isArray(aggPaths)) {
+            // Only create shortcuts in ONGOING mode if the primary routing succeeded
+            if (mode === "ONGOING" && moved && Array.isArray(aggPaths)) {
                 aggPaths.forEach(aggPath => {
                     if (aggPath && aggPath !== "Unknown" && aggPath !== data.concat_path) {
                         const aggParts = aggPath.split(">");
@@ -439,7 +437,10 @@ function extractContentV3(fileObj) {
 function askGeminiStable(rules, batch, currentModel) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${DRIVE_KEY}`;
     const parts = [{ text: rules }, { text: `Analyze ${batch.length} files. Return JSON ARRAY.` }];
-    batch.forEach((f, i) => { parts.push({ text: `--- FILE [${i}]: ${f.name} ---` }); parts.push(f.parts); });
+    batch.forEach((f, i) => { 
+        parts.push({ text: `--- FILE [${i}] ---\nFilename: ${f.name}\nMETADATA_CONTEXT:\n- dateCreated: ${f.dateCreated || "Unknown"}\n- folder_context: ${f.folderPath || "Unknown"}` }); 
+        parts.push(f.parts); 
+    });
 
     const options = { 
         method: "post", 
@@ -488,22 +489,36 @@ function askGeminiStable(rules, batch, currentModel) {
 // --- 7. HELPERS ---
 
 function getArchiveFilesRecursive(folderId, processedSet, limit) {
-    const list = []; const stack = [folderId];
+    const list = []; 
+    let rootPath = "Archive";
+    try { rootPath = DriveApp.getFolderById(folderId).getName(); } catch(e) {}
+    const stack = [{id: folderId, path: rootPath}];
+    
     while (stack.length > 0 && list.length < limit) {
-        const id = stack.pop();
+        const current = stack.pop();
         try {
-            const folder = DriveApp.getFolderById(id);
+            const folder = DriveApp.getFolderById(current.id);
             const files = folder.getFiles();
             while (files.hasNext() && list.length < limit) {
                 const f = files.next();
-                if (!processedSet.has(f.getId())) list.push({ id: f.getId(), name: f.getName(), mime: f.getMimeType(), desc: f.getDescription() || "", sourceFolderId: id });
+                if (!processedSet.has(f.getId())) {
+                    list.push({ 
+                        id: f.getId(), 
+                        name: f.getName(), 
+                        mime: f.getMimeType(), 
+                        desc: f.getDescription() || "", 
+                        sourceFolderId: current.id,
+                        folderPath: current.path,
+                        dateCreated: Utilities.formatDate(f.getDateCreated(), "GMT", "yyyy-MM-dd")
+                    });
+                }
             }
             const subs = folder.getFolders();
             while (subs.hasNext()) {
                 const s = subs.next();
-                if (s.getName() !== "[File Review]") stack.push(s.getId());
+                if (s.getName() !== "[File Review]") stack.push({id: s.getId(), path: current.path + "/" + s.getName()});
             }
-        } catch (e) { console.error("Error in getArchiveFilesRecursive for folder " + id + ": " + e.message); }
+        } catch (e) { console.error("Error in getArchiveFilesRecursive for folder " + current.id + ": " + e.message); }
     }
     return list;
 }

@@ -3,7 +3,7 @@
  * Fetches available Gemini models from the API and populates the dedicated sheet tab.
  */
 function updateModelList() {
-  const ss = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty("MASTER_SHEET_ID"));
+  const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
   const targetGid = 1704335578;
   const sheets = ss.getSheets();
   let sheet = null;
@@ -15,7 +15,7 @@ function updateModelList() {
   }
   if (!sheet) throw new Error("Target sheet with GID " + targetGid + " not found.");
 
-  const apiKey = PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY") || PropertiesService.getScriptProperties().getProperty("gemini_api_key");
+  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
   if (!apiKey) throw new Error("Missing Gemini API Key in Script Properties");
   
   const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
@@ -70,7 +70,7 @@ function updateModelList() {
   sheet.autoResizeColumns(1, tableData[0].length);
   
   // Export to Google Drive as JSON
-  const TARGET_FOLDER_ID = PropertiesService.getScriptProperties().getProperty("WORKSPACE_FOLDER_ID"); // Main Docs Workspace
+  const TARGET_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
   const fileName = "Actual_Gemini_Models.json";
   
   try {
@@ -87,4 +87,15 @@ function updateModelList() {
   } catch (e) {
     console.error("Failed to write JSON to Drive: " + e.message);
   }
+}
+
+function getModelsForCLI() {
+  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+  const response = UrlFetchApp.fetch(url, {muteHttpExceptions: true});
+  const data = JSON.parse(response.getContentText());
+  if (data.models) {
+    return data.models.map(m => m.name);
+  }
+  return "Error: " + response.getContentText();
 }

@@ -5,7 +5,7 @@
  */
 
 const PIPELINE_CONFIG = {
-  spreadsheetId: PropertiesService.getScriptProperties().getProperty("MASTER_SHEET_ID"),
+  spreadsheetId: SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID,
   emailLogGid: "2131515996",
   driveLogGid: "809034738",
   tasksDatabaseGid: "1580572397", // TM - Email and Tasks
@@ -291,8 +291,8 @@ function getExistingTasksForLinks(ss, links) {
  */
 function harmonizeTasksWithGemini(groupedData) {
   const props = PropertiesService.getScriptProperties();
-  const apiKey = props.getProperty("GEMINI_API_KEY") || props.getProperty("gemini_api_key");
-  const modelId = props.getProperty("GEMINI_MODEL") || props.getProperty("gemini_model") || "gemini-3.1-flash-lite-preview";
+  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
+  const modelId = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL;
   
   if (!apiKey) return null;
 
@@ -308,7 +308,7 @@ function harmonizeTasksWithGemini(groupedData) {
   }
 
   let basePrompt = "";
-  const promptDocId = props.getProperty("PROMPT_TASKMASTER_DOC_ID") || "1_qa0MsqPL6KLea8UJkwBzw2KzWO9WNNe";
+  const promptDocId = SYSTEM_CONFIG.DOCS.PROMPT_TASKMASTER_OLD;
   try {
     basePrompt = DocumentApp.openById(promptDocId).getBody().getText();
   } catch (e) {

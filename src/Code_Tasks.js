@@ -227,7 +227,7 @@ function extractTasksWithConversationDetails() {
       }
       
       const summary = currentNotes.trim();
-      notesRevised = `${summary}\n\n${metaBlock}\n\n${link}`.trim();
+      notesRevised = link ? `${link}\n\n${summary}\n\n${metaBlock}`.trim() : `${summary}\n\n${metaBlock}`.trim();
     } else {
       notesRevised = currentNotes;
     }
@@ -251,6 +251,24 @@ function extractTasksWithConversationDetails() {
          systemComment = "Missing action separator ' > '.";
       }
     }
+
+    let sysCommentParsed = "";
+    let daCommentParsed = "";
+    const rawNotes = task.notes || "";
+    
+    const sysMatch = rawNotes.match(/^SYS:\s*(.*)$/m);
+    if (sysMatch) sysCommentParsed = sysMatch[1];
+    
+    const daMatch = rawNotes.match(/^DA:\s*(.*)$/m);
+    if (daMatch) daCommentParsed = daMatch[1];
+    
+    if (systemComment !== "") {
+       systemComment += sysCommentParsed ? ` | AI: ${sysCommentParsed}` : "";
+    } else {
+       systemComment = sysCommentParsed;
+    }
+    
+    let daComment = daCommentParsed;
 
     if (!isLOSValid) {
       // Only auto-populate if the user HAS NOT manually reviewed them yet!
@@ -355,7 +373,7 @@ function extractTasksWithConversationDetails() {
       emailInfo.labels, 
       emailInfo.firstSender, emailInfo.firstBody,
       emailInfo.lastSender, emailInfo.lastBody, emailInfo.link,
-      aiData.emailSummary || "N/A", aiData.proposedCategory || "N/A", systemComment,
+      aiData.emailSummary || "N/A", aiData.proposedCategory || "N/A", systemComment, daComment,
       task.id, taskList.id, status      // Hidden Tracking IDs & Original Status
     ]);
     
@@ -381,7 +399,7 @@ function getExportHeaders() {
     "Email Labels",
     "First Msg (Sender)", "First Msg (Body Preview)", 
     "Last Msg (Sender)", "Last Msg (Body Preview)", "Email Link",
-    "AI Context Summary", "AI Proposed Category", "System Comment",
+    "AI Context Summary", "AI Proposed Category", "System Comment", "DA Comment",
     "Task ID", "Task List ID", "Original Status"
   ];
 }
@@ -401,7 +419,7 @@ function getExportDescriptions() {
     "Native Gmail Labels",
     "First Msg Sender", "Snippet", 
     "Last Msg Sender", "Snippet", "Link to Thread",
-    "AI generated brief", "AI proposed routing category", "System flagged errors",
+    "AI generated brief", "AI proposed routing category", "System flagged errors", "Direct instruction to Task Master",
     "Hidden System ID", "Hidden System ID", "Hidden System Status"
   ];
 }
@@ -825,6 +843,7 @@ function syncRevisionsToTasks() {
   const taskListIdIdx = headers.indexOf("Task List ID");
   const originalStatusIdx = headers.indexOf("Original Status");
   const sysCommentIdx = headers.indexOf("System Comment");
+  const daCommentIdx = headers.indexOf("DA Comment");
 
   if (taskIdIdx === -1 || taskListIdIdx === -1) {
     console.error("Task ID or Task List ID columns missing. Cannot sync.");
@@ -875,9 +894,28 @@ function syncRevisionsToTasks() {
     }
     
     const originalNotes = row[notesIdx] ? row[notesIdx].toString().trim() : "";
+    let finalNotes = originalNotes;
+    
     if (newNotes && newNotes.toString().trim() !== "" && newNotes.toString().trim() !== originalNotes) {
-      resource.notes = newNotes;
+      finalNotes = newNotes;
       hasUpdates = true;
+    }
+
+    const daCommentRev = daCommentIdx !== -1 ? row[daCommentIdx] : undefined;
+    if (daCommentRev && daCommentRev.toString().trim() !== "") {
+      const existingDA = finalNotes.match(/^DA:\s*(.*)$/m);
+      if (!existingDA || existingDA[1].trim() !== daCommentRev.toString().trim()) {
+        if (finalNotes.includes("DA:")) {
+           finalNotes = finalNotes.replace(/^DA:.*$/gm, `DA: ${daCommentRev.toString().trim()}`);
+        } else {
+           finalNotes += `\n\nDA: ${daCommentRev.toString().trim()}`;
+        }
+        hasUpdates = true;
+      }
+    }
+    
+    if (hasUpdates) {
+      resource.notes = finalNotes;
     }
 
     if (newDeadline && newDeadline.toString().trim() !== "") {

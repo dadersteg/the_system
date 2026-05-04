@@ -5,7 +5,7 @@
  */
 
 function updateLabelList() {
-const ss = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty("MASTER_SHEET_ID"));
+const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
   
   // Try to find the Label Management tab (GID from Clerk) or default to creating a new one
   const targetGid = 1007497112; 
@@ -64,7 +64,7 @@ const ss = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getPr
   sheet.autoResizeColumns(1, tableData[0].length);
   
   // 3. Export to Google Drive as JSON
-  const TARGET_FOLDER_ID = PropertiesService.getScriptProperties().getProperty("WORKSPACE_FOLDER_ID"); // Main Docs Workspace
+  const TARGET_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
   const fileName = "Actual_Gmail_Labels.json";
   
   try {
