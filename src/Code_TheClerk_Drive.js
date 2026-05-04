@@ -1,10 +1,14 @@
 /**
-* THE CLERK: VERSION 26.0 (THE TRUTH ENGINE)
-* - Split-Model Architecture (Both engines now default to Flash-Lite for cost-efficiency, but can be overridden via Script Properties).
-* - Deterministic Override Rules (Spreadsheet Fast-Path).
-* - Robust Error Handling & Retry Logic.
-* - Strict Taxonomy Alignment.
-*/
+ * @file Code_TheClerk_Drive.js
+ * @description THE CLERK: VERSION 26.0 (THE TRUTH ENGINE). Ingests files from Google Drive, extracts content via OCR/Text conversion, categorizes them against a taxonomy using Gemini, and routes/renames files based on strict protocols or spreadsheet overrides.
+ *
+ * @version 26.0.1
+ * @last_modified 2024-05-24
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 26.0.1: Implemented folderCache to reduce duplicate Drive API calls for identical taxonomy contexts. Increased Gemini batching parameters to 5 files per call to maximize throughput.
+ */
 
 // --- 1. CONFIGURATION ---
 const DRIVE_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
@@ -19,8 +23,8 @@ const DRIVE_RULES_SHEET_ID = SYSTEM_CONFIG.ROOTS.DRIVE_RULES_SHEET_ID;
 const DRIVE_FILENAME_RULES_GID = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_FILENAME_RULES; // Filename Rules Tab
 const DRIVE_FOLDER_RULES_GID = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_FOLDER_RULES;   // Folder Rules Tab
 
-const DRIVE_MAX_BATCH_SIZE = 1;
-const DRIVE_TOTAL_FILES_LIMIT = 5;
+const DRIVE_MAX_BATCH_SIZE = 5;
+const DRIVE_TOTAL_FILES_LIMIT = 20;
 const DRIVE_MAX_EXECUTION_TIME_MS = 280000;
 
 const DRIVE_DOC_IDS = {
@@ -60,6 +64,7 @@ function executeEngine(mode, currentModel) {
         
         if (!log) throw new Error("Execution Log sheet not found.");
         const fullRules = loadKnowledgeDocs();
+        const folderCache = { byId: {}, byName: {} };
         let allFiles = [];
 
         // Search Phase
@@ -97,19 +102,19 @@ function executeEngine(mode, currentModel) {
 
             if (needsIsolation) {
                 if (currentBatch.length > 0) { 
-                    processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules); 
+                    processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules, folderCache);
                     currentBatch = []; 
                 }
-                processAndLog([f], fullRules, log, mode, currentModel, driveRules);
+                processAndLog([f], fullRules, log, mode, currentModel, driveRules, folderCache);
             } else {
                 currentBatch.push(f);
                 if (currentBatch.length >= DRIVE_MAX_BATCH_SIZE) { 
-                    processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules); 
+                    processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules, folderCache);
                     currentBatch = []; 
                 }
             }
         }
-        if (currentBatch.length > 0) processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules);
+        if (currentBatch.length > 0) processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules, folderCache);
 
         if (sessionLog) {
             sessionLog.appendRow([new Date(), mode, currentModel, allFiles.length, "Completed", `${((Date.now() - sessionStart) / 1000).toFixed(1)}s`]);
@@ -129,7 +134,7 @@ function executeEngine(mode, currentModel) {
 
 // --- 3. UNIFIED PROCESSING & LOGGING ---
 
-function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules) {
+function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, folderCache) {
     console.log(`   > Extracting: ${batch.map(b => b.name).join(", ")}`);
     const batchLogs = [];
     let validFiles = [];
@@ -178,7 +183,7 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules) {
                     logSheet.getRange(logSheet.getLastRow() + 1, 1, batchLogs.length, batchLogs[0].length).setValues(batchLogs);
                     batchLogs.length = 0;
                 }
-                filesForAI.forEach(single => processAndLog([single], rules, logSheet, mode, currentModel, driveRules));
+                filesForAI.forEach(single => processAndLog([single], rules, logSheet, mode, currentModel, driveRules, folderCache));
                 filesForAI = []; // Prevent double processing
             } else {
                 const f = filesForAI[0];
@@ -240,21 +245,46 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules) {
                 targetFolderPath = "My Drive";
                 
                 if (data.context_id && data.context_id !== "Unknown") {
-                    const folders = DriveApp.getFoldersByName(data.context_id);
-                    if (folders.hasNext()) {
-                        const targetFolder = folders.next();
+                    let targetFolder = null;
+                    if (folderCache.byName[data.context_id]) {
+                        targetFolder = folderCache.byName[data.context_id];
+                    } else {
+                        const folders = DriveApp.getFoldersByName(data.context_id);
+                        if (folders.hasNext()) {
+                            targetFolder = folders.next();
+                            folderCache.byName[data.context_id] = targetFolder;
+                        }
+                    }
+
+                    if (targetFolder) {
                         file.moveTo(targetFolder);
                         targetFolderId = targetFolder.getId();
-                        targetFolderPath = getFullFolderPath(targetFolder);
+
+                        // Also cache full folder paths
+                        if (!targetFolder.fullPath) {
+                            targetFolder.fullPath = getFullFolderPath(targetFolder);
+                        }
+                        targetFolderPath = targetFolder.fullPath;
                         moved = true;
                     }
                 }
                 
                 if (!moved) {
-                    const reviewFolder = DriveApp.getFolderById(DRIVE_FOLDERS.REVIEW);
+                    let reviewFolder = null;
+                    if (folderCache.byId[DRIVE_FOLDERS.REVIEW]) {
+                        reviewFolder = folderCache.byId[DRIVE_FOLDERS.REVIEW];
+                    } else {
+                        reviewFolder = DriveApp.getFolderById(DRIVE_FOLDERS.REVIEW);
+                        folderCache.byId[DRIVE_FOLDERS.REVIEW] = reviewFolder;
+                    }
+
                     file.moveTo(reviewFolder);
                     targetFolderId = reviewFolder.getId();
-                    targetFolderPath = getFullFolderPath(reviewFolder);
+
+                    if (!reviewFolder.fullPath) {
+                        reviewFolder.fullPath = getFullFolderPath(reviewFolder);
+                    }
+                    targetFolderPath = reviewFolder.fullPath;
                     console.log(`   [WARNING] Target folder '${data.context_id}' not found. Moved to Manual Review.`);
                 }
             }
@@ -269,10 +299,18 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules) {
                     if (aggPath && aggPath !== "Unknown" && aggPath !== data.concat_path) {
                         const aggParts = aggPath.split(">");
                         const aggContextId = aggParts[aggParts.length - 1].trim();
-                        const aggFolders = DriveApp.getFoldersByName(aggContextId);
+                        let targetAggFolder = null;
+                        if (folderCache.byName[aggContextId]) {
+                            targetAggFolder = folderCache.byName[aggContextId];
+                        } else {
+                            const aggFolders = DriveApp.getFoldersByName(aggContextId);
+                            if (aggFolders.hasNext()) {
+                                targetAggFolder = aggFolders.next();
+                                folderCache.byName[aggContextId] = targetAggFolder;
+                            }
+                        }
                         
-                        if (aggFolders.hasNext()) {
-                            const targetAggFolder = aggFolders.next();
+                        if (targetAggFolder) {
                             try {
                                 const resource = {
                                     name: finalName,

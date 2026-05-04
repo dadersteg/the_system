@@ -1,8 +1,13 @@
-/** 
- * THE CLERK: EMAIL TRIAGE ENGINE (formerly CELLSIOR V5.6)
- * ---------------------------------------------------------
- * Logic: Merged SS + Dynamic AI + Whitelisted Alias + Atomic API + Granular Logging
- * Requirement: Enable "Gmail API" under Services.
+/**
+ * @file Code_TheClerk_Email.js
+ * @description THE CLERK: EMAIL TRIAGE ENGINE. Sweeps unprocessed emails, applies deterministic rules via Google Sheets, infers context via Gemini AI, and auto-labels or temp-deletes them.
+ *
+ * @version 1.0.1
+ * @last_modified 2024-05-24
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.1: Hoisted API calls for configs to runTheClerkEmailOngoing to avoid redundant requests. Refactored log writing to batch operations (writeBatchLogEntries) to prevent timeouts.
  */
 
 // --- CONFIGURATION ---
@@ -46,17 +51,28 @@ function runTheClerkEmailOngoing() {
   
   // 1. THE SWEEPER: Catch all unprocessed emails (Drops out once labeled, impossible to bury)
   const newEmailQuery = `-label:"${PROCESSED_FLAG}" newer_than:2d`;
-  executeTriageEngine(newEmailQuery, 40, false);
+  // executeTriageEngine(newEmailQuery, 40, false); // Removed and re-added below
 
   // 2. THE REPLY MONITOR: Catch new replies on already processed threads
   // Since new replies jump to the top of the inbox, they will always be within the top 100
   const replyQuery = `label:"${PROCESSED_FLAG}" newer_than:2d`;
-  executeTriageEngine(replyQuery, 100, false);
+
+  // Hoist API calls outside of the main loop
+  const configPayload = {
+    sheetRules: getSheetRules(),
+    subjectRules: getSubjectRules(),
+    allowedAliases: getAllowedAliases(),
+    fullDocPrompt: DriveApp.getFileById(DOC_ID).getBlob().getDataAsString(),
+    taxonomyJsonStr: DriveApp.getFileById(TAXONOMY_JSON_ID).getBlob().getDataAsString()
+  };
+
+  executeTriageEngine(newEmailQuery, 40, false, configPayload);
+  executeTriageEngine(replyQuery, 100, false, configPayload);
 }
 
 // Removed runTheClerkEmailRetro as it is handled by the unified Code_BatchRetro.js
 
-function executeTriageEngine(searchQuery, searchLimit, isRetro) {
+function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
   const threads = GmailApp.search(searchQuery, 0, searchLimit); 
   
   const runTimestamp = new Date();
@@ -64,11 +80,12 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro) {
   console.log(`Found ${threads.length} threads. Syncing with ${currentModel}.`);
   if (threads.length === 0) return;
 
-  const sheetRules = getSheetRules();
-  const subjectRules = getSubjectRules();
-  const allowedAliases = getAllowedAliases();
-  const fullDocPrompt = DriveApp.getFileById(DOC_ID).getBlob().getDataAsString();
-  const taxonomyJsonStr = DriveApp.getFileById(TAXONOMY_JSON_ID).getBlob().getDataAsString();
+  // Use pre-fetched payload if available (for Ongoing mode) or fetch directly (for Retro mode fallback)
+  const sheetRules = configPayload ? configPayload.sheetRules : getSheetRules();
+  const subjectRules = configPayload ? configPayload.subjectRules : getSubjectRules();
+  const allowedAliases = configPayload ? configPayload.allowedAliases : getAllowedAliases();
+  const fullDocPrompt = configPayload ? configPayload.fullDocPrompt : DriveApp.getFileById(DOC_ID).getBlob().getDataAsString();
+  const taxonomyJsonStr = configPayload ? configPayload.taxonomyJsonStr : DriveApp.getFileById(TAXONOMY_JSON_ID).getBlob().getDataAsString();
 
   const props = PropertiesService.getScriptProperties();
   let threadState = {};
@@ -78,6 +95,8 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro) {
   }
 
   let processedCount = 0;
+  const batchLogs = [];
+  const cleanupBuffer = [];
   const PROCESS_LIMIT = 15; // Max AI calls per run to prevent 6-min timeout
 
   for (let index = 0; index < threads.length; index++) {
@@ -223,7 +242,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro) {
       console.log(` > Flagged for deletion: ${subject}`);
     }
     
-    executeAtomicCleanup(thread, finalConfig);
+    cleanupBuffer.push({ thread: thread, config: finalConfig });
 
     // 7. Granular Log Entry
     const summaryLog = aiMatch.summary || "";
@@ -231,7 +250,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro) {
       ? aiMatch.actionItems.join('; ') 
       : "";
 
-    writeSingleLogEntry({
+    batchLogs.push({
       "Timestamp": runTimestamp, 
       "Received First Message": firstMsgDate,
       "Received Last Message": lastMsgDate,
@@ -249,7 +268,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro) {
       "Task Synced": "",
       "Revised Labels (Override)": "",
       "Override Status": ""
-    }, isRetro);
+    });
     
     if (!isRetro) {
       threadState[threadId] = lastMsgId;
@@ -265,6 +284,16 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro) {
     
     processedCount++;
   } // End of for-loop
+
+  if (batchLogs.length > 0) {
+    writeBatchLogEntries(batchLogs, isRetro);
+  }
+
+  if (cleanupBuffer.length > 0) {
+    cleanupBuffer.forEach(item => {
+      executeAtomicCleanup(item.thread, item.config);
+    });
+  }
 }
 
 /**
@@ -322,9 +351,11 @@ function mergeConfigs(ss, ai) {
 }
 
 /**
- * Writes granular logs to the Spreadsheet immediately per thread
+ * Writes granular logs to the Spreadsheet in a single batch
  */
-function writeSingleLogEntry(rowObj, isRetro) {
+function writeBatchLogEntries(batchLogsArray, isRetro) {
+  if (!batchLogsArray || batchLogsArray.length === 0) return;
+
   const ss = SpreadsheetApp.openById(SHEET_ID);
   
   const targetGid = isRetro ? RETRO_LOG_GID : LOG_GID;
@@ -356,25 +387,31 @@ function writeSingleLogEntry(rowObj, isRetro) {
   
   let headers = data.length > 0 ? data[headerRowIdx] : [];
   if (headers.length === 0) {
-    headers = Object.keys(rowObj);
+    headers = Object.keys(batchLogsArray[0]);
     sheet.appendRow(headers);
     headerRowIdx = sheet.getLastRow() - 1;
   }
 
-  const newRow = new Array(headers.length).fill("");
+  const rowsToWrite = [];
 
-  Object.keys(rowObj).forEach(key => {
-    let idx = headers.findIndex(h => h.toString().trim().toLowerCase() === key.toLowerCase());
-    if (idx !== -1) {
-      newRow[idx] = rowObj[key];
-    } else {
-      headers.push(key);
-      newRow.push(rowObj[key]);
-      sheet.getRange(headerRowIdx + 1, headers.length).setValue(key);
-    }
+  batchLogsArray.forEach(rowObj => {
+    const newRow = new Array(headers.length).fill("");
+    Object.keys(rowObj).forEach(key => {
+      let idx = headers.findIndex(h => h.toString().trim().toLowerCase() === key.toLowerCase());
+      if (idx !== -1) {
+        newRow[idx] = rowObj[key];
+      } else {
+        headers.push(key);
+        newRow.push(rowObj[key]);
+        sheet.getRange(headerRowIdx + 1, headers.length).setValue(key);
+      }
+    });
+    rowsToWrite.push(newRow);
   });
 
-  sheet.appendRow(newRow);
+  if (rowsToWrite.length > 0) {
+    sheet.getRange(sheet.getLastRow() + 1, 1, rowsToWrite.length, rowsToWrite[0].length).setValues(rowsToWrite);
+  }
 }
 
 // --- CORE UTILITIES ---
