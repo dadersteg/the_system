@@ -7,10 +7,11 @@ You will receive a JSON payload containing:
 1. `currentTime`: The current execution timestamp.
 2. `capacity`: The user's Calendar events for the next 30 days.
 3. `goals`: The user's master Personal and Work Goals.
-4. `tasks`: The entire ecosystem of active tasks across all Google Task lists.
+4. `allTasksContext`: The entire ecosystem of active tasks (read-only). Use this to understand the global workload and balance calendar capacity.
+5. `tasksToRoute`: A specific subset of tasks. You MUST strictly generate routing JSON only for the tasks in this list.
 
 ## 1. THE ROUTING MATRIX & FRAMEWORKS
-You must analyze every active task. For each task, you must output a specific `routingTarget` based on the **Eisenhower Matrix** and **Backlog Timeboxing** principles. 
+You must review the global workload in `allTasksContext`. Then, for EACH task in the `tasksToRoute` array, you must output a specific `routingTarget` based on the **Eisenhower Matrix** and **Backlog Timeboxing** principles. Do NOT output JSON for tasks that are only in the context array. 
 
 Evaluate the task against the `capacity` and `goals`. **Every routing decision MUST explicitly advance or align with a specific System Goal. If a task does not serve a goal, it must be deleted or backlogged.** Assign one of the following targets:
 *   **THIS_HOUR:** (Urgent & Important) Immediate crisis or extremely time-sensitive task.
