@@ -2,12 +2,13 @@
  * @file Code_TheClerk_Drive.js
  * @description THE CLERK: VERSION 26.0 (THE TRUTH ENGINE). Ingests files from Google Drive, extracts content via OCR/Text conversion, categorizes them against a taxonomy using Gemini, and routes/renames files based on strict protocols or spreadsheet overrides.
  *
- * @version 26.0.1
+ * @version 26.0.2
  * @last_modified 2024-05-24
  * @modified_by Jules
  *
  * @changelog
  * - 26.0.1: Implemented folderCache to reduce duplicate Drive API calls for identical taxonomy contexts. Increased Gemini batching parameters to 5 files per call to maximize throughput.
+ * - 26.0.2: Added comprehensive JSDoc comments to configuration constants.
  */
 
 // --- 1. CONFIGURATION ---
@@ -23,10 +24,35 @@ const DRIVE_RULES_SHEET_ID = SYSTEM_CONFIG.ROOTS.DRIVE_RULES_SHEET_ID;
 const DRIVE_FILENAME_RULES_GID = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_FILENAME_RULES; // Filename Rules Tab
 const DRIVE_FOLDER_RULES_GID = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_FOLDER_RULES;   // Folder Rules Tab
 
+/**
+ * @constant {number} DRIVE_MAX_BATCH_SIZE
+ * @description Defines the chunking limit (max number of files sent in a single Gemini API payload).
+ * By batching files, the system avoids generating excessively large payloads that could crash the
+ * script or exceed API limits, while maintaining efficient throughput within execution boundaries.
+ */
 const DRIVE_MAX_BATCH_SIZE = 5;
+
+/**
+ * @constant {number} DRIVE_TOTAL_FILES_LIMIT
+ * @description The absolute maximum number of Drive files to process in a single execution.
+ * This acts as a fail-safe threshold to prevent the script from hitting Google Apps Script's
+ * strict 6-minute execution timeout.
+ */
 const DRIVE_TOTAL_FILES_LIMIT = 20;
+
+/**
+ * @constant {number} DRIVE_MAX_EXECUTION_TIME_MS
+ * @description The maximum execution time allowed (in milliseconds) before proactively halting operations.
+ * Allows the script to terminate gracefully and commit state changes just prior to hitting the
+ * 6-minute (360,000 ms) Google Apps Script hard timeout.
+ */
 const DRIVE_MAX_EXECUTION_TIME_MS = 280000;
 
+/**
+ * @constant {Object} DRIVE_DOC_IDS
+ * @description Stores structural Document IDs necessary for Drive file processing.
+ * Includes IDs for operational instructions, taxonomy definitions (JSON format), and system protocols.
+ */
 const DRIVE_DOC_IDS = {
     INSTRUCTIONS: SYSTEM_CONFIG.DOCS.CLERK_DRIVE_INSTRUCTIONS,
     TAXONOMY_JSON: SYSTEM_CONFIG.DOCS.TAXONOMY_JSON_ID, // Structured JSON
@@ -36,6 +62,11 @@ const DRIVE_DOC_IDS = {
 const DRIVE_ARCHIVE_ROOT = SYSTEM_CONFIG.ROOTS.DRIVE_RETRO_ROOT_ID;
 if (!DRIVE_ARCHIVE_ROOT) throw new Error("Missing Script Property: DRIVE_RETRO_ROOT_ID");
 
+/**
+ * @constant {Object} DRIVE_FOLDERS
+ * @description Manages routing configurations for Google Drive files.
+ * Specifies the input queue (STND_SOURCES), archive roots, and destinations for manual review.
+ */
 const DRIVE_FOLDERS = {
     STND_SOURCES: SYSTEM_CONFIG.DRIVE_FOLDERS.STND_SOURCES,
     STND_DEST: SYSTEM_CONFIG.DRIVE_FOLDERS.STND_DEST,
