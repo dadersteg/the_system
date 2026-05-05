@@ -2,12 +2,13 @@
  * @file Code_TheClerk_Email.js
  * @description THE CLERK: EMAIL TRIAGE ENGINE. Sweeps unprocessed emails, applies deterministic rules via Google Sheets, infers context via Gemini AI, and auto-labels or temp-deletes them.
  *
- * @version 1.0.1
+ * @version 1.0.2
  * @last_modified 2024-05-24
  * @modified_by Jules
  *
  * @changelog
  * - 1.0.1: Hoisted API calls for configs to runTheClerkEmailOngoing to avoid redundant requests. Refactored log writing to batch operations (writeBatchLogEntries) to prevent timeouts.
+ * - 1.0.2: Added comprehensive JSDoc comment for the PROCESS_LIMIT constant.
  */
 
 // --- CONFIGURATION ---
@@ -97,6 +98,14 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
   let processedCount = 0;
   const batchLogs = [];
   const cleanupBuffer = [];
+
+  /**
+   * @constant {number} PROCESS_LIMIT
+   * @description Restricts the total number of email threads processed in a single execution.
+   * This limit acts as a critical safety valve to prevent the script from exceeding the
+   * Google Apps Script 6-minute hard execution timeout, ensuring state changes and logs
+   * are successfully committed before the script terminates.
+   */
   const PROCESS_LIMIT = 15; // Max AI calls per run to prevent 6-min timeout
 
   for (let index = 0; index < threads.length; index++) {
