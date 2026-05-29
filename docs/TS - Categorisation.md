@@ -369,9 +369,9 @@ These tags are used strictly for triage, automation pipelines, and system mainte
 ### 99 System Operational (Processing & Deletion)
 * **99 Google Comments:** Automated notifications from Google Docs/Drive that require a quick read but no permanent storage.
 * **99 Label_Reviewed:** A vital system flag applied by the Apps Scripts to indicate an item has been successfully processed and should not be analyzed again in the next batch.
-* **99 SMS:** Funnel endpoint for incoming routed SMS messages awaiting processing or task extraction.
-* **99 Telegram:** Funnel endpoint for incoming routed Telegram messages awaiting processing or task extraction.
-* **99 WhatsApp:** Funnel endpoint for incoming routed WhatsApp messages awaiting processing or task extraction.
+* **98 SMS:** Funnel endpoint for incoming routed SMS messages awaiting processing or task extraction.
+* **98 Telegram:** Funnel endpoint for incoming routed Telegram messages awaiting processing or task extraction.
+* **98 WhatsApp:** Funnel endpoint for incoming routed WhatsApp messages awaiting processing or task extraction.
 * **99 To be deleted:** Temporary storage and the purge queue. Items that are needed briefly or marked for the next automated/manual trash cycle.
 
 ### Routing Tags (Legacy & Alias Emails)

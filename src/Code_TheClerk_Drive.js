@@ -94,7 +94,12 @@ function executeEngine(mode, currentModel) {
         const sessionLog = ss.getSheets().find(s => s.getSheetId().toString() === DRIVE_SESSION_LOG_GID);
         
         if (!log) throw new Error("Execution Log sheet not found.");
-        const fullRules = loadKnowledgeDocs();
+        const knowledge = loadKnowledgeDocs();
+        const recentContext = fetchRecentContext(ss);
+        const fullRules = knowledge.text + "\n\n" + recentContext;
+        let parsedTaxonomy = [];
+        try { parsedTaxonomy = JSON.parse(knowledge.taxonomyJson); } catch (e) { console.warn("Failed to parse taxonomy JSON"); }
+        
         const folderCache = { byId: {}, byName: {} };
         let allFiles = [];
 
@@ -133,19 +138,19 @@ function executeEngine(mode, currentModel) {
 
             if (needsIsolation) {
                 if (currentBatch.length > 0) { 
-                    processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules, folderCache);
+                    processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules, folderCache, parsedTaxonomy);
                     currentBatch = []; 
                 }
-                processAndLog([f], fullRules, log, mode, currentModel, driveRules, folderCache);
+                processAndLog([f], fullRules, log, mode, currentModel, driveRules, folderCache, parsedTaxonomy);
             } else {
                 currentBatch.push(f);
                 if (currentBatch.length >= DRIVE_MAX_BATCH_SIZE) { 
-                    processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules, folderCache);
+                    processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules, folderCache, parsedTaxonomy);
                     currentBatch = []; 
                 }
             }
         }
-        if (currentBatch.length > 0) processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules, folderCache);
+        if (currentBatch.length > 0) processAndLog(currentBatch, fullRules, log, mode, currentModel, driveRules, folderCache, parsedTaxonomy);
 
         if (sessionLog) {
             sessionLog.appendRow([new Date(), mode, currentModel, allFiles.length, "Completed", `${((Date.now() - sessionStart) / 1000).toFixed(1)}s`]);
@@ -165,7 +170,7 @@ function executeEngine(mode, currentModel) {
 
 // --- 3. UNIFIED PROCESSING & LOGGING ---
 
-function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, folderCache) {
+function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, folderCache, parsedTaxonomy) {
     console.log(`   > Extracting: ${batch.map(b => b.name).join(", ")}`);
     const batchLogs = [];
     let validFiles = [];
@@ -214,7 +219,7 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                     logSheet.getRange(logSheet.getLastRow() + 1, 1, batchLogs.length, batchLogs[0].length).setValues(batchLogs);
                     batchLogs.length = 0;
                 }
-                filesForAI.forEach(single => processAndLog([single], rules, logSheet, mode, currentModel, driveRules, folderCache));
+                filesForAI.forEach(single => processAndLog([single], rules, logSheet, mode, currentModel, driveRules, folderCache, parsedTaxonomy));
                 filesForAI = []; // Prevent double processing
             } else {
                 const f = filesForAI[0];
@@ -265,6 +270,26 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
             file.setName(finalName);
             file.setDescription(`${data.description}\n\nSummary: ${data.summary}`);
             
+            // Extract and create nuanced actions/tasks
+            let tasksCreated = 0;
+            if (data.tasks && Array.isArray(data.tasks)) {
+                data.tasks.forEach(t => {
+                    if (t.title) {
+                        try {
+                            const taskNotes = `${file.getUrl()}\n[Source: ${file.getName()}]\n\n${t.notes || ""}`;
+                            const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
+                            Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
+                            tasksCreated++;
+                        } catch (e) {
+                            console.error("Error creating task from Drive: " + e.message);
+                        }
+                    }
+                });
+            }
+            if (tasksCreated > 0) {
+                console.log(`   [TASKS] Extracted ${tasksCreated} actions from ${finalName}`);
+            }
+            
             let sourceFolderPath = f.folderPath || f.sourceFolderId;
 
             let moved = false;
@@ -275,16 +300,23 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                 targetFolderId = "Root";
                 targetFolderPath = "My Drive";
                 
-                if (data.context_id && data.context_id !== "Unknown") {
+                if (data.concat_path && data.concat_path !== "Unknown") {
                     let targetFolder = null;
-                    if (folderCache.byName[data.context_id]) {
-                        targetFolder = folderCache.byName[data.context_id];
+                    if (folderCache.byName[data.concat_path]) {
+                        targetFolder = folderCache.byName[data.concat_path];
                     } else {
-                        const folders = DriveApp.getFoldersByName(data.context_id);
-                        if (folders.hasNext()) {
-                            targetFolder = folders.next();
-                            folderCache.byName[data.context_id] = targetFolder;
+                        targetFolder = typeof resolveFolderFromTaxonomy === "function" ? resolveFolderFromTaxonomy(data.concat_path, parsedTaxonomy) : null;
+                        if (!targetFolder) {
+                            const folders = DriveApp.getFoldersByName(data.context_id);
+                            while (folders.hasNext()) {
+                                const f = folders.next();
+                                if (!f.isTrashed()) {
+                                    targetFolder = f;
+                                    break;
+                                }
+                            }
                         }
+                        if (targetFolder) folderCache.byName[data.concat_path] = targetFolder;
                     }
 
                     if (targetFolder) {
@@ -331,13 +363,19 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                         const aggParts = aggPath.split(">");
                         const aggContextId = aggParts[aggParts.length - 1].trim();
                         let targetAggFolder = null;
-                        if (folderCache.byName[aggContextId]) {
-                            targetAggFolder = folderCache.byName[aggContextId];
+                        if (folderCache.byName["AGG:" + aggContextId]) {
+                            targetAggFolder = folderCache.byName["AGG:" + aggContextId];
                         } else {
                             const aggFolders = DriveApp.getFoldersByName(aggContextId);
-                            if (aggFolders.hasNext()) {
-                                targetAggFolder = aggFolders.next();
-                                folderCache.byName[aggContextId] = targetAggFolder;
+                            while (aggFolders.hasNext()) {
+                                const f = aggFolders.next();
+                                if (!f.isTrashed()) {
+                                    targetAggFolder = f;
+                                    break;
+                                }
+                            }
+                            if (targetAggFolder) {
+                                folderCache.byName["AGG:" + aggContextId] = targetAggFolder;
                             }
                         }
                         
@@ -363,7 +401,10 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
             const shortcutsLog = shortcutsCreated.length > 0 ? shortcutsCreated.join(", ") : "None";
 
             const successMsg = isBypass ? `${mode} Success (Fast-Path)` : `${mode} Success`;
-            batchLogs.push([file.getUrl(), f.name, f.desc, finalName, data.path_code, data.context_id, data.summary, data.description, data.reasoning, isBypass ? 0 : tpf, successMsg, sourceFolderPath, targetFolderId, targetFolderPath, shortcutsLog, "", "", ""]);
+            const targetFolderUrl = targetFolderId === "Root" || targetFolderId === "N/A" ? "https://drive.google.com/drive/my-drive" : `https://drive.google.com/drive/folders/${targetFolderId}`;
+            const targetFolderLink = `=HYPERLINK("${targetFolderUrl}", "${targetFolderPath.replace(/"/g, '""')}")`;
+            
+            batchLogs.push([file.getUrl(), f.name, f.desc, finalName, data.path_code, data.context_id, data.summary, data.description, data.reasoning, isBypass ? 0 : tpf, successMsg, sourceFolderPath, targetFolderId, targetFolderLink, shortcutsLog, "", "", ""]);
             console.log(`   [OK] Processed: ${finalName}`);
         } catch (e) {
             batchLogs.push([`https://drive.google.com/open?id=${f.id}`, f.name, f.desc, "[SYSTEM ERROR]", "N/A", "N/A", "Update Failed", e.message, "N/A", 0, "SYSTEM_ERROR", f.sourceFolderId, "N/A", "N/A", "None", "", "", ""]);
@@ -506,7 +547,15 @@ function extractContentV3(fileObj) {
 
 function askGeminiStable(rules, batch, currentModel) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${DRIVE_KEY}`;
-    const parts = [{ text: rules }, { text: `Analyze ${batch.length} files. Return JSON ARRAY.` }];
+    
+    // Add instruction to extract tasks
+    const taskInstruction = `
+## ACTION EXTRACTION
+Determine if any specific, nuanced action is required FROM the file added. Do NOT suggest generic actions like "review the file". If an action is required, provide it in the \`tasks\` array with a clear \`title\` (Action Verb + Object) and \`notes\`. If no action is needed, return an empty array.
+Output schema must include \`tasks: [ { "title": "...", "notes": "..." } ]\` alongside \`filename\`, \`concat_path\`, \`summary\`, \`description\`, and \`reasoning\`.
+`;
+
+    const parts = [{ text: rules + taskInstruction }, { text: `Analyze ${batch.length} files. Return JSON ARRAY.` }];
     batch.forEach((f, i) => { 
         parts.push({ text: `--- FILE [${i}] ---\nFilename: ${f.name}\nMETADATA_CONTEXT:\n- dateCreated: ${f.dateCreated || "Unknown"}\n- folder_context: ${f.folderPath || "Unknown"}` }); 
         parts.push(f.parts); 
@@ -635,7 +684,10 @@ function loadKnowledgeDocs() {
 
     const taxonomyJson = DriveApp.getFileById(DRIVE_DOC_IDS.TAXONOMY_JSON).getBlob().getDataAsString();
     
-    return [instructions, "--- VALID TAXONOMY CATEGORIES (Use 'Concat' logic) ---", taxonomyJson, protocol].join("\n\n"); 
+    return {
+        text: [instructions, "--- VALID TAXONOMY CATEGORIES (Use 'Concat' logic) ---", taxonomyJson, protocol].join("\n\n"),
+        taxonomyJson: taxonomyJson
+    };
 }
 
 function moveToReview(id, msg) { 
@@ -723,4 +775,48 @@ function applyManualRevisionsDrive() {
     }
     
     console.log(`Manual Revisions Complete. Updated ${updates} files.`);
+}
+
+// --- 9. CONTEXT HELPER ---
+
+function fetchRecentContext(ss) {
+    let contextStr = "--- RECENT CONTEXT (EMAILS & TASKS) ---\nUse this context to understand current ongoing activities and avoid duplicating tasks. If the file being processed relates to these, determine nuanced actions that move the work forward.\n\n";
+    try {
+        // Fetch Emails
+        const emailLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
+        if (emailLogSheet) {
+            const lastRow = emailLogSheet.getLastRow();
+            if (lastRow > 1) {
+                const startRow = Math.max(2, lastRow - 30);
+                const data = emailLogSheet.getRange(startRow, 1, lastRow - startRow + 1, 8).getValues();
+                contextStr += "[RECENT EMAILS]\n";
+                data.forEach(row => {
+                    if (row[1] && row[4]) {
+                        contextStr += `- Email: "${row[1]}" | Summary: ${row[4]}\n`;
+                    }
+                });
+            }
+        }
+        
+        // Fetch Tasks
+        const taskLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.TASK_REVIEW);
+        if (taskLogSheet) {
+            const lastRow = taskLogSheet.getLastRow();
+            if (lastRow > 2) {
+                const startRow = Math.max(3, lastRow - 30);
+                const data = taskLogSheet.getRange(startRow, 1, lastRow - startRow + 1, 10).getValues();
+                contextStr += "\n[RECENT TASKS]\n";
+                data.forEach(row => {
+                    const title = row[5] || row[3];
+                    const notes = row[8] || row[7];
+                    if (title) {
+                        contextStr += `- Task: "${title}" | Notes: ${notes ? String(notes).substring(0, 100).replace(/\n/g, ' ') : 'N/A'}\n`;
+                    }
+                });
+            }
+        }
+    } catch (e) {
+        console.error("Error fetching recent context: " + e.message);
+    }
+    return contextStr;
 }

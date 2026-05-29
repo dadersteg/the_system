@@ -27,7 +27,6 @@ const CONFIG = {
  * and export the data to the target Spreadsheet with interleaved revision columns.
  */
 function extractTasksWithConversationDetails() {
-  return; // EMERGENCY DISABLE
   const exportTs = Utilities.formatDate(new Date(), "GMT", "yyyyMMdd-HHmmss");
   const ss = SpreadsheetApp.openById(CONFIG.spreadsheetId);
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === CONFIG.targetGid);
@@ -121,70 +120,7 @@ function extractTasksWithConversationDetails() {
     } while (pageToken);
   });
 
-  console.log(`Total tasks to process: ${allTasksToExport.length}. Batching for Gemini AI...`);
-  
-  // Extract existing properly formatted task titles to use as naming context
-  // Only include tasks that strictly match the current validPaths so the AI doesn't mimic deprecated ones.
-  const existingTaskContext = allTasksToExport
-    .filter(item => {
-      const parts = (item.task.title || "").split(" > ");
-      if (parts.length >= 2) {
-        const potentialPath = parts.slice(0, -1).join(" > ").trim().toLowerCase();
-        return validPaths.has(potentialPath);
-      }
-      return false;
-    })
-    .map(item => item.task.title)
-    .slice(0, 100)
-    .join("\n");
-  
-  // Process Gemini AI in batches to avoid 6-minute execution limit
-  const aiResultsMap = {};
-  const newTasksForGemini = [];
-
-  allTasksToExport.forEach(item => {
-    const tid = item.task.id;
-    if (existingTaskMap.has(tid)) {
-      const existing = existingTaskMap.get(tid);
-      // Pre-fill aiResultsMap so we don't query Gemini again for existing tasks
-      aiResultsMap[tid] = {
-        emailSummary: existing.aiContextSummary || "N/A",
-        proposedCategory: existing.aiProposedCategory || "N/A"
-      };
-    } else {
-      newTasksForGemini.push(item);
-    }
-  });
-
-  console.log(`Found ${allTasksToExport.length} total tasks. ${newTasksForGemini.length} are new and require Gemini AI...`);
-  
-  for (let i = 0; i < newTasksForGemini.length; i += CONFIG.geminiBatchSize) {
-    const batch = newTasksForGemini.slice(i, i + CONFIG.geminiBatchSize);
-    const geminiInputBatch = batch.map(item => {
-      let rawTitle = item.task.title || "";
-      let oldContext = "";
-      
-      const titleParts = rawTitle.split(" > ");
-      if (titleParts.length >= 2) {
-        rawTitle = titleParts[titleParts.length - 1].trim();
-        oldContext = titleParts.slice(0, -1).join(" > ").trim();
-      }
-      
-      return {
-        id: item.task.id,
-        taskAction: rawTitle,
-        previousCategoryContextHint: oldContext,
-        notes: item.task.notes || "",
-        emailLabels: item.emailInfo.labels || "",
-        firstMessage: item.emailInfo.firstBody || "",
-        lastMessage: item.emailInfo.lastBody || ""
-      };
-    });
-
-    console.log(`Sending batch ${Math.floor(i / CONFIG.geminiBatchSize) + 1} of ${Math.ceil(newTasksForGemini.length / CONFIG.geminiBatchSize)} to Gemini...`);
-    const batchResults = batchAnalyzeTasksWithGemini(geminiInputBatch, existingTaskContext);
-    Object.assign(aiResultsMap, batchResults);
-  }
+  console.log(`Found ${allTasksToExport.length} total tasks. Exporting to Spreadsheet...`);
 
   // Construct final row results
   const results = [];
@@ -194,7 +130,6 @@ function extractTasksWithConversationDetails() {
     const task = item.task;
     const taskList = item.taskList;
     const emailInfo = item.emailInfo;
-    const aiData = aiResultsMap[task.id] || { emailSummary: "N/A", proposedCategory: "N/A" };
 
     const urn = `urn:task:${exportTs}-${rowCounter.toString().padStart(4, '0')}`;
     const formattedDate = task.due ? Utilities.formatDate(new Date(task.due), "GMT", "yyyy-MM-dd") : "";
@@ -378,7 +313,9 @@ function extractTasksWithConversationDetails() {
       emailInfo.labels, 
       emailInfo.firstSender, emailInfo.firstBody,
       emailInfo.lastSender, emailInfo.lastBody, emailInfo.link,
-      aiData.emailSummary || "N/A", aiData.proposedCategory || "N/A", systemComment, daComment,
+      "", // No AI Context
+      "", // No AI Category
+      systemComment, daComment,
       task.id, taskList.id, status      // Hidden Tracking IDs & Original Status
     ]);
     
@@ -1223,5 +1160,66 @@ function createAdHocTaskFromCLI(title, notes) {
     console.log(`Success: Task "${title}" created in default list. Task ID: ${createdTask.id}`);
   } catch (e) {
     console.log(`Failed to create task: ${e.message}`);
+  }
+}
+
+/**
+ * Ad-Hoc Task Update Engine
+ * Receives CLI inputs from Antigravity to update Google Tasks by title.
+ */
+function updateAdHocTaskFromCLI(title, status, appendNotes) {
+  try {
+    const taskLists = fetchTaskLists();
+    if (!taskLists) {
+      console.log("Failed to fetch task lists.");
+      return;
+    }
+
+    let foundTask = null;
+    let foundListId = null;
+
+    for (const list of taskLists) {
+      let pageToken = null;
+      do {
+        const response = Tasks.Tasks.list(list.id, {
+          showCompleted: true,
+          showHidden: true,
+          maxResults: 100,
+          pageToken: pageToken
+        });
+        if (response.items) {
+          const matched = response.items.find(t => t.title.trim() === title.trim());
+          if (matched) {
+            foundTask = matched;
+            foundListId = list.id;
+            break;
+          }
+        }
+        pageToken = response.nextPageToken;
+      } while (pageToken);
+      if (foundTask) break;
+    }
+
+    if (!foundTask) {
+      console.log(`Failed to update: Task with title "${title}" not found.`);
+      return;
+    }
+
+    const resource = {};
+    if (status && (status === "completed" || status === "needsAction")) {
+      resource.status = status;
+    }
+    if (appendNotes) {
+      resource.notes = foundTask.notes ? foundTask.notes + "\n\n" + appendNotes : appendNotes;
+    }
+
+    if (Object.keys(resource).length > 0) {
+      Tasks.Tasks.patch(resource, foundListId, foundTask.id);
+      console.log(`Success: Task "${title}" updated.`);
+    } else {
+      console.log(`No valid updates provided for task "${title}".`);
+    }
+  } catch (e) {
+    console.log(`Failed to update task: ${e.message}`);
   }
 }

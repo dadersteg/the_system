@@ -39,6 +39,7 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *   **[x] Task C.1:** Build the functionality to capture external messages (WhatsApp, SMS, Telegram) and route them into the system (e.g., into Gmail or Google Tasks).
 *   **[x] Task C.2:** Guarantee all incoming "noise" is funneled into a single triage gateway ready for The Clerk to process.
 *   **[ ] Task C.3:** Information Curation (Daily Brief): Develop a scalable, scheduled AI pipeline (e.g., fetching specific RSS feeds) to ingest high-volume information and synthesize it into a tailored, single "Morning Briefing" email to prevent triage fatigue.
+*   **[ ] Task C.4:** Unstructured Data Parsing (MarkItDown Pipeline): Integrate Microsoft's Python `markitdown` utility as a core ingestion tool. Develop a local script or webhook that intercepts complex attachments (PDFs, PPTs, Excel sheets) identified by The Clerk, converts them into clean `.md` format, and stores them in the Second Brain for seamless LLM referencing.
 
 ### Phase D: Task Analysis & Synthesis (The Doer) [📍 CURRENT PHASE]
 *Extracting the signal from the noise (High Priority).*
@@ -76,7 +77,11 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 
 ### Phase H: Autonomous Execution
 *Moving beyond management to actual "doing."*
-*   **[ ] Task H.1:** Automate the actual task execution. Develop an agent that can actively work through Google Tasks and perform the physical/digital work required, rather than just organizing it.
+*   **[x] Task H.1:** Build the Generalist Executor Persona (MacGyver). Create the system instructions (`macgyver.md`) and Gem Wrapper to establish an orchestration protocol where MacGyver acts as the doer, tagging in James (Strategy) and Penny (Copywriting) to execute tasks. *(Completed: Aliased into the_system workspace).*
+*   **[x] Task H.2:** Manual Execution Pipeline. Since MacGyver can be run locally via Antigravity or via the Gemini App, we will forgo automated Apps Script triggers for now. MacGyver will read the live `Google Tasks.md` file to understand the active queue.
+*   **[x] Task H.3:** Task Status Updates (Skill/Workflow). Built the `edit_task.md` skill utilizing `Code_Tasks.js` (updateAdHocTaskFromCLI) to allow MacGyver to natively patch task statuses and append execution notes directly to the cloud without editing local read-only exports.
+*   **[ ] Task H.4:** Full Autonomy Pipeline (Future Scope). Transition MacGyver from a manual, user-triggered workflow (Antigravity/Gemini App) to a fully independent background agent that automatically monitors `Google Tasks.md`, assesses task viability, executes actionable items, and updates the task status autonomously.
+*   **[ ] Task H.5:** Rule Refinement & Edge Case Handling (Continuous). Iteratively revise and improve `macgyver.md` based on real-world execution data. Develop explicit instructions for handling edge cases, tool failures, or tasks requiring ambiguous personal context to ensure high-fidelity deliverables.
 
 ### Phase I: Multi-Tenant & Family Expansion (Future Scope)
 *Scaling The System from a personal Second Brain to a Family Hub.*
