@@ -1494,10 +1494,10 @@
     "L2 Name": "",
     "L3 Code": "",
     "L3 Name": "",
-    "L4 Name": "99 SMS",
+    "L4 Name": "98 SMS",
     "L4 Description": "Funnel endpoint for incoming routed SMS messages awaiting processing or task extraction.",
-    "Concat (Label)": "99 SMS",
-    "Concat (Path)": "99 SMS"
+    "Concat (Label)": "98 SMS",
+    "Concat (Path)": "98 SMS"
   },
   {
     "L1 Code": "00 00 00",
@@ -1506,10 +1506,10 @@
     "L2 Name": "",
     "L3 Code": "",
     "L3 Name": "",
-    "L4 Name": "99 Telegram",
+    "L4 Name": "98 Telegram",
     "L4 Description": "Funnel endpoint for incoming routed Telegram messages awaiting processing or task extraction.",
-    "Concat (Label)": "99 Telegram",
-    "Concat (Path)": "99 Telegram"
+    "Concat (Label)": "98 Telegram",
+    "Concat (Path)": "98 Telegram"
   },
   {
     "L1 Code": "00 00 00",
@@ -1518,10 +1518,10 @@
     "L2 Name": "",
     "L3 Code": "",
     "L3 Name": "",
-    "L4 Name": "99 WhatsApp",
+    "L4 Name": "98 WhatsApp",
     "L4 Description": "Funnel endpoint for incoming routed WhatsApp messages awaiting processing or task extraction.",
-    "Concat (Label)": "99 WhatsApp",
-    "Concat (Path)": "99 WhatsApp"
+    "Concat (Label)": "98 WhatsApp",
+    "Concat (Path)": "98 WhatsApp"
   },
   {
     "L1 Code": "00 00 00",

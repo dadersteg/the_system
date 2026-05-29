@@ -17,7 +17,7 @@ const RETRO_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_RETRO_MODEL;
 const API_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
 
 // Drive File ID for the AI Prompt provided by the user.
-const DOC_ID = SYSTEM_CONFIG.DOCS.PROMPT_TASKMASTER_OLD;
+const DOC_ID = SYSTEM_CONFIG.DOCS.CLERK_EMAIL_PROMPT_ID;
 const TAXONOMY_JSON_ID = SYSTEM_CONFIG.DOCS.TAXONOMY_JSON_ID;
 
 const SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
@@ -71,9 +71,29 @@ function runTheClerkEmailOngoing() {
   executeTriageEngine(replyQuery, 100, false, configPayload);
 }
 
+/**
+ * Executes a dedicated recovery pass to process emails missed due to API outages.
+ * Bypasses regular limits to catch up on the backlog from the last 24 hours.
+ */
+function runRecoveryCatchup() {
+  console.log("Running recovery catch-up for missed emails...");
+  const catchupQuery = `-label:"${PROCESSED_FLAG}" newer_than:1d`;
+  
+  const configPayload = {
+    sheetRules: getSheetRules(),
+    subjectRules: getSubjectRules(),
+    allowedAliases: getAllowedAliases(),
+    fullDocPrompt: DriveApp.getFileById(DOC_ID).getBlob().getDataAsString(),
+    taxonomyJsonStr: DriveApp.getFileById(TAXONOMY_JSON_ID).getBlob().getDataAsString()
+  };
+
+  // Run the triage engine. Bypassing state cache to fix the poisoned states.
+  executeTriageEngine(catchupQuery, 50, false, configPayload, true);
+}
+
 // Removed runTheClerkEmailRetro as it is handled by the unified Code_BatchRetro.js
 
-function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
+function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload, bypassState = false) {
   const threads = GmailApp.search(searchQuery, 0, searchLimit); 
   
   const runTimestamp = new Date();
@@ -87,8 +107,19 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
   const allowedAliases = configPayload ? configPayload.allowedAliases : getAllowedAliases();
   const fullDocPrompt = configPayload ? configPayload.fullDocPrompt : DriveApp.getFileById(DOC_ID).getBlob().getDataAsString();
   const taxonomyJsonStr = configPayload ? configPayload.taxonomyJsonStr : DriveApp.getFileById(TAXONOMY_JSON_ID).getBlob().getDataAsString();
+  const labelToPathMap = {};
+  try {
+    const parsedTaxonomy = JSON.parse(taxonomyJsonStr);
+    parsedTaxonomy.forEach(item => {
+      if (item["Concat (Label)"] && item["Concat (Path)"]) {
+        labelToPathMap[item["Concat (Label)"]] = item["Concat (Path)"];
+      }
+    });
+  } catch(e) {
+    console.error("Failed to parse taxonomy for path mapping: " + e.message);
+  }
+  const activeThreadTaskMap = getActiveThreadTaskMap();
 
-  const props = PropertiesService.getScriptProperties();
   let threadState = {};
   if (!isRetro) {
     const stateStr = SYSTEM_CONFIG.STATE.THREAD_STATE;
@@ -124,7 +155,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
     const lastMsgId = lastMsg.getId();
     
     // Stateful Memory Check
-    if (!isRetro) {
+    if (!isRetro && !bypassState) {
       if (threadState[threadId] === lastMsgId) {
         continue; // Skip: we've already processed this exact state of the thread
       }
@@ -222,7 +253,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
     const aiMatch = callLLMWithSourceContext(subject, sender, body, fullDocPrompt, taxonomyJsonStr, existingLabels, ssLabels, isRetro, currentModel, inlineImages, systemNotes);
     if (!aiMatch) {
        console.log(` > Skipping thread due to AI failure (likely 503/Rate Limit). Preserving for next run.`);
-       return; // Aborts processing this thread so it doesn't get the 'Label_Reviewed' flag
+       break; // FIXED: break instead of return so we don't drop the logs and labels for emails processed successfully before the failure
     }
     Utilities.sleep(1500); // Increased Rate Limit Protection
 
@@ -253,11 +284,54 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
     
     cleanupBuffer.push({ thread: thread, config: finalConfig });
 
-    // 7. Granular Log Entry
+    // 7. Granular Log Entry & Task Push
     const summaryLog = aiMatch.summary || "";
-    const actionItemsLog = (aiMatch.actionItems && aiMatch.actionItems.length > 0) 
-      ? aiMatch.actionItems.join('; ') 
-      : "";
+    let actionItemsLog = "";
+    let syncedTaskIds = [];
+
+    // Filter out hallucinations like ["None"], ["N/A"]
+    let validActions = [];
+    if (aiMatch.actionItems && Array.isArray(aiMatch.actionItems)) {
+       validActions = aiMatch.actionItems.filter(a => {
+          const str = a.toLowerCase().trim();
+          return str !== "" && str !== "none" && str !== "n/a" && str !== "null";
+       });
+    }
+
+    if (validActions.length > 0) {
+      actionItemsLog = validActions.join('; ');
+      
+      const primaryCategoryLabel = (aiMatch.categories && aiMatch.categories.length > 0) ? aiMatch.categories[0] : "00 Manual Review";
+      const categoryPath = labelToPathMap[primaryCategoryLabel] || primaryCategoryLabel;
+      
+      const importerListId = SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
+      
+      if (activeThreadTaskMap[threadId]) {
+          console.log(` > Task already exists for thread ${threadId}. Skipping duplicate creation.`);
+      } else {
+          validActions.forEach(actionTitle => {
+             const metadata = {
+                duration: "15m",
+                goal: "TBD",
+                category_path: categoryPath
+             };
+             
+             const notes = `${threadUrl}\nContext: ${categoryPath}\n\n${actionTitle}\n\nSYS: Pending initial review.\nDA:\n\n---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+             const cleanTitle = actionTitle.split(' - ')[0] || actionTitle;
+             
+             try {
+                const created = Tasks.Tasks.insert({
+                   title: cleanTitle,
+                   notes: notes
+                }, importerListId);
+                syncedTaskIds.push(created.id);
+                console.log(` > Pushed task to Importer: ${cleanTitle}`);
+             } catch(e) {
+                console.error("Failed to push task to Importer: " + e.message);
+             }
+          });
+      }
+    }
 
     batchLogs.push({
       "Timestamp": runTimestamp, 
@@ -274,7 +348,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
       "Sender": sender,
       "AI Summary": summaryLog,
       "AI Action Items": actionItemsLog,
-      "Task Synced": "",
+      "Task Synced": syncedTaskIds.join(', '),
       "Revised Labels (Override)": "",
       "Override Status": ""
     });
@@ -288,7 +362,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
          keys.slice(-500).forEach(k => prunedState[k] = threadState[k]);
          threadState = prunedState;
       }
-      props.setProperty("THREAD_STATE", JSON.stringify(threadState));
+      PropertiesService.getScriptProperties().setProperty("THREAD_STATE", JSON.stringify(threadState));
     }
     
     processedCount++;
@@ -743,4 +817,39 @@ function applyManualRevisionsEmail() {
   });
   
   console.log(`Manual Revisions Complete. Updated ${totalUpdates} threads across all logs.`);
+}
+/**
+ * Builds a map of active Google Tasks mapped by Gmail Thread ID to prevent duplicate creations.
+ * @returns {Object} Map of { threadId: taskId }
+ */
+function getActiveThreadTaskMap() {
+  const map = {};
+  const lists = [SYSTEM_CONFIG.TASKS.TODO_LIST_ID, SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID, SYSTEM_CONFIG.TASKS.BACKLOG_LIST_ID];
+  
+  lists.forEach(listId => {
+    let pageToken;
+    do {
+      try {
+        const res = Tasks.Tasks.list(listId, {
+           showCompleted: false, 
+           showHidden: false, 
+           maxResults: 100, 
+           pageToken: pageToken
+        });
+        const items = res.items || [];
+        items.forEach(t => {
+          if (t.notes) {
+            // Find the thread ID at the end of the URL
+            const match = t.notes.match(/https:\/\/mail\.google\.com\/mail\/u\/0\/#all\/([a-zA-Z0-9]+)/);
+            if (match) map[match[1]] = t.id;
+          }
+        });
+        pageToken = res.nextPageToken;
+      } catch (e) {
+        console.error(`Failed to fetch tasks for duplicate prevention mapping: ${e.message}`);
+        pageToken = null;
+      }
+    } while (pageToken);
+  });
+  return map;
 }

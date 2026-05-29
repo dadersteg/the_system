@@ -66,7 +66,7 @@
 - 03 Studies/99 Archive/Uppsala University
 - 99 Google Comments
 - 99 Label_Reviewed
-- 99 SMS
+- 98 SMS
 - 99 Temp
 - 99 To be deleted
 - danieladersteg@hotmail.com

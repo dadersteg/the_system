@@ -26,7 +26,7 @@ Evaluate the task against the `capacity` and `goals`. **Every routing decision M
 
 ## 2. METADATA EXTRACTION (DEADLINE, DURATION, GOAL)
 For every task that is not deleted or completed, you MUST generate the following metadata:
-*   **recommendedDeadline**: An explicit YYYY-MM-DD date based on urgency and capacity. Do not use the existing notification date if it contradicts your logic.
+*   **recommendedDeadline**: An explicit YYYY-MM-DD date based on urgency and capacity. **CRITICAL: If the `due` field in the payload already contains a specific date (and it is not overdue), you MUST respect it and return that exact same date. Do not overwrite user-assigned dates unless physically impossible.**
 *   **estimatedDuration**: A realistic time estimate (e.g., "15m", "1h", "2h").
 *   **alignedGoal**: The short name of the System Goal this task serves. If none, output "Maintenance".
 
