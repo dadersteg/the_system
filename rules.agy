@@ -1,0 +1,44 @@
+# Antigravity Workspace Rules: The System
+
+This is the central workspace rules file for **The System**. Verne and all other native Antigravity agents must read and adhere to these guidelines to ensure architectural stability, prevent execution blocks, and avoid OAuth/scope synchronization issues.
+
+---
+
+## 1. Project Stack & Architecture
+* **Primary Language/Framework:** JavaScript (Google Apps Script runtime V8), Python 3.9+ (local automation/sync utilities).
+* **Workspace Engine:** Managed locally via `clasp` (Command Line Apps Script Projects) for code syncing, and Git/GitHub for version control.
+
+---
+
+## 2. Google OAuth & Manifest Synchronization Protocol (CRITICAL)
+Both **The System** (`the_system`) and **Reflection** (`reflection`) Apps Script projects are linked to the **same** Google Cloud Platform (GCP) project (`gemini-project-487511`). Under Google Cloud's identity system, they share a single logical OAuth client application.
+
+To avoid the **Scope Downgrade Loop** (where authorizing one script revokes permission to Gmail, Sheets, or Health APIs for the other):
+
+1. **Strict Manifest Scope Alignment:**
+   - The `oauthScopes` array in [the_system/src/appsscript.json](file:///Users/daniel/Documents/the_system/src/appsscript.json) and [reflection/appsscript.json](file:///Users/daniel/Documents/reflection/appsscript.json) **MUST** remain 100% identical.
+   - Any time you add, modify, or remove a scope in one project's manifest, you **MUST** immediately mirror the exact change to the other manifest.
+2. **Manifest-First Push:**
+   - Always push the manifest changes to the Google Apps Script runtime using `npx clasp push -f` or `npx clasp push` **before** attempting to execute any functions that require the updated scopes.
+3. **Invalidating Cached Authorizations:**
+   - If a script encounters a permission denied error without prompting the user with an authorization modal, ask the user to open the Apps Script editor, select the `0_AuthScopeFixer` script, choose the `triggerAuthPrompt` function, and click **Run**. This will touch all active services and trigger Google's OAuth consent popup.
+
+---
+
+## 3. Local Python Credentials & Token Auditing
+Local integration scripts (e.g., Python sync scripts) rely on client credentials (`client_secret.json`) and generated credentials (`token.json`).
+
+1. **Deleted OAuth Client Recovery:**
+   - If a local script fails with a `deleted_client` error, the Client ID has been deleted or changed in the GCP Console.
+   - Download the new active client ID JSON credentials, overwrite `the_system/client_secret.json`, delete the stale `token.json` files, and re-run the Python script to trigger the browser OAuth consent flow.
+2. **System Health Check CLI:**
+   - Run the health checker from the root of `the_system/` workspace to verify python dependencies, clasp connection, and token validity:
+     ```bash
+     ./check_system_health.py
+     ```
+
+---
+
+## 4. Documentation Integrity
+* Always maintain the diagnostic utilities (`0_AuthScopeFixer.js` in Apps Script, `check_system_health.py` locally) as new Google Services or resource endpoints are added to the system.
+* Document any new system sheets, drive folders, or task lists in [TS - Auth & Resource Troubleshooting.md](file:///Users/daniel/Documents/the_system/docs/TS%20-%20Auth%20&%20Resource%20Troubleshooting.md) and inside the verifier scripts.
