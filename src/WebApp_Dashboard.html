@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap');
+    
+    :root {
+      /* Monochrome Navy & Grey Theme - Light */
+      --color-primary: #1e293b; /* slate-800 */
+      --color-primary-on: #ffffff;
+      --color-bg: #f8fafc; /* slate-50 */
+      --color-surface: #ffffff;
+      --color-text: #0f172a; /* slate-900 */
+      --color-text-muted: #64748b; /* slate-500 */
+      --color-border: #e2e8f0; /* slate-200 */
+      --color-hover: #f1f5f9; /* slate-100 */
+      --color-icon-bg: #e2e8f0;
+      
+      --sidebar-width: 240px;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* Monochrome Navy & Grey Theme - Dark */
+        --color-primary: #cbd5e1; /* slate-300 */
+        --color-primary-on: #0f172a;
+        --color-bg: #0f172a; /* slate-900 */
+        --color-surface: #1e293b; /* slate-800 */
+        --color-text: #f8fafc; /* slate-50 */
+        --color-text-muted: #94a3b8; /* slate-400 */
+        --color-border: #334155; /* slate-700 */
+        --color-hover: #0f172a; /* slate-900 */
+        --color-icon-bg: #334155;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    h1, h2, h3, h4 { font-family: 'Google Sans', sans-serif; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 12px;
+      gap: 8px;
+    }
+    
+    .logo-container {
+      padding: 0 16px 16px 16px;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--color-primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary-on);
+      font-weight: bold;
+    }
+
+    .nav-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      color: var(--color-text);
+      transition: background 0.2s;
+    }
+    
+    .nav-item:hover { background: var(--color-hover); }
+    .nav-item.active { background: var(--color-primary); color: var(--color-primary-on); }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 24px 40px;
+      position: relative;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.3s ease; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Dashboard Layout */
+    .header-area { margin-bottom: 24px; }
+    .header-area h1 { font-size: 28px; font-weight: 400; }
+    
+    .quick-links {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    
+    .quick-link-chip {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .quick-link-chip:hover {
+      background: var(--color-hover);
+      border-color: var(--color-text-muted);
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin: 32px 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+    }
+
+    .dashboard-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .dash-card {
+      background: var(--color-surface);
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .dash-card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-hover);
+    }
+    
+    .dash-card-header h2 {
+      font-size: 16px;
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .dash-card-body {
+      padding: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    /* Markdown Task Lists Styling */
+    .md-parsed-content ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .md-parsed-content li {
+      margin-bottom: 12px;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      color: var(--color-text);
+    }
+    .md-parsed-content li input[type="checkbox"] {
+      margin-top: 4px;
+      margin-right: 12px;
+      accent-color: var(--color-primary);
+      flex-shrink: 0;
+    }
+    /* Simple strike-through for checked items (if possible with CSS parent selectors, but sticking to standard for now) */
+    .md-parsed-content li:has(input[type="checkbox"]:checked) {
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+    }
+
+    /* List Items */
+    .list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--color-text);
+      transition: background 0.2s;
+      border: 1px solid transparent;
+    }
+    
+    .list-item:hover {
+      background: var(--color-hover);
+      border-color: var(--color-border);
+    }
+    
+    .list-item-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: var(--color-icon-bg);
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    
+    .list-item-content { flex: 1; min-width: 0; }
+    .list-item-title { font-weight: 500; font-size: 14px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .list-item-subtitle { font-size: 12px; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Pagination */
+    .pagination-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+    
+    .page-info {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+    
+    .page-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--color-text);
+      cursor: pointer;
+    }
+    
+    .page-btn:hover:not(:disabled) {
+      background: var(--color-hover);
+    }
+    
+    .page-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* Legacy Cards (Pipelines/Admin) */
+    .legacy-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .legacy-card-title { font-family: 'Google Sans', sans-serif; font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+    .legacy-card-desc { font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px; line-height: 1.5; }
+    
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: 1px solid var(--color-border);
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary { background: var(--color-primary); color: var(--color-primary-on); border-color: var(--color-primary); }
+    .btn-primary:hover { opacity: 0.9; }
+    
+    .btn-outline { background: transparent; color: var(--color-text); }
+    .btn-outline:hover { background: var(--color-hover); }
+
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Inputs */
+    input, select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: inherit;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--color-primary); }
+
+    /* Fixed Log */
+    .log-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      padding: 12px 24px;
+      z-index: 100;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .log-header span { font-size: 12px; font-weight: 500; font-family: 'Google Sans', sans-serif; }
+    .log-clear { font-size: 12px; color: var(--color-primary); cursor: pointer; background: none; border: none; font-weight: 500; }
+    .log-container {
+      background: var(--color-bg);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      height: 100px;
+      overflow-y: auto;
+      border: 1px solid var(--color-border);
+    }
+    .log-entry { margin-bottom: 6px; border-bottom: 1px solid var(--color-border); padding-bottom: 4px; }
+    .log-time { color: var(--color-text-muted); margin-right: 8px; }
+
+    /* Skeleton Loaders */
+    .skeleton {
+      background: linear-gradient(90deg, var(--color-hover) 25%, var(--color-border) 50%, var(--color-hover) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+    }
+    .sk-title { height: 16px; width: 70%; margin-bottom: 8px; }
+    .sk-sub { height: 12px; width: 40%; }
+    .sk-icon { width: 24px; height: 24px; border-radius: 4px; }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Breathing App */
+    .breathe-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 40px auto;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .breathe-text {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--color-primary-on);
+      z-index: 10;
+      font-family: 'Google Sans', sans-serif;
+    }
+    .breathe-status {
+      font-size: 24px;
+      color: var(--color-text);
+      font-family: 'Google Sans', sans-serif;
+      height: 34px;
+      margin-top: 10px;
+    }
+
+    /* Intelligence Tabs */
+    .intel-tabs { display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--color-border); padding-bottom: 8px; flex-wrap: wrap; }
+    .intel-tab { padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; color: var(--color-text-muted); transition: all 0.2s; }
+    .intel-tab:hover { background: var(--color-hover); color: var(--color-text); }
+    .intel-tab.active { background: var(--color-primary); color: var(--color-primary-on); }
+    
+    .article-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 40px;
+      min-height: 400px;
+    }
+
+    /* Markdown Content styling */
+    .md-content { font-size: 16px; line-height: 1.8; color: var(--color-text); }
+    .md-content h1 { font-size: 28px; margin-top: 32px; margin-bottom: 20px; border-bottom: 2px solid var(--color-border); padding-bottom: 10px; color: var(--color-primary); font-weight: 700; letter-spacing: -0.5px; }
+    .md-content h2 { font-size: 22px; margin-top: 28px; margin-bottom: 16px; color: var(--color-text); font-weight: 600; letter-spacing: -0.3px; }
+    .md-content h3 { font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600; color: var(--color-primary); }
+    .md-content p { margin-bottom: 18px; }
+    .md-content ul, .md-content ol { margin-bottom: 18px; padding-left: 24px; }
+    .md-content li { margin-bottom: 10px; }
+    .md-content code { background: rgba(79, 70, 229, 0.1); padding: 4px 8px; border-radius: 6px; font-family: 'Courier New', Courier, monospace; font-size: 14px; color: var(--color-primary); font-weight: 600; }
+    .md-content pre { background: #1e1e1e; color: #d4d4d4; border: 1px solid var(--color-border); padding: 20px; border-radius: 10px; overflow-x: auto; margin-bottom: 20px; font-size: 14px; }
+    .md-content pre code { background: transparent; padding: 0; color: inherit; font-weight: 400; }
+    .md-content a { color: var(--color-primary); text-decoration: none; font-weight: 600; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    .md-content a:hover { border-bottom-color: var(--color-primary); }
+    .md-content blockquote { background: rgba(79, 70, 229, 0.05); border-left: 4px solid var(--color-primary); padding: 16px 20px; margin: 0 0 20px 0; color: var(--color-text); font-style: italic; border-radius: 0 8px 8px 0; }
+    .md-content strong { color: var(--color-primary); font-weight: 700; }
+    .md-content table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .md-content th, .md-content td { padding: 12px 16px; border-bottom: 1px solid var(--color-border); text-align: left; }
+    .md-content th { background: rgba(79, 70, 229, 0.05); font-weight: 600; color: var(--color-primary); }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="logo-container">
+      The System
+    </div>
+    <div class="nav-item active" onclick="switchTab('dashboard', this)">
+      <span>Overview</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('tasks', this)">
+      <span>Daily Tasks</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('breathe', this)">
+      <span>Mental Health</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('physical', this)">
+      <span>Physical Health</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('intel', this)">
+      <span>Reflection</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('messages', this)">
+      <span>Messages</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('admin', this)">
+      <span>Admin</span>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    
+    <!-- 1. OVERVIEW SECTION -->
+    <div id="sec-dashboard" class="section active" style="padding-bottom: 100px;">
+      <div class="header-area" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <h1 id="greeting" style="margin: 0;">Welcome to The System</h1>
+      </div>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;">
+        <div id="quick-links-container" style="display: inline-flex; gap: 12px; flex-wrap: wrap;"></div>
+      </div>
+      
+      <h2 class="section-title">Immediate Reality</h2>
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <!-- Calendar Card -->
+        <div class="dash-card">
+          <div class="dash-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Today's Calendar</h2>
+            <a href="https://calendar.google.com/" target="_blank" style="font-size: 14px; color: var(--color-primary); text-decoration: none; font-weight: 500;">Open Calendar ↗</a>
+          </div>
+          <div class="dash-card-body" id="calendar-container">
+            <!-- skeletons -->
+            <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton"></div><div class="sk-sub skeleton"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="calendar-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="calendar-prev" onclick="changePage('calendar', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="calendar-next" onclick="changePage('calendar', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tasks Card -->
+        <div class="dash-card">
+          <div class="dash-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Open Tasks</h2>
+            <a href="https://calendar.google.com/calendar/u/0/r/tasks" target="_blank" style="font-size: 14px; color: var(--color-primary); text-decoration: none; font-weight: 500;">Open Google Tasks ↗</a>
+          </div>
+          <div class="dash-card-body" id="tasks-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton"></div><div class="sk-sub skeleton"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="tasks-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="tasks-prev" onclick="changePage('tasks', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="tasks-next" onclick="changePage('tasks', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emails Card -->
+        <div class="dash-card">
+          <div class="dash-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Inbox</h2>
+            <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank" style="font-size: 14px; color: var(--color-primary); text-decoration: none; font-weight: 500;">Open Inbox ↗</a>
+          </div>
+          <div class="dash-card-body" id="emails-container">
+            <!-- skeletons -->
+            <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton"></div><div class="sk-sub skeleton"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="emails-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="emails-prev" onclick="changePage('emails', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="emails-next" onclick="changePage('emails', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2. DAILY TASKS SECTION -->
+    <div id="sec-tasks" class="section" style="padding-bottom: 100px;">
+      <div class="header-area"><h1>Daily Tasks</h1></div>
+      
+      <div class="legacy-card" style="margin-bottom: 32px;">
+        <div class="legacy-card-title">Execution Gems</div>
+        <div class="quick-links">
+          <a href="https://gemini.google.com/gem/f982f396b0e5" target="_blank" class="quick-link-chip" title="Task Orchestrator">Task Master</a>
+          <a href="https://gemini.google.com/gem/b664322551c4" target="_blank" class="quick-link-chip" title="Task Executor">MacGyver</a>
+          <a href="https://gemini.google.com/gem/497094160865" target="_blank" class="quick-link-chip" title="Problem Solver">James</a>
+          <a href="https://gemini.google.com/gem/fb62ecefe421" target="_blank" class="quick-link-chip" title="Copywriter">Penny</a>
+          <a href="https://gemini.google.com/gem/7bbb01c5b0d5" target="_blank" class="quick-link-chip" title="Decision Matrix">Prism</a>
+        </div>
+      </div>
+      
+      <div id="daily-plan-container">
+        <div class="article-container">
+          <div class="md-content">
+            <div class="skeleton sk-title"></div>
+            <div class="skeleton sk-title" style="width: 80%"></div>
+            <div class="skeleton sk-sub"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- 3. MENTAL HEALTH (BREATHE) -->
+    <div id="sec-breathe" class="section" style="padding-bottom: 100px; text-align: center;">
+      <div class="header-area" style="text-align: left;"><h1>Mental Health</h1></div>
+      
+      <div class="dashboard-grid" style="display: flex; justify-content: center; align-items: center; min-height: 500px;">
+        <div class="dash-card" style="width: 100%; max-width: 500px; padding: 48px 24px; display: flex; flex-direction: column; align-items: center; gap: 40px; border: 1px solid var(--color-border); box-shadow: none;">
+          
+          <div style="font-size: 14px; font-weight: 500; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 2px;">
+            Rounds Remaining: <span id="breathe-cycles-count" style="color: var(--color-text); font-weight: bold;">4</span>
+          </div>
+
+          <div style="position: relative; width: 240px; height: 240px; display: flex; justify-content: center; align-items: center;">
+            <div id="breathe-circle" style="position: absolute; width: 100%; height: 100%; background: var(--color-primary); opacity: 0.1; border-radius: 50%; transform: scale(0.4); transition: transform 4s ease-in-out;"></div>
+            <div id="breathe-text" style="position: absolute; font-size: 64px; font-weight: bold; color: var(--color-text); z-index: 10;">4</div>
+          </div>
+          
+          <button id="breathe-start-btn" onclick="startBreathing()" style="padding: 14px 40px; background: var(--color-text); color: var(--color-bg); border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; transition: opacity 0.2s;">Start</button>
+          
+          <div style="font-size: 14px; font-weight: 500; color: var(--color-text-muted); display: flex; align-items: center; gap: 8px;">
+            <span id="breathe-streak">0</span> Days
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. PHYSICAL HEALTH -->
+    <div id="sec-physical" class="section" style="padding-bottom: 100px;">
+      <div class="header-area" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Physical Health</h1>
+        <div style="display: flex; gap: 12px;">
+          <a href="https://calendar.google.com/" target="_blank" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center;">Calendar</a>
+          <a href="https://calendar.google.com/calendar/u/0/r/tasks" target="_blank" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center;">Tasks</a>
+        </div>
+      </div>
+      
+      <div class="dashboard-grid">
+        
+        <!-- Vitals Card -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Vitals Snapshot</h2>
+          </div>
+          <div class="dash-card-body" style="justify-content: center; align-items: center; flex-direction: row; gap: 24px;">
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: bold; color: #3b82f6;" id="health-sleep">-</div>
+              <div style="font-size: 14px; color: var(--color-text-muted);">Avg Sleep (hrs)</div>
+            </div>
+            <div style="height: 50px; width: 1px; background: var(--color-border);"></div>
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: bold; color: #10b981;" id="health-active">-</div>
+              <div style="font-size: 14px; color: var(--color-text-muted);">Active Mins</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workouts Card -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Recent Workouts</h2>
+          </div>
+          <div class="dash-card-body" id="workouts-container" style="overflow-y: auto; max-height: 250px;">
+             <!-- skeletons -->
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton"></div><div class="sk-sub skeleton"></div></div></div>
+          </div>
+        </div>
+
+        <!-- AI Insights Placeholder -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>AI Health Insights</h2>
+          </div>
+          <div class="dash-card-body" style="justify-content: center; align-items: center; text-align: center; color: var(--color-text-muted);">
+            <p>AI Insights Generation<br><small>(TBU / Future Update)</small></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 5. INTELLIGENCE SECTION -->
+    <div id="sec-intel" class="section" style="padding-bottom: 100px;">
+      <div class="header-area"><h1>Reflection</h1></div>
+      
+      <div style="display: flex; flex-direction: column; gap: 24px; max-width: 600px; margin: 0 auto; margin-top: 40px;">
+        <a href="https://gemini.google.com/gem/atlas" target="_blank" style="display: flex; align-items: center; justify-content: space-between; background: var(--color-surface); border: 1px solid var(--color-border); padding: 24px; border-radius: 12px; color: var(--color-text); text-decoration: none; transition: background 0.2s, border-color 0.2s;" onmouseover="this.style.background='var(--color-hover)'; this.style.borderColor='var(--color-primary)';" onmouseout="this.style.background='var(--color-surface)'; this.style.borderColor='var(--color-border)';">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--color-icon-bg); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">A</div>
+            <div>
+              <div style="font-weight: 500; font-size: 18px;">Atlas</div>
+              <div style="font-size: 14px; color: var(--color-text-muted); margin-top: 4px;">Reflective AI Partner</div>
+            </div>
+          </div>
+          <div style="color: var(--color-text-muted); font-size: 24px;">→</div>
+        </a>
+
+        <a href="https://docs.google.com/spreadsheets/d/1pchhGyniJKiWRm6zNXy834SSeITh3BW4ogVJGImfvFM/edit?gid=0#gid=0" target="_blank" style="display: flex; align-items: center; justify-content: space-between; background: var(--color-surface); border: 1px solid var(--color-border); padding: 24px; border-radius: 12px; color: var(--color-text); text-decoration: none; transition: background 0.2s, border-color 0.2s;" onmouseover="this.style.background='var(--color-hover)'; this.style.borderColor='var(--color-primary)';" onmouseout="this.style.background='var(--color-surface)'; this.style.borderColor='var(--color-border)';">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--color-icon-bg); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">J</div>
+            <div>
+              <div style="font-weight: 500; font-size: 18px;">Daily Journal</div>
+            </div>
+          </div>
+          <div style="color: var(--color-text-muted); font-size: 24px;">→</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- 6. ADMIN SECTION -->
+    <div id="sec-admin" class="section" style="padding-bottom: 100px;">
+      <div class="header-area" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <h1>System Administration</h1>
+        <a href="https://docs.google.com/spreadsheets/d/1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4/edit" target="_blank" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+          Master Spreadsheet ↗
+        </a>
+      </div>
+      <div class="dashboard-grid">
+        
+        <!-- Clerk Emails -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Clerk Emails Processed</h2>
+          </div>
+          <div class="dash-card-body" id="clerkEmails-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton"></div><div class="sk-sub skeleton"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="clerkEmails-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="clerkEmails-prev" onclick="changePage('clerkEmails', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="clerkEmails-next" onclick="changePage('clerkEmails', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clerk Tasks -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Clerk Tasks Processed</h2>
+          </div>
+          <div class="dash-card-body" id="clerkTasks-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton"></div><div class="sk-sub skeleton"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="clerkTasks-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="clerkTasks-prev" onclick="changePage('clerkTasks', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="clerkTasks-next" onclick="changePage('clerkTasks', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clerk Notes -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Clerk Notes Processed</h2>
+          </div>
+          <div class="dash-card-body" id="notes-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton"></div><div class="sk-sub skeleton"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="notes-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="notes-prev" onclick="changePage('notes', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="notes-next" onclick="changePage('notes', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modified Files -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Modified Files</h2>
+          </div>
+          <div class="dash-card-body" id="files-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton"></div><div class="sk-sub skeleton"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="files-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="files-prev" onclick="changePage('files', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="files-next" onclick="changePage('files', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- System Controls -->
+      <h2 class="section-title" style="margin-top: 0;">System Controls & Pipelines</h2>
+      
+      <div class="legacy-card" style="margin-bottom: 24px;">
+        <div class="legacy-card-title">Task Management</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="runPipeline('runTaskMaster')">▶ Run Task Master Pipeline</button>
+          <button class="btn btn-primary" onclick="runPipeline('run1DayMaintenance')">▶ Run 1-Day Maintenance</button>
+          <button class="btn btn-primary" onclick="runPipeline('executeTimeboxing')">▶ Sync Top 3 to Calendar</button>
+          <button class="btn btn-secondary" onclick="runPipeline('runWeeklyReview')">↺ Generate 7-Day Roadmap</button>
+          <button class="btn btn-secondary" onclick="runPipeline('runMonthlyReview')">↺ Generate 28-Day Plan</button>
+        </div>
+      </div>
+
+      <div class="legacy-card" style="margin-bottom: 24px;">
+        <div class="legacy-card-title">The Clerk (Agent Pipelines)</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="runPipeline('runTheClerkEmailOngoing')">▶ Run The Clerk (Email)</button>
+          <button class="btn btn-secondary" onclick="runPipeline('runTheClerkNotes')">▶ Run The Clerk (Notes)</button>
+          <button class="btn btn-secondary" onclick="runPipeline('runTheClerkDriveOngoing')">▶ Run The Clerk (Drive)</button>
+        </div>
+      </div>
+
+      <div class="legacy-card" style="margin-bottom: 24px;">
+        <div class="legacy-card-title">System Administration</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="runPipeline('syncTaxonomyToSheet')">↺ Sync Taxonomy (MD → Sheet)</button>
+          <button class="btn btn-secondary" onclick="runPipeline('syncDriveFoldersFromTaxonomy')">▶ Build Missing Drive Folders</button>
+          <button class="btn btn-secondary" onclick="runPipeline('executeFolderMapping')">Map Drive Topology</button>
+          <button class="btn btn-secondary" onclick="runPipeline('executeDoneReset')">Reset [DONE] Folders</button>
+        </div>
+        <div id="pipeline-status" style="margin-top: 16px; font-weight: 500; font-size: 14px; color: var(--color-primary);"></div>
+      </div>
+
+    </div>
+    
+    <!-- 7. MESSAGES SECTION -->
+    <div id="sec-messages" class="section" style="padding-bottom: 100px;">
+      <div class="header-area"><h1>Messages</h1></div>
+      <h2 class="section-title">Send a Sweet Message</h2>
+      <div class="dash-card" style="margin-bottom: 24px; padding: 16px;">
+        <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">Wifie Message Generator 💖</div>
+        <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 12px;">Generates a sweet and relevant message for Carry using the latest WhatsApp context and upcoming Family calendar events.</div>
+        <textarea id="wifie-message-box" style="width: 100%; height: 100px; resize: vertical; margin-bottom: 12px; padding: 8px; border: 1px solid var(--color-border); border-radius: 6px; font-family: inherit; font-size: 13px;" placeholder="Your message will appear here..."></textarea>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" onclick="generateWifieMessageBtn(this)">Generate Message</button>
+          <button class="btn btn-outline" onclick="copyWifieMessageBtn()">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FIXED EXECUTION LOG -->
+  <div class="log-wrapper">
+    <div class="log-header">
+      <span>Execution Log</span>
+      <button class="log-clear" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log-container" id="log-container">
+      <div class="log-entry"><span class="log-time">[Init]</span><span class="log-info">Dashboard loaded.</span></div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      data: {
+        emails: [], tasks: [], recentTasks: [], workoutsTasks: [], workouts: [], files: [], notes: [], calendar: [], clerkEmails: [], clerkTasks: []
+      },
+      page: {
+        emails: 0, tasks: 0, recentTasks: 0, workoutsTasks: 0, workouts: 0, files: 0, notes: 0, calendar: 0, clerkEmails: 0, clerkTasks: 0
+      },
+      itemsPerPage: 5
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setGreeting();
+      loadSheets();
+      fetchDashboardData();
+    });
+
+    function setGreeting() {
+      const hour = new Date().getHours();
+      let greeting = 'Good evening';
+      if (hour < 12) greeting = 'Good morning';
+      else if (hour < 18) greeting = 'Good afternoon';
+      document.getElementById('greeting').innerText = greeting;
+    }
+
+    function switchTab(id, el) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+      document.getElementById('sec-' + id).classList.add('active');
+      el.classList.add('active');
+    }
+
+    function renderMarkdown(mdText, elementId) {
+      try {
+        let html = marked.parse(mdText);
+        html = html.replace(/<a /g, '<a target="_blank" ');
+        document.getElementById(elementId).innerHTML = html;
+      } catch (e) {
+        console.error("Marked parse error:", e);
+      }
+    }
+
+    function renderStructuredMarkdown(mdText, elementId) {
+      const container = document.getElementById(elementId);
+      if (!mdText) {
+        container.innerHTML = "<div style='color:var(--color-text-muted); text-align:center;'>No data found.</div>";
+        return;
+      }
+      
+      // Split the document into sections by headers (H1 or H2)
+      const lines = mdText.split('\n');
+      let sections = [];
+      let currentSection = { title: null, body: [] };
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.match(/^#{1,3}\s/)) {
+          if (currentSection.title !== null || currentSection.body.length > 0) {
+            sections.push(currentSection);
+          }
+          currentSection = { title: line.replace(/^#+\s*/, ''), body: [] };
+        } else {
+          currentSection.body.push(line);
+        }
+      }
+      sections.push(currentSection);
+      
+      let html = '<div style="display: flex; flex-direction: column; gap: 24px;">';
+      sections.forEach(sec => {
+        let bodyText = sec.body.join('\n').trim();
+        if (!sec.title && !bodyText) return;
+        
+        // Pre-process markdown checkboxes so marked doesn't escape them
+        bodyText = bodyText.replace(/^- \[\s*\] /gm, '- <input type="checkbox" disabled> ');
+        bodyText = bodyText.replace(/^- \[[xX\/]\] /gm, '- <input type="checkbox" disabled checked> ');
+        
+        html += `<div class="dash-card">`;
+        if (sec.title) {
+          html += `<div class="dash-card-header"><h2>${sec.title}</h2></div>`;
+        }
+        
+        if (bodyText) {
+          let parsedBody = marked.parse(bodyText);
+          
+          // Post-process HTML to style the lists perfectly without external CSS dependencies
+          parsedBody = parsedBody.replace(/<ul>(\s*<li[^>]*><input type="checkbox")/g, '<ul style="list-style:none; padding-left:0;">$1');
+          
+          parsedBody = parsedBody.replace(/<li>(\s*)<input type="checkbox" disabled( checked)?>/g, (match, p1, checked) => {
+            const isChecked = !!checked;
+            const textStyle = isChecked ? 'text-decoration:line-through; color:var(--color-text-muted);' : 'color:var(--color-text);';
+            return `<li style="list-style:none; display:flex; align-items:flex-start; margin-bottom:12px; line-height:1.5; ${textStyle}"><input type="checkbox" disabled ${isChecked ? 'checked' : ''} style="margin-top:4px; margin-right:12px; accent-color:var(--color-primary); flex-shrink:0;">`;
+          });
+          
+          html += `<div class="dash-card-body md-parsed-content" style="padding: 16px;">${parsedBody}</div>`;
+        }
+        html += `</div>`;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function switchIntelTab(key, el) {
+      if (el) {
+        document.querySelectorAll('.intel-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+      }
+      
+      const content = state.data[key];
+      const container = document.getElementById('intel-article-content-2');
+      if (content) {
+        if (key === 'executionPlan' || key === 'vantageReport' || key === 'vantageReport14') {
+          renderStructuredMarkdown(content, 'intel-article-content-2');
+        } else {
+          renderMarkdown(content, 'intel-article-content-2');
+        }
+      } else {
+        container.innerHTML = `<div style='color: var(--color-text-muted); text-align: center; margin-top: 40px;'>No ${key} found.</div>`;
+      }
+    }
+
+    function log(msg, type) {
+      const c = document.getElementById('log-container');
+      const t = new Date().toLocaleTimeString([], {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      const e = document.createElement('div');
+      e.className = 'log-entry';
+      e.innerHTML = `<span class="log-time">[${t}]</span><span class="log-${type||'info'}">${msg}</span>`;
+      c.appendChild(e);
+      c.scrollTop = c.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('log-container').innerHTML = '<div class="log-entry"><span class="log-time">[System]</span><span class="log-info">Log cleared.</span></div>';
+    }
+
+    function setLoadingBtn(btn, on, origHTML) {
+      if (on) { btn.disabled = true; btn._origHTML = btn.innerHTML; btn.innerHTML = 'Running...'; }
+      else { btn.disabled = false; btn.innerHTML = btn._origHTML || origHTML || 'Run'; }
+    }
+
+    function generateWifieMessageBtn(btn) {
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Generating...';
+      const box = document.getElementById('wifie-message-box');
+      box.value = "Thinking of something sweet (this may take a few seconds)...";
+      
+      google.script.run.withSuccessHandler(function(res) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+        if (res.success) {
+          box.value = res.message;
+        } else {
+          box.value = 'Error: ' + res.message;
+        }
+      }).withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+        box.value = 'Execution failed: ' + err.message;
+      }).generateWifieMessage();
+    }
+    
+    function copyWifieMessageBtn() {
+      const box = document.getElementById('wifie-message-box');
+      if (!box.value) return;
+      box.select();
+      box.setSelectionRange(0, 99999); 
+      navigator.clipboard.writeText(box.value).then(() => {
+        alert("Copied to clipboard!");
+      }).catch(err => {
+        alert("Failed to copy: " + err);
+      });
+    }
+
+    // DASHBOARD FETCHING
+    async function fetchDashboardData() {
+      try {
+        const loader = document.createElement('div');
+        loader.id = 'dashboard-loader';
+        loader.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--color-bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--color-text);"><div class="spinner" style="margin-bottom:20px;"></div><h2>Loading your workspace...</h2><p style="color:var(--color-text-muted);">Fetching concurrent API calls.</p></div>';
+        document.body.appendChild(loader);
+        
+        const pEmails = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej).getDashboardEmails());
+        const pCalendar = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej).getDashboardCalendar());
+        const pTasks = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej).getDashboardTasks());
+        const pFiles = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej).getDashboardFiles());
+        const pClerk = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej).getDashboardClerkLogs());
+        const pDocs = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej).getDashboardDocs());
+
+        const [emails, calendar, tasksData, files, clerkLogs, docs] = await Promise.all([pEmails, pCalendar, pTasks, pFiles, pClerk, pDocs]);
+        
+        state.data = {
+          emails: emails || [],
+          calendar: calendar || [],
+          tasks: (tasksData && tasksData.tasks) ? tasksData.tasks : [],
+          recentTasks: (tasksData && tasksData.recentTasks) ? tasksData.recentTasks : [],
+          workoutsTasks: (tasksData && tasksData.workoutsTasks) ? tasksData.workoutsTasks : [],
+          workouts: (tasksData && tasksData.workouts) ? tasksData.workouts : [],
+          files: files || [],
+          notes: (clerkLogs && clerkLogs.notes) ? clerkLogs.notes : [],
+          clerkEmails: (clerkLogs && clerkLogs.emails) ? clerkLogs.emails : [],
+          clerkTasks: (clerkLogs && clerkLogs.tasks) ? clerkLogs.tasks : [],
+          links: (docs && docs.links) ? docs.links : [],
+          executionPlan: (docs && docs.executionPlan) ? docs.executionPlan : "",
+          executionPlanData: (docs && docs.executionPlanData) ? docs.executionPlanData : null,
+          vantageReport: (docs && docs.vantageReport) ? docs.vantageReport : "",
+          vantageReport14: (docs && docs.vantageReport14) ? docs.vantageReport14 : "",
+          recentReflections: (docs && docs.recentReflections) ? docs.recentReflections : "",
+          roadmap: (docs && docs.roadmap) ? docs.roadmap : "",
+          monthlyReview: (docs && docs.monthlyReview) ? docs.monthlyReview : "",
+          completedTasksCount: (docs && docs.completedTasksCount) ? docs.completedTasksCount : 0,
+          manualReviewCount: (docs && docs.manualReviewCount) ? docs.manualReviewCount : 0,
+          activeMinutes: (docs && docs.activeMinutes) ? docs.activeMinutes : 0,
+          sleepHours: (docs && docs.sleepHours) ? docs.sleepHours : 0
+        };
+        
+        const existingLoader = document.getElementById('dashboard-loader');
+        if (existingLoader) existingLoader.remove();
+        
+        renderAll();
+      } catch (err) {
+          console.error(err);
+          const loader = document.getElementById('dashboard-loader');
+          if (loader) loader.remove();
+          document.body.insertAdjacentHTML('beforeend', `<div class="error-state" style="position:fixed;bottom:20px;right:20px;background:red;color:white;padding:15px;border-radius:8px;z-index:10000;">Failed to load data: ${err.message}</div>`);
+      }
+    }
+    
+    function renderAll() {
+      if (!state.data) return;
+      
+      const linksHtml = state.data.links.map(l => 
+        `<a href="${l.url}" target="_blank" class="quick-link-chip">
+          ${l.name}
+        </a>`
+      ).join('');
+      document.getElementById('quick-links-container').innerHTML = linksHtml;
+      
+      if (document.getElementById('health-active')) {
+        document.getElementById('health-active').innerText = state.data.activeMinutes !== undefined ? state.data.activeMinutes : '-';
+      }
+      if (document.getElementById('health-sleep')) {
+        document.getElementById('health-sleep').innerText = state.data.sleepHours !== undefined ? state.data.sleepHours : '-';
+      }
+      
+      if (document.getElementById('daily-plan-container')) {
+        if (state.data.executionPlanData) {
+          const d = state.data.executionPlanData;
+          
+          const renderSleekList = (items, themeColor) => {
+            if (!items || items.length === 0) return '<div style="color:var(--color-text-muted); font-size:14px; font-style: italic;">No tasks scheduled.</div>';
+            return '<div style="display:flex; flex-direction:column; gap:10px;">' + items.map(item => {
+              const bg = item.checked ? 'var(--color-hover)' : 'var(--color-surface)';
+              const textColor = item.checked ? 'var(--color-text-muted)' : 'var(--color-text)';
+              const textDecor = item.checked ? 'line-through' : 'none';
+              const indicatorColor = item.checked ? 'var(--color-border)' : themeColor;
+              
+              return `
+              <div style="background: ${bg}; border: 1px solid var(--color-border); border-left: 4px solid ${indicatorColor}; padding: 14px 18px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s;">
+                <span style="color: ${textColor}; font-weight: 500; text-decoration: ${textDecor}; line-height: 1.4;">${item.text}</span>
+                ${item.checked ? '<span style="color: var(--color-text-muted); font-size: 12px; font-weight: bold; letter-spacing: 0.5px;">DONE</span>' : ''}
+              </div>
+            `}).join('') + '</div>';
+          };
+          
+          let html = '';
+          if (d.bluf) html += `<div style="padding: 20px 24px; border-radius: 12px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--color-primary); margin-bottom: 36px; display: flex; flex-direction: column; gap: 8px;"><div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; color: #3b82f6;">Bottom Line Up Front</div><div style="font-size: 16px; line-height: 1.6; font-weight: 500;">${d.bluf}</div></div>`;
+          
+          const sectionTemplate = (title, workItems, personalItems, themeColor) => {
+             if ((!workItems || workItems.length === 0) && (!personalItems || personalItems.length === 0)) return '';
+             return `
+               <div style="margin-bottom: 40px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                 <div style="background: var(--color-hover); padding: 16px 24px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 10px;">
+                   <span style="width: 10px; height: 10px; border-radius: 50%; background: ${themeColor};"></span>
+                   <h2 style="font-size: 18px; font-weight: 600; margin: 0; color: var(--color-text); font-family: 'Google Sans', sans-serif;">${title}</h2>
+                 </div>
+                 <div class="dashboard-grid" style="padding: 24px; gap: 32px;">
+                   <div>
+                     <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-text-muted); margin-bottom: 16px; font-weight: 600;">Work</h3>
+                     ${renderSleekList(workItems, themeColor)}
+                   </div>
+                   <div>
+                     <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-text-muted); margin-bottom: 16px; font-weight: 600;">Personal</h3>
+                     ${renderSleekList(personalItems, themeColor)}
+                   </div>
+                 </div>
+               </div>
+             `;
+          };
+
+          html += sectionTemplate("EAT THE FROG", d.frogs.work, d.frogs.personal, "#ef4444"); // Red
+          html += sectionTemplate("TODAY'S TOP 3", d.top3.work, d.top3.personal, "#f59e0b"); // Amber
+          html += sectionTemplate("THE REST OF TODAY", d.rest.work, d.rest.personal, "#3b82f6"); // Blue
+
+          if (d.alerts && d.alerts.length > 0) {
+            html += `<div style="margin-bottom: 40px; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 24px;">`;
+            html += `<h2 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #ef4444; font-family: 'Google Sans', sans-serif; display: flex; align-items: center; gap: 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> BOTTLENECKS & ALERTS</h2>`;
+            html += '<ul style="margin:0; padding-left:24px; color: #ef4444; font-size: 15px; line-height: 1.6;">' + d.alerts.map(a => `<li style="margin-bottom:8px;">${a}</li>`).join('') + '</ul>';
+            html += `</div>`;
+          }
+
+          document.getElementById('daily-plan-container').innerHTML = html;
+        } else {
+          document.getElementById('daily-plan-container').innerHTML = "<div style='color:var(--color-text-muted); text-align:center;'>No execution plan found.</div>";
+        }
+      }
+      
+      const activeTab = document.querySelector('.intel-tab.active');
+      if (activeTab) {
+        const key = activeTab.innerText.includes('2-Day') ? 'vantageReport' : 
+                    activeTab.innerText.includes('14-Day') ? 'vantageReport14' : 'recentReflections';
+        switchIntelTab(key, activeTab);
+      }
+
+      renderList('calendar', item => {
+        const timeStr = item.isAllDay ? "All Day" : `${new Date(item.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(item.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        return `
+        <a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="list-item">
+          <div class="list-item-icon">C</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.title}</div>
+            <div class="list-item-subtitle">${timeStr} ${item.location ? '• ' + item.location : ''}</div>
+          </div>
+        </a>
+      `}, "No events today.");
+
+      renderList('emails', item => `
+        <a href="${item.url}" target="_blank" class="list-item">
+          <div class="list-item-icon">M</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.subject}</div>
+            <div class="list-item-subtitle">${item.sender} • ${new Date(item.date).toLocaleDateString()}</div>
+          </div>
+        </a>
+      `, "No recent emails.");
+
+      renderList('tasks', item => `
+        <div class="list-item" style="cursor: default;">
+          <div class="list-item-icon">T</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.title}</div>
+            <div class="list-item-subtitle">Due: ${item.due ? new Date(item.due).toLocaleDateString() : 'None'}</div>
+          </div>
+        </div>
+      `, "No tasks due today.");
+
+      renderList('clerkEmails', item => `
+        <a href="${item.link}" target="_blank" class="list-item">
+          <div class="list-item-icon">E</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.subject}</div>
+            <div class="list-item-subtitle">${item.sender} • [${item.status}]</div>
+          </div>
+        </a>
+      `, "No Clerk emails processed recently.");
+
+      renderList('clerkTasks', item => `
+        <div class="list-item" style="cursor: default;">
+          <div class="list-item-icon">A</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.cleanedTitle || item.originalTitle}</div>
+            <div class="list-item-subtitle">${item.targetList} • [${item.status}]</div>
+          </div>
+        </div>
+      `, "No Clerk tasks processed recently.");
+
+      renderList('files', item => `
+        <a href="${item.url}" target="_blank" class="list-item">
+          <div class="list-item-icon">F</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.name}</div>
+            <div class="list-item-subtitle">Modified: ${new Date(item.date).toLocaleDateString()}</div>
+          </div>
+        </a>
+      `, "No recent files.");
+
+      renderList('workouts', item => {
+        const d = new Date(item.startTime);
+        const dateStr = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `
+        <div class="list-item" style="cursor: default;">
+          <div class="list-item-icon">W</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.title}</div>
+            <div class="list-item-subtitle">${dateStr} • ${timeStr}</div>
+          </div>
+        </div>
+      `}, "No recent workouts found.");
+
+      renderList('notes', item => `
+        <a href="${item.url}" target="_blank" class="list-item">
+          <div class="list-item-icon">N</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.name}</div>
+            <div class="list-item-subtitle">Tasks: ${item.tasksCount} • ${new Date(item.date).toLocaleDateString()}</div>
+          </div>
+        </a>
+      `, "No recent notes.");
+    }
+
+    function renderList(key, templateFn, emptyMsg) {
+      const items = state.data[key] || [];
+      const page = state.page[key];
+      const start = page * state.itemsPerPage;
+      const end = start + state.itemsPerPage;
+      const slice = items.slice(start, end);
+      
+      const container = document.getElementById(`${key}-container`);
+      if (!container) return; // Safely skip if container doesn't exist
+      
+      if (items.length === 0) {
+        container.innerHTML = `<div style="padding: 12px; color: var(--color-text-muted)">${emptyMsg}</div>`;
+      } else {
+        container.innerHTML = slice.map(templateFn).join('');
+      }
+
+      const totalPages = Math.ceil(items.length / state.itemsPerPage) || 1;
+      const infoEl = document.getElementById(`${key}-info`);
+      if (infoEl) infoEl.innerText = `Page ${page + 1} of ${totalPages}`;
+      
+      const prevEl = document.getElementById(`${key}-prev`);
+      if (prevEl) prevEl.disabled = page === 0;
+      
+      const nextEl = document.getElementById(`${key}-next`);
+      if (nextEl) nextEl.disabled = page >= totalPages - 1;
+    }
+
+    function changePage(key, delta) {
+      const items = state.data[key] || [];
+      const totalPages = Math.ceil(items.length / state.itemsPerPage) || 1;
+      let newPage = state.page[key] + delta;
+      if (newPage < 0) newPage = 0;
+      if (newPage >= totalPages) newPage = totalPages - 1;
+      state.page[key] = newPage;
+      renderAll();
+    }
+
+    function loadSheets() {
+      google.script.run
+        .withSuccessHandler(function(sheets) {
+          const sel = document.getElementById('sheet-select');
+          if (sel) {
+            sel.innerHTML = '<option value="">Select a sheet...</option>';
+            sheets.forEach(function(s) { const o = document.createElement('option'); o.value = s.name; o.textContent = s.name; sel.appendChild(o); });
+          }
+        })
+        .withFailureHandler(function() { log('Failed to load sheet list.', 'error'); })
+        .getSheetsList();
+    }
+
+    function runPipeline(fn) {
+      const btn = event.target;
+      setLoadingBtn(btn, true);
+      log(`Running ${fn}...`, 'info');
+      google.script.run.withSuccessHandler(res => {
+        setLoadingBtn(btn, false);
+        log(res, 'success');
+      }).withFailureHandler(err => {
+        setLoadingBtn(btn, false);
+        log(err.message, 'error');
+      })[fn]();
+    }
+
+    // -----------------------------------------
+    // BREATHE APP LOGIC
+    // -----------------------------------------
+    let breatheInterval;
+    let breatheState = 0; // 1=inhale, 2=hold, 3=exhale
+    let breatheTicks = 0;
+    let cyclesCompleted = 0;
+    let isBreathing = false;
+    let audioCtx;
+
+    function playTone(freq, durationStr) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = freq;
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        // Envelope
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
+        
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 2);
+      } catch(e) {}
+    }
+
+    function startBreathing() {
+      const btn = document.getElementById('breathe-start-btn');
+      const text = document.getElementById('breathe-text');
+      const circle = document.getElementById('breathe-circle');
+      
+      if (isBreathing) {
+        clearInterval(breatheInterval);
+        isBreathing = false;
+        btn.innerText = 'Start';
+        text.innerText = '4';
+        circle.style.transform = 'scale(0.4)';
+        return;
+      }
+      
+      isBreathing = true;
+      btn.innerText = 'Stop';
+      breatheState = 1;
+      breatheTicks = 0;
+      cyclesCompleted = 0;
+      document.getElementById('breathe-cycles-count').innerText = 4;
+      
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      doBreatheTick();
+      breatheInterval = setInterval(doBreatheTick, 1000);
+    }
+
+    function playTick() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine'; // Very soft sine tick
+        oscillator.frequency.value = 600; // mid-high pitch
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        // Very short percussive envelope for the tick
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
+      } catch(e) {}
+    }
+
+    function doBreatheTick() {
+      const circle = document.getElementById('breathe-circle');
+      const text = document.getElementById('breathe-text');
+      
+      if (breatheState === 1) { // Inhale 4s
+        if (breatheTicks === 0) {
+          playTone(329.63, 4); // E4
+          circle.style.transition = 'transform 4s ease-in-out';
+          circle.style.transform = 'scale(1.2)';
+        } else {
+          playTick();
+        }
+        const remaining = 4 - breatheTicks;
+        text.innerText = remaining;
+        breatheTicks++;
+        if (breatheTicks >= 4) {
+          breatheState = 2;
+          breatheTicks = 0;
+        }
+      } else if (breatheState === 2) { // Hold 7s
+        if (breatheTicks === 0) {
+          playTone(440.00, 7); // A4
+        } else {
+          playTick();
+        }
+        const remaining = 7 - breatheTicks;
+        text.innerText = remaining;
+        breatheTicks++;
+        if (breatheTicks >= 7) {
+          breatheState = 3;
+          breatheTicks = 0;
+        }
+      } else if (breatheState === 3) { // Exhale 8s
+        if (breatheTicks === 0) {
+          playTone(261.63, 8); // C4
+          circle.style.transition = 'transform 8s ease-in-out';
+          circle.style.transform = 'scale(0.4)';
+        } else {
+          playTick();
+        }
+        const remaining = 8 - breatheTicks;
+        text.innerText = remaining;
+        breatheTicks++;
+        if (breatheTicks >= 8) {
+          breatheState = 1;
+          breatheTicks = 0;
+          cyclesCompleted++;
+          document.getElementById('breathe-cycles-count').innerText = Math.max(0, 4 - cyclesCompleted);
+          if (cyclesCompleted === 4) {
+            winBreatheStreak();
+          }
+        }
+      }
+    }
+
+    function winBreatheStreak() {
+      clearInterval(breatheInterval);
+      isBreathing = false;
+      const btn = document.getElementById('breathe-start-btn');
+      const text = document.getElementById('breathe-text');
+      const circle = document.getElementById('breathe-circle');
+      btn.innerText = 'Done!';
+      text.innerText = '✓';
+      circle.style.transform = 'scale(0.4)';
+      
+      const el = document.getElementById('breathe-streak');
+      el.innerText = parseInt(el.innerText) + 1 + ' (Syncing...)';
+      
+      // Hit backend to log habit
+      google.script.run.withSuccessHandler(function(res) {
+         el.innerText = parseInt(el.innerText) + ' (Logged)';
+      }).withUserObject({}).logHabit('4-7-8 Breathing');
+      
+      // Try to find the Google Task ID for Morning or Evening Breathing
+      let breathingTaskId = null;
+      if (state.data && state.data.tasks) {
+        for (let t of state.data.tasks) {
+           if (t.title && t.title.toLowerCase().includes("4-7-8 breathing")) {
+               breathingTaskId = t.id;
+               break;
+           }
+        }
+      }
+      
+      if (breathingTaskId) {
+         google.script.run.completeTaskById(breathingTaskId);
+      }
+    }
+
+  </script>
+</body>
+</html>
+ 
+// test force push
+ 
