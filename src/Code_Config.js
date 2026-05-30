@@ -2,12 +2,13 @@
  * @file Code_Config.js
  * @description Centralized configuration mapping for all Google Apps Script files in The System framework.
  *
- * @version 1.0.0
- * @last_modified 2024-05-24
+ * @version 1.0.1
+ * @last_modified 2026-05-30
  * @modified_by Jules
  *
  * @changelog
  * - 1.0.0: Initial standardized documentation added.
+ * - 1.0.1: Added PERSONA_SHEET_ID, JOURNAL_SHEET_ID, and VANTAGE IDs to support dashboard.
  */
 
 // ==========================================
@@ -45,6 +46,8 @@ const SYSTEM_CONFIG = {
    */
   ROOTS: {
     MASTER_SHEET_ID: PropertiesService.getScriptProperties().getProperty("MASTER_SHEET_ID"),
+    PERSONA_SHEET_ID: "1x4vRE93oz5xoaqEx96MWk65pSDmNt7YvQkrluTV3jeU",
+    JOURNAL_SHEET_ID: "1pchhGyniJKiWRm6zNXy834SSeITh3BW4ogVJGImfvFM",
     WORKSPACE_FOLDER_ID: PropertiesService.getScriptProperties().getProperty("WORKSPACE_FOLDER_ID"),
     DRIVE_RETRO_ROOT_ID: PropertiesService.getScriptProperties().getProperty("DRIVE_RETRO_ROOT_ID"),
     DRIVE_RULES_SHEET_ID: PropertiesService.getScriptProperties().getProperty("DRIVE_RULES_SHEET_ID") || PropertiesService.getScriptProperties().getProperty("MASTER_SHEET_ID"),
@@ -63,7 +66,9 @@ const SYSTEM_CONFIG = {
     TAXONOMY_DOC_ID: "1CWiCihx-aR9U-UBh04F6XjITfB8aSxrf",
     TAXONOMY_JSON_ID: "199ChTlYe3xKsybllcJ3BXYUIEs8cxvWq",
     PROMPT_VANTAGE: "1Cw4KXmJ7cN114YFub9voVhlzEL_EEF1D",
-    PERSONAL_GOALS_FILE_ID: "1bj6AmZRRaHh4r2fBG2A9V1rtnXa707Qg", 
+    PERSONAL_GOALS_FILE_ID: "1bj6AmZRRaHh4r2fBG2A9V1rtnXa707Qg",
+    VANTAGE_DEBUG_FILE_ID: "1Pk_hMSx9-VGGW0Kv77Z30dPztg3wEhAE",
+    VANTAGE_FILE_ID: "1oTcChwJQ4uMj5bYk-GlJl1J-yiRTU3If",
     WORK_GOALS_FILE_ID: "14k8NX8vLdA7EjEujYRk0a0V3UKCLfI1I",
     CLERK_DRIVE_INSTRUCTIONS: "1BgYouMZhPq9XPj73fxQZRCfrSTwWfvehdYzll5YuNVw",
     CLERK_DRIVE_PROTOCOL: "1rL1zqmSbzm9jjz2gJ2dewHxBRwX-cWIgN9gy3L-4idI",

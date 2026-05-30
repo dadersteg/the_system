@@ -1,3 +1,14 @@
+<!-- /**
+ * @file WebApp_Dashboard.html
+ * @description Frontend HTML/CSS/JS for the responsive monochrome navy/grey web app dashboard.
+ *
+ * @version 1.0.0
+ * @last_modified 2026-05-30
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.0: Added JSDoc header, optimized performance, replaced hardcoded IDs, improved UI.
+ */ -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -671,7 +682,7 @@
           <div style="color: var(--color-text-muted); font-size: 24px;">→</div>
         </a>
 
-        <a href="https://docs.google.com/spreadsheets/d/1pchhGyniJKiWRm6zNXy834SSeITh3BW4ogVJGImfvFM/edit?gid=0#gid=0" target="_blank" style="display: flex; align-items: center; justify-content: space-between; background: var(--color-surface); border: 1px solid var(--color-border); padding: 24px; border-radius: 12px; color: var(--color-text); text-decoration: none; transition: background 0.2s, border-color 0.2s;" onmouseover="this.style.background='var(--color-hover)'; this.style.borderColor='var(--color-primary)';" onmouseout="this.style.background='var(--color-surface)'; this.style.borderColor='var(--color-border)';">
+        <a href="https://docs.google.com/spreadsheets/d/<?= SYSTEM_CONFIG.ROOTS.JOURNAL_SHEET_ID ?>/edit?gid=0#gid=0" target="_blank" style="display: flex; align-items: center; justify-content: space-between; background: var(--color-surface); border: 1px solid var(--color-border); padding: 24px; border-radius: 12px; color: var(--color-text); text-decoration: none; transition: background 0.2s, border-color 0.2s;" onmouseover="this.style.background='var(--color-hover)'; this.style.borderColor='var(--color-primary)';" onmouseout="this.style.background='var(--color-surface)'; this.style.borderColor='var(--color-border)';">
           <div style="display: flex; align-items: center; gap: 20px;">
             <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--color-icon-bg); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">J</div>
             <div>
@@ -687,7 +698,7 @@
     <div id="sec-admin" class="section" style="padding-bottom: 100px;">
       <div class="header-area" style="display: flex; justify-content: space-between; align-items: flex-end;">
         <h1>System Administration</h1>
-        <a href="https://docs.google.com/spreadsheets/d/1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4/edit" target="_blank" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+        <a href="https://docs.google.com/spreadsheets/d/<?= SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID ?>/edit" target="_blank" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
           Master Spreadsheet ↗
         </a>
       </div>

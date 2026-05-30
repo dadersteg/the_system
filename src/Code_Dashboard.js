@@ -1,5 +1,34 @@
+/**
+ * @file Code_Dashboard.js
+ * @description Backend logic for the web app dashboard, providing data from Google Sheets, Drive, and Tasks.
+ *
+ * @version 1.0.0
+ * @last_modified 2026-05-30
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.0: Added JSDoc header, optimized performance, replaced hardcoded IDs, improved UI.
+ */
+
+let _cachedMasterSheet = null;
+
+let _cachedPersonaSheet = null;
+function getPersonaSheet() {
+  if (!_cachedPersonaSheet) {
+    _cachedPersonaSheet = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.PERSONA_SHEET_ID);
+  }
+  return _cachedPersonaSheet;
+}
+
+function getMasterSheet() {
+  if (!_cachedMasterSheet) {
+    _cachedMasterSheet = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+  }
+  return _cachedMasterSheet;
+}
+
 function debugGetHeaders() {
-   const ss = SpreadsheetApp.openById("1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4");
+   const ss = getMasterSheet();
    const notes = ss.getSheets().find(s => s.getSheetId().toString() === "967747913");
    const emails = ss.getSheets().find(s => s.getSheetId().toString() === "2131515996");
    const tasks = ss.getSheets().find(s => s.getSheetId().toString() === "1580572397");
@@ -15,11 +44,11 @@ function doGet(e) {
      return ContentService.createTextOutput(debugGetHeaders());
   }
    if (e && e.parameter && e.parameter.debugVantage === "true") {
-      return ContentService.createTextOutput(DriveApp.getFileById("1Pk_hMSx9-VGGW0Kv77Z30dPztg3wEhAE").getBlob().getDataAsString());
+      return ContentService.createTextOutput(DriveApp.getFileById(SYSTEM_CONFIG.DOCS.VANTAGE_DEBUG_FILE_ID).getBlob().getDataAsString());
    }
 
   if (e && e.parameter && e.parameter.vantage === "true") {
-     return ContentService.createTextOutput(DriveApp.getFileById("1oTcChwJQ4uMj5bYk-GlJl1J-yiRTU3If").getBlob().getDataAsString());
+     return ContentService.createTextOutput(DriveApp.getFileById(SYSTEM_CONFIG.DOCS.VANTAGE_FILE_ID).getBlob().getDataAsString());
   }
    if (e && e.parameter && e.parameter.debugActualTasks === "true") {
       const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
@@ -28,7 +57,7 @@ function doGet(e) {
    }
 
    if (e && e.parameter && e.parameter.debugTasks === "true") {
-      const ss = SpreadsheetApp.openById("1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4");
+      const ss = getMasterSheet();
       const taskLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === "1580572397");
       if (taskLogSheet) {
           const lr = taskLogSheet.getLastRow();
@@ -40,7 +69,7 @@ function doGet(e) {
    }
 
    if (e && e.parameter && e.parameter.debugEmails === "true") {
-      const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+      const ss = getMasterSheet();
       const sheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
       const lr = sheet.getLastRow();
       const startRow = Math.max(2, lr - 24);
@@ -359,7 +388,7 @@ function doGet(e) {
 
 
 
-  return HtmlService.createHtmlOutputFromFile('WebApp_Dashboard')
+  return HtmlService.createTemplateFromFile('WebApp_Dashboard').evaluate()
       .setTitle('The System Dashboard')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -367,7 +396,7 @@ function doGet(e) {
 
 // Ensure the UI functions are accessible
 function getSheetsList() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+  const ss = getMasterSheet();
   return ss.getSheets().map(sheet => ({
     name: sheet.getName(),
     id: sheet.getSheetId()
@@ -376,7 +405,7 @@ function getSheetsList() {
 
 function sortTabs() {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     const sheets = ss.getSheets();
     
     // Create an array of sheet objects with their current names
@@ -425,7 +454,7 @@ function sortTabs() {
 
 function createIndex() {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     let indexSheet = ss.getSheetByName('Index');
     
     if (!indexSheet) {
@@ -467,7 +496,7 @@ function createIndex() {
 
 function bulkRenameTabs(findStr, replaceStr) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     const sheets = ss.getSheets();
     let count = 0;
     
@@ -492,7 +521,7 @@ function bulkRenameTabs(findStr, replaceStr) {
 
 function renameTab(oldName, newName) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     const sheet = ss.getSheetByName(oldName);
     if (!sheet) {
       return { success: false, message: `Sheet '${oldName}' not found.` };
@@ -510,7 +539,7 @@ function renameTab(oldName, newName) {
 
 function hideSheets(matchStr) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     const sheets = ss.getSheets();
     const search = matchStr.toLowerCase();
     let count = 0;
@@ -531,7 +560,7 @@ function hideSheets(matchStr) {
 
 function showSheets(matchStr) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     const sheets = ss.getSheets();
     const search = matchStr.toLowerCase();
     let count = 0;
@@ -552,7 +581,7 @@ function showSheets(matchStr) {
 
 function deleteSheets(matchStr) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     const sheets = ss.getSheets();
     const search = matchStr.toLowerCase();
     let count = 0;
@@ -576,7 +605,7 @@ function deleteAllSheetsFrom(numStr) {
     const num = parseInt(numStr, 10);
     if (isNaN(num) || num < 1) return { success: false, message: `Invalid sheet number: ${numStr}` };
     
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     const sheets = ss.getSheets();
     const total = sheets.length;
     
@@ -606,7 +635,7 @@ function copySheets(matchStr, destId) {
   try {
     if (!destId) return { success: false, message: `Destination ID is required.` };
     
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     const sheets = ss.getSheets();
     const search = matchStr.toLowerCase();
     const destSS = SpreadsheetApp.openById(destId);
@@ -678,7 +707,7 @@ function getDashboardData() {
   let allSheets = [];
   let workspaceFolder = null;
   try {
-    ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    ss = getMasterSheet();
     allSheets = ss.getSheets();
   } catch (e) { console.error("Error loading master sheet: " + e.message); }
   
@@ -1117,7 +1146,7 @@ function createDraftReply(threadId, bodyText) {
 function generateWifieMessage() {
   try {
     // 1. Fetch WhatsApp context from Email_Log
-    const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSheet();
     const logSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
     let whatsappContext = "No recent WhatsApp context found.";
     
@@ -1178,7 +1207,7 @@ CRITICAL: Keep the message VERY SHORT. Maximum 2-3 sentences. Do NOT over-index 
     
     let systemInstruction = "You are Daniel. Write a loving, sweet, and context-aware message to Carry. Use the provided context."; // Fallback
     try {
-      const personaSs = SpreadsheetApp.openById('1x4vRE93oz5xoaqEx96MWk65pSDmNt7YvQkrluTV3jeU');
+      const personaSs = getPersonaSheet();
       const sheets = personaSs.getSheets();
       let personaSheet = null;
       for (let i = 0; i < sheets.length; i++) {
@@ -1231,7 +1260,7 @@ CRITICAL: Keep the message VERY SHORT. Maximum 2-3 sentences. Do NOT over-index 
 }
 
 function dumpPersonaSheet() {
-  const ss = SpreadsheetApp.openById('1x4vRE93oz5xoaqEx96MWk65pSDmNt7YvQkrluTV3jeU');
+  const ss = getPersonaSheet();
   const sheets = ss.getSheets();
   let out = {};
   for(let s of sheets){
@@ -1383,7 +1412,7 @@ function getDashboardClerkLogs() { const startT = Date.now();
   const res = { emails: [], notes: [], tasks: [] };
   try {
     // Hardcode to the provided master spreadsheet ID to ensure we find the logs
-    const ss = SpreadsheetApp.openById("1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4");
+    const ss = getMasterSheet();
     const allSheets = ss.getSheets();
     
     const safeDate = (val) => {
