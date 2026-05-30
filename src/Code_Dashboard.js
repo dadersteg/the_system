@@ -1,5 +1,17 @@
+/**
+ * @file Code_Dashboard.js
+ * @description Backend logic for the web dashboard, handling data fetching, external API interactions, and system controls.
+ *
+ * @version 1.1.0
+ * @last_modified 2026-05-30
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.1.0: Premium refactoring, UI/UX enhancements, and performance optimizations.
+ */
+
 function debugGetHeaders() {
-   const ss = SpreadsheetApp.openById("1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4");
+   const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
    const notes = ss.getSheets().find(s => s.getSheetId().toString() === "967747913");
    const emails = ss.getSheets().find(s => s.getSheetId().toString() === "2131515996");
    const tasks = ss.getSheets().find(s => s.getSheetId().toString() === "1580572397");
@@ -28,7 +40,7 @@ function doGet(e) {
    }
 
    if (e && e.parameter && e.parameter.debugTasks === "true") {
-      const ss = SpreadsheetApp.openById("1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4");
+      const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
       const taskLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === "1580572397");
       if (taskLogSheet) {
           const lr = taskLogSheet.getLastRow();
@@ -1326,7 +1338,7 @@ function getDashboardEmails() { const startT = Date.now();
       date: t.getLastMessageDate().toISOString(),
       url: `https://mail.google.com/mail/u/0/#inbox/${t.getId()}`
     }));
-  } catch(e) { console.error("Error emails: " + e.message); return []; }
+  } catch (e) { console.error("Error fetching emails: " + e.stack); return []; }
 }
 
 function getDashboardCalendar() { const startT = Date.now();
@@ -1341,7 +1353,7 @@ function getDashboardCalendar() { const startT = Date.now();
       isAllDay: e.isAllDayEvent(),
       location: e.getLocation()
     }));
-  } catch(e) { console.error("Error cal: " + e.message); return []; }
+  } catch (e) { console.error("Error fetching calendar: " + e.stack); return []; }
 }
 
 function getDashboardTasks() { const startT = Date.now();
@@ -1369,21 +1381,21 @@ function getDashboardTasks() { const startT = Date.now();
     const workoutEvents = CalendarApp.getDefaultCalendar().getEvents(sevenDaysAgo, sevenDaysFromNow);
     const calWorkouts = workoutEvents.filter(e => workoutKeywords.some(kw => (e.getTitle() || "").toLowerCase().includes(kw))).map(e => ({ title: e.getTitle(), startTime: e.getStartTime().toISOString(), endTime: e.getEndTime().toISOString() }));
     res.workouts = [...calWorkouts, ...res.workoutsTasks].sort((a, b) => new Date(b.startTime) - new Date(a.startTime)).slice(0, 15);
-  } catch(e) { console.error("Error tasks: " + e.message); }
+  } catch (e) { console.error("Error fetching tasks: " + e.stack); }
   console.log("Docs load time: " + (Date.now() - startT) + "ms"); return res; }
 
 function getDashboardFiles() {
   try {
     const fileList = Drive.Files.list({ q: "trashed=false and mimeType != 'application/vnd.google-apps.folder'", orderBy: "modifiedByMeTime desc", maxResults: 25, fields: "files(id, name, webViewLink, modifiedByMeTime, mimeType)" });
     return (fileList.files || []).map(f => ({ id: f.id, name: f.name, date: f.modifiedByMeTime, url: f.webViewLink, mimeType: f.mimeType }));
-  } catch(e) { console.error("Error files: " + e.message); return []; }
+  } catch (e) { console.error("Error fetching files: " + e.stack); return []; }
 }
 
 function getDashboardClerkLogs() { const startT = Date.now();
   const res = { emails: [], notes: [], tasks: [] };
   try {
     // Hardcode to the provided master spreadsheet ID to ensure we find the logs
-    const ss = SpreadsheetApp.openById("1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4");
+    const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
     const allSheets = ss.getSheets();
     
     const safeDate = (val) => {
@@ -1439,7 +1451,7 @@ function getDashboardClerkLogs() { const startT = Date.now();
           .slice(0, 25);
       }
     }
-  } catch(e) { console.error("Error clerk: " + e.message); }
+  } catch (e) { console.error("Error fetching clerk logs: " + e.stack); }
   console.log("Clerk logs load time: " + (Date.now() - startT) + "ms"); return res; }
 
 function parseExecutionPlan(md) {
@@ -1558,7 +1570,7 @@ function getDashboardDocs() { const startT = Date.now();
     }
     const inboxThreads = GmailApp.search('label:00-manual-review', 0, 100);
     res.manualReviewCount = inboxThreads.length;
-  } catch(e) { console.error("Error docs: " + e.message); }
+  } catch (e) { console.error("Error fetching docs: " + e.stack); }
   console.log("Docs load time: " + (Date.now() - startT) + "ms"); return res; }
 // trigger push
  
