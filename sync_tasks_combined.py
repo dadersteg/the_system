@@ -8,8 +8,8 @@ from googleapiclient.discovery import build
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
 
-# Keywords to trigger local routing from Private -> Work Google Tasks
-WORK_KEYWORDS = ['playmetech', 'quantum 21', 'quantum21']
+# Work LOS context code to trigger local routing from Private -> Work Google Tasks
+WORK_LOS_CODE = '02 01 01'
 
 # The work Google Tasks list to route tasks into.
 # '@default' targets whatever list is set as default on the work account.
@@ -113,18 +113,15 @@ def check_and_route_tasks(private_service, work_service):
             title = task.get('title', '')
             notes = task.get('notes', '')
             
-            # Combine title and notes to check for work keywords
-            combined_text = (title + " " + notes).lower()
-            
-            if any(keyword in combined_text for keyword in WORK_KEYWORDS):
-                print(f"[Gateway] Found work-related task in private list '{list_title}': '{title}'")
+            # Use strict LOS matching instead of loose keywords
+            if f"Context: {WORK_LOS_CODE}" in notes or f"Context:{WORK_LOS_CODE}" in notes:
+                print(f"[Gateway] Found Quantum 21 task (LOS: {WORK_LOS_CODE}) in private list '{list_title}': '{title}'")
                 try:
                     # 1. Insert into the configured work destination list
-                    #    Strip SYSTEM_METADATA before sending to work account
-                    routed_notes = strip_system_metadata(task.get('notes', ''))
+                    #    Preserve ALL notes safely without overriding them.
                     work_task_body = {
                         'title': task.get('title'),
-                        'notes': routed_notes or 'Routed from personal account.',
+                        'notes': notes,
                         'due': task.get('due')
                     }
                     inserted = work_service.tasks().insert(tasklist=WORK_TASKS_DEST, body=work_task_body).execute()
