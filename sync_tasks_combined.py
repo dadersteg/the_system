@@ -10,13 +10,13 @@ SCOPES = ['https://www.googleapis.com/auth/tasks']
 
 # Work LOS context code to trigger local routing from Private -> Work Google Tasks
 WORK_LOS_CODE = '02 01 01'
+# Private LOS context code to trigger local routing from Work -> Private Google Tasks
+PRIVATE_LOS_CODE = '01 01 00'
 
 # The work Google Tasks list to route tasks into.
-# '@default' targets whatever list is set as default on the work account.
-# Once the work instance of The System is fully set up, replace this with
-# the specific work Importer list ID (e.g. 'MDI4NDE2...') so routed tasks
-# land directly in the work inbox pipeline.
+# '@default' targets whatever list is set as default on the account.
 WORK_TASKS_DEST = '@default'
+PRIVATE_TASKS_DEST = '@default'
 
 # Redaction rules (Regex patterns to scrub from combined Markdown tasks)
 REDACTION_PATTERNS = [
@@ -83,56 +83,67 @@ def redact_text(text):
 
 def check_and_route_tasks(private_service, work_service):
     """
-    Checks the private Google Tasks lists for tasks matching work keywords
-    and automatically routes them to the work account.
+    Checks the private Google Tasks lists for tasks matching work LOS,
+    and work Google Tasks lists for tasks matching private LOS, routing them appropriately.
     """
-    print("\n[Gateway] Checking for tasks to route from Private to Work...")
-    try:
-        task_lists = private_service.tasklists().list(maxResults=20).execute().get('items', [])
-    except Exception as e:
-        print(f"Failed to fetch private task lists: {e}")
-        return
-
+    print("\n[Gateway] Checking for tasks to route (Bi-directional)...")
     routed_count = 0
 
-    for lst in task_lists:
-        list_id = lst['id']
-        list_title = lst['title']
-        
-        # Don't sweep tasks from 'To be deleted' list if it's junk
-        if "deleted" in list_title.lower():
-            continue
+    # --- 1. Private to Work ---
+    try:
+        private_lists = private_service.tasklists().list(maxResults=20).execute().get('items', [])
+        for lst in private_lists:
+            list_id = lst['id']
+            list_title = lst['title']
+            if "deleted" in list_title.lower(): continue
             
-        try:
             tasks = private_service.tasks().list(tasklist=list_id, showCompleted=False).execute().get('items', [])
-        except Exception as e:
-            print(f"Failed to fetch tasks for private list {list_title}: {e}")
-            continue
+            for task in tasks:
+                title = task.get('title', '')
+                notes = task.get('notes', '')
+                
+                if f"Context: {WORK_LOS_CODE}" in notes or f"Context:{WORK_LOS_CODE}" in notes:
+                    print(f"[Gateway] Found Quantum 21 task (LOS: {WORK_LOS_CODE}) in private list '{list_title}': '{title}'")
+                    try:
+                        work_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}
+                        inserted = work_service.tasks().insert(tasklist=WORK_TASKS_DEST, body=work_task_body).execute()
+                        print(f"[Gateway] Pushed task to Work default list. (ID: {inserted['id']})")
+                        
+                        private_service.tasks().delete(tasklist=list_id, task=task['id']).execute()
+                        print(f"[Gateway] Removed task from Private list.")
+                        routed_count += 1
+                    except Exception as ex:
+                        print(f"[Gateway] Error routing task '{title}': {ex}")
+    except Exception as e:
+        print(f"Failed to fetch private task lists: {e}")
 
-        for task in tasks:
-            title = task.get('title', '')
-            notes = task.get('notes', '')
+    # --- 2. Work to Private ---
+    try:
+        work_lists = work_service.tasklists().list(maxResults=20).execute().get('items', [])
+        for lst in work_lists:
+            list_id = lst['id']
+            list_title = lst['title']
+            if "deleted" in list_title.lower(): continue
             
-            # Use strict LOS matching instead of loose keywords
-            if f"Context: {WORK_LOS_CODE}" in notes or f"Context:{WORK_LOS_CODE}" in notes:
-                print(f"[Gateway] Found Quantum 21 task (LOS: {WORK_LOS_CODE}) in private list '{list_title}': '{title}'")
-                try:
-                    # 1. Insert into the configured work destination list
-                    #    Preserve ALL notes safely without overriding them.
-                    work_task_body = {
-                        'title': task.get('title'),
-                        'notes': notes,
-                        'due': task.get('due')
-                    }
-                    inserted = work_service.tasks().insert(tasklist=WORK_TASKS_DEST, body=work_task_body).execute()
-                    print(f"[Gateway] Pushed task to Work default list. (ID: {inserted['id']})")
-                    
-                    # 2. Delete from private tasks list
-                    private_service.tasks().delete(tasklist=list_id, task=task['id']).execute()
-                    print(f"[Gateway] Removed task from Private list.")
-                    routed_count += 1
-                except Exception as ex:
-                    print(f"[Gateway] Error routing task '{title}': {ex}")
+            tasks = work_service.tasks().list(tasklist=list_id, showCompleted=False).execute().get('items', [])
+            for task in tasks:
+                title = task.get('title', '')
+                notes = task.get('notes', '')
+                
+                if f"Context: {PRIVATE_LOS_CODE}" in notes or f"Context:{PRIVATE_LOS_CODE}" in notes:
+                    print(f"[Gateway] Found Personal task (LOS: {PRIVATE_LOS_CODE}) in work list '{list_title}': '{title}'")
+                    try:
+                        private_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}
+                        inserted = private_service.tasks().insert(tasklist=PRIVATE_TASKS_DEST, body=private_task_body).execute()
+                        print(f"[Gateway] Pushed task to Private default list. (ID: {inserted['id']})")
+                        
+                        work_service.tasks().delete(tasklist=list_id, task=task['id']).execute()
+                        print(f"[Gateway] Removed task from Work list.")
+                        routed_count += 1
+                    except Exception as ex:
+                        print(f"[Gateway] Error routing task '{title}': {ex}")
+    except Exception as e:
+        print(f"Failed to fetch work task lists: {e}")
                     
     print(f"[Gateway] Routing sweep complete. Routed {routed_count} task(s).")
 
