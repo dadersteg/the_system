@@ -7,6 +7,7 @@ This is the central workspace rules file for **The System**. Verne and all other
 ## 1. Project Stack & Architecture
 * **Primary Language/Framework:** JavaScript (Google Apps Script runtime V8), Python 3.9+ (local automation/sync utilities).
 * **Workspace Engine:** Managed locally via `clasp` (Command Line Apps Script Projects) for code syncing, and Git/GitHub for version control.
+* **Git Protocol (CRITICAL):** Because `clasp push` is decoupled from version control, the local Git history will drift behind the live code. To prevent wiping out uncommitted work, you MUST run a global git commit (e.g., `git add -u && git commit -m "saving progress"`) at the end of your task or shift to ensure all your changes are preserved in Git.
 
 ---
 
