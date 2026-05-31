@@ -7,9 +7,9 @@ function syncTaxonomyToSheet() {
   const sheetId = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
   const targetGid = 1287896098;
 
-  const files = DriveApp.getFilesByName("TS - Categorisation.md");
-  if (!files.hasNext()) throw new Error("Could not find TS - Categorisation.md in Google Drive. Make sure it exists.");
-  const file = files.next();
+  const fileId = SYSTEM_CONFIG.DOCS.TAXONOMY_DOC_ID;
+  if (!fileId) throw new Error("TAXONOMY_DOC_ID is not configured in Script Properties or Code_Config.js.");
+  const file = DriveApp.getFileById(fileId);
   let text = file.getBlob().getDataAsString();
   
   // 1. Add Niklas Johansson if not present

@@ -19,46 +19,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Google+Sans:wght@400;500;600;700&display=swap');
     
     :root {
-      /* Premium Monochrome Navy & Grey Theme - Light */
-      --color-primary: #0f172a; /* deeper navy */
+      /* Premium Zinc/Slate Theme - Light */
+      --color-primary: #0f172a; /* deep zinc */
       --color-primary-on: #ffffff;
       --color-bg: #f8fafc;
-      --color-surface: rgba(255, 255, 255, 0.7); /* glassmorphism base */
-      --color-text: #0f172a;
+      --color-surface: rgba(255, 255, 255, 0.85); /* stronger glass */
+      --color-text: #1e293b;
       --color-text-muted: #64748b;
-      --color-border: rgba(226, 232, 240, 0.8);
-      --color-hover: rgba(241, 245, 249, 0.8);
-      --color-icon-bg: #e2e8f0;
+      --color-border: rgba(226, 232, 240, 0.9);
+      --color-hover: rgba(241, 245, 249, 0.9);
+      --color-icon-bg: #f1f5f9;
       
       --sidebar-width: 260px;
-      --glass-blur: blur(12px);
-      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --glass-blur: blur(16px);
+      --card-shadow: 0 8px 32px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.02);
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     
     @media (prefers-color-scheme: dark) {
       :root {
-        /* Premium Monochrome Navy & Grey Theme - Dark */
-        --color-primary: #e2e8f0;
+        /* Premium Zinc/Slate Theme - Dark */
+        --color-primary: #f8fafc;
         --color-primary-on: #0f172a;
-        --color-bg: #090e17; /* Very dark navy */
-        --color-surface: rgba(30, 41, 59, 0.6); /* glassmorphism base */
+        --color-bg: #020617; /* Slate 950 */
+        --color-surface: rgba(15, 23, 42, 0.65); /* Slate 900 glass */
         --color-text: #f8fafc;
         --color-text-muted: #94a3b8;
-        --color-border: rgba(51, 65, 85, 0.6);
-        --color-hover: rgba(15, 23, 42, 0.8);
+        --color-border: rgba(30, 41, 59, 0.8);
+        --color-hover: rgba(30, 41, 59, 0.7);
         --color-icon-bg: #1e293b;
-        --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
       }
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
-      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--color-bg);
       background-image: radial-gradient(circle at 100% 0%, rgba(15, 23, 42, 0.02) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(15, 23, 42, 0.02) 0%, transparent 50%);
       color: var(--color-text);
@@ -222,10 +222,18 @@
       overflow: hidden;
       box-shadow: var(--card-shadow);
       transition: var(--transition);
+      animation: fadeUpIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
     }
     
+    .dash-card:nth-child(1) { animation-delay: 0.05s; }
+    .dash-card:nth-child(2) { animation-delay: 0.1s; }
+    .dash-card:nth-child(3) { animation-delay: 0.15s; }
+    .dash-card:nth-child(4) { animation-delay: 0.2s; }
+    .dash-card:nth-child(5) { animation-delay: 0.25s; }
+    
     .dash-card:hover {
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+      transform: translateY(-4px);
     }
     
     .dash-card-header {
@@ -299,8 +307,9 @@
     
     .list-item:hover {
       background: var(--color-hover);
-      border-color: rgba(226, 232, 240, 0.4);
-      transform: translateX(4px);
+      border-color: rgba(226, 232, 240, 0.8);
+      transform: translateX(4px) scale(1.01);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
     }
     @media (prefers-color-scheme: dark) {
       .list-item:hover { border-color: rgba(51, 65, 85, 0.4); }
@@ -393,11 +402,14 @@
     }
     .btn-primary:hover { 
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+    }
+    .btn-primary:active {
+      transform: scale(0.97);
     }
     @media (prefers-color-scheme: dark) {
       .btn-primary { box-shadow: 0 4px 12px rgba(226, 232, 240, 0.15); }
-      .btn-primary:hover { box-shadow: 0 6px 16px rgba(226, 232, 240, 0.2); }
+      .btn-primary:hover { box-shadow: 0 8px 24px rgba(226, 232, 240, 0.25); }
     }
     
     .btn-outline { 
@@ -1124,8 +1136,10 @@
     }
 
     function renderStructuredMarkdown(mdText, elementId) {
-      const container = document.getElementById(elementId);
-      if (!mdText) {
+      try {
+        const container = document.getElementById(elementId);
+        if (!container) return;
+        if (!mdText) {
         container.innerHTML = "<div style='color:var(--color-text-muted); text-align:center;'>No data found.</div>";
         return;
       }
@@ -1178,12 +1192,18 @@
         }
         html += `</div>`;
       });
-      html += '</div>';
-      container.innerHTML = html;
+        html += '</div>';
+        container.innerHTML = html;
+      } catch (err) {
+        console.error("renderStructuredMarkdown error:", err);
+        const container = document.getElementById(elementId);
+        if (container) container.innerHTML = `<div style="color: red; padding: 10px;">Error rendering content</div>`;
+      }
     }
 
     function switchIntelTab(key, el) {
-      if (el) {
+      try {
+        if (el) {
         document.querySelectorAll('.intel-tab').forEach(t => t.classList.remove('active'));
         el.classList.add('active');
       }
@@ -1196,8 +1216,11 @@
         } else {
           renderMarkdown(content, 'intel-article-content-2');
         }
-      } else {
-        container.innerHTML = `<div style='color: var(--color-text-muted); text-align: center; margin-top: 40px;'>No ${key} found.</div>`;
+        } else {
+          container.innerHTML = `<div style='color: var(--color-text-muted); text-align: center; margin-top: 40px;'>No ${key} found.</div>`;
+        }
+      } catch(err) {
+        console.error("switchIntelTab error:", err);
       }
     }
 
@@ -1879,5 +1902,5 @@
 </body>
 </html>
  
-// test force push
+
  
