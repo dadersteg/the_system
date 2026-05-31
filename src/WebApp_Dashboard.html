@@ -816,8 +816,31 @@
             Rounds Remaining: <span id="breathe-cycles-count" style="color: var(--color-text); font-weight: bold;">4</span>
           </div>
 
-          <div style="position: relative; width: 240px; height: 240px; display: flex; justify-content: center; align-items: center;">
+          <div style="display: flex; gap: 12px; margin-bottom: -10px; z-index: 20;">
+            <select id="breathe-mode-select" onchange="switchBreatheMode()" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); font-size: 14px; cursor: pointer; backdrop-filter: blur(8px);">
+              <option value="478">4-7-8 Breathing</option>
+              <option value="box">Box Breathing</option>
+            </select>
+          </div>
+
+          <div style="position: relative; width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; margin: 20px 0;">
+            <!-- 4-7-8 Circle -->
             <div id="breathe-circle" style="position: absolute; width: 100%; height: 100%; background: var(--color-primary); opacity: 0.15; border-radius: 50%; transform: scale(0.4); transition: transform 4s ease-in-out; filter: blur(4px);"></div>
+            
+            <!-- Box Breathing Origami -->
+            <div id="origami-box" class="origami-box" style="display: none;">
+              <div class="origami-base" id="origami-base">
+                <div id="flap-top" class="origami-flap origami-top"></div>
+                <div id="flap-right" class="origami-flap origami-right"></div>
+                <div id="flap-bottom" class="origami-flap origami-bottom"></div>
+                <div id="flap-left" class="origami-flap origami-left"></div>
+              </div>
+            </div>
+
+            <!-- Pixel Grid Streak (Lotus) -->
+            <div id="breathe-lotus" style="position: absolute; width: 240px; height: 240px; display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(7, 1fr); gap: 2px; opacity: 0.4; z-index: 5;">
+            </div>
+
             <div id="breathe-text" style="position: absolute; font-size: 64px; font-weight: bold; color: var(--color-text); z-index: 10;">4</div>
           </div>
           
