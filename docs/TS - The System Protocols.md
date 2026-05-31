@@ -60,7 +60,7 @@ Every task must contain:
   * Example: 01 04 02 202510 M > Finalize moving contract [Link to Gmail]
 ### 3.1.1. Level 5 Workstream Tags (Optional extension)
 
-* **Purpose:** To group tasks within high-volume L4 Projects (e.g., 2027 W) without creating physical folders.
+* **Purpose:** To group tasks within high-volume L4 Projects (e.g., 2027 Wedding) without creating physical folders.
 
 * **Syntax:** L1 L2 L3 L4 > L5 > Task Description
 
@@ -87,7 +87,7 @@ Tasks are sorted using a hybrid of Eisenhower (Importance/Urgency) and 1-3-5 (Vo
 
 The System requires maintenance to ensure the "Funnel" does not clog.
 
-### 4.1. Daily Routines
+### 4.1. 1 Day Routines
 
 * Morning Planning (Start of Day):
   * Review "Frog" (Most important task).
@@ -99,12 +99,12 @@ The System requires maintenance to ensure the "Funnel" does not clog.
     1. Identify tomorrow's "Frog".
     1. Clear tabs and physical workspace.
     1. Verbalize: "Shutdown Complete".
-### 4.2. Weekly Routines (Fri/Sun)
+### 4.2. 7 Day Routines (Fri/Sun)
 
 * Review: Look at Week/Month view.
 * Clean: Process the Inbox/Keep/Running Notes to Zero.
 * Plan: Set objectives for the coming week.
-### 4.3. Bi-Weekly Reflection (The "Data" Cycle)
+### 4.3. 14 Day Reflection (The "Data" Cycle)
 
 * Frequency: Every 14 days.
 * The Philosophy:
@@ -115,7 +115,7 @@ The System requires maintenance to ensure the "Funnel" does not clog.
   * Output: The Performance Audit Table.
   * Metric Check: Use the Seinfeld Method to verify "Don't Break the Chain" consistency for habits.
 * Phase 2: The Synthesis Reflection (Atlas)
-  * The Input: Combine the daily qualitative journals and reflections from the past 14 days with the clinical Vantage table.
+  * The Input: Combine the 1 day qualitative journals and reflections from the past 14 days with the clinical Vantage table.
   * The Mandate: Atlas analyzes both sources to identify where subjective feelings (qualitative) correlate with objective targets (quantitative) over the larger time period.
   * Pattern Recognition: Identify if "bad days" in the narrative correlate with "Below Target" metrics in the data.
 * Phase 3: Realignment
@@ -148,7 +148,7 @@ Constraint: Strictly clinical and objective; does not provide advice.
 
 ### 5.5. Atlas (Reflective & Synthesis): 
 
-The Analyst. Provides strategic reflection by synthesizing qualitative journals with clinical Vantage data. Identifies long-term patterns and ensures daily actions align with high-level goal architecture.
+The Analyst. Provides strategic reflection by synthesizing qualitative journals with clinical Vantage data. Identifies long-term patterns and ensures 1 day actions align with high-level goal architecture.
 
 
 

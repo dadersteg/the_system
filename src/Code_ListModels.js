@@ -3,16 +3,11 @@
  * Fetches available Gemini models from the API and populates the dedicated sheet tab.
  */
 function updateModelList() {
-  const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+  const ss = getMasterSpreadsheet();
   const targetGid = 1704335578;
   const sheets = ss.getSheets();
-  let sheet = null;
-  for (let i = 0; i < sheets.length; i++) {
-    if (sheets[i].getSheetId() == targetGid) {
-      sheet = sheets[i];
-      break;
-    }
-  }
+  
+  const sheet = sheets.find(s => s.getSheetId() === targetGid);
   if (!sheet) throw new Error("Target sheet with GID " + targetGid + " not found.");
 
   const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
@@ -31,11 +26,10 @@ function updateModelList() {
   // Prepare Table Headers
   const tableData = [["Model ID (Copy this)", "Version", "Display Name", "Description", "Input Limit", "Output Limit", "Thinking"]];
 
-  const jsonOutput = [];
-
-  // Map JSON to Rows
-  models.forEach(model => {
+  // Map JSON to Rows and Data
+  const jsonOutput = models.map(model => {
     let modelId = model.name.replace("models/", "");
+    
     tableData.push([
       modelId, 
       model.version || "N/A",
@@ -46,7 +40,7 @@ function updateModelList() {
       model.thinking ? "Yes" : "No"
     ]);
 
-    jsonOutput.push({
+    return {
       id: modelId,
       version: model.version || "N/A",
       displayName: model.displayName || "",
@@ -54,7 +48,7 @@ function updateModelList() {
       inputLimit: model.inputTokenLimit || 0,
       outputLimit: model.outputTokenLimit || 0,
       thinking: model.thinking ? true : false
-    });
+    };
   });
 
   // Write to Sheet

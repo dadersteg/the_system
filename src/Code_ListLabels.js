@@ -5,23 +5,14 @@
  */
 
 function updateLabelList() {
-const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+const ss = getMasterSpreadsheet();
   
   // Try to find the Label Management tab (GID from Clerk) or default to creating a new one
   const targetGid = 1007497112; 
   const sheets = ss.getSheets();
-  let sheet = null;
-  for (let i = 0; i < sheets.length; i++) {
-    if (sheets[i].getSheetId() == targetGid) {
-      sheet = sheets[i];
-      break;
-    }
-  }
   
-  if (!sheet) {
-    // Fallback if the tab was deleted
-    sheet = ss.insertSheet("Actual Gmail Labels");
-  }
+  // ES6 Refactoring: Use find instead of iterative loop
+  let sheet = sheets.find(s => s.getSheetId() === targetGid) || ss.insertSheet("Actual Gmail Labels");
 
   // 1. Fetch Labels
   const labels = GmailApp.getUserLabels();
@@ -29,26 +20,22 @@ const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
   labels.sort((a, b) => a.getName().localeCompare(b.getName()));
 
   const tableData = [["Label Name", "Label Content", "Unread Count", "Total Threads"]];
-  const jsonOutput = [];
+  
+  // ES6 Refactoring: Map over labels to build the JSON and Table Data cleanly
+  const jsonOutput = labels.map(l => {
+    const name = l.getName();
+    const parts = name.split("/");
+    const leaf = parts[parts.length - 1];
+    const unreadCount = l.getUnreadCount();
+    const threadCount = l.getThreads().length;
 
-  labels.forEach(l => {
-    let name = l.getName();
-    // The "Label Content" can be derived by splitting
-    let parts = name.split("/");
-    let leaf = parts[parts.length - 1];
+    tableData.push([name, leaf, unreadCount, threadCount]);
 
-    tableData.push([
-      name,
-      leaf,
-      l.getUnreadCount(),
-      l.getThreads().length
-    ]);
-
-    jsonOutput.push({
+    return {
       name: name,
       leaf: leaf,
-      unread_count: l.getUnreadCount()
-    });
+      unread_count: unreadCount
+    };
   });
 
   // 2. Write to Spreadsheet

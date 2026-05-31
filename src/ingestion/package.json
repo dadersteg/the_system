@@ -1,7 +1,7 @@
 {
   "name": "the_system",
   "version": "1.0.0",
-  "description": "\"The System\" is an AI-powered Executive Suite functioning as a comprehensive \"Second Brain.\" Its primary goal is to unburden the mind by managing the administrative friction of daily life—triage, file categorization, task processing, and reflective planning. By handling the noise, The System allows the user to focus purely on meaningful execution and strategic growth.",
+  "description": "\"The System\" is an AI-powered Executive Suite functioning as a comprehensive \"Second Brain.\" Its primary goal is to unburden the mind by managing the administrative friction of 1 day life—triage, file categorization, task processing, and reflective planning. By handling the noise, The System allows the user to focus purely on meaningful execution and strategic growth.",
   "main": "index.js",
   "directories": {
     "doc": "docs"

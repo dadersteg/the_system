@@ -11,7 +11,7 @@
  */
 
 function debugGetHeaders() {
-   const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+   const ss = getMasterSpreadsheet();
    const notes = ss.getSheets().find(s => s.getSheetId().toString() === "967747913");
    const emails = ss.getSheets().find(s => s.getSheetId().toString() === "2131515996");
    const tasks = ss.getSheets().find(s => s.getSheetId().toString() === "1580572397");
@@ -23,6 +23,9 @@ function debugGetHeaders() {
 }
 
 function doGet(e) {
+  const healthRes = processHealthRequest(e);
+  if (healthRes) return healthRes;
+  
   if (e && e.parameter && e.parameter.getHeaders === "true") {
      return ContentService.createTextOutput(debugGetHeaders());
   }
@@ -40,7 +43,7 @@ function doGet(e) {
    }
 
    if (e && e.parameter && e.parameter.debugTasks === "true") {
-      const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+      const ss = getMasterSpreadsheet();
       const taskLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === "1580572397");
       if (taskLogSheet) {
           const lr = taskLogSheet.getLastRow();
@@ -52,7 +55,7 @@ function doGet(e) {
    }
 
    if (e && e.parameter && e.parameter.debugEmails === "true") {
-      const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+      const ss = getMasterSpreadsheet();
       const sheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
       const lr = sheet.getLastRow();
       const startRow = Math.max(2, lr - 24);
@@ -83,6 +86,10 @@ function doGet(e) {
   if (e && e.parameter && e.parameter.runHourlyReview === "true") {
      runHourlyReview();
      return ContentService.createTextOutput("Successfully ran the hourly review and timeboxing pipeline.");
+  }
+  if (e && e.parameter && e.parameter.runTaskFixer === "true") {
+     generateCorrectionDossier();
+     return ContentService.createTextOutput("Fixer complete");
   }
   if (e && e.parameter && e.parameter.runTaskMaster === "true") {
      run1DayTaskMaintenance();
@@ -115,59 +122,74 @@ function doGet(e) {
      return ContentService.createTextOutput(JSON.stringify(result));
   }
   if (e && e.parameter && e.parameter.action === "getFile") {
-     const fileId = e.parameter.fileId;
-     const file = DriveApp.getFileById(fileId);
-     const mimeType = file.getMimeType();
-     let base64Data;
-     if (mimeType === MimeType.GOOGLE_SHEETS || mimeType === "application/vnd.google-apps.spreadsheet") {
-       const url = "https://docs.google.com/spreadsheets/d/" + fileId + "/export?format=xlsx";
-       const response = UrlFetchApp.fetch(url, {
-         headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
-         muteHttpExceptions: true
-       });
-       base64Data = Utilities.base64Encode(response.getBlob().getBytes());
-     } else if (mimeType === MimeType.GOOGLE_DOCS || mimeType === "application/vnd.google-apps.document") {
-       const url = "https://docs.google.com/document/d/" + fileId + "/export?format=docx";
-       const response = UrlFetchApp.fetch(url, {
-         headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
-         muteHttpExceptions: true
-       });
-       base64Data = Utilities.base64Encode(response.getBlob().getBytes());
-     } else {
-       base64Data = Utilities.base64Encode(file.getBlob().getBytes());
-     }
-     return ContentService.createTextOutput(JSON.stringify({
-       name: file.getName(),
-       mimeType: mimeType,
-       data: base64Data
-     })).setMimeType(ContentService.MimeType.JSON);
+    try {
+      const fileId = e.parameter.fileId;
+      const file = DriveApp.getFileById(fileId);
+      const mimeType = file.getMimeType();
+      let base64Data;
+      if (mimeType === MimeType.GOOGLE_SHEETS || mimeType === "application/vnd.google-apps.spreadsheet") {
+        const url = "https://docs.google.com/spreadsheets/d/" + fileId + "/export?format=xlsx";
+        const response = UrlFetchApp.fetch(url, {
+          headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+          muteHttpExceptions: true
+        });
+        base64Data = Utilities.base64Encode(response.getBlob().getBytes());
+      } else if (mimeType === MimeType.GOOGLE_DOCS || mimeType === "application/vnd.google-apps.document") {
+        const url = "https://docs.google.com/document/d/" + fileId + "/export?format=docx";
+        const response = UrlFetchApp.fetch(url, {
+          headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+          muteHttpExceptions: true
+        });
+        base64Data = Utilities.base64Encode(response.getBlob().getBytes());
+      } else {
+        base64Data = Utilities.base64Encode(file.getBlob().getBytes());
+      }
+      return ContentService.createTextOutput(JSON.stringify({
+        name: file.getName(),
+        mimeType: mimeType,
+        data: base64Data
+      })).setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      return ContentService.createTextOutput(JSON.stringify({ error: err.message })).setMimeType(ContentService.MimeType.JSON);
+    }
   }
   if (e && e.parameter && e.parameter.action === "updateFileText") {
-     const fileId = e.parameter.fileId;
-     const text = e.postData.contents;
-     const doc = DocumentApp.openById(fileId);
-     doc.getBody().setText(text);
-     doc.saveAndClose();
-     return ContentService.createTextOutput("Successfully updated document").setMimeType(ContentService.MimeType.TEXT);
+    try {
+      const fileId = e.parameter.fileId;
+      const text = e.postData.contents;
+      const doc = DocumentApp.openById(fileId);
+      doc.getBody().setText(text);
+      doc.saveAndClose();
+      return ContentService.createTextOutput("Successfully updated document").setMimeType(ContentService.MimeType.TEXT);
+    } catch (err) {
+      return ContentService.createTextOutput("Error: " + err.message).setMimeType(ContentService.MimeType.TEXT);
+    }
   }
   if (e && e.parameter && e.parameter.action === "createNewDoc") {
-     const name = e.parameter.name;
-     const text = e.postData.contents;
-     const folderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
-     const folder = DriveApp.getFolderById(folderId);
-     const doc = DocumentApp.create(name);
-     doc.getBody().setText(text);
-     doc.saveAndClose();
-     
-     const file = DriveApp.getFileById(doc.getId());
-     folder.addFile(file);
-     DriveApp.getRootFolder().removeFile(file);
-     
-     return ContentService.createTextOutput(JSON.stringify({
-       success: true,
-       id: doc.getId(),
-       url: doc.getUrl()
-     })).setMimeType(ContentService.MimeType.JSON);
+    try {
+      const name = e.parameter.name;
+      const text = e.postData.contents;
+      const folderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
+      const folder = DriveApp.getFolderById(folderId);
+      const doc = DocumentApp.create(name);
+      doc.getBody().setText(text);
+      doc.saveAndClose();
+      
+      const file = DriveApp.getFileById(doc.getId());
+      folder.addFile(file);
+      DriveApp.getRootFolder().removeFile(file);
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        id: doc.getId(),
+        url: doc.getUrl()
+      })).setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      return ContentService.createTextOutput(JSON.stringify({
+        success: false,
+        error: err.message
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
   }
   if (e && e.parameter && e.parameter.action === "fixSpreadsheetTypos") {
      const ssId = e.parameter.ssId;
@@ -379,7 +401,7 @@ function doGet(e) {
 
 // Ensure the UI functions are accessible
 function getSheetsList() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+  const ss = getMasterSpreadsheet();
   return ss.getSheets().map(sheet => ({
     name: sheet.getName(),
     id: sheet.getSheetId()
@@ -388,7 +410,7 @@ function getSheetsList() {
 
 function sortTabs() {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheets = ss.getSheets();
     
     // Create an array of sheet objects with their current names
@@ -437,7 +459,7 @@ function sortTabs() {
 
 function createIndex() {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     let indexSheet = ss.getSheetByName('Index');
     
     if (!indexSheet) {
@@ -479,7 +501,7 @@ function createIndex() {
 
 function bulkRenameTabs(findStr, replaceStr) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheets = ss.getSheets();
     let count = 0;
     
@@ -504,7 +526,7 @@ function bulkRenameTabs(findStr, replaceStr) {
 
 function renameTab(oldName, newName) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheet = ss.getSheetByName(oldName);
     if (!sheet) {
       return { success: false, message: `Sheet '${oldName}' not found.` };
@@ -522,7 +544,7 @@ function renameTab(oldName, newName) {
 
 function hideSheets(matchStr) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheets = ss.getSheets();
     const search = matchStr.toLowerCase();
     let count = 0;
@@ -543,7 +565,7 @@ function hideSheets(matchStr) {
 
 function showSheets(matchStr) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheets = ss.getSheets();
     const search = matchStr.toLowerCase();
     let count = 0;
@@ -564,7 +586,7 @@ function showSheets(matchStr) {
 
 function deleteSheets(matchStr) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheets = ss.getSheets();
     const search = matchStr.toLowerCase();
     let count = 0;
@@ -588,7 +610,7 @@ function deleteAllSheetsFrom(numStr) {
     const num = parseInt(numStr, 10);
     if (isNaN(num) || num < 1) return { success: false, message: `Invalid sheet number: ${numStr}` };
     
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheets = ss.getSheets();
     const total = sheets.length;
     
@@ -618,7 +640,7 @@ function copySheets(matchStr, destId) {
   try {
     if (!destId) return { success: false, message: `Destination ID is required.` };
     
-    const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheets = ss.getSheets();
     const search = matchStr.toLowerCase();
     const destSS = SpreadsheetApp.openById(destId);
@@ -690,7 +712,7 @@ function getDashboardData() {
   let allSheets = [];
   let workspaceFolder = null;
   try {
-    ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    ss = getMasterSpreadsheet();
     allSheets = ss.getSheets();
   } catch (e) { console.error("Error loading master sheet: " + e.message); }
   
@@ -766,18 +788,7 @@ function getDashboardData() {
       notesSnippet: (t.notes || "").substring(0, 50).replace(/\n/g, " ")
     }));
 
-    // Extract workout tasks from allRecent
-    const workoutKeywords = ["workout", "gym", "run", "swim", "lift", "cycle", "yoga", "training", "exercise", "cardio", "pilates", "boulder", "climb", "fitness"];
-    const workoutTasks = allRecent.filter(t => {
-      const title = (t.title || "").toLowerCase();
-      return workoutKeywords.some(kw => title.includes(kw));
-    }).map(t => ({
-      title: t.title,
-      startTime: t.updated || new Date().toISOString(),
-      endTime: t.updated || new Date().toISOString()
-    }));
-    
-    data.workoutsTasks = workoutTasks;
+    data.workoutsTasks = [];
   } catch(e) { console.error("Error fetching tasks: " + e.message); }
 
   try {
@@ -799,7 +810,7 @@ function getDashboardData() {
         endTime: e.getEndTime().toISOString()
       }));
       
-    data.workouts = [...calWorkouts, ...(data.workoutsTasks || [])].sort((a, b) => new Date(b.startTime) - new Date(a.startTime)).slice(0, 15);
+    data.workouts = calWorkouts.sort((a, b) => new Date(b.startTime) - new Date(a.startTime)).slice(0, 15);
   } catch(e) { console.error("Error fetching workouts: " + e.message); }
 
   try {
@@ -924,14 +935,11 @@ function getDashboardData() {
         const v2 = DriveApp.getFileById(SYSTEM_CONFIG.DOCS.VANTAGE_LOG_ID);
         data.vantageReport = v2.getBlob().getDataAsString();
         
-        let activeMinutes = 0;
-        let sleepHours = 0;
-        const activeMatch = data.vantageReport.match(/Total Active\/Cardio Minutes:\s*(\d+)/i);
-        if (activeMatch) activeMinutes = parseInt(activeMatch[1], 10);
-        const sleepMatch = data.vantageReport.match(/Avg Sleep:\s*([\d\.]+)/i);
-        if (sleepMatch) sleepHours = parseFloat(sleepMatch[1]);
-        
-        data.health = { activeMinutes: activeMinutes, sleepHours: sleepHours };
+        const vantageJson = parseVantageJson(data.vantageReport);
+        data.health = {
+          activeMinutes: vantageJson ? vantageJson.activeMinutes : parseActiveMinutesFromVantage(data.vantageReport),
+          sleepHours: vantageJson ? vantageJson.sleepHours : parseSleepHoursFromVantage(data.vantageReport)
+        };
       }
 
       // 14-Day Vantage Log
@@ -1079,28 +1087,52 @@ function getHabitStreak(habitName) {
     
     const dates = data.slice(1)
       .filter(row => row[1] === habitName)
-      .map(row => row[2])
-      .sort((a, b) => new Date(b) - new Date(a));
+      .map(row => {
+        const val = row[2];
+        if (!val) return null;
+        if (val instanceof Date || (val && typeof val.getMonth === 'function' && typeof val.getFullYear === 'function')) {
+          try {
+            if (isNaN(val.getTime())) return null;
+            return val.toISOString().split('T')[0];
+          } catch (e) {
+            try {
+              const y = val.getFullYear();
+              const m = String(val.getMonth() + 1).padStart(2, '0');
+              const d = String(val.getDate()).padStart(2, '0');
+              return `${y}-${m}-${d}`;
+            } catch (inner) {
+              return null;
+            }
+          }
+        }
+        const match = val.toString().match(/^\d{4}-\d{2}-\d{2}/);
+        return match ? match[0] : null;
+      })
+      .filter(d => d !== null);
       
     if (dates.length === 0) return 0;
     
-    let streak = 0;
-    let currentDate = new Date();
-    currentDate.setHours(0,0,0,0);
+    // Sort chronological descending (localeCompare works perfectly for YYYY-MM-DD format)
+    dates.sort((a, b) => b.localeCompare(a));
     
-    let lastLoggedDate = new Date(dates[0]);
-    lastLoggedDate.setHours(0,0,0,0);
-    
-    const diffDays = Math.floor((currentDate - lastLoggedDate) / (1000 * 60 * 60 * 24));
-    if (diffDays > 1) return 0; // Streak broken
-    
-    let checkDate = new Date(lastLoggedDate);
     const uniqueDates = [...new Set(dates)];
     
+    let streak = 0;
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    
+    const lastLoggedStr = uniqueDates[0];
+    const lastLoggedDate = new Date(lastLoggedStr);
+    const todayDate = new Date(todayStr);
+    
+    const diffDays = Math.round((todayDate - lastLoggedDate) / (1000 * 60 * 60 * 24));
+    if (diffDays > 1) return 0; // Streak broken
+    
+    let checkDate = new Date(lastLoggedStr);
     for (let i = 0; i < uniqueDates.length; i++) {
-      const d = new Date(uniqueDates[i]);
-      d.setHours(0,0,0,0);
-      if (d.getTime() === checkDate.getTime()) {
+      const dStr = uniqueDates[i];
+      const checkStr = checkDate.toISOString().split('T')[0];
+      if (dStr === checkStr) {
         streak++;
         checkDate.setDate(checkDate.getDate() - 1);
       } else {
@@ -1109,6 +1141,7 @@ function getHabitStreak(habitName) {
     }
     return streak;
   } catch (e) {
+    console.error("Error calculating habit streak: " + e.stack);
     return 0;
   }
 }
@@ -1129,7 +1162,7 @@ function createDraftReply(threadId, bodyText) {
 function generateWifieMessage() {
   try {
     // 1. Fetch WhatsApp context from Email_Log
-    const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const logSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
     let whatsappContext = "No recent WhatsApp context found.";
     
@@ -1373,14 +1406,14 @@ function getDashboardTasks() { const startT = Date.now();
     res.recentTasks = updatedTasks.slice(0, 25).map(t => ({ id: t.id, title: t.title, updated: t.updated, status: t.status, notesSnippet: (t.notes || "").substring(0, 50).replace(/\n/g, " ") }));
 
     const workoutKeywords = ["workout", "gym", "run", "swim", "lift", "cycle", "yoga", "training", "exercise", "cardio", "pilates", "boulder", "climb", "fitness"];
-    res.workoutsTasks = allRecent.filter(t => workoutKeywords.some(kw => (t.title || "").toLowerCase().includes(kw))).map(t => ({ title: t.title, startTime: t.updated || new Date().toISOString(), endTime: t.updated || new Date().toISOString() }));
+    res.workoutsTasks = [];
 
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     const workoutEvents = CalendarApp.getDefaultCalendar().getEvents(sevenDaysAgo, sevenDaysFromNow);
     const calWorkouts = workoutEvents.filter(e => workoutKeywords.some(kw => (e.getTitle() || "").toLowerCase().includes(kw))).map(e => ({ title: e.getTitle(), startTime: e.getStartTime().toISOString(), endTime: e.getEndTime().toISOString() }));
-    res.workouts = [...calWorkouts, ...res.workoutsTasks].sort((a, b) => new Date(b.startTime) - new Date(a.startTime)).slice(0, 15);
+    res.workouts = calWorkouts.sort((a, b) => new Date(b.startTime) - new Date(a.startTime)).slice(0, 15);
   } catch (e) { console.error("Error fetching tasks: " + e.stack); }
   console.log("Docs load time: " + (Date.now() - startT) + "ms"); return res; }
 
@@ -1395,7 +1428,7 @@ function getDashboardClerkLogs() { const startT = Date.now();
   const res = { emails: [], notes: [], tasks: [] };
   try {
     // Hardcode to the provided master spreadsheet ID to ensure we find the logs
-    const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const allSheets = ss.getSheets();
     
     const safeDate = (val) => {
@@ -1406,8 +1439,23 @@ function getDashboardClerkLogs() { const startT = Date.now();
         return new Date().toISOString();
       }
     };
+
+    const parseUrnDate = (urn) => {
+      try {
+        if (typeof urn !== 'string') return new Date(0);
+        const match = urn.match(/urn:task:(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})/);
+        if (match) {
+          const [_, y, m, d, hh, mm, ss] = match;
+          return new Date(Date.UTC(parseInt(y, 10), parseInt(m, 10) - 1, parseInt(d, 10), parseInt(hh, 10), parseInt(mm, 10), parseInt(ss, 10)));
+        }
+      } catch (e) {
+        console.error("Error parsing URN date: " + e.stack);
+      }
+      return new Date(0);
+    };
     
-    const notesLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.NOTES_LOG || s.getName().toLowerCase().includes('notes log') || s.getName().toLowerCase().includes('notes_log') || s.getName().toLowerCase() === 'files');
+    let notesLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.NOTES_LOG);
+    if (!notesLogSheet) notesLogSheet = allSheets.find(s => s.getName().toLowerCase().includes('notes log') || s.getName().toLowerCase().includes('notes_log') || s.getName().toLowerCase() === 'files');
     if (notesLogSheet) {
       const lastRow = notesLogSheet.getLastRow();
       if (lastRow > 1) {
@@ -1422,7 +1470,8 @@ function getDashboardClerkLogs() { const startT = Date.now();
       }
     }
     
-    const emailLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG || s.getName().toLowerCase().includes('email log') || s.getName().toLowerCase().includes('email_log') || s.getName().toLowerCase() === 'emails');
+    let emailLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
+    if (!emailLogSheet) emailLogSheet = allSheets.find(s => s.getName().toLowerCase().includes('email log') || s.getName().toLowerCase().includes('email_log') || s.getName().toLowerCase() === 'emails');
     if (emailLogSheet) {
       const lastRow = emailLogSheet.getLastRow();
       if (lastRow > 1) {
@@ -1437,18 +1486,94 @@ function getDashboardClerkLogs() { const startT = Date.now();
       }
     }
     
-    const taskLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.TASK_REVIEW || s.getName().toLowerCase().includes('task review') || s.getName().toLowerCase().includes('task_review') || s.getName().toLowerCase().includes('tasks'));
-    if (taskLogSheet) {
-      const lastRow = taskLogSheet.getLastRow();
-      if (lastRow > 1) {
-        const lastCol = Math.max(taskLogSheet.getLastColumn(), 1);
-        const fetchCount = Math.min(500, lastRow - 1);
-        const fetchStartRow = lastRow - fetchCount + 1;
-        const data = taskLogSheet.getRange(fetchStartRow, 1, fetchCount, lastCol).getValues();
-        res.tasks = data.filter(row => row.join('').trim().length > 0)
-          .map(row => ({ date: safeDate(row[11] || row[0]), originalTitle: row[3] || "Untitled", due: row[12] || "", targetList: row[2] || row[1] || "", cleanedTitle: row[6] || row[5] || "", notes: row[8] || row[7] || "", status: row[10] || row[9] || "", taskId: row[23] || "" }))
-          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-          .slice(0, 25);
+    // Implement direct Tasks API fetching and caching
+    const cache = CacheService.getScriptCache();
+    const cachedTasks = cache.get("DASHBOARD_CLERK_TASKS_V3");
+    if (cachedTasks) {
+      try {
+        res.tasks = JSON.parse(cachedTasks);
+      } catch(e) {
+        console.error("Error parsing cached clerk tasks: " + e.message);
+      }
+    }
+    
+    if (!res.tasks || res.tasks.length === 0) {
+      const taskLists = [
+        { id: SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID, name: "Clerk Review" },
+        { id: SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID, name: "Importer" },
+        { id: SYSTEM_CONFIG.TASKS.TODO_LIST_ID, name: "ToDo" }
+      ];
+      
+      const allTasks = [];
+      taskLists.forEach(listInfo => {
+        if (!listInfo.id) return;
+        try {
+          const response = Tasks.Tasks.list(listInfo.id, {
+            showCompleted: true,
+            showHidden: true,
+            maxResults: 50
+          });
+          const items = response.items || [];
+          items.forEach(t => {
+            let cleanedTitle = t.title || "Untitled";
+            let parts = cleanedTitle.split(" > ");
+            if (parts.length >= 2) {
+              cleanedTitle = parts.slice(1).join(" > ").trim();
+            }
+            
+            // Extract created_at from metadata if present
+            let dateVal = "";
+            let hasCreatedAt = false;
+            
+            if (t.notes) {
+              const metaSplit = t.notes.split('---SYSTEM_METADATA---');
+              if (metaSplit.length > 1) {
+                try {
+                  const meta = JSON.parse(metaSplit[1].trim());
+                  if (meta.created_at) {
+                    dateVal = new Date(meta.created_at).toISOString();
+                    hasCreatedAt = true;
+                  }
+                } catch(e) {}
+              }
+            }
+            
+            if (!hasCreatedAt) {
+              // For triage lists (Clerk Review, Importer), the modified date is a good proxy for creation
+              if (listInfo.name === "Clerk Review" || listInfo.name === "Importer") {
+                dateVal = t.updated ? new Date(t.updated).toISOString() : new Date().toISOString();
+              } else {
+                // For ToDo and other lists, if no created_at exists, treat as ancient (push to bottom)
+                dateVal = new Date(0).toISOString();
+              }
+            }
+            
+            allTasks.push({
+              urn: t.id, // Fallback for spreadsheet mapping compatibility
+              date: dateVal,
+              originalTitle: t.title || "Untitled",
+              due: t.due || "",
+              targetList: listInfo.name,
+              cleanedTitle: cleanedTitle,
+              notes: t.notes || "",
+              status: t.status || "",
+              taskId: t.id
+            });
+          });
+        } catch(e) {
+          console.error("Error fetching tasks for list " + listInfo.name + ": " + e.message);
+        }
+      });
+      
+      // Sort all fetched tasks by modified date descending, and slice the top 25
+      res.tasks = allTasks
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 25);
+        
+      try {
+        cache.put("DASHBOARD_CLERK_TASKS_V3", JSON.stringify(res.tasks), 60); // Cache for 60 seconds
+      } catch(e) {
+        console.error("Failed to save clerk tasks cache: " + e.message);
       }
     }
   } catch (e) { console.error("Error fetching clerk logs: " + e.stack); }
@@ -1456,54 +1581,65 @@ function getDashboardClerkLogs() { const startT = Date.now();
 
 function parseExecutionPlan(md) {
   const data = { bluf: "", frogs: { work: [], personal: [] }, top3: { work: [], personal: [] }, rest: { work: [], personal: [] }, alerts: [], triage: "" };
+  if (typeof md !== "string") {
+    console.warn("parseExecutionPlan received non-string input:", md);
+    return data;
+  }
+  
   let currentSection = "";
   let currentCategory = ""; // "work" or "personal"
   
-  const lines = md.split('\n');
-  for (let line of lines) {
-    if (line.startsWith("**BLUF:**")) {
-      data.bluf = line.replace("**BLUF:**", "").trim();
-      continue;
-    }
-    if (line.match(/^#+\s/)) {
-      if (line.toUpperCase().includes("EAT THE FROG")) currentSection = "frogs";
-      else if (line.toUpperCase().includes("TOP 3")) currentSection = "top3";
-      else if (line.toUpperCase().includes("REST OF TODAY")) currentSection = "rest";
-      else if (line.toUpperCase().includes("BOTTLENECKS") || line.toUpperCase().includes("SYS ALERTS")) currentSection = "alerts";
-      else if (line.toUpperCase().includes("TRIAGE")) currentSection = "triage";
-      continue;
-    }
-    
-    // Support emojis or bold
-    if (line.match(/^\*\*Work:\*\*/i) || line.match(/^\*\*💼 Work:\*\*/i)) {
-      currentCategory = "work";
-      continue;
-    }
-    if (line.match(/^\*\*Personal:\*\*/i) || line.match(/^\*\*🏠 Personal:\*\*/i)) {
-      currentCategory = "personal";
-      continue;
-    }
-    
-    // Regex to strip emojis
-    const stripEmojis = (str) => str.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F018}-\u{1F270}\u{238C}-\u{2454}\u{20D0}-\u{20FF}\u{2B50}\u{2B55}]/gu, '').trim();
+  try {
+    const lines = md.split('\n');
+    for (let line of lines) {
+      if (!line) continue;
+      if (line.startsWith("**BLUF:**")) {
+        data.bluf = line.replace("**BLUF:**", "").trim();
+        continue;
+      }
+      if (line.match(/^#+\s/)) {
+        const upperLine = line.toUpperCase();
+        if (upperLine.includes("EAT THE FROG")) currentSection = "frogs";
+        else if (upperLine.includes("TOP 3")) currentSection = "top3";
+        else if (upperLine.includes("REST OF TODAY")) currentSection = "rest";
+        else if (upperLine.includes("BOTTLENECKS") || upperLine.includes("SYS ALERTS")) currentSection = "alerts";
+        else if (upperLine.includes("TRIAGE")) currentSection = "triage";
+        continue;
+      }
+      
+      // Support emojis or bold
+      if (line.match(/^\*\*Work:\*\*/i) || line.match(/^\*\*💼 Work:\*\*/i)) {
+        currentCategory = "work";
+        continue;
+      }
+      if (line.match(/^\*\*Personal:\*\*/i) || line.match(/^\*\*🏠 Personal:\*\*/i)) {
+        currentCategory = "personal";
+        continue;
+      }
+      
+      // Regex to strip emojis
+      const stripEmojis = (str) => str.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F018}-\u{1F270}\u{238C}-\u{2454}\u{20D0}-\u{20FF}\u{2B50}\u{2B55}]/gu, '').trim();
 
-    if (currentSection === "frogs" || currentSection === "top3" || currentSection === "rest") {
-      if (line.startsWith("- [ ]") || line.startsWith("- [x]")) {
-        const isChecked = line.startsWith("- [x]");
-        // remove the checkbox syntax and strip emojis
-        let text = line.replace(/^- \[[xX ]\]\s*/, "").trim();
-        text = stripEmojis(text);
-        if (text && currentCategory && data[currentSection][currentCategory]) {
-          data[currentSection][currentCategory].push({ text, checked: isChecked });
+      if (currentSection === "frogs" || currentSection === "top3" || currentSection === "rest") {
+        if (line.startsWith("- [ ]") || line.startsWith("- [x]")) {
+          const isChecked = line.startsWith("- [x]");
+          // remove the checkbox syntax and strip emojis
+          let text = line.replace(/^- \[[xX ]\]\s*/, "").trim();
+          text = stripEmojis(text);
+          if (text && currentCategory && data[currentSection] && data[currentSection][currentCategory]) {
+            data[currentSection][currentCategory].push({ text, checked: isChecked });
+          }
+        }
+      } else if (currentSection === "alerts") {
+        if (line.startsWith("- ")) data.alerts.push(stripEmojis(line.substring(2)));
+      } else if (currentSection === "triage") {
+        if (line.trim().length > 0 && !line.startsWith("*(") && !line.startsWith("---")) {
+          data.triage += stripEmojis(line) + "\n";
         }
       }
-    } else if (currentSection === "alerts") {
-      if (line.startsWith("- ")) data.alerts.push(stripEmojis(line.substring(2)));
-    } else if (currentSection === "triage") {
-      if (line.trim().length > 0 && !line.startsWith("*(") && !line.startsWith("---")) {
-        data.triage += stripEmojis(line) + "\n";
-      }
     }
+  } catch (e) {
+    console.error("Error parsing execution plan: " + e.stack);
   }
   return data;
 }
@@ -1536,17 +1672,13 @@ function getDashboardDocs() { const startT = Date.now();
         if (SYSTEM_CONFIG.DOCS.VANTAGE_LOG_ID) {
           const v2 = DriveApp.getFileById(SYSTEM_CONFIG.DOCS.VANTAGE_LOG_ID);
           res.vantageReport = v2.getBlob().getDataAsString();
-          let activeMinutes = 0;
-          let sleepHours = 0;
           
-          const tMatch = res.vantageReport.match(/Active Min[a-z]*[^\d\n]*(\d+)/i) || res.vantageReport.match(/Total Active\/Cardio Minutes:[^\d\n]*(\d+)/i);
-          if (tMatch) activeMinutes = parseInt(tMatch[1], 10);
-          
-          const sMatch = res.vantageReport.match(/Avg Sleep[^\d\n]*(\d+(?:\.\d+)?)/i);
-          if (sMatch) sleepHours = parseFloat(sMatch[1]);
-          
-          res.activeMinutes = activeMinutes;
-          res.sleepHours = sleepHours;
+          const vantageJson = parseVantageJson(res.vantageReport);
+          res.activeMinutes = vantageJson ? vantageJson.activeMinutes : parseActiveMinutesFromVantage(res.vantageReport);
+          res.sleepHours = vantageJson ? vantageJson.sleepHours : parseSleepHoursFromVantage(res.vantageReport);
+          res.totalSteps = vantageJson ? vantageJson.totalSteps : 0;
+          res.totalCalories = vantageJson ? vantageJson.totalCalories : 0;
+          res.avgHeartRate = vantageJson ? vantageJson.avgHeartRate : 0;
         }
       } catch(e) { console.error("Error loading 2-day report: " + e.message); }
     }
@@ -1566,12 +1698,123 @@ function getDashboardDocs() { const startT = Date.now();
     const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
     const completedTasksResponse = Tasks.Tasks.list(todoListId, { showCompleted: true, showHidden: true, maxResults: 100 });
     if (completedTasksResponse.items) {
-       res.completedTasksCount = completedTasksResponse.items.filter(t => t.status === 'completed' && t.completed && t.completed >= todayStart).length;
+       res.completedTasksCount = completedTasksResponse.items.filter(t => t.status === 'completed' && t.completed && new Date(t.completed) >= todayStart).length;
     }
     const inboxThreads = GmailApp.search('label:00-manual-review', 0, 100);
     res.manualReviewCount = inboxThreads.length;
+    
+    res.breatheStreak = getHabitStreak('4-7-8 Breathing');
+    res.boxBreatheStreak = getHabitStreak('Box Breathing');
   } catch (e) { console.error("Error fetching docs: " + e.stack); }
   console.log("Docs load time: " + (Date.now() - startT) + "ms"); return res; }
-// trigger push
- 
-// 
+
+function parseVantageJson(content) {
+  if (!content) return null;
+  const match = content.match(/```json([\s\S]*?)```/);
+  if (match) {
+    try {
+      return JSON.parse(match[1].trim());
+    } catch (e) {
+      console.error("Failed to parse Vantage JSON", e);
+    }
+  }
+  return null;
+}
+
+function parseSleepHoursFromVantage(content) {
+  if (!content) return 0;
+  const lines = content.split('\n');
+  
+  // Phase 1: Try exact URN first (most reliable) - 2024-1-004 is Sleep 7.5 per 1 day
+  for (let line of lines) {
+    if (line.includes('|') && line.includes('2024-1-004')) {
+      const parts = line.split('|').map(p => p.trim());
+      if (parts.length >= 6) {
+        const perf = parts[5];
+        if (perf) {
+          const match = perf.match(/([\d\.]+)/);
+          if (match) {
+            const val = parseFloat(match[1]);
+            // Sleep should be a realistic duration, not a boolean '1'
+            if (!isNaN(val) && val > 2 && val < 20) return val;
+          }
+        }
+      }
+    }
+  }
+  
+  // Phase 2: Try specific sleep metrics in Metric or Path columns (avoiding prepare/ritual/breathing/meditation and boolean counts)
+  for (let line of lines) {
+    if (line.includes('|') && /sleep/i.test(line)) {
+      if (/prepare|ritual|breathing|meditate|meditation|exercise|score/i.test(line)) {
+        continue;
+      }
+      const parts = line.split('|').map(p => p.trim());
+      if (parts.length >= 6) {
+        const perf = parts[5];
+        if (perf) {
+          const match = perf.match(/([\d\.]+)/);
+          if (match) {
+            const val = parseFloat(match[1]);
+            // Only accept realistic sleep durations (e.g., > 2 hours) to avoid parsing boolean '1' goals
+            if (!isNaN(val) && val > 2 && val < 20) return val;
+          }
+        }
+      }
+    }
+  }
+  
+  // Phase 3: Fallbacks
+  const sMatch = content.match(/Avg Sleep:\s*([\d\.]+)/i);
+  if (sMatch) {
+    const val = parseFloat(sMatch[1]);
+    if (!isNaN(val)) return val;
+  }
+  
+  const strictMatch = content.match(/\bSleep(?:\s+hours?|:\s+)([\d\.]+)/i);
+  if (strictMatch) {
+      const val = parseFloat(strictMatch[1]);
+      if (!isNaN(val)) return val;
+  }
+  return 0;
+}
+
+function parseActiveMinutesFromVantage(content) {
+  if (!content) return 0;
+  const lines = content.split('\n');
+  for (let line of lines) {
+    if (line.includes('|') && (/active/i.test(line) || /walking/i.test(line) || /rowing/i.test(line))) {
+      const parts = line.split('|').map(p => p.trim());
+      if (parts.length >= 6) {
+        const perf = parts[5];
+        if (perf) {
+          const match = perf.match(/([\d\.]+)/);
+          if (match) {
+            const val = parseFloat(match[1]);
+            if (!isNaN(val) && val > 0) return val;
+          }
+        }
+      }
+    }
+  }
+  const tMatch = content.match(/Active Min[a-z]*[^\d\n]*(\d+)/i) || 
+                 content.match(/Total Active\/Cardio Minutes:[^\d\n]*(\d+)/i) ||
+                 content.match(/Total Active\/Cardio Minutes:\s*(\d+)/i);
+  if (tMatch) {
+    const val = parseInt(tMatch[1], 10);
+    if (!isNaN(val)) return val;
+  }
+  return 0;
+}
+
+// Temp endpoints
+function processHealthRequest(e) {
+  if (e && e.parameter && e.parameter.action === "readFile" && e.parameter.fileId) {
+    try {
+      const file = DriveApp.getFileById(e.parameter.fileId);
+      return ContentService.createTextOutput(file.getBlob().getDataAsString());
+    } catch(err) { return ContentService.createTextOutput(err.toString()); }
+  }
+  return null;
+}
+

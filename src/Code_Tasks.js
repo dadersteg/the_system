@@ -44,39 +44,83 @@ function extractTasksWithConversationDetails() {
   
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight("bold");
   sheet.getRange(2, 1, 1, descriptions.length).setValues([descriptions]).setFontStyle("italic").setFontColor("#666666");
-  // Hide internal tracking columns: Task ID, Task List ID, Original Status
+  
   const idColStartIndex = headers.indexOf("Task ID") + 1;
   if (idColStartIndex > 0) {
     sheet.hideColumns(idColStartIndex, 3);
   }
   SpreadsheetApp.flush();
 
-  // Create persistent database map from existing sheet to preserve manual reviews
+  const existingTaskMap = loadExistingTaskMap(sheet, headers);
+  const validPaths = loadValidTaxonomyPaths(ss);
+  const allowedAliases = loadAllowedAliases(ss);
+
+  const { tasks, threadIds } = fetchAllTasksAndThreadIds(taskLists);
+  console.log(`Found ${tasks.length} total tasks. Bulk fetching Gmail threads...`);
+  
+  const threadCache = bulkFetchGmailThreads(threadIds);
+
+  const results = [];
+  let rowCounter = 1;
+
+  tasks.forEach(item => {
+    const emailInfo = processTaskEmailLinks(item.task, allowedAliases, threadCache);
+    const row = buildTaskExportRow(
+      item.task,
+      item.taskList,
+      emailInfo,
+      exportTs,
+      rowCounter,
+      existingTaskMap,
+      validPaths,
+      allowedAliases,
+      taskLists
+    );
+    results.push(row);
+    rowCounter++;
+  });
+
+  exportResultsToSheet(sheet, results, headers.length);
+  exportTasksToMarkdownDrive(results);
+}
+
+/**
+ * Loads existing tasks from the spreadsheet to preserve manual reviews.
+ * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet 
+ * @param {string[]} headers 
+ * @returns {Map<string, Object>} Map of Task ID -> existing task values
+ */
+function loadExistingTaskMap(sheet, headers) {
   const existingTaskMap = new Map();
   const existingData = sheet.getDataRange().getValues();
   if (existingData.length > 2) {
-    const sheetHeaders = existingData[0];
-    const taskIdIdx = sheetHeaders.indexOf("Task ID");
-    
+    const taskIdIdx = headers.indexOf("Task ID");
     for (let r = 2; r < existingData.length; r++) {
       const row = existingData[r];
       const tid = row[taskIdIdx];
       if (tid) {
         existingTaskMap.set(tid, {
-          losCodeRevised: row[sheetHeaders.indexOf("LOS Code (Revised)")],
-          actionTitleRevised: row[sheetHeaders.indexOf("Action Title (Revised)")],
-          notesRevised: row[sheetHeaders.indexOf("Notes (Revised)")],
-          taskListRevised: row[sheetHeaders.indexOf("Task List (Revised)")],
-          statusRevised: row[sheetHeaders.indexOf("Status (Revised)")],
-          deadlineRevised: row[sheetHeaders.indexOf("Deadline (Revised)")],
-          aiContextSummary: row[sheetHeaders.indexOf("AI Context Summary")],
-          aiProposedCategory: row[sheetHeaders.indexOf("AI Proposed Category")]
+          losCodeRevised: row[headers.indexOf("LOS Code (Revised)")],
+          actionTitleRevised: row[headers.indexOf("Action Title (Revised)")],
+          notesRevised: row[headers.indexOf("Notes (Revised)")],
+          taskListRevised: row[headers.indexOf("Task List (Revised)")],
+          statusRevised: row[headers.indexOf("Status (Revised)")],
+          deadlineRevised: row[headers.indexOf("Deadline (Revised)")],
+          aiContextSummary: row[headers.indexOf("AI Context Summary")],
+          aiProposedCategory: row[headers.indexOf("AI Proposed Category")]
         });
       }
     }
   }
+  return existingTaskMap;
+}
 
-  // Fetch all valid taxonomy paths dynamically
+/**
+ * Fetches all valid taxonomy paths dynamically.
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss 
+ * @returns {Set<string>} Set of lowercase valid taxonomy paths
+ */
+function loadValidTaxonomyPaths(ss) {
   const taxonomySheet = ss.getSheets().find(s => s.getSheetId().toString() === "1287896098");
   const validPaths = new Set();
   if (taxonomySheet) {
@@ -88,242 +132,273 @@ function extractTasksWithConversationDetails() {
       }
     }
   }
+  return validPaths;
+}
 
+/**
+ * Loads allowed email aliases from the alias sheet.
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss 
+ * @returns {string[]} Array of lowercase allowed email aliases
+ */
+function loadAllowedAliases(ss) {
   const aliasSheet = ss.getSheets().find(s => s.getSheetId().toString() === "1799689202");
   let allowedAliases = [];
   if (aliasSheet) {
     const aliasData = aliasSheet.getRange("A:A").getValues();
     allowedAliases = aliasData.map(row => row[0].toString().trim().toLowerCase()).filter(val => val !== "" && val !== "email");
   }
+  return allowedAliases;
+}
 
-  const allTasksToExport = [];
-
+/**
+ * Fetches all tasks across all lists and collects thread IDs from email links.
+ * @param {Object[]} taskLists Array of task lists
+ * @returns {Object} Object containing tasks array and threadIds array
+ */
+function fetchAllTasksAndThreadIds(taskLists) {
+  const tasks = [];
+  const threadIds = [];
   taskLists.forEach(taskList => {
     console.log(`Fetching tasks for list: ${taskList.title}`);
     let pageToken = null;
-    
     do {
       const taskResponse = fetchTasks(taskList.id, pageToken);
       if (!taskResponse) break;
-
       if (taskResponse.items) {
         taskResponse.items.forEach(task => {
-          const emailInfo = processTaskEmailLinks(task, allowedAliases);
-          allTasksToExport.push({
-            task: task,
-            taskList: taskList,
-            emailInfo: emailInfo
-          });
+          tasks.push({ task: task, taskList: taskList });
+          if (task.links) {
+            const emailLinkObj = task.links.find(l => l.type === "email");
+            if (emailLinkObj && emailLinkObj.link) {
+              const idMatch = emailLinkObj.link.match(/([a-zA-Z0-9]{10,})$/);
+              if (idMatch) {
+                threadIds.push(idMatch[1]);
+              }
+            }
+          }
         });
       }
       pageToken = taskResponse.nextPageToken;
     } while (pageToken);
   });
+  return { tasks, threadIds };
+}
 
-  console.log(`Found ${allTasksToExport.length} total tasks. Exporting to Spreadsheet...`);
+/**
+ * Bulk fetches Gmail threads by their IDs in batches of 20 to prevent N+1 queries.
+ * Indexes threads by both thread ID and all contained message IDs.
+ * @param {string[]} threadIds Array of Gmail thread or message IDs
+ * @returns {Object} Cache map of ID -> GmailThread
+ */
+function bulkFetchGmailThreads(threadIds) {
+  const threadMap = {};
+  if (!threadIds || threadIds.length === 0) return threadMap;
 
-  // Construct final row results
-  const results = [];
-  let rowCounter = 1;
+  const uniqueIds = Array.from(new Set(threadIds));
+  const BATCH_SIZE = 20;
 
-  allTasksToExport.forEach(item => {
-    const task = item.task;
-    const taskList = item.taskList;
-    const emailInfo = item.emailInfo;
-
-    const urn = `urn:task:${exportTs}-${rowCounter.toString().padStart(4, '0')}`;
-    const formattedDate = task.due ? Utilities.formatDate(new Date(task.due), "GMT", "yyyy-MM-dd") : "";
-    const status = task.status || "needsAction";
-
-    let losCodeRevised = "";
-    let actionTitleRevised = "";
-    let notesRevised = "";
-    let taskListRevised = "";
-    let statusRevised = "";
-    let deadlineRevised = "";
-
-    // Preserve the user's manual review columns if it already existed in the spreadsheet!
-    if (existingTaskMap.has(task.id)) {
-      const existing = existingTaskMap.get(task.id);
-      losCodeRevised = existing.losCodeRevised || "";
-      actionTitleRevised = existing.actionTitleRevised || "";
-      notesRevised = existing.notesRevised || "";
-      taskListRevised = existing.taskListRevised || "";
-      statusRevised = existing.statusRevised || "";
-      deadlineRevised = existing.deadlineRevised || "";
-    }
-
-    // Ensure all tasks, including manually created ones, have the correct D.13 metadata structure
-    let currentNotes = notesRevised ? notesRevised : (task.notes || "");
-    if (!currentNotes.includes("[DEADLINE:")) {
-      const deadline = formattedDate || "None";
-      const metaBlock = `[DEADLINE: ${deadline}] | [DURATION: N/A] | [GOAL: TBD]`;
-      
-      const linkMatch = currentNotes.match(/https?:\/\/[^\s]+/);
-      let link = "";
-      if (linkMatch) {
-         link = linkMatch[0];
-         currentNotes = currentNotes.replace(link, "").trim();
-      }
-      
-      const summary = currentNotes.trim();
-      notesRevised = link ? `${link}\n\n${summary}\n\n${metaBlock}`.trim() : `${summary}\n\n${metaBlock}`.trim();
-    } else {
-      notesRevised = currentNotes;
-    }
-
-    // Attempt to validate the current title against the taxonomy sheet
-    let isLOSValid = false;
-    let systemComment = "";
-
-    const titleParts = (task.title || "").split(" > ");
-    if (titleParts.length >= 2) {
-      // The LOS path is everything EXCEPT the last part (which is the action title)
-      const potentialPath = titleParts.slice(0, -1).join(" > ").trim().toLowerCase();
-      if (validPaths.has(potentialPath)) {
-        isLOSValid = true;
-      } else {
-        systemComment = `Invalid LOS Path: Not found in taxonomy.`;
-      }
-    } else {
-      const hasLOSPrefix = /^\d{2}\s\d{2}\s\d{2}/.test(task.title || "");
-      if (hasLOSPrefix) {
-         systemComment = "Missing action separator ' > '.";
-      }
-    }
-
-    let sysCommentParsed = "";
-    let daCommentParsed = "";
-    const rawNotes = task.notes || "";
-    
-    const sysMatch = rawNotes.match(/^SYS:\s*(.*)$/m);
-    if (sysMatch) sysCommentParsed = sysMatch[1];
-    
-    const daMatch = rawNotes.match(/^DA:\s*(.*)$/m);
-    if (daMatch) daCommentParsed = daMatch[1];
-    
-    if (systemComment !== "") {
-       systemComment += sysCommentParsed ? ` | AI: ${sysCommentParsed}` : "";
-    } else {
-       systemComment = sysCommentParsed;
-    }
-    
-    let daComment = daCommentParsed;
-
-    if (!isLOSValid) {
-      // Only auto-populate if the user HAS NOT manually reviewed them yet!
-      if (!existingTaskMap.has(task.id) || (!losCodeRevised && !actionTitleRevised)) {
-        if (aiData.proposedCategory && aiData.proposedCategory !== "N/A" && aiData.proposedCategory !== "") {
-          losCodeRevised = aiData.proposedCategory;
-        }
-        
-        if (aiData.proposedActionTitle && aiData.proposedActionTitle !== "") {
-          actionTitleRevised = aiData.proposedActionTitle;
-        } else if (aiData.proposedTitle && aiData.proposedTitle !== "") {
-          // Fallback for old prompt format (splitting string)
-          const splitParts = aiData.proposedTitle.split(" > ");
-          if (splitParts.length > 1) {
-            actionTitleRevised = splitParts.slice(1).join(" > ").trim();
-          } else {
-            actionTitleRevised = aiData.proposedTitle;
+  for (let i = 0; i < uniqueIds.length; i += BATCH_SIZE) {
+    const batch = uniqueIds.slice(i, i + BATCH_SIZE);
+    const query = batch.map(id => `id:${id}`).join(" OR ");
+    try {
+      const threads = GmailApp.search(query, 0, batch.length);
+      threads.forEach(thread => {
+        if (thread) {
+          const tId = thread.getId();
+          threadMap[tId] = thread;
+          try {
+            const msgs = thread.getMessages();
+            msgs.forEach(msg => {
+              threadMap[msg.getId()] = thread;
+            });
+          } catch (err) {
+            // Ignore message fetch errors
           }
-        } else if (losCodeRevised !== "") {
-          actionTitleRevised = `[AI FALLBACK] ${task.title || "No Title"}`;
         }
-      }
+      });
+    } catch (e) {
+      console.warn(`Bulk fetch failed for batch starting at index ${i}: ${e.message}`);
     }
+  }
+  return threadMap;
+}
 
-    if (!existingTaskMap.has(task.id) || !notesRevised) {
-      if ((!task.notes || task.notes.trim() === "") && aiData.emailSummary && aiData.emailSummary !== "N/A" && aiData.emailSummary !== "") {
-        notesRevised = aiData.emailSummary;
-      }
+/**
+ * Builds the data row array for exporting a single task.
+ */
+function buildTaskExportRow(task, taskList, emailInfo, exportTs, rowCounter, existingTaskMap, validPaths, allowedAliases, taskLists) {
+  const urn = `urn:task:${exportTs}-${rowCounter.toString().padStart(4, '0')}`;
+  const formattedDate = task.due ? Utilities.formatDate(new Date(task.due), "GMT", "yyyy-MM-dd") : "";
+  const status = task.status || "needsAction";
+
+  let losCodeRevised = "";
+  let actionTitleRevised = "";
+  let notesRevised = "";
+  let taskListRevised = "";
+  let statusRevised = "";
+  let deadlineRevised = "";
+
+  if (existingTaskMap.has(task.id)) {
+    const existing = existingTaskMap.get(task.id);
+    losCodeRevised = existing.losCodeRevised || "";
+    actionTitleRevised = existing.actionTitleRevised || "";
+    notesRevised = existing.notesRevised || "";
+    taskListRevised = existing.taskListRevised || "";
+    statusRevised = existing.statusRevised || "";
+    deadlineRevised = existing.deadlineRevised || "";
+  }
+
+  let currentNotes = notesRevised ? notesRevised : (task.notes || "");
+  const linkMatch = currentNotes.match(/https?:\/\/[^\s]+/);
+  let link = "";
+  if (linkMatch) {
+    link = linkMatch[0];
+    currentNotes = currentNotes.replace(link, "").trim();
+  }
+  notesRevised = link ? `${link}\n\n${currentNotes}`.trim() : currentNotes.trim();
+
+  let isLOSValid = false;
+  let systemComment = "";
+
+  const titleParts = (task.title || "").split(" > ");
+  if (titleParts.length >= 2) {
+    const potentialPath = titleParts.slice(0, -1).join(" > ").trim().toLowerCase();
+    if (validPaths.has(potentialPath)) {
+      isLOSValid = true;
+    } else {
+      systemComment = `Invalid LOS Path: Not found in taxonomy.`;
     }
+  } else {
+    const hasLOSPrefix = /^\d{2}\s\d{2}\s\d{2}/.test(task.title || "");
+    if (hasLOSPrefix) {
+      systemComment = "Missing action separator ' > '.";
+    }
+  }
 
-    // Intelligent Task List routing (Only apply to tasks stuck in triage lists)
-    if (!existingTaskMap.has(task.id) || !taskListRevised) {
-      taskListRevised = taskList.title === "Importer" ? "ToDo" : taskList.title; 
+  let sysCommentParsed = "";
+  let daCommentParsed = "";
+  const rawNotes = task.notes || "";
+  
+  const sysMatch = rawNotes.match(/^SYS:\s*(.*)$/m);
+  if (sysMatch) sysCommentParsed = sysMatch[1];
+  
+  const daMatch = rawNotes.match(/^DA:\s*(.*)$/m);
+  if (daMatch) daCommentParsed = daMatch[1];
+  
+  if (systemComment !== "") {
+    systemComment += sysCommentParsed ? ` | AI: ${sysCommentParsed}` : "";
+  } else {
+    systemComment = sysCommentParsed;
+  }
+  
+  let daComment = daCommentParsed;
+  const aiData = {};
+
+  if (!isLOSValid) {
+    if (!existingTaskMap.has(task.id) || (!losCodeRevised && !actionTitleRevised)) {
+      if (aiData.proposedCategory && aiData.proposedCategory !== "N/A" && aiData.proposedCategory !== "") {
+        losCodeRevised = aiData.proposedCategory;
+      }
       
-      if (taskList.title.toLowerCase() === "importer" || taskList.title.toLowerCase() === "todo") {
-        let activeCategory = losCodeRevised;
-        if (!activeCategory && isLOSValid) {
-          const parts = (task.title || "").split(" > ");
-          if (parts.length >= 2) activeCategory = parts.slice(0, -1).join(" > ").trim();
-        } else if (!activeCategory) {
-          activeCategory = aiData.proposedCategory;
+      if (aiData.proposedActionTitle && aiData.proposedActionTitle !== "") {
+        actionTitleRevised = aiData.proposedActionTitle;
+      } else if (aiData.proposedTitle && aiData.proposedTitle !== "") {
+        const splitParts = aiData.proposedTitle.split(" > ");
+        if (splitParts.length > 1) {
+          actionTitleRevised = splitParts.slice(1).join(" > ").trim();
+        } else {
+          actionTitleRevised = aiData.proposedTitle;
         }
+      } else if (losCodeRevised !== "") {
+        actionTitleRevised = `[AI FALLBACK] ${task.title || "No Title"}`;
+      }
+    }
+  }
 
-        if (activeCategory && activeCategory !== "N/A") {
-          const activeCategoryLower = activeCategory.toLowerCase();
-          const excludedLists = ["todo", "importer", "my tasks", "recurring", "backlog"];
-          const candidateLists = taskLists.filter(l => !excludedLists.includes(l.title.toLowerCase()));
+  if (!existingTaskMap.has(task.id) || !notesRevised) {
+    if ((!task.notes || task.notes.trim() === "") && aiData.emailSummary && aiData.emailSummary !== "N/A" && aiData.emailSummary !== "") {
+      notesRevised = aiData.emailSummary;
+    }
+  }
+
+  if (!existingTaskMap.has(task.id) || !taskListRevised) {
+    taskListRevised = taskList.title === "Importer" ? "ToDo" : taskList.title; 
+    
+    if (taskList.title.toLowerCase() === "importer" || taskList.title.toLowerCase() === "todo") {
+      let activeCategory = losCodeRevised;
+      if (!activeCategory && isLOSValid) {
+        const parts = (task.title || "").split(" > ");
+        if (parts.length >= 2) activeCategory = parts.slice(0, -1).join(" > ").trim();
+      } else if (!activeCategory) {
+        activeCategory = aiData.proposedCategory;
+      }
+
+      if (activeCategory && activeCategory !== "N/A") {
+        const activeCategoryLower = activeCategory.toLowerCase();
+        const excludedLists = ["todo", "importer", "my tasks", "recurring", "backlog"];
+        const candidateLists = taskLists.filter(l => !excludedLists.includes(l.title.toLowerCase()));
+        
+        let bestList = null;
+        let bestMatchLength = 0;
+        
+        for (const list of candidateLists) {
+          const match = list.title.match(/\(([^)]+)\)/);
+          const listKeyword = match ? match[1].toLowerCase().trim() : list.title.toLowerCase();
           
-          let bestList = null;
-          let bestMatchLength = 0;
+          let isMatch = false;
+          let priority = 0;
           
-          for (const list of candidateLists) {
-            const match = list.title.match(/\(([^)]+)\)/);
-            const listKeyword = match ? match[1].toLowerCase().trim() : list.title.toLowerCase();
+          const listCodeMatch = listKeyword.match(/^(\d{2}\s\d{2}\s\d{2})(?:\s+(.+))?$/);
+          if (listCodeMatch) {
+            const code = listCodeMatch[1];
+            const rest = listCodeMatch[2];
             
-            let isMatch = false;
-            let priority = 0;
-            
-            const listCodeMatch = listKeyword.match(/^(\d{2}\s\d{2}\s\d{2})(?:\s+(.+))?$/);
-            if (listCodeMatch) {
-              const code = listCodeMatch[1];
-              const rest = listCodeMatch[2];
-              
-              if (activeCategoryLower.includes(code)) {
-                if (!rest) {
-                  isMatch = true; priority = 10;
+            if (activeCategoryLower.includes(code)) {
+              if (!rest) {
+                isMatch = true; priority = 10;
+              } else {
+                if (activeCategoryLower.includes(rest)) {
+                  isMatch = true; priority = 50 + rest.length;
                 } else {
-                  if (activeCategoryLower.includes(rest)) {
-                    isMatch = true; priority = 50 + rest.length;
-                  } else {
-                    const restWords = rest.split(/\s+/).filter(w => w.length > 3);
-                    const hasWordMatch = restWords.some(w => activeCategoryLower.includes(w));
-                    if (hasWordMatch) {
-                      isMatch = true; priority = 20;
-                    }
+                  const restWords = rest.split(/\s+/).filter(w => w.length > 3);
+                  const hasWordMatch = restWords.some(w => activeCategoryLower.includes(w));
+                  if (hasWordMatch) {
+                    isMatch = true; priority = 20;
                   }
                 }
               }
-            } else if (activeCategoryLower.includes(listKeyword)) {
-              isMatch = true; priority = listKeyword.length;
             }
-
-            if (isMatch && priority > bestMatchLength) {
-              bestList = list.title;
-              bestMatchLength = priority;
-            }
+          } else if (activeCategoryLower.includes(listKeyword)) {
+            isMatch = true; priority = listKeyword.length;
           }
-          
-          if (bestList) taskListRevised = bestList;
+
+          if (isMatch && priority > bestMatchLength) {
+            bestList = list.title;
+            bestMatchLength = priority;
+          }
         }
+        
+        if (bestList) taskListRevised = bestList;
       }
     }
+  }
 
-    results.push([
-      urn, 
-      taskList.title, taskListRevised,          // Task List + Revised
-      task.title || "No Title",                 // Task Title
-      losCodeRevised, actionTitleRevised, "",   // LOS Code, Action Title, Task (Revised) [Empty for Formula]
-      task.notes || "", notesRevised,           // Notes + Revised
-      status, statusRevised,                    // Status + Revised
-      formattedDate, deadlineRevised,           // Date + Revised
-      emailInfo.labels, 
-      emailInfo.firstSender, emailInfo.firstBody,
-      emailInfo.lastSender, emailInfo.lastBody, emailInfo.link,
-      "", // No AI Context
-      "", // No AI Category
-      systemComment, daComment,
-      task.id, taskList.id, status      // Hidden Tracking IDs & Original Status
-    ]);
-    
-    rowCounter++;
-  });
-
-  exportResultsToSheet(sheet, results, headers.length);
-  exportTasksToMarkdownDrive(results);
+  return [
+    urn, 
+    taskList.title, taskListRevised,
+    task.title || "No Title",
+    losCodeRevised, actionTitleRevised, "",
+    task.notes || "", notesRevised,
+    status, statusRevised,
+    formattedDate, deadlineRevised,
+    emailInfo.labels, 
+    emailInfo.firstSender, emailInfo.firstBody,
+    emailInfo.lastSender, emailInfo.lastBody, emailInfo.link,
+    "", // No AI Context
+    "", // No AI Category
+    systemComment, daComment,
+    task.id, taskList.id, status
+  ];
 }
 
 /**
@@ -373,7 +448,9 @@ function getExportDescriptions() {
 function fetchTaskLists() {
   try {
     const response = Tasks.Tasklists.list();
-    return response.items || null;
+    const EXCLUDED_LIST_IDS = [SYSTEM_CONFIG.TASKS.RECURRING_LIST_ID];
+    const items = (response.items || []).filter(list => !EXCLUDED_LIST_IDS.includes(list.id));
+    return items.length > 0 ? items : null;
   } catch (e) {
     console.error(`Critical API Failure (Tasklists.list): ${e.message}`);
     return null;
@@ -403,9 +480,11 @@ function fetchTasks(taskListId, pageToken) {
 /**
  * Processes associated email links for a task to extract conversation details.
  * @param {Object} task The task object
+ * @param {string[]} allowedAliases Allowed email aliases for filtering
+ * @param {Object} threadCache Cached Gmail threads
  * @returns {Object} Extracted email information
  */
-function processTaskEmailLinks(task, allowedAliases = []) {
+function processTaskEmailLinks(task, allowedAliases = [], threadCache = {}) {
   const emailInfo = { labels: "", firstSender: "", firstBody: "", lastSender: "", lastBody: "", link: "" };
 
   if (task.links) {
@@ -416,17 +495,19 @@ function processTaskEmailLinks(task, allowedAliases = []) {
         const idMatch = emailInfo.link.match(/([a-zA-Z0-9]{10,})$/);
         if (idMatch) {
           const gmailId = idMatch[1];
-          let thread = null;
+          let thread = threadCache[gmailId] || null;
           
-          try {
-            thread = GmailApp.getThreadById(gmailId);
-          } catch (e) {
+          if (!thread) {
             try {
-              const msg = GmailApp.getMessageById(gmailId);
-              if (msg) thread = msg.getThread();
-            } catch (e2) {
-              const search = GmailApp.search("id:" + gmailId, 0, 1);
-              if (search.length > 0) thread = search[0];
+              thread = GmailApp.getThreadById(gmailId);
+            } catch (e) {
+              try {
+                const msg = GmailApp.getMessageById(gmailId);
+                if (msg) thread = msg.getThread();
+              } catch (e2) {
+                const search = GmailApp.search("id:" + gmailId, 0, 1);
+                if (search.length > 0) thread = search[0];
+              }
             }
           }
 
@@ -524,7 +605,7 @@ function getTaskMasterPrompt() {
 }
 
 /**
- * Calls Gemini API to analyze a batch of tasks using gemini-2.5-flash.
+ * Calls Gemini API to analyze a batch of tasks using the configured Flash model.
  * Batches multiple tasks into a single prompt to bypass the 6-min execution limit and API rate limits.
  * 
  * @param {Array<{id: string, title: string, notes: string, firstMessage: string, lastMessage: string}>} tasksBatch 
@@ -561,7 +642,7 @@ function batchAnalyzeTasksWithGemini(tasksBatch, existingTaskContext = "") {
    - IMPORTANT: Heavily weigh any provided "emailLabels" when determining the category.
 3. "proposedActionTitle": A proposed, fully-formatted task title.
    - You MUST strictly apply the format: \`[Action Verb] [Object]\`
-   - Example 1: \`Pay the monthly electricity bill\`
+   - Example 1: \`Pay the 28 day electricity bill\`
    - Example 2: \`Book flights for Liverpool FC match\`
    - You MUST invent a strong Action Verb (e.g., Review, Read, Pay, Process, Track) for the task if one is missing from the original title. Do NOT just append the raw subject.
    - THE JUNK VS TRACKING RULE: Do NOT put pure junk (2FA codes, login alerts, spam) in the same bracket as important transactional data. Pure junk must NEVER generate an action title; return "N/A" for pure junk. However, important events like high-value deliveries or incoming bills SHOULD be extracted as passive tracking items (e.g., "Track: Delivery of MacBook expected on Tuesday" or "Reference: Electricity bill due on 15th").
@@ -898,11 +979,14 @@ function syncRevisionsToTasks() {
         if (listMigrated) {
           const oldTask = executeWithRetry(() => Tasks.Tasks.get(taskListId, taskId));
           
-          // Preserve the native email link by moving it to the notes before deleting the read-only links array
-          let nativeLinkUrl = "";
+          // Preserve all links by moving them to the notes before deleting the read-only links array
+          let extractedLinks = [];
           if (oldTask.links && oldTask.links.length > 0) {
-             const emailLinkObj = oldTask.links.find(l => l.type === "email");
-             if (emailLinkObj) nativeLinkUrl = emailLinkObj.link;
+             oldTask.links.forEach(l => {
+                let desc = l.description || "Link";
+                let url = l.link || "";
+                if (url) extractedLinks.push(`${desc}: ${url}`);
+             });
           }
           
           if (resource.title) oldTask.title = resource.title;
@@ -910,9 +994,24 @@ function syncRevisionsToTasks() {
           if (resource.due) oldTask.due = resource.due;
           if (resource.status) oldTask.status = resource.status;
           
-          // Ensure the native link is embedded in the notes so it survives the migration
-          if (nativeLinkUrl && (!oldTask.notes || !oldTask.notes.includes(nativeLinkUrl))) {
-             oldTask.notes = oldTask.notes ? oldTask.notes + "\n\n" + nativeLinkUrl : nativeLinkUrl;
+          // Ensure links are embedded in the notes so they survive the migration
+          if (extractedLinks.length > 0) {
+             let newLinksAdded = false;
+             let currentNotes = oldTask.notes || "";
+             extractedLinks.forEach(linkStr => {
+                const urlMatch = linkStr.match(/:\s*(.+)$/);
+                const url = urlMatch ? urlMatch[1] : linkStr;
+                if (currentNotes.indexOf(url) === -1) {
+                   if (!newLinksAdded) {
+                      currentNotes += currentNotes ? "\n\n--- Attached Links ---\n" : "--- Attached Links ---\n";
+                      newLinksAdded = true;
+                   } else {
+                      currentNotes += "\n";
+                   }
+                   currentNotes += linkStr;
+                }
+             });
+             oldTask.notes = currentNotes;
           }
           
           delete oldTask.id;
@@ -1015,30 +1114,58 @@ function exportTasksToMarkdownDrive(results) {
     // 19: AI Context Summary, 20: AI Proposed Category
     const listName = row[1];
     const title = row[3];
-    const notes = row[7];
-    const status = row[9];
+    let notes = row[7];
     const date = row[11];
+    const status = row[9];
     const aiSummary = row[19];
     const aiCategory = row[20];
+
+    // Clean up the JSON metadata block for the Markdown output
+    let metadataStr = "";
+    if (notes) {
+      const parts = notes.split('---SYSTEM_METADATA---');
+      if (parts.length > 1) {
+        notes = parts[0].trim();
+        try {
+          const metadata = JSON.parse(parts[1].trim());
+          const dl = metadata.deadline || "None";
+          const dur = metadata.duration || "N/A";
+          const goal = metadata.goal || "TBD";
+          metadataStr = `  [DEADLINE: ${dl}] | [DURATION: ${dur}] | [GOAL: ${goal}]`;
+        } catch(e) {}
+      }
+    }
 
     if (listName !== currentList) {
       mdContent += `\n## ${listName}\n\n`;
       currentList = listName;
     }
 
-    const checkbox = status === "completed" ? "[x]" : "[ ]";
-    mdContent += `- ${checkbox} **${title}**`;
-    if (date) mdContent += ` *(Due: ${date})*`;
-    mdContent += `\n`;
-
+    // Strip out the legacy string blocks if they still exist in the clean notes
     if (notes) {
-      mdContent += `  - **Notes:** ${notes.replace(/\n/g, ' ')}\n`;
+      notes = notes.replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "").trim();
+      notes = notes.replace(/\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "").trim();
+      notes = notes.replace(/\n\s*\n/g, "\n"); // remove multiple blank lines
     }
+
+    let line = `- [${status === "completed" ? "x" : " "}] **${title}**`;
+    if (date && date.toString().trim() !== "" && !date.toString().includes("2099")) {
+      line += ` *(Due: ${date})*`;
+    }
+    line += `\n`;
+    
+    if ((notes && notes !== "") || metadataStr !== "") {
+      const cleanedNotes = notes ? notes.replace(/\n/g, " ").trim() : "";
+      line += `  - **Notes:** ${cleanedNotes}${metadataStr}\n`;
+    }
+    
+    mdContent += line;
+
     if (aiSummary && aiSummary !== "N/A" && aiSummary !== "") {
-      mdContent += `  - **AI Context:** ${aiSummary.replace(/\n/g, ' ')}\n`;
+      mdContent += `  - **AI Context:** ${aiSummary.toString().replace(/\n/g, ' ')}\n`;
     }
     if (aiCategory && aiCategory !== "N/A" && aiCategory !== "") {
-      mdContent += `  - **Category:** ${aiCategory.replace(/\n/g, ' ')}\n`;
+      mdContent += `  - **Category:** ${aiCategory.toString().replace(/\n/g, ' ')}\n`;
     }
   });
 
@@ -1146,7 +1273,7 @@ function syncCompletedTasksLog() {
  * Ad-Hoc Task Creation Engine
  * Receives CLI inputs from Antigravity to create Google Tasks.
  */
-function createAdHocTaskFromCLI(title, notes) {
+function createAdHocTaskFromCLI(title, notes, listId) {
   try {
     const newTask = {
       title: title,
@@ -1154,7 +1281,7 @@ function createAdHocTaskFromCLI(title, notes) {
     };
     
     // '@default' is the Google Tasks API identifier for the primary/default list
-    const targetListId = '@default';
+    const targetListId = listId || '@default';
     
     const createdTask = Tasks.Tasks.insert(newTask, targetListId);
     console.log(`Success: Task "${title}" created in default list. Task ID: ${createdTask.id}`);
@@ -1167,7 +1294,7 @@ function createAdHocTaskFromCLI(title, notes) {
  * Ad-Hoc Task Update Engine
  * Receives CLI inputs from Antigravity to update Google Tasks by title.
  */
-function updateAdHocTaskFromCLI(title, status, appendNotes) {
+function updateAdHocTaskFromCLI(title, status, appendNotes, due) {
   try {
     const taskLists = fetchTaskLists();
     if (!taskLists) {
@@ -1212,6 +1339,15 @@ function updateAdHocTaskFromCLI(title, status, appendNotes) {
     if (appendNotes) {
       resource.notes = foundTask.notes ? foundTask.notes + "\n\n" + appendNotes : appendNotes;
     }
+    if (due) {
+      // Validate and format date
+      const parsedDate = new Date(due);
+      if (!isNaN(parsedDate.getTime())) {
+        resource.due = parsedDate.toISOString();
+      } else {
+        console.warn(`Invalid date format provided for task "${title}": ${due}`);
+      }
+    }
 
     if (Object.keys(resource).length > 0) {
       Tasks.Tasks.patch(resource, foundListId, foundTask.id);
@@ -1222,4 +1358,96 @@ function updateAdHocTaskFromCLI(title, status, appendNotes) {
   } catch (e) {
     console.log(`Failed to update task: ${e.message}`);
   }
+}
+
+// --- AUTOMATION & SCHEDULING ---
+
+/**
+ * Permanently deletes all tasks sitting in the 'To Be Deleted' list.
+ */
+function purgeToBeDeletedTasks() {
+  console.log("Purging tasks from 'To Be Deleted' list...");
+  const deleteListId = SYSTEM_CONFIG.TASKS.TO_BE_DELETED_LIST_ID;
+  if (!deleteListId) {
+    console.log("No To Be Deleted List ID found in config. Skipping purge.");
+    return;
+  }
+  
+  let pageToken;
+  let deletedCount = 0;
+  
+  do {
+    try {
+      const response = executeWithRetry(() => Tasks.Tasks.list(deleteListId, {
+        showCompleted: true,
+        showHidden: true,
+        maxResults: 100,
+        pageToken: pageToken
+      }));
+      
+      const items = response.items || [];
+      for (const t of items) {
+         try {
+           executeWithRetry(() => Tasks.Tasks.remove(deleteListId, t.id));
+           deletedCount++;
+         } catch (e) {
+           console.error(`Failed to delete task ${t.id}: ${e.message}`);
+         }
+      }
+      pageToken = response.nextPageToken;
+    } catch (e) {
+      console.error(`Failed to fetch tasks from To Be Deleted list: ${e.message}`);
+      break;
+    }
+  } while (pageToken);
+  
+  console.log(`Successfully purged ${deletedCount} tasks from the To Be Deleted list.`);
+}
+
+/**
+ * Main entry point for the 1 day automated Task Master sweep.
+ * Called by time-based triggers.
+ */
+function run1DayTaskMaintenance() {
+  console.log("Starting 1 Day Task Master Maintenance...");
+  
+  try {
+    // 1. Sync completed tasks to log and wipe them from Google Tasks
+    syncCompletedTasksLog();
+    
+    // 2. Purge tasks from To Be Deleted list
+    purgeToBeDeletedTasks();
+    
+    // 3. Run the main Task Master engine (extract, AI-analyze, and export to MD)
+    extractTasksWithConversationDetails();
+    
+    console.log("1 Day Task Master Maintenance complete.");
+  } catch (e) {
+    console.error("Critical failure during Task Maintenance: " + e.message);
+  }
+}
+
+/**
+ * Configures the project triggers for the Task Master pipeline.
+ * Run this function once to setup the 1 day schedule.
+ */
+function setup1DayTaskTriggers() {
+  const triggers = ScriptApp.getProjectTriggers();
+  
+  // Clean existing triggers for these functions
+  triggers.forEach(t => {
+    const fn = t.getHandlerFunction();
+    if (fn === 'runDailyTaskMaintenance' || fn === 'run1DayTaskMaintenance' || fn === 'START_AI_TASK_MASTER' || fn === 'extractTasksWithConversationDetails') {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+
+  // Schedule the unified maintenance function to run every hour.
+  // This ensures the task list and Markdown export are always up-to-date.
+  ScriptApp.newTrigger('run1DayTaskMaintenance')
+    .timeBased()
+    .everyHours(1)
+    .create();
+    
+  console.log("Trigger established: run1DayTaskMaintenance scheduled for hourly execution.");
 }

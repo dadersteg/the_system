@@ -510,6 +510,127 @@
       font-family: 'Google Sans', sans-serif;
     }
 
+    .btn-breathe {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 14px 44px;
+      border: 1px solid transparent;
+      border-radius: 50px;
+      background: var(--color-primary);
+      color: var(--color-primary-on);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .btn-breathe::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.12);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .btn-breathe:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.25);
+    }
+    
+    .btn-breathe:hover::before {
+      opacity: 1;
+    }
+
+    .btn-breathe:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+    }
+    
+    .btn-breathe:focus-visible {
+      box-shadow: 0 0 0 3px var(--color-border), 0 0 0 6px var(--color-primary);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .btn-breathe {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      }
+      .btn-breathe:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      }
+      .btn-breathe:active {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    /* Origami Box */
+    .origami-box {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1200px;
+    }
+    .origami-base {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      box-sizing: border-box;
+      background: rgba(79, 70, 229, 0.7);
+      border: 1.5px solid rgba(255, 255, 255, 0.5);
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transform: scale(0.5) rotateX(60deg) rotateZ(45deg);
+      box-shadow: 0 0 30px rgba(79, 70, 229, 0.4);
+      transition: transform 4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      -webkit-
+    }
+    .origami-flap {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      box-sizing: border-box;
+      background: rgba(99, 102, 241, 0.85);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+      backface-visibility: visible;
+      -webkit-
+    }
+    .origami-top { top: -90px; left: -1.5px; transform-origin: bottom; transform: rotateX(-90deg); }
+    .origami-bottom { bottom: -90px; left: -1.5px; transform-origin: top; transform: rotateX(90deg); }
+    .origami-left { top: -1.5px; left: -90px; transform-origin: right; transform: rotateY(90deg); }
+    .origami-right { top: -1.5px; right: -90px; transform-origin: left; transform: rotateY(-90deg); }
+    
+    @media (prefers-color-scheme: dark) {
+      .origami-base { background: rgba(99, 102, 241, 0.6); border-color: rgba(255,255,255,0.3); }
+      .origami-flap { background: rgba(129, 140, 248, 0.75); border-color: rgba(255,255,255,0.4); }
+    }
+
+    .breathe-text {
+      position: absolute;
+      font-size: clamp(3rem, 8vw, 4.5rem);
+      font-weight: 700;
+      color: var(--color-text);
+      z-index: 10;
+      font-family: 'Google Sans', sans-serif;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -2px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: color 0.3s ease;
+    }
+
+
     /* Intelligence Tabs */
     .intel-tabs { display: flex; gap: 12px; margin-bottom: 32px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; flex-wrap: wrap; }
     .intel-tab { padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--color-text-muted); transition: var(--transition); }
@@ -689,7 +810,7 @@
       <div class="header-area" style="text-align: left;"><h1>Mental Health</h1></div>
       
       <div class="dashboard-grid" style="display: flex; justify-content: center; align-items: center; min-height: 500px;">
-        <div class="dash-card" style="width: 100%; max-width: 500px; padding: 48px 24px; display: flex; flex-direction: column; align-items: center; gap: 40px; border: 1px solid var(--color-border); box-shadow: none;">
+        <div class="dash-card" style="width: 100%; max-width: 500px; padding: 48px 24px; display: flex; flex-direction: column; align-items: center; gap: 40px; border: 1px solid var(--color-border); box-shadow: none; overflow: visible; backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(30, 41, 59, 0.9);">
           
           <div style="font-size: 14px; font-weight: 500; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 2px;">
             Rounds Remaining: <span id="breathe-cycles-count" style="color: var(--color-text); font-weight: bold;">4</span>
@@ -700,10 +821,11 @@
             <div id="breathe-text" style="position: absolute; font-size: 64px; font-weight: bold; color: var(--color-text); z-index: 10;">4</div>
           </div>
           
-          <button id="breathe-start-btn" onclick="startBreathing()" style="padding: 14px 40px; background: var(--color-text); color: var(--color-bg); border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; transition: opacity 0.2s;">Start</button>
+          <button id="breathe-start-btn" class="btn-breathe" onclick="startBreathing()">Start</button>
           
           <div style="font-size: 14px; font-weight: 500; color: var(--color-text-muted); display: flex; align-items: center; gap: 8px;">
             <span id="breathe-streak">0</span> Days
+            <span id="lotus-ticker" style="display: none; align-items: center; gap: 4px; padding: 2px 8px; background: rgba(236, 72, 153, 0.1); color: #ec4899; border-radius: 12px; font-size: 12px; font-weight: 700;">🌸 <span id="lotus-count">0</span></span>
           </div>
 
         </div>
@@ -1406,7 +1528,9 @@
     let breatheState = 0; // 1=inhale, 2=hold, 3=exhale
     let breatheTicks = 0;
     let cyclesCompleted = 0;
+        let breatheMode = '478';
     let isBreathing = false;
+    let boxRotationX = 0;
     let audioCtx;
 
     function playTone(freq, durationStr) {
@@ -1429,22 +1553,150 @@
       } catch(e) {}
     }
 
+        
+    function renderLotus() {
+      const container = document.getElementById('streak-lotus-container');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      let rawStreak = 0;
+      if (breatheMode === '478' && state.data && state.data.breatheStreak !== undefined) {
+          rawStreak = state.data.breatheStreak;
+      } else if (breatheMode === 'box' && state.data && state.data.boxBreatheStreak !== undefined) {
+          rawStreak = state.data.boxBreatheStreak;
+      }
+      
+      const lotusCount = Math.floor(rawStreak / 37);
+      const streak = rawStreak % 37;
+      
+      const ticker = document.getElementById('lotus-ticker');
+      const countEl = document.getElementById('lotus-count');
+      if (lotusCount > 0) {
+        ticker.style.display = 'inline-flex';
+        countEl.innerText = 'x' + lotusCount;
+      } else {
+        ticker.style.display = 'none';
+      }
+      
+      const map = [
+        [ 0,  0,  0,  0,  0, 37,  0,  0,  0,  0,  0],
+        [ 0,  0,  0,  0, 35, 34, 36,  0,  0,  0,  0],
+        [ 0, 33,  0,  0, 31, 29, 30,  0,  0, 32,  0],
+        [ 0, 27, 25,  0, 23, 22, 24,  0, 26, 28,  0],
+        [21, 19, 17, 15, 13, 11, 12, 14, 16, 18, 20],
+        [ 0,  0, 10,  8,  6,  4,  5,  7,  9,  0,  0],
+        [ 0,  0,  0,  0,  2,  1,  3,  0,  0,  0,  0]
+      ];
+      
+      for (let r = 0; r < map.length; r++) {
+        for (let c = 0; c < map[r].length; c++) {
+          const val = map[r][c];
+          const div = document.createElement('div');
+          
+          if (val === 0) {
+            div.style.background = 'transparent';
+          } else {
+            const isActive = streak >= val;
+            if (isActive) {
+              let color = 'var(--color-primary)';
+              if (r === 6) color = '#10b981'; // Green stem
+              else if (r >= 4) color = '#d946ef'; // Deep fuchsia
+              else if (r >= 2) color = '#f472b6'; // Pink
+              else color = '#fbcfe8'; // Light pink
+              
+              div.style.background = color;
+              div.style.borderRadius = '2px';
+              div.style.transition = 'all 0.5s ease';
+              if (streak === 36 || lotusCount > 0) {
+                div.style.boxShadow = `0 0 4px ${color}`;
+              }
+            } else {
+              div.style.background = 'var(--color-border)';
+              div.style.opacity = '0.25';
+              div.style.borderRadius = '2px';
+              div.style.transition = 'all 0.5s ease';
+            }
+          }
+          container.appendChild(div);
+        }
+      }
+    }
+
+    function switchBreatheMode() {
+      if (isBreathing) startBreathing(); // stop if running
+      breatheMode = document.getElementById('breathe-mode-select').value;
+      const streakEl = document.getElementById('breathe-streak');
+      const circle = document.getElementById('breathe-circle');
+      const origami = document.getElementById('origami-box');
+      
+      if (breatheMode === '478') {
+        streakEl.innerText = state.data && state.data.breatheStreak !== undefined ? state.data.breatheStreak : '0';
+        circle.style.display = 'block';
+        origami.style.display = 'none';
+        circle.style.transform = 'scale(0.4)';
+      } else {
+        streakEl.innerText = state.data && state.data.boxBreatheStreak !== undefined ? state.data.boxBreatheStreak : '0';
+        circle.style.display = 'none';
+        origami.style.display = 'flex';
+        setOrigamiState('closed', '0.5s');
+      }
+      renderLotus();
+    }
+
+    function setOrigamiState(stateStr, dur = '4s', ease = 'cubic-bezier(0.34, 1.56, 0.64, 1)') {
+      const t = document.getElementById('flap-top');
+      const b = document.getElementById('flap-bottom');
+      const l = document.getElementById('flap-left');
+      const r = document.getElementById('flap-right');
+      
+      if (!t || !b || !l || !r) return;
+      
+      t.style.transition = `transform ${dur} ${ease}`;
+      b.style.transition = `transform ${dur} ${ease}`;
+      l.style.transition = `transform ${dur} ${ease}`;
+      r.style.transition = `transform ${dur} ${ease}`;
+      
+      if (stateStr === 'open') {
+        t.style.transform = 'rotateX(0deg)';
+        b.style.transform = 'rotateX(0deg)';
+        l.style.transform = 'rotateY(0deg)';
+        r.style.transform = 'rotateY(0deg)';
+      } else {
+        t.style.transform = 'rotateX(-90deg)';
+        b.style.transform = 'rotateX(90deg)';
+        l.style.transform = 'rotateY(90deg)';
+        r.style.transform = 'rotateY(-90deg)';
+      }
+    }
+
     function startBreathing() {
       const btn = document.getElementById('breathe-start-btn');
       const text = document.getElementById('breathe-text');
       const circle = document.getElementById('breathe-circle');
+      const origamiBase = document.getElementById('origami-base');
       
       if (isBreathing) {
         clearInterval(breatheInterval);
         isBreathing = false;
         btn.innerText = 'Start';
+        btn.classList.remove('state-stop', 'state-done');
         text.innerText = '4';
-        circle.style.transform = 'scale(0.4)';
+        
+        if (breatheMode === '478') {
+          circle.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          circle.style.transform = 'scale(0.4)';
+        } else {
+          origamiBase.style.transition = 'transform 0.5s ease';
+          origamiBase.style.transform = 'scale(0.5) rotateX(60deg) rotateZ(45deg)';
+          setOrigamiState('closed', '0.5s');
+        }
         return;
       }
       
       isBreathing = true;
       btn.innerText = 'Stop';
+      btn.classList.remove('state-done');
+      btn.classList.add('state-stop');
       breatheState = 1;
       breatheTicks = 0;
       cyclesCompleted = 0;
@@ -1457,76 +1709,82 @@
       breatheInterval = setInterval(doBreatheTick, 1000);
     }
 
-    function playTick() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        oscillator.type = 'sine'; // Very soft sine tick
-        oscillator.frequency.value = 600; // mid-high pitch
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        
-        // Very short percussive envelope for the tick
-        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-        
-        oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.1);
-      } catch(e) {}
-    }
-
     function doBreatheTick() {
       const circle = document.getElementById('breathe-circle');
       const text = document.getElementById('breathe-text');
+      const origamiBase = document.getElementById('origami-base');
       
-      if (breatheState === 1) { // Inhale 4s
-        if (breatheTicks === 0) {
-          playTone(329.63, 4); // E4
-          circle.style.transition = 'transform 4s ease-in-out';
-          circle.style.transform = 'scale(1.2)';
-        } else {
-          playTick();
+      if (breatheMode === '478') {
+        if (breatheState === 1) { // Inhale 4s
+          if (breatheTicks === 0) {
+            playTone(329.63, 4); // E4
+            circle.style.transition = 'transform 4s ease-in-out, border-radius 0.5s ease';
+            circle.style.transform = 'scale(1.2) rotateX(0deg)';
+          } else { playTick(); }
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { breatheState = 2; breatheTicks = 0; }
+        } else if (breatheState === 2) { // Hold 7s
+          if (breatheTicks === 0) { playTone(440.00, 7); } else { playTick(); }
+          const remaining = 7 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 7) { breatheState = 3; breatheTicks = 0; }
+        } else if (breatheState === 3) { // Exhale 8s
+          if (breatheTicks === 0) {
+            playTone(261.63, 8); // C4
+            circle.style.transition = 'transform 8s ease-in-out, border-radius 0.5s ease';
+            circle.style.transform = 'scale(0.4) rotateX(0deg)';
+          } else { playTick(); }
+          const remaining = 8 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 8) {
+            breatheState = 1; breatheTicks = 0; cyclesCompleted++;
+            document.getElementById('breathe-cycles-count').innerText = Math.max(0, 4 - cyclesCompleted);
+            if (cyclesCompleted === 4) { winBreatheStreak(); }
+          }
         }
-        const remaining = 4 - breatheTicks;
-        text.innerText = remaining;
-        breatheTicks++;
-        if (breatheTicks >= 4) {
-          breatheState = 2;
-          breatheTicks = 0;
-        }
-      } else if (breatheState === 2) { // Hold 7s
-        if (breatheTicks === 0) {
-          playTone(440.00, 7); // A4
-        } else {
-          playTick();
-        }
-        const remaining = 7 - breatheTicks;
-        text.innerText = remaining;
-        breatheTicks++;
-        if (breatheTicks >= 7) {
-          breatheState = 3;
-          breatheTicks = 0;
-        }
-      } else if (breatheState === 3) { // Exhale 8s
-        if (breatheTicks === 0) {
-          playTone(261.63, 8); // C4
-          circle.style.transition = 'transform 8s ease-in-out';
-          circle.style.transform = 'scale(0.4)';
-        } else {
-          playTick();
-        }
-        const remaining = 8 - breatheTicks;
-        text.innerText = remaining;
-        breatheTicks++;
-        if (breatheTicks >= 8) {
-          breatheState = 1;
-          breatheTicks = 0;
-          cyclesCompleted++;
-          document.getElementById('breathe-cycles-count').innerText = Math.max(0, 4 - cyclesCompleted);
-          if (cyclesCompleted === 4) {
-            winBreatheStreak();
+      } else {
+        // Box Breathing (Origami)
+        if (breatheState === 1) { // Inhale 4s
+          if (breatheTicks === 0) {
+            playTone(329.63, 4);
+            setOrigamiState('open', '4s');
+            origamiBase.style.transition = 'transform 4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            origamiBase.style.transform = `scale(1.3) rotateX(60deg) rotateZ(45deg)`;
+          } else { playTick(); }
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { breatheState = 2; breatheTicks = 0; }
+        } else if (breatheState === 2) { // Hold 4s
+          if (breatheTicks === 0) { playTone(440.00, 4); } else { playTick(); }
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { breatheState = 3; breatheTicks = 0; }
+        } else if (breatheState === 3) { // Exhale 4s
+          if (breatheTicks === 0) {
+            playTone(261.63, 4);
+            setOrigamiState('closed', '4s');
+            origamiBase.style.transition = 'transform 4s cubic-bezier(0.4, 0, 0.2, 1)';
+            origamiBase.style.transform = `scale(0.6) rotateX(60deg) rotateZ(45deg)`;
+          } else { playTick(); }
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { breatheState = 4; breatheTicks = 0; }
+        } else if (breatheState === 4) { // Hold 4s
+          if (breatheTicks === 0) { playTone(440.00, 4); } else { playTick(); }
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { 
+            breatheState = 1; breatheTicks = 0; cyclesCompleted++;
+            document.getElementById('breathe-cycles-count').innerText = Math.max(0, 4 - cyclesCompleted);
+            if (cyclesCompleted === 4) { winBreatheStreak(); }
           }
         }
       }
@@ -1538,23 +1796,47 @@
       const btn = document.getElementById('breathe-start-btn');
       const text = document.getElementById('breathe-text');
       const circle = document.getElementById('breathe-circle');
+      const origamiBase = document.getElementById('origami-base');
+      
       btn.innerText = 'Done!';
+      btn.classList.remove('state-stop');
+      btn.classList.add('state-done');
       text.innerText = '✓';
-      circle.style.transform = 'scale(0.4)';
+      
+      if (breatheMode === '478') {
+        circle.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        circle.style.transform = 'scale(0.4)';
+      } else {
+        origamiBase.style.transition = 'transform 0.5s ease';
+        origamiBase.style.transform = 'scale(0.5) rotateX(60deg) rotateZ(45deg)';
+        setOrigamiState('closed', '0.5s');
+      }
       
       const el = document.getElementById('breathe-streak');
       el.innerText = parseInt(el.innerText) + 1 + ' (Syncing...)';
       
-      // Hit backend to log habit
-      google.script.run.withSuccessHandler(function(res) {
-         el.innerText = parseInt(el.innerText) + ' (Logged)';
-      }).withUserObject({}).logHabit('4-7-8 Breathing');
+      const habitName = breatheMode === '478' ? '4-7-8 Breathing' : 'Box Breathing';
+      if (state.data) {
+          if (breatheMode === '478') state.data.breatheStreak = (state.data.breatheStreak || 0) + 1;
+          else state.data.boxBreatheStreak = (state.data.boxBreatheStreak || 0) + 1;
+      }
+      renderLotus();
       
-      // Try to find the Google Task ID for Morning or Evening Breathing
+      google.script.run
+        .withSuccessHandler(function(res) {
+           el.innerText = parseInt(el.innerText) + ' (Logged)';
+        })
+        .withFailureHandler(function(err) {
+           console.error('Failed to log habit:', err);
+           el.innerText = parseInt(el.innerText) + ' (Error)';
+        })
+        .withUserObject({})
+        .logHabit(habitName);
+      
       let breathingTaskId = null;
       if (state.data && state.data.tasks) {
         for (let t of state.data.tasks) {
-           if (t.title && t.title.toLowerCase().includes("4-7-8 breathing")) {
+           if (t.title && t.title.toLowerCase().includes(habitName.toLowerCase())) {
                breathingTaskId = t.id;
                break;
            }
@@ -1562,7 +1844,11 @@
       }
       
       if (breathingTaskId) {
-         google.script.run.completeTaskById(breathingTaskId);
+         google.script.run
+           .withFailureHandler(function(err) {
+             console.error('Failed to complete breathing task:', err);
+           })
+           .completeTaskById(breathingTaskId);
       }
     }
 

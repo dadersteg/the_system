@@ -147,7 +147,7 @@ function exportSystemManifest() {
 
   // 1. Map Spreadsheet Tabs
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheets = ss.getSheets();
     sheets.forEach(sheet => {
       manifest.spreadsheet.tabs.push({

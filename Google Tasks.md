@@ -1,344 +1,213 @@
 # Google Tasks
 
-*Last Updated: Mon, 04 May 2026 08:10:18 GMT*
+*Last Updated: Sat, 30 May 2026 02:08:41 GMT*
 
+
+## Clerk Review
+
+- [ ] **Debug Roadmap display**
+  - **Notes:** https://drive.google.com/file/d/1cBfHwQZmmIF6WVmX3VEg5i9r2LL0c_kI/view?usp=drivesdk [Source: The System - 202605 Roadmap Error.png] Investigate why the roadmap is not loading in the system dashboard as shown in the screenshot.
+- [ ] **Standardize development practices**
+  - **Notes:** https://docs.google.com/document/d/1GvAIwswo6QG3_b9M3TydH9zC0r0tNiTgqmee-ri24YI/edit [Source: 20260519 [Meeting] Development Practices and Operational Bottlenecks Review] Transition from research-oriented code to production-grade standards to improve reliability.
+- [ ] **Audit access management**
+  - **Notes:** https://docs.google.com/document/d/1GvAIwswo6QG3_b9M3TydH9zC0r0tNiTgqmee-ri24YI/edit [Source: 20260519 [Meeting] Development Practices and Operational Bottlenecks Review] Review and restrict user access levels to align with necessary skill sets and security requirements.
+- [ ] **Mitigate single points of failure**
+  - **Notes:** https://docs.google.com/document/d/1GvAIwswo6QG3_b9M3TydH9zC0r0tNiTgqmee-ri24YI/edit [Source: 20260519 [Meeting] Development Practices and Operational Bottlenecks Review] Develop redundancy plans for W. and Murat to reduce operational risk.
+- [ ] **Streamline communication workflows**
+  - **Notes:** https://docs.google.com/document/d/1GvAIwswo6QG3_b9M3TydH9zC0r0tNiTgqmee-ri24YI/edit [Source: 20260519 [Meeting] Development Practices and Operational Bottlenecks Review] Address the bottleneck caused by W.'s role as a bridge to improve researcher autonomy and morale.
+- [ ] **Implement automated testing**
+  - **Notes:** https://docs.google.com/document/d/1GvAIwswo6QG3_b9M3TydH9zC0r0tNiTgqmee-ri24YI/edit [Source: 20260519 [Meeting] Development Practices and Operational Bottlenecks Review] Increase testing frequency to eliminate the need for testing in production environments.
 
 ## ToDo
 
-- [ ] **01 05 01 Projects > AI > Review 'MarkItDown' repository on GitHub** *(Due: 2026-05-18)*
-  - **Notes:** Newsletter: Cursor 3.1 agents, Claude Code stabilization tips, and engineering leadership trends.  [DEADLINE: 2026-05-17] | [DURATION: 30m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19d8c4bf88c6c79e
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 03 02 Reflection > Add a questions about mistakes** *(Due: 2026-05-03)*
-  - **Notes:** Newsletter: Lessons Learned Journal; turning mistakes into systems through review and adjustment.  [DEADLINE: 2026-05-02] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19da5d7c57b8fbc2
-  - **Category:** 01 03 02 Reflection
-- [ ] **01 03 00 Personal Growth > Read "A System for Living on Principle" and draft principles** *(Due: 2026-05-03)*
-  - **Notes:** Newsletter: Principle-first living; simple rules to minimize decision fatigue and build congruence.  [DEADLINE: 2026-05-02] | [DURATION: 1h 30m] | [GOAL: TBD]  https://mail.google.com/mail/#all/199482b221b497c8
-  - **Category:** 01 03 00 Personal Growth
-- [ ] **01 04 01 Purchase > Track: Access Mamma Mia! e-tickets** *(Due: 2026-05-05)*
-  - **Notes:** Access e-tickets for Mamma Mia! at Novello Theatre via confirmation link 24 hours before the May 6, 2026, 7:30 PM show.  [DEADLINE: 2026-05-05] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19def1f727cecdc1
-  - **Category:** 01 04 01 Purchase
-- [ ] **01 04 02 House > SW1V 4QE > Track IKEA delivery** *(Due: 2026-05-06)*
-  - **Notes:** Monitor the IKEA delivery of kitchen items scheduled for May 6, 2026.  [DEADLINE: 2026-05-06] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19de3db06b5aa9ca
-  - **Category:** 01 04 02 House > SW1V 4QE
-- [ ] **01 05 01 Projects > 20260510-20260514 Lisbon** *(Due: 2026-05-07)*
-  - **Notes:** Add passenger passport details, check in online, and save boarding passes for the easyJet flight to Lisbon.  [DEADLINE: 2026-05-10] | [DURATION: 20m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19dceec283e26b1e
-  - **Category:** 01 05 01 Projects > 20260510-20260514 Lisbon
-- [ ] **01 05 01 Projects > 20260509 LFC-CFC > Save match hospitality tickets** *(Due: 2026-05-08)*
-  - **Notes:** Confirmation of match hospitality tickets for Liverpool v Chelsea (9 May 2026).  [DEADLINE: 2026-05-07] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19dbe65354b6b5a3
-  - **AI Context:** Confirmed hospitality ticket purchase for Liverpool vs Chelsea on May 9, 2026.
-  - **Category:** 01 05 01 Projects > 20260509 LFC-CFC
-- [ ] **01 05 01 Projects > 20260509 LFC-CFC > Save train tickets** *(Due: 2026-05-09)*
-  - **Notes:** Confirmed train booking for 09 May 2026: London Euston to Liverpool Lime Street, 1st Class return.  [DEADLINE: 2026-05-08] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19d8e3139696bea7
-  - **AI Context:** Confirmed train booking for London-Liverpool round trip on May 9, 2026, Avanti West Coast.
-  - **Category:** 01 05 01 Projects > 20260509 LFC-CFC
-- [ ] **01 01 01 Task Management > Review account security settings**
-  - **Notes:** Notification: Google Advanced Protection Programme deactivated for adersteg.daniel@gmail.com.  [DEADLINE: 2026-04-29] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19db5ae5e52ff2d3
-  - **AI Context:** Google notifications regarding account security settings and the Advanced Protection Programme status.
-  - **Category:** 01 01 01 Task Management
-- [ ] **01 05 02 Relationships > Follow up with Eleanor Drage regarding Monday evening availability** *(Due: 2026-05-04)*
-  - **Notes:** Coordinate dinner or lunch with Dr. Eleanor Drage; currently targeting Monday evening.  [DEADLINE: TBC] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19dead5f3002ca33
-  - **Category:** 01 05 02 Relationships
-- [ ] **01 04 02 House > Update and document all storage boxes in flat** *(Due: 2026-05-10)*
-  - **Notes:** [DEADLINE: 2026-05-09] | [DURATION: 3h] | [GOAL: TBD]
-  - **Category:** 01 04 02 House > SW1V 4QE
-- [ ] **01 05 02 Relationships > CMA > Set up POP / IMAP for Carry** *(Due: 2026-05-10)*
-  - **Notes:** [DEADLINE: 2026-05-09] | [DURATION: 20m] | [GOAL: TBD]
-  - **Category:** 01 05 02 Relationships > CMA
-- [ ] **01 03 02 Reflection > Review goals and Master Memo 'Cheat Sheet'** *(Due: 2026-05-03)*
-  - **Notes:** [DEADLINE: 2026-05-02] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 03 02 Reflection
-- [ ] **01 02 01 Physical Health > Follow up on blood test results with GP and endocrinologist** *(Due: 2026-05-04)*
-  - **Notes:** [DEADLINE: 2026-05-03] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 02 01 Physical Health
-- [ ] **01 02 01 Physical Health > Give details to GP** *(Due: 2026-04-23)*
-  - **Notes:** [DEADLINE: 2026-04-22] | [DURATION: 15m] | [GOAL: TBD]
-  - **Category:** 01 02 01 Physical Health
-- [ ] **01 05 02 Relationships > CMA > Buy Peonies** *(Due: 2026-05-06)*
-  - **Notes:** [DEADLINE: 2026-05-05] | [DURATION: 15m] | [GOAL: TBD]
-  - **Category:** 01 05 02 Relationships > CMA
-- [ ] **01 05 01 Projects > Upgrade Office > Repair old keyboard** *(Due: 2026-05-29)*
-  - **Notes:** [DEADLINE: 2026-05-28] | [DURATION: 1h] | [GOAL: TBD]
-  - **Category:** 01 05 01 Projects > Upgrade Office
-- [ ] **02 01 99 Archive > 201911 Revolut > TSE-21018 Laptop Return — Daniel Adersteg (2217)** *(Due: 2026-05-20)*
-  - **Notes:** [DEADLINE: 2026-05-19] | [DURATION: 1h] | [GOAL: TBD]  https://mail.google.com/mail/#all/19d87b1a5ea06316
-  - **Category:** 02 01 99 Archive
-- [ ] **02 01 99 Archive > 201911 Revolut > Return Computer** *(Due: 2026-05-18)*
-  - **Notes:** [DEADLINE: 2026-05-17] | [DURATION: 1h] | [GOAL: TBD]  https://mail.google.com/mail/#all/19d8bf7ccaa57e56
-  - **Category:** 02 01 99 Archive
-- [ ] **01 03 02 Reflection > Add random question to journal** *(Due: 2026-05-03)*
-  - **Notes:** [DEADLINE: 2026-05-02] | [DURATION: 5m] | [GOAL: TBD]
-  - **Category:** 01 03 02 Reflection
+- [ ] **Update and Polish System Dashboard** *(Due: 2026-05-29)*
+  - **Notes:** SYS: Task routed to today as requested for system maintenance. DA:  [DEADLINE: 2026-05-29] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-026]
+- [ ] **Water plants** *(Due: 2026-05-30)*
+  - **Notes:** SYS: DA:  [DEADLINE: 2026-05-30] | [DURATION: 10m] | [GOAL: 2024-3-041A]
+- [ ] **Execute AXA Health Plan Extension Signup** *(Due: 2026-05-31)*
+  - **Notes:** Complete the signup and payment setup for the AXA personal health plan extension once Simon Dews replies. Thread Link: https://mail.google.com/mail/u/0/#all/19e740dff3285093 [UPDATE]: Track AXA Health plan activation and policy start date alignment Link: https://mail.google.com/mail/u/0/#all/19e740dff3285093 SYS: Task is dependent on Simon Dews. If no reply is received by end of day, I will move this to the backlog. DA:  [DEADLINE: 2026-05-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-002]
+- [ ] **Join Carry Google Chat Space**
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e753de6d29aee3 Context: 01 05 02 Relationships > CMA Join the Carry Google Chat space SYS: Migrated to V6 structure. DA:  [DEADLINE: None] | [DURATION: 5m] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Set up The Clerk and Task Master for Work** *(Due: 2026-05-29)*
+  - **Notes:** SYS: This is a high-leverage setup task critical for your Q2 goals. I have prioritized it for immediate execution. DA:  [DEADLINE: 2026-05-29] | [DURATION: 1h] | [GOAL: 2026-Q2-PRE-004]
+- [ ] **Review Personal Health Insurance Quote** *(Due: 2026-07-28)*
+  - **Notes:** https://drive.google.com/file/d/1GU67bhWggdEG7QGJC6yv0CFYdgoQ5DpV/view?usp=drivesdk [Source: Health - 202605 Personal Health Insurance Quote.pdf] Review the terms, conditions, and coverage options in the quote (valid until 28/07/2026) to decide whether to proceed with the plan. SYS: DA:  [DEADLINE: 2026-07-28] | [DURATION: 45m] | [GOAL: 2026-MD-NEW-002]
+- [ ] **Discuss Equity Share Agreement with Nataliya** *(Due: 2026-06-05)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e3c024d4ae27bb Context: 01 01 02 Contracts > Signature Review and discuss proposed amendments to Equity Share Agreement with Nataliya SYS: Constraint applied as requested for next week (June 5). Calendar capacity is sufficient for this deep work session. DA: Move this to June 5  [DEADLINE: 2026-06-05] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Initiate Aviva to HL SIPP transfer** *(Due: 2026-06-18)*
+  - **Notes:** Context: 01 04 00 Finances > Pension SYS: This is dependent on the Aviva contribution confirmation. I have scheduled it for the same week. DA:  [DEADLINE: 2026-06-18] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-039]
+- [ ] **Confirm final pension contribution to Aviva** *(Due: 2026-06-15)*
+  - **Notes:** Confirm final contribution has been made (mid-June) before initiating the Aviva to HL SIPP transfer. SYS: DA:  [DEADLINE: 2026-06-15] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-039]
+- [ ] **Confirm apartment borrowing with Mikkel for Pontus wedding** *(Due: 2026-06-05)*
+  - **Notes:** SYS: DA:  [DEADLINE: 2026-06-05] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Confirm receipt of new British passport** *(Due: 2026-11-15)*
+  - **Notes:** Confirm new British passport in name Martens-Adersteg has arrived and that HMPO has returned all your original documents safely. SYS: DA:  [DEADLINE: 2026-11-15] | [DURATION: 15m] | [GOAL: Maintenance]
+- [ ] **Mail Skatteverket name change form SKV 7502** *(Due: 2026-06-10)*
+  - **Notes:** Complete & sign form SKV 7502 (both you & Carina sign) for double surname Martens-Adersteg. Mail it with your original Apostilled Tbilisi Marriage Certificate. Ref: file:///Users/daniel/Documents/the_system/docs/TS%20-%20Passport%20Renewal%20Strategy.md SYS: DA:  [DEADLINE: 2026-06-10] | [DURATION: 45m] | [GOAL: Maintenance]
+- [ ] **Book Swedish passport biometrics in Malmö** *(Due: 2026-06-15)*
+  - **Notes:** Log in to polisen.se using Freja eID+ and book a passport appointment in Malmö (Rättscentrum/Fosie) or Lund to align with your August trip. SYS: DA:  [DEADLINE: 2026-06-15] | [DURATION: 30m] | [GOAL: Maintenance]
+- [ ] **Confirm Skatteverket name registration & get Personbevis** *(Due: 2026-07-15)*
+  - **Notes:** Follow up with Skatteverket (via Kivra/phone) to verify the marriage and name change are registered. Download your Personbevis register extract in your new name. SYS: DA:  [DEADLINE: 2026-07-15] | [DURATION: 30m] | [GOAL: Maintenance]
+- [ ] **Attend Swedish passport biometrics in Malmö** *(Due: 2026-08-15)*
+  - **Notes:** Bring original Swedish & British passports, naturalisation certificate, Tbilisi marriage certificate, and new Personbevis. Request delivery to Swedish Embassy in London. SYS: DA:  [DEADLINE: 2026-08-15] | [DURATION: 2h] | [GOAL: Maintenance]
+- [ ] **Collect new Swedish passport from London Embassy** *(Due: 2026-09-15)*
+  - **Notes:** Pick up your new passport at Paternoster House in London. Pay the 200 SEK collection fee. SYS: DA:  [DEADLINE: 2026-09-15] | [DURATION: 1h] | [GOAL: Maintenance]
+- [ ] **Apply for British passport name change (HMPO)** *(Due: 2026-10-01)*
+  - **Notes:** Apply online via GOV.UK. Mail your new Swedish passport (original), current British passport (original), marriage certificate, and naturalisation certificate to HMPO. SYS: DA:  [DEADLINE: 2026-10-01] | [DURATION: 1h] | [GOAL: Maintenance]
+- [ ] **Attend EMS session at Vive Fitness Westminster** *(Due: 2026-05-31)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e7372247a7d52b Context: 01 02 01 Physical Health > Medical Appointments & Tests Attend EMS session at Vive Fitness Westminster SYS: Calendar capacity is limited today; scheduled for Saturday as requested by deadline context. DA:  [DEADLINE: 2026-05-31] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-002]
+- [ ] **Research WhatsApp to Google Chat integration for wedding channel**
+  - **Notes:** SYS: DA:  [DEADLINE: 2099-12-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-026]
+- [ ] **Review Quantitative Sports Betting Firm: Comprehensive Goal Architecture** *(Due: 2026-05-29)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e69bac625a41d3 Context: 02 01 01 Quantum 21 > 03 Professional Growth Review Quantitative Sports Betting Firm: Comprehensive Goal Architecture document SYS: Prioritizing as requested for today's focus. DA:  [DEADLINE: 2026-05-29] | [DURATION: 2h] | [GOAL: 2026-Q2-004]
+- [ ] **Review PAYE tax code after first Quantum 21 payslip** *(Due: 2026-06-30)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e6761f72221a02 Context: 01 04 00 Finances > Tax Review PAYE tax code change on GOV.UK SYS: Acknowledged. Rescheduled for late June to align with your first payroll cycle at the new firm. DA: I have reviewed it. The temp one is good, but need to review when I get my first payslip from Quantum 21. Should move to late June / Early July.  [DEADLINE: 2026-06-30] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Review status of request POC-343839 (Payslips/P45)** *(Due: 2026-06-05)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e5ebadcd3cb69d Context: 02 01 99 Archive > 201911 Revolut Review status of request POC-343839 and provide requested information SYS: Acknowledged. Moved to this week as requested. Please ensure this is prioritized for your transition documentation requirements. DA: This is actually a critical task about payslips amnd p45 from my previous employeer. The 2019 tag comes from the fact that is when I joined. Move to prioriy task next week.  [DEADLINE: 2026-06-05] | [DURATION: 15m] | [GOAL: 2026-Q2-012]
+- [ ] **Track insurance claim dispute GB26CFAJ00108** *(Due: 2026-06-02)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e6e7eb2fbac00c Context: 01 04 00 Finances > Insurance Track status of insurance claim dispute GB26CFAJ00108 SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-02] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Drop off Stanley 1913 return at Royal Mail** *(Due: 2026-06-28)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e6fcf3bd394f78 Context: 01 04 01 Purchase Drop off Stanley 1913 return at Royal Mail SYS: This is a routine administrative task. It is scheduled for the end of June to align with your deadline. DA:  [DEADLINE: 2026-06-28] | [DURATION: 30m] | [GOAL: Maintenance]
+- [ ] **Review floral quote for 2027 wedding** *(Due: 2026-06-01)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e5f7bcc44b44d5 Context: 01 05 01 Projects > 2027 Wedding Review floral quote for 2027 wedding SYS: This task is scheduled for this week to ensure alignment with your 2027 wedding planning goal. DA:  [DEADLINE: 2026-06-01] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-022]
+- [ ] **Track order placement by Nataliya** *(Due: 2026-06-01)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e636ad9b30d96f Context: 02 01 01 Quantum 21 > 01 Professional Admin Track order placement by Nataliya SYS: Task is on the radar for this month as requested. No further action needed today. DA:  [DEADLINE: 2026-06-01] | [DURATION: 15m] | [GOAL: 2026-Q2-012]
+- [ ] **Review and sign the Music and Light service contract** *(Due: 2027-06-11)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e6b44569940960 Context: 01 05 01 Projects > 2027 Wedding Review and sign the Music and Light service contract SYS: Migrated to V6 structure. DA:  [DEADLINE: 2027-06-11] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-022]
+- [ ] **Evaluate and purchase Tractive GPS tracker for Dobby** *(Due: 2026-06-02)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e66736786f0099 Context: 01 05 02 Relationships Evaluate and purchase Tractive GPS tracker for Dobby SYS: This task aligns with maintaining important relationships (Dobby). I have scheduled it for this week. DA:  [DEADLINE: 2026-06-02] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Sign wedding music and light quote** *(Due: 2026-06-10)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e634a710c70e12 Context: 01 05 01 Projects > 2027 Wedding Review and sign the Music and Light quote for the wedding SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-10] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-022]
+- [ ] **Download final payslip and P45** *(Due: 2026-06-25)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e5df78481190bd Context: 01 04 00 Finances > Payslips Download final payslip and P45 from ADP portal SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-25] | [DURATION: 15m] | [GOAL: Maintenance]
+- [ ] **Review Pregnancy Screening Tests Guide** *(Due: 2026-06-01)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e364206afa8c47` `  Context: 01 02 01 Physical Health > 2026 Pregnancy. Review pregnancy screening tests guide.  SYS: Deadline updated to 2026-06-01 as requested. DA:  [DEADLINE: 2026-06-01] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-001]
+- [ ] **Track Revolut IT return materials** *(Due: 2026-05-31)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19d8b8621c46242f Context: 02 01 99 Archive > 201911 Revolut Track: Receive return materials and courier instructions from Revolut IT SYS: This is an administrative task related to your previous employment. I have scheduled it for this week to ensure you clear your obligations. DA:  [DEADLINE: 2026-05-31] | [DURATION: 30m] | [GOAL: Maintenance]
+- [ ] **Track early pregnancy scan** *(Due: 2026-06-03)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e44a129147bf1e Context: 01 02 01 Physical Health > 2026 Pregnancy Track: Attend early pregnancy scan SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-03] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-001]
+- [ ] **Decide on attendance for Farhad's 35th birthday**
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e41452b29d6cf2 Context: 01 05 02 Relationships Decide on attendance for Farhad's 35th birthday in Mykonos SYS: Moved to backlog per user instruction. DA:  [DEADLINE: 2099-12-31] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Engage with Temple of the Jedi Order**
+  - **Notes:** https://mail.google.com/mail/#all/18b925848d2d6279 Context: 01 05 03 Collections > Star Wars Engage with the Temple of the Jedi Order initiate program, including finding a sponsor. SYS: Moved to backlog per user instruction. DA:  [DEADLINE: 2099-12-31] | [DURATION: 15m] | [GOAL: Maintenance]
+- [ ] **Review calendar event for Pickle due date** *(Due: 2027-01-15)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e41c535f573780 Context: 01 05 02 Relationships > CMA Review calendar event for Pickle due date SYS: Migrated to V6 structure. DA:  [DEADLINE: 2027-01-15] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Review AI Gmail inbox features**
+  - **Notes:** https://mail.google.com/mail/#all/19ba323bf82194f2 Context: 01 05 01 Projects > AI Review new AI-powered Gmail inbox features, including natural language search. SYS: Moved to backlog per user instruction. DA:  [DEADLINE: 2099-12-31] | [DURATION: 15m] | [GOAL: Maintenance]
+- [ ] **Attend midwifery service appointment** *(Due: 2026-06-17)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e3a3bc9870d474 Context: 01 02 01 Physical Health > 2026 Pregnancy Attend Midwifery Service appointment SYS: This task is scheduled for June 17th. It is currently on the radar as a future commitment. DA:  [DEADLINE: 2026-06-17] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-001]
+- [ ] **Attend private early pregnancy scan** *(Due: 2026-06-03)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e3b3bc1fcf41e3 Context: 01 02 01 Physical Health > 2026 Pregnancy Attend private early pregnancy scan SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-03] | [DURATION: 2h] | [GOAL: 2026-MD-NEW-001]
+- [ ] **Submit income documentation to accountants** *(Due: 2026-08-24)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e3a300acd80b11 Context: 01 04 00 Finances > Tax Gather and submit P45/P60, crypto, and stock option income documentation to The Friendly Accountants SYS: This is a significant administrative task. I have scheduled it for this month to ensure you have time to gather the various documents. DA:  [DEADLINE: 2026-08-24] | [DURATION: 2h] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Attend obstetric ultrasound** *(Due: 2026-07-02)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e36c787dd7193e` `  Context: 01 02 01 Physical Health > 2026 Pregnancy. Attend obstetric ultrasound.  SYS: Deadline locked per your instruction. DA:  [DEADLINE: 2026-07-02] | [DURATION: 2h] | [GOAL: 2026-MD-NEW-001]
+- [ ] **Track Fin Taylor event attendance** *(Due: 2026-11-19)*
+  - **Notes:** https://mail.google.com/mail/u/0/#all/19e224f8db1745f8 Context: 01 04 01 Purchase > Passes & Tickets Track Fin Taylor event attendance SYS: Scheduled for November. DA:  [DEADLINE: 2026-11-19] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-045]
+- [ ] **Deep clean rental bedroom fixtures** *(Due: 2026-05-31)*
+  - **Notes:** https://docs.google.com/document/d/1xhsJuqnEIzD2HuU9TWve3qaHuDceL2Ocvlhqze2CqI8/edit?usp=drivesdk [Source: Nose/Nostril/Allergy Issues ] Wash drapes at 60°C or vacuum thoroughly with upholstery attachment; remove excess decorative cushions and throws. SYS: Scheduled for today to align with your end-of-month focus. DA:  [DEADLINE: 2026-05-31] | [DURATION: 2h] | [GOAL: 2026-MD-NEW-002]
+- [ ] **Install new HEPA vacuum filters** *(Due: 2026-05-31)*
+  - **Notes:** https://docs.google.com/document/d/1xhsJuqnEIzD2HuU9TWve3qaHuDceL2Ocvlhqze2CqI8/edit?usp=drivesdk [Source: Nose/Nostril/Allergy Issues ] Replace old filters before performing the next deep clean. SYS: Scheduled for today to align with your end-of-month focus. DA:  [DEADLINE: 2026-05-31] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-002]
+- [ ] **Purchase allergy-safe bedding and cleaning supplies** *(Due: 2026-05-31)*
+  - **Notes:** https://docs.google.com/document/d/1xhsJuqnEIzD2HuU9TWve3qaHuDceL2Ocvlhqze2CqI8/edit?usp=drivesdk [Source: Nose/Nostril/Allergy Issues ] Buy zip-up micro-pore pillow encasements (<6 microns), replacement HEPA vacuum filters, a certified HEPA air purifier, and microfibre cloths. SYS: Prioritizing for end of May as requested. Please confirm if this fits your current schedule today. DA:  [DEADLINE: 2026-05-31] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-002]
+- [ ] **Return company computer**
+  - **Notes:** https://mail.google.com/mail/#all/19d8bf7ccaa57e56 Context: 02 01 99 Archive > 201911 Revolut SYS: Acknowledged. Task moved to SCHEDULED_LATER pending receipt of packaging materials from Revolut. DA:  [DEADLINE: None] | [DURATION: 30m] | [GOAL: Maintenance]
+- [ ] **Review Advanced Protection Unenrollment**
+  - **Notes:** SYS: DA:  [DEADLINE: None] | [DURATION: 0m] | [GOAL: Maintenance]
+- [ ] **Add photographer meals to wedding budget** *(Due: 2026-06-25)*
+  - **Notes:** Ensure €100-200 is budgeted for Rellini Art Studio photographers' hot meals on the wedding day. SYS: DA:  [DEADLINE: 2026-06-25] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Request photographer meals from venue** *(Due: 2026-06-25)*
+  - **Notes:** Coordinate with Castello di San Ruffino to provide hot meals for the two photographers (Maurizio and Serena) on 09 October 2027. SYS: DA:  [DEADLINE: 2026-06-25] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Add Bookmark Management to the_system**
+  - **Notes:** SYS: Scheduled for this week. DA:  [DEADLINE: 2099-12-31] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-026]
+- [ ] **Create Wedding Project Plan** *(Due: 2026-06-01)*
+  - **Notes:** Context: 01 05 01 Projects > 2027 Wedding Create a project plan for the wedding. Sync with "Create Gem for Wedding Planning". SYS: Scheduling for this week to align with the Gem creation task. DA:  [DEADLINE: 2026-06-01] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-022]
+- [ ] **Build Antigravity Workspace for Finance and Tax** *(Due: 2026-06-30)*
+  - **Notes:** Convert Sterling into a dedicated Antigravity workspace workflow for safe tax operations. SYS: DA:  [DEADLINE: 2026-06-30] | [DURATION: 2h] | [GOAL: 2026-Q2-PRE-004]
+- [ ] **Purchase Luca Falloni 3/4 Zip (Tax-Free)**
+  - **Notes:** SYS: Task is marked for today to align with your schedule. DA:  [DEADLINE: 2099-12-31] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-046]
+- [ ] **Store Google Workspace password**
+  - **Notes:** SYS: DA:  [DEADLINE: 2099-12-31] | [DURATION: 5m] | [GOAL: Maintenance]
+- [ ] **Attend Therapy Session** *(Due: 2026-06-10)*
+  - **Notes:** Recurring therapy session SYS: Scheduled for June 10th as per calendar. DA:  [DEADLINE: 2026-06-10] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-001]
+- [ ] **Purchase Hermes Tie for Wedding** *(Due: 2026-06-03)*
+  - **Notes:** https://mail.google.com/mail/#all/19e07711152a156a SYS: Execution set to 20 May as requested. DA:  [DEADLINE: 2026-06-03] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Open UK Revolut Account for Carina**
+  - **Notes:** Context: 01 04 00 Finances > Banking SYS: Calendar capacity is sufficient for this lunch break task. DA:  [DEADLINE: 2099-12-31] | [DURATION: 30m] | [GOAL: 01 04 00 Finances]
+- [ ] **Migrate Reading List to Google Interests**
+  - **Notes:** Context: 01 01 01 Projects > AI SYS: Migrated to V6 structure. DA:  [DEADLINE: 2099-12-31] | [DURATION: 1h] | [GOAL: 01 03 00 Personal Growth]
+- [ ] **Create Gem for Business Idea**
+  - **Notes:** Context: 01 05 02 Relationships > CMA SYS: Aligning with AI EA development goals as requested. DA:  [DEADLINE: 2099-12-31] | [DURATION: 2h] | [GOAL: 01 03 00 Personal Growth]
+- [ ] **Re-evaluate HL SIPP Limit Ladders** *(Due: 2026-06-15)*
+  - **Notes:** Context: 01 04 00 Finances > Pension SYS: Financial review. DA:  [DEADLINE: 2026-06-15] | [DURATION: 1h] | [GOAL: 01 04 00 Finances]
+- [ ] **Repair Old Keyboard** *(Due: 2026-06-15)*
+  - **Notes:** Context: 01 05 01 Projects > Upgrade Office SYS: Scheduled for this week as requested. DA:  [DEADLINE: 2026-06-15] | [DURATION: 1h] | [GOAL: 01 03 00 Personal Growth]
+- [ ] **Attend Jake and Amir Live in London** *(Due: 2026-09-29)*
+  - **Notes:** SYS: DA:  [DEADLINE: 2026-09-29] | [DURATION: 3h] | [GOAL: 01 05 00 Other]
+- [ ] **Set up The_Clerk retro for files and Gmail**
+  - **Notes:** This is not an urgent / prioritiy task and should not be in the way of anything related to starting my new job SYS: DA:  [DEADLINE: 2099-12-31] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-026]
+- [ ] **Review Alisson 'My Story' series** *(Due: 2026-05-31)*
+  - **Notes:** Context: 01 05 03 Collections > Liverpool FC Review details for the new LFC original series 'Alisson: My Story'. SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-05-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-045]
+- [ ] **Check Gemini projects and notebook functionality** *(Due: 2026-06-15)*
+  - **Notes:** Context: 01 05 01 Projects > AI SYS: Scheduled for deep work block. DA:  [DEADLINE: 2026-06-15] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-023]
+- [ ] **Review Gemini UK personalization features**
+  - **Notes:** SYS: DA:  [DEADLINE: 2099-12-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-026]
+- [ ] **Investigate Google Drive Projects integration**
+  - **Notes:** Context: 01 01 01 Task Management > The System (TS) Investigate how to maximize Google Drive Projects for The_System (replacing shortcuts) and general project management (dynamic grounding for Ministry of Workflows). SYS: Migrated to V6 structure. DA:  [DEADLINE: 2099-12-31] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-026]
+- [ ] **Renew Amex Sync** *(Due: 2026-06-30)*
+  - **Notes:** Context: 01 04 00 Finances > Banking SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-30] | [DURATION: 15m] | [GOAL: Maintenance]
+- [ ] **Audit Final Revolut Payslip** *(Due: 2026-06-30)*
+  - **Notes:** Context: 01 04 00 Finances > Payslips SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-30] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Confirm Pension Contribution for Settlement** *(Due: 2026-06-30)*
+  - **Notes:** Context: 01 04 00 Finances > Pension SYS: Deadline respected. DA:  [DEADLINE: 2026-06-30] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-039]
+- [ ] **Mid-Year 2026 Financial Review** *(Due: 2026-06-30)*
+  - **Notes:** Context: 01 04 00 Finances > Budgeting & Planning SYS: Deadline respected. DA:  [DEADLINE: 2026-06-30] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Consolidate 2526 document pack for TFA** *(Due: 2026-06-30)*
+  - **Notes:** Context: 01 04 00 Finances > Tax SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-30] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-041]
+- [ ] **File Self Assessment** *(Due: 2026-06-15)*
+  - **Notes:** Context: 01 04 00 Finances > Tax SYS: Deadline respected. DA:  [DEADLINE: 2026-06-15] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Create Gem for Wedding Planning** *(Due: 2026-06-15)*
+  - **Notes:** Context: 01 05 01 Projects > 2027 W SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-15] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Save the date for the wedding weekend in Tuscany** *(Due: 2027-02-15)*
+  - **Notes:** Context: 01 05 01 Projects > 2027 Wedding. Reminder ~9 months out.  SYS: Generated per user instruction. DA:  [DEADLINE: 2027-02-15] | [DURATION: 5m] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Buy Peonies for Carina** *(Due: 2026-06-20)*
+  - **Notes:** Context: 01 05 02 Relationships > CMA.  SYS: Rescheduled to mid-June to space out gifts. DA:  [DEADLINE: 2026-06-20] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Review Chrome AI Skills and Gemini Mac App**
+  - **Notes:** Context: 01 05 01 Projects > AI.  SYS: Pushed to backlog pending UK availability. DA:  [DEADLINE: 2099-12-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-026]
+- [ ] **Track Event Cancellation Claim**
+  - **Notes:** Context: 01 04 00 Finances > Insurance.  SYS: Pushed to backlog as it is non-urgent. DA:  [DEADLINE: 2099-12-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Track Landlord Appliance Inspection** *(Due: 2026-06-05)*
+  - **Notes:** Context: 01 04 02 House > SW1V 4QE.  SYS: Pushed forward two weeks. DA:  [DEADLINE: 2026-06-05] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Attend Haircut Appointment** *(Due: 2026-06-27)*
+  - **Notes:** Context: 01 02 01 Physical Health.  SYS: DA:  [DEADLINE: 2026-06-27] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-002]
+- [ ] **Review Gemini Mac Agent File Organization**
+  - **Notes:** Context: 01 05 01 Projects > AI.  SYS: Pushed to backlog pending UK rollout. DA:  [DEADLINE: 2099-12-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-026]
+- [ ] **Review Google Photos backup settings**
+  - **Notes:** SYS: DA:  [DEADLINE: 2099-12-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-026]
+- [ ] **Review Carry's Tax Status** *(Due: 2026-06-30)*
+  - **Notes:** Context: 01 04 00 Finances > Tax SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-30] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Add CSN details to budget** *(Due: 2026-06-25)*
+  - **Notes:** Context: 01 04 00 Finances > Budgeting & Planning SYS: Processed migration to V6 structure. DA:  [DEADLINE: 2026-06-25] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Revisit Energy Tariff** *(Due: 2026-06-15)*
+  - **Notes:** Context: 01 04 02 House > SW1V 4QE SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-15] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Update and Document Storage Boxes** *(Due: 2026-06-15)*
+  - **Notes:** Context: 01 04 02 House SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-15] | [DURATION: 2h] | [GOAL: 2024-3-041A]
+- [ ] **Transfer £30k to HL SIPP** *(Due: 2027-02-01)*
+  - **Notes:** Context: 01 04 00 Finances > Pension Transfer £30k to HL SIPP for Annual Allowance utilization and asset consolidation. SYS: Confirmed for Feb 2027. DA:  [DEADLINE: 2027-02-01] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-039]
+- [ ] **Set up POP/IMAP for Carina** *(Due: 2026-06-15)*
+  - **Notes:** Context: 01 05 02 Relationships > CMA SYS: Scheduled as requested. DA:  [DEADLINE: 2026-06-15] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-043]
+- [ ] **Review Daniel's Tax Status** *(Due: 2026-06-30)*
+  - **Notes:** Context: 01 04 00 Finances > Tax SYS: Confirmed. Pushing to late June to avoid conflict with new job start date. DA:  [DEADLINE: 2026-06-30] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Review Budgeting Approach** *(Due: 2026-06-30)*
+  - **Notes:** Context: 01 04 00 Finances > Budgeting & Planning SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-30] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Add Tax Insurance to Budget** *(Due: 2026-06-25)*
+  - **Notes:** Context: 01 04 00 Finances > Budgeting & Planning SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-06-25] | [DURATION: 15m] | [GOAL: 2026-MD-NEW-041]
+- [ ] **Update Digital Signature** *(Due: 2027-01-01)*
+  - **Notes:** Context: 01 01 00 Personal Admin SYS: Processing as requested. DA:  [DEADLINE: 2027-01-01] | [DURATION: 30m] | [GOAL: Maintenance]
 
-## ToDo (01 04 00 Finances)
+## To be Deleted
 
-- [ ] **01 04 00 Finances > Banking > Open UK Revolut account for Carry** *(Due: 2026-06-01)*
-  - **Category:** 01 04 00 Finances > Banking
-- [ ] **01 04 00 Finances > Tax > File Self Assessment**
-  - **Category:** 01 04 00 Finances > Tax
-- [ ] **01 04 00 Finances > Budgeting & Planning > Review budget approach** *(Due: 2026-05-31)*
-  - **Notes:** [DEADLINE: 2026-05-03] | [DURATION: 1h] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Budgeting & Planning
-- [ ] **01 04 00 Finances > Pension > Re-evaluate HL SIPP limit ladders** *(Due: 2026-05-20)*
-  - **Notes:** [DEADLINE: 2026-05-19] | [DURATION: 45m] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Pension
-- [ ] **01 04 00 Finances > Set up £1.25-1.5k Direct Debit to HL SIPP** *(Due: 2026-06-01)*
-  - **Notes:** [DEADLINE: 2026-05-31] | [DURATION: 10m] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Pension
-
-## ToDo (01 05 01 2027 W)
-
-- [ ] **01 05 01 Projects > 2027 W > Schedule ring fitting and collection** *(Due: 2026-05-04)*
-  - **Notes:** Coordinate with Sam Hunter and Carry to schedule a fitting and collection appointment for the wedding band.  [DEADLINE: TBC] | [DURATION: 1h] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19dde77acda00886
-  - **Category:** 01 05 01 Projects > 2027 W
-
-## Backlog
-
-- [ ] **01 04 00 Finances > Tax > Consolidate 2526 document pack for TFA**
-  - **Category:** 01 04 00 Finances > Tax
-- [ ] **01 04 00 Finances > Tax > Review Carry's tax status** *(Due: 2026-11-29)*
-  - **Category:** 01 04 00 Finances > Tax
-- [ ] **01 04 00 Finances > Tax > Review Daniel's tax status** *(Due: 2026-11-29)*
-  - **Category:** 01 04 00 Finances > Tax
-- [ ] **01 04 00 Finances > Insurance > Evaluate Axa policy status after employment ends** *(Due: 2026-05-31)*
-  - **Category:** 01 04 00 Finances > Insurance
-- [ ] **01 01 01 Task Management > The System (TS) > Debug MacroDroid execution errors** *(Due: 2026-05-04)*
-  - **Category:** 01 01 01 Task Management
-- [ ] **01 05 01 Projects > Cooking > Review Villeroy & Boch sauce boat for kitchenware purchase**
-  - **Notes:** Review the Villeroy & Boch sauce boat link shared by Carina for potential kitchenware acquisition.  [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19dead5c17569bf3
-  - **Category:** 01 05 01 Projects > Cooking
-- [ ] **01 05 01 Projects > AI > Review First conversion context from Farhad Tatar**
-  - **Notes:** Review the context of the 'First conversion' mentioned by Farhad Tatar in the recent Telegram message.  [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19de98c2f6b3fb66
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 01 Projects > 202606 P&E > Review event details** *(Due: 2026-06-14)*
-  - **Notes:** Event details for Emilia & Pontus wedding celebration on June 13, 2026, in Falsterbo, Sweden.  [DEADLINE: 2026-06-13] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19bc84f3db6f6b80
-  - **Category:** 01 05 01 Projects > 202606 P&E
-- [ ] **01 04 01 Purchase > Receipts > Record Inside Success Union CIC receipt** *(Due: 2027-04-30)*
-  - **Notes:** Digital receipt for £50.00 from Inside Success Union CIC.  [DEADLINE: 2027-04-29] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19d9168137ce8e86
-  - **Category:** 01 04 01 Purchase > Receipts
-- [ ] **01 04 00 Finances > Pension > Transfer £30k refund to HL SIPP** *(Due: 2027-01-31)*
-  - **Notes:** Transfer £30k to HL SIPP for Annual Allowance utilization and asset consolidation.  [DEADLINE: 2027-01-31] | [DURATION: 15m] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Pension
-- [ ] **01 04 00 Finances > Budgeting & Planning > Add Google One back to subscriptions** *(Due: 2026-09-01)*
-  - **Notes:** Re-add Google One to personal finance subscription list.  [DEADLINE: 2026-08-31] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/#all/191c319e0f804868
-  - **Category:** 01 04 00 Finances > Budgeting & Planning
-- [ ] **01 05 01 Projects > 202608 M&N > Save Hotell Gässlingen booking details** *(Due: 2026-08-14)*
-  - **Notes:** Confirmed reservation for Hotell Gässlingen (14-16 Aug 2026).  [DEADLINE: 2026-08-13] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19cece5c762a6bf5
-  - **Category:** 01 05 01 Projects > 202608 M&N
-- [ ] **01 04 01 Purchase > Monitor Philips Sonicare repair status** *(Due: 2026-05-10)*
-  - **Notes:** Track repair progress with partner; note the 20-business-day turnaround time.  [DEADLINE: TBC] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19dc75b69bd20302  
-  - **Category:** 01 04 01 Purchase
-- [ ] **01 05 01 Projects > 2027 W > Review wedding florist pricing brochures**
-  - **Notes:** Evaluate pricing and consultation processes for the Castello di San Ruffino venue.  [DEADLINE: TBC] | [DURATION: 20m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19dddf8b0e2036a5  
-  - **Category:** 01 05 01 Projects > 2027 W
-- [ ] **02 02 00 Career Management > 202604 Deel > Monitor Deel careers page for future openings**
-  - **Notes:** Following the application rejection, periodically check the Deel careers page for new roles that align with strategic objectives.  [DEADLINE: None] | [DURATION: N/A] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19d76891150140a8  
-  - **Category:** 02 02 00 Career Management > 202604 Deel
-- [ ] **01 01 02 Contracts > Signature > Archive signed Mutual Separation Agreement**
-  - **Notes:** Download and archive the fully executed Mutual Separation Agreement for personal records.  [DEADLINE: None] | [DURATION: 5m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19d8ff2ca70b8b19
-  - **Category:** 01 01 02 Contracts > Signature
-- [ ] **01 05 01 Projects > AI > Review First conversion context from Farhad Tatar**
-  - **Notes:** Review the context of the 'First conversion' mentioned by Farhad Tatar in the recent Telegram message.  [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19de98c2f6b3fb66
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 01 Projects > Cooking > Review Villeroy & Boch sauce boat for kitchenware purchase**
-  - **Notes:** Review the Villeroy & Boch sauce boat link shared by Carina for potential kitchenware acquisition.  [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19dead5c17569bf3
-  - **Category:** 01 05 01 Projects > Cooking
-- [ ] **01 02 02 Mental Health > Learn 4-7-8 breathing technique**
-  - **Notes:** Adopt Dr. Andrew Weil's 4-7-8 deep breathing technique to reduce stress and improve sleep.  [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/#all/197df576b41cbd33
-  - **AI Context:** Explanation of the 4-7-8 breathing method for reducing stress and aiding sleep.
-  - **Category:** 01 02 02 Mental Health
-- [ ] **01 03 00 Personal Growth > Research 'A System for Power Napping'**
-  - **Notes:** Research power napping strategies and military sleep methods to improve daily energy and focus.  [DEADLINE: None] | [DURATION: 30m] | [GOAL: TBD]  https://mail.google.com/mail/#all/198b842934b84f08
-  - **AI Context:** Evidence-based power napping guide, including timing, consistency, and the Military Method for quick recharging.
-  - **Category:** 01 03 00 Personal Growth
-- [ ] **01 05 01 Projects > AI > Create prompt for pre-mortem analysis for projects**
-  - **Notes:** Insights on DeepSeek V4 models and tips for performing pre-mortem analysis on projects.  [DEADLINE: None] | [DURATION: 30m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19dcf0aa36207e4f
-  - **AI Context:** DeepSeek V4 release benchmarks and cost analysis, plus prompting instructions for multi-model comparison.
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 01 Projects > AI > Review Workspace Intelligence admin settings**
-  - **Notes:** Google Workspace Intelligence updates for Gemini grounding; new admin controls rollout April 22, 2026.  [DEADLINE: None] | [DURATION: 30m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19db817c365d590d
-  - **AI Context:** Introduction of Workspace Intelligence for real-time grounded AI answers in Docs/Gmail/Drive with new admin controls.
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 01 Projects > AI > Review AI Gmail inbox availability**
-  - **Notes:** Review new AI-powered Gmail inbox features, including natural language search.  [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19ba323bf82194f2
-  - **AI Context:** Gmail natural language search updates, Help Me Write and Suggested Replies now free, and Claude Code 2.1.0 upgrades.
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 01 Projects > AI > Review Chrome AI-powered Skills**
-  - **Notes:** Learn about the Gemini Mac app and Chrome's new AI-powered 'Skills' functionality.  [DEADLINE: None] | [DURATION: 30m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19d9666214cffaa1
-  - **AI Context:** Updates on Gemini's new Mac app, Chrome AI-powered Skills, and tools for agentic sales prospecting.
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 03 Collections > Liverpool FC > Review Jurgen Klopp interview**
-  - **Notes:** Review interview regarding Jurgen Klopp's new corporate role at Red Bull.  [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/#all/1999a16ce9135817
-  - **AI Context:** Interview discussing Jurgen Klopp's transition from coaching to his new role at Red Bull.
-  - **Category:** 01 05 03 Collections > Liverpool FC
-- [ ] **01 05 03 Collections > Star Wars > Engage with Temple of the Jedi Order**
-  - **Notes:** Engage with the Temple of the Jedi Order initiate program, including finding a sponsor.  [DEADLINE: None] | [DURATION: 1h] | [GOAL: TBD]  https://mail.google.com/mail/#all/18b925848d2d6279
-  - **AI Context:** Introduction to the Temple of the Jedi Order and sponsorship opportunities for the Initiate Program.
-  - **Category:** 01 05 03 Collections > Star Wars
-- [ ] **01 05 01 Projects > AI > Optimize Gemini API usage**
-  - **Notes:** Updates on Claude Opus 4.7 capabilities and Gemini API cost optimization strategies.  [DEADLINE: None] | [DURATION: 1h] | [GOAL: TBD]  https://mail.google.com/mail/#all/19d9bbfca1163c6d
-  - **AI Context:** Highlights Claude Opus 4.7 capabilities, agentic patterns for devs, and strategies to reduce API billing costs.
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 01 Projects > AI > Research Gemini multi-step task availability**
-  - **Notes:** Determine availability of Gemini's multi-step task features in the UK.  [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 03 00 Personal Growth > Study 'The Four Agreements'**
-  - **Notes:** Apply the principles of Don Miguel Ruiz's 'The Four Agreements' for personal self-mastery.  [DEADLINE: None] | [DURATION: 2h] | [GOAL: TBD]  https://mail.google.com/mail/#all/19a448afb543cdd4
-  - **AI Context:** Practical application of The Four Agreements for peace and self-mastery, with a quarterly integrity audit framework.
-  - **Category:** 01 03 00 Personal Growth
-- [ ] **01 03 00 Personal Growth > Review "A System for The Ideal Morning [Habit Mapping]**
-  - **Notes:** Implement System Sunday advice on morning habit mapping to improve productivity.  [DEADLINE: None] | [DURATION: 45m] | [GOAL: TBD]  https://mail.google.com/mail/#all/1996c573f45c1633
-  - **AI Context:** Guide on mapping the first hour of your day for success, including habit mapping, testing routines, and nightly preparation.
-  - **Category:** 01 03 00 Personal Growth
-- [ ] **01 05 03 Collections > Liverpool FC > Review Alisson 'My Story' series**
-  - **Notes:** Review details for the new LFC original series 'Alisson: My Story'.  [DEADLINE: None] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 05 03 Collections > Liverpool FC
-- [ ] **01 01 01 Task Management > The System (TS) > Research Google Drive projects functionality**
-  - **Notes:** [DEADLINE: None] | [DURATION: 45m] | [GOAL: TBD]  
-  - **Category:** 01 01 01 Task Management
-- [ ] **01 05 01 Projects > AI > Set up AI Executive Assistant** *(Due: 2026-04-27)*
-  - **Notes:** [DEADLINE: 2026-04-26] | [DURATION: 2h] | [GOAL: TBD]
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 01 Projects > AI > Check Gemini Projects and Notebook functionality** *(Due: 2026-05-18)*
-  - **Notes:** [DEADLINE: 2026-05-17] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 01 01 Task Management > The System (TS) > Establish Ministry of Gentlemanly Workflows** *(Due: 2026-05-18)*
-  - **Notes:** [DEADLINE: 2026-05-17] | [DURATION: 1h] | [GOAL: TBD]
-  - **Category:** 01 01 01 Task Management
-- [ ] **01 05 01 Projects > 2027 W > Create Gem for wedding planning** *(Due: 2026-05-31)*
-  - **Notes:** [DEADLINE: 2026-05-30] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 05 01 Projects > 2027 W
-- [ ] **01 04 00 Finances > Budgeting & Planning > Review for 2026**
-  - **Notes:** [DEADLINE: None] | [DURATION: 2h] | [GOAL: TBD]  
-  - **Category:** 01 04 00 Finances > Budgeting & Planning
-- [ ] **01 04 00 Finances > Budgeting & Planning > Add CSN**
-  - **Notes:** [DEADLINE: None] | [DURATION: 10m] | [GOAL: TBD]  
-  - **Category:** 01 04 00 Finances > Budgeting & Planning
-- [ ] **01 04 00 Finances > Budgeting & Planning > Add Tax Insurance**
-  - **Notes:** [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  
-  - **Category:** 01 04 00 Finances > Budgeting & Planning
-- [ ] **02 01 01 Quantum 21 > 03 Professional Growth**
-  - **Notes:** [DEADLINE: None] | [DURATION: 2h] | [GOAL: TBD]  
-  - **Category:** 02 01 01 Quantum 21 > 03 Professional Growth
-- [ ] **01 04 02 House > SW1V 4QE > Revisit energy tariff** *(Due: 2027-03-01)*
-  - **Notes:** [DEADLINE: 2027-03-01] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 04 02 House > SW1V 4QE
-- [ ] **01 01 00 Personal Admin > Update digital signature with new name** *(Due: 2026-09-30)*
-  - **Notes:** [DEADLINE: 2026-09-29] | [DURATION: 15m] | [GOAL: TBD]
-  - **Category:** 01 01 01 Task Management
-- [ ] **01 04 00 Finances > Banking > Renew Amex sync** *(Due: 2026-06-30)*
-  - **Notes:** [DEADLINE: None] | [DURATION: 5m] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Banking
-- [ ] **01 04 00 Finances > Pension > Confirm pension contribution for settlement payment** *(Due: 2026-06-30)*
-  - **Notes:** [DEADLINE: None] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Pension
-- [ ] **01 04 00 Finances > Budgeting & Planning > Evaluate Uber One subscription status** *(Due: 2026-09-01)*
-  - **Notes:** [DEADLINE: 2026-08-31] | [DURATION: 10m] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Budgeting & Planning
-- [ ] **01 03 02 Reflection > Perform 365-day annual reflection** *(Due: 2026-12-31)*
-  - **Notes:** [DEADLINE: 2026-12-31] | [DURATION: N/A] | [GOAL: TBD]
-  - **Category:** 01 03 02 Reflection
-- [ ] **01 04 02 House > Pay SBF housing queue fee** *(Due: 2026-09-01)*
-  - **Notes:** [DEADLINE: 2026-09-01] | [DURATION: N/A] | [GOAL: TBD]
-  - **Category:** 01 04 02 House
-- [ ] **01 04 00 Finances > Tax > Pause TFA contributions** *(Due: 2027-04-08)*
-  - **Notes:** [DEADLINE: 2027-04-08] | [DURATION: N/A] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Tax
-- [ ] **01 04 00 Finances > Budgeting & Planning > Pay CSN bill** *(Due: 2027-01-28)*
-  - **Notes:** [DEADLINE: 2027-01-28] | [DURATION: N/A] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Budgeting & Planning
-- [ ] **01 04 00 Finances > Investing > Refill rent pocket from ex-gratia funds** *(Due: 2026-06-15)*
-  - **Notes:** [DEADLINE: 2026-06-14] | [DURATION: 5m] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Investing
-- [ ] **01 04 00 Finances > Payslips > Audit final Revolut payslip** *(Due: 2026-06-30)*
-  - **Notes:** [DEADLINE: 2026-06-29] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Payslips
-- [ ] **01 04 00 Finances > Pension > Initiate Aviva to HL SIPP transfer** *(Due: 2026-07-01)*
-  - **Notes:** [DEADLINE: 2026-06-30] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Pension
-- [ ] **01 01 01 Task Management > The System (TS) > Draft second brain capture methodology**
-  - **Notes:** [DEADLINE: None] | [DURATION: N/A] | [GOAL: TBD]  
-  - **Category:** 01 01 01 Task Management > The System (TS)
-- [ ] **01 04 01 Purchase > Ship MacBook Air for Apple trade-in**
-  - **Notes:** [DEADLINE: None] | [DURATION: 45m] | [GOAL: TBD]
-  - **Category:** 01 04 01 Purchase
-- [ ] **01 01 01 Task Management > The System (TS) > Research Google Drive projects functionality**
-  - **Notes:** [DEADLINE: None] | [DURATION: 45m] | [GOAL: TBD]  
-  - **Category:** 01 01 01 Task Management > The System (TS)
-- [ ] **01 01 01 Task Management > The System (TS) > Draft second brain capture methodology**
-  - **Notes:** [DEADLINE: None] | [DURATION: N/A] | [GOAL: TBD]  
-  - **Category:** 01 01 01 Task Management > The System (TS)
-- [ ] **01 04 01 Purchase > Ship MacBook Air for Apple trade-in**
-  - **Notes:** [DEADLINE: None] | [DURATION: 45m] | [GOAL: TBD]
-  - **Category:** 01 04 01 Purchase
-- [ ] **02 02 00 Career Management > 202603 OLIX > Check in**
-  - **Notes:** [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19c6c8e894179630
-  - **Category:** 02 02 00 Career Management > 202603 OLIX
-- [ ] **01 04 01 Purchase > Register Ninja Grill**
-  - **Notes:** [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]
-  - **Category:** 01 04 01 Purchase
-- [ ] **01 05 01 Projects > AI > Deploy cloud server for 24/7 Python scripts**
-  - **Notes:** [DEADLINE: None] | [DURATION: 1h 30m] | [GOAL: TBD]
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 02 Relationships > CMA > Create Gem for business idea**
-  - **Notes:** [DEADLINE: None] | [DURATION: 30m] | [GOAL: TBD]
-  - **Category:** 01 05 02 Relationships > CMA
-- [ ] **01 05 01 Projects > AI > Migrate reading list to Google Interests**
-  - **Notes:** [DEADLINE: None] | [DURATION: 1h] | [GOAL: TBD]
-  - **Category:** 01 05 01 Projects > AI
-- [ ] **01 05 01 Projects > 2027 W > Track wedding florist responses**
-  - **Notes:** Monitor responses from Mrs. Pizzi and Atipicio Fiori regarding availability for October 2027.  [DEADLINE: TBC] | [DURATION: 10m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19dddf8b0e2036a5
-  - **AI Context:** Monitor florist responses for October 2027 wedding.
-  - **Category:** 01 05 01 Projects > 2027 W
-- [ ] **01 05 00 Other > Waymo**
-  - **Notes:** https://mail.google.com/mail/#all/19a0a5b26f1271f6  [DEADLINE: None] | [DURATION: 30m] | [GOAL: TBD]  Stay updated on Waymo autonomous driving news, service areas, and tech developments.
-  - **AI Context:** Marketing communication regarding Waymo autonomous ride-hailing availability in Phoenix, San Francisco, and Los Angeles.
-  - **Category:** 01 05 00 Other
-- [ ] **01 05 01 Projects > Upgrade Office > Charge WaterRower battery**
-  - **Notes:** [
-  - **Category:** 01 05 01 Projects > Upgrade Office
-- [ ] **01 01 01 Task Management > The System (TS) > Set up Gems with instructions in MD files** *(Due: 2026-05-04)*
-  - **Category:** 01 01 01 Task Management > The System (TS)
-
-## Recurring
-
-- [ ] **01 03 02 Reflection > Perform daily review** *(Due: 2026-05-04)*
-  - **Category:** 01 03 02 Reflection
-- [ ] **01 03 02 Reflection > Perform 90-day review** *(Due: 2026-05-03)*
-  - **Category:** 01 03 02 Reflection
-- [ ] **01 01 01 Task Management > Perform daily review** *(Due: 2026-05-04)*
-  - **Category:** 01 01 01 Task Management
-- [ ] **01 03 02 Reflection > Perform 365-day annual reflection** *(Due: 2027-12-31)*
-  - **Category:** 01 03 02 Reflection
-- [ ] **01 04 02 House > Pay SBF housing queue fee** *(Due: 2027-09-01)*
-  - **Category:** 01 04 02 House
-- [ ] **01 04 00 Finances > Tax > Pause TFA contributions** *(Due: 2028-04-08)*
-  - **Category:** 01 04 00 Finances > Tax
-- [ ] **01 04 00 Finances > Budgeting & Planning > Pay CSN bill** *(Due: 2028-01-28)*
-  - **Category:** 01 04 00 Finances > Budgeting & Planning
-- [ ] **01 04 00 Finances > Banking > Pay Amex UK credit card bill** *(Due: 2026-05-07)*
-  - **Notes:** [DEADLINE: 2026-05-07] | [DURATION: N/A] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Banking
-- [ ] **01 04 00 Finances > Tax > Pay TFA tax bill** *(Due: 2026-05-08)*
-  - **Notes:** [DEADLINE: 2026-05-08] | [DURATION: N/A] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Tax
-- [ ] **01 04 00 Finances > Budgeting & Planning > Review monthly finances** *(Due: 2026-06-01)*
-  - **Notes:** [DEADLINE: 2026-06-01] | [DURATION: N/A] | [GOAL: TBD]
-  - **Category:** 01 04 00 Finances > Budgeting & Planning
-- [ ] **01 01 01 Task Management > The System (TS) > Monthly Review of Backlog** *(Due: 2026-05-04)*
-  - **Notes:** [DEADLINE: 2026-05-02] | [DURATION: 1h] | [GOAL: TBD]
-  - **Category:** 01 01 01 Task Management > The System (TS)
-- [ ] **01 01 01 TM > Weekly Review** *(Due: 2026-05-10)*
-  - **Category:** 01 01 01 Task Management
-- [ ] **01 03 02 Reflection > Perform 14-day review** *(Due: 2026-05-20)*
-  - **Notes:** [[[
-  - **Category:** 01 03 02 Reflection
-
-## 99 To be Deleted
-
-- [ ] **01 05 03 Collections > Newsletters > Read Lessons Learned Journal newsletter**
-  - **Notes:** Read Ben Meer's System Sunday newsletter on the Lessons Learned Journal framework.  [DEADLINE: None] | [DURATION: 15m] | [GOAL: TBD]  https://mail.google.com/mail/u/0/#all/19da5d7c57b8fbc2
-  - **Category:** 01 05 03 Collections > Newsletters
-- [ ] **02 03 00 Collections > Review Revolut People's content** *(Due: 2026-05-18)*
-  - **Notes:** [DEADLINE: 2026-05-17] | [DURATION: 30m] | [GOAL: TBD]  https://mail.google.com/mail/#all/19dd2e917b9996ee
-  - **AI Context:** Content from Revolut People newsletter.
-  - **Category:** 02 03 00 Collections
+- [ ] **Pay outstanding medical excess**
+  - **Notes:** https://docs.google.com/document/d/1RZWAliL-v9LnIm7uoTU9AiL1zF29TsH-x1BIWS-kBWM/edit?usp=drivesdk [Source: Health - 202605 AXA Health Policy Continuation] Settle £100.00 excess shortfall to Alusi Ent Ltd for consultation with Prof. Ghassan Alusi (Invoice Ref: GA97726344959Y).
+- [ ] **Update on claim GB26CFAJ00108**
+  - **Notes:** https://mail.google.com/mail/#all/19e707d696e22209 --- Attached Links --- Update on your claim GB26CFAJ00108 with Qover:  SYS: Duplicate of task amVzbFBDcXpyOTRmbVA1Sw. DA:  [DEADLINE: None] | [DURATION: 0m] | [GOAL: Maintenance]

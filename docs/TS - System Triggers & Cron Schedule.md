@@ -2,61 +2,76 @@
 
 This document outlines the automated trigger schedule for the Life Organisation System (LOS). Because Google Apps Script has a strict 6-minute execution limit per function and shared rate limits for the Gemini API, functions are decoupled and spaced out to prevent collision and lag.
 
-## Active Automated Pipelines
+## Active Automated Pipelines (Ministry of Workflows)
 
 ### 1. The Ingestion Layer (The Clerk)
 *   **Email Triage (Ongoing) (`runTheClerkEmailOngoing`)**
     *   **Schedule:** Every 10 Minutes
     *   **Purpose:** Ingests new emails from the Inbox, queries Gemini, assigns labels, and writes to the Execution Log.
-    *   **Collision Risk:** High (Hits Gmail API and Gemini API). It has built-in batching and a `PROCESS_LIMIT` to prevent timeouts.
 
 *   **Drive Triage (Ongoing) (`runTheClerkDriveOngoing`)**
     *   **Schedule:** Every 1 Minute
     *   **Purpose:** Ingests loose files from the root of Google Drive, queries Gemini, moves them to the L4 Context folder, and writes to the Execution Log.
-    *   **Collision Risk:** Low. The maximum batch size is very small (1-5 files) to ensure fast, real-time sorting.
 
-*   **Drive Triage (Retro) (`runTheClerkDriveRetro`)**
-    *   **Schedule:** Every 2 Hours
-    *   **Purpose:** Slowly works through the historical Drive backlog, processing files in older Archive/Retro folders and moving them to the 'Retro Review' folder or routing them correctly.
-    *   **Collision Risk:** Low (spaced out to avoid Gemini API limits).
+*   *(PAUSED)* **Drive Triage (Retro) (`runTheClerkDriveRetro`)**
+    *   *Currently paused pending review of batch scripts.*
 
 ### 2. The Execution Layer (Task Master)
 *   **Task Execution Pipeline (`runTaskExecutionPipeline`)**
     *   **Schedule:** Every 15 Minutes
-    *   **Purpose:** Reads the Execution Log for newly extracted `actionItems`, harmonizes/deduplicates them, and pushes them to Google Tasks with encoded metadata.
-    *   **Collision Risk:** Low. Only reads from the spreadsheet and writes to the Google Tasks API.
+    *   **Purpose:** Reads the Execution Log for newly extracted action items and pushes them to Google Tasks.
 
 *   **Task Metadata Export (`extractTasksWithConversationDetails`)**
     *   **Schedule:** Every 15 Minutes
-    *   **Purpose:** Reads Google Tasks, extracts metadata/AI summaries for new tasks, and exports them to the Master Spreadsheet for manual review.
-    *   **Collision Risk:** Low. Uses delta-syncing (`existingTaskMap`) to only query Gemini for newly created tasks.
+    *   **Purpose:** Reads Google Tasks, extracts metadata/AI summaries, and exports them to the Master Spreadsheet.
 
 *   **Task Revisions Sync (`syncRevisionsToTasks`)**
     *   **Schedule:** Every 15 Minutes
     *   **Purpose:** Pushes manual "Revised" edits made in the Master Spreadsheet back to Google Tasks.
-    *   **Collision Risk:** Low. Staggered alongside other 15-minute cron jobs.
 
-*   **Task Master Engine (`runTaskMasterEngine`)**
+*   **Task Master Engine (Micro-Batch Polisher) (`runTaskMasterEngine`)**
+    *   **Schedule:** Every 15 Minutes
+    *   **Purpose:** Uses Delta-Sync to detect new/modified tasks. Routes them via Gemini for immediate categorization and deadline assignment.
+
+### 3. Review & Reflection Wrappers (Task Master)
+*These wrappers trigger every 1 hour to check the clock, but only consume Gemini tokens at the precise configured times:*
+*   **1-Day Priority Overview (`hourlyReviewTriggerWrapper`)**
+    *   **Execution Time:** Every day at 08:00, 12:00, 16:00, and 20:00.
+    *   **Purpose:** Generates the '1 Day Execution Plan.md' Priority Dashboard.
+*   **7-Day Weekly Roadmap (`weeklyReviewTriggerWrapper`)**
+    *   **Execution Time:** Every Sunday at 18:00.
+    *   **Purpose:** Sweeps backlog and aligns with 7-day calendar capacity.
+*   **28-Day Strategic Pruning (`monthlyReviewTriggerWrapper`)**
+    *   **Execution Time:** Every 28 days (starting May 10, 2026) at 18:00.
+    *   **Purpose:** Prunes the backlog and aligns tasks with overarching goals.
+*   **84-Day Quarterly Reflection (`quarterlyReviewTriggerWrapper`)**
+    *   **Execution Time:** Every 84 days (starting May 10, 2026) at 18:00.
+    *   **Purpose:** Generates a macro-trajectory and goal alignment report.
+
+### 4. Daily Reference Syncs (System Architect)
+*   **Schedule:** Every Day at 02:00 AM
+    *   `updateModelList()`: Exports active Gemini Models to Google Drive JSON and Sheets.
+    *   `updateLabelList()`: Exports Gmail Labels to Google Drive JSON and Sheets.
+    *   `updateTaskList()`: Exports Google Task List IDs to Google Drive JSON.
+    *   `syncTaxonomyToSheet()`: Rebuilds the LOS_Taxonomy JSON and updates the Master Spreadsheet from the markdown file.
+    *   `exportTriageTasksToDrive()`: Exports tasks with missing metadata or placeholder goals to a JSON file for agent analysis.
+
+## Active Automated Pipelines (Reflection Workspace)
+
+*   **Vantage Reflection AI (`runDailyMaintenance`)**
     *   **Schedule:** Every 1 Hour
-    *   **Purpose:** Reads the current Tasks backlog, evaluates 30-day Calendar capacity, cross-references Personal & Work goals, updates stale task deadlines, quarantines junk to the 'Trash' list, and regenerates the Markdown Priority One-Pager in the workspace.
-    *   **Collision Risk:** Low. Runs on an isolated hourly cadence.
-
-### 3. The Maintenance Layer (System Architect)
-*   **Manual Revisions Sync (`applyManualRevisionsEmail` & `applyManualRevisionsDrive`)**
-    *   **Schedule:** Every 1 Hour (Staggered or sequential based on triggers)
-    *   **Purpose:** Sweeps the Execution Log for any manual changes you made to "Revised Name" or "Revised Path" and executes those changes retroactively on the Email labels and Drive files.
+    *   **Purpose:** Re-generates the daily Vantage Log reflecting on system outputs and daily habits.
+*   **Export Goals (`exportAllGoalsToMD`)**
+    *   **Schedule:** Every Day at 02:00 AM
+    *   **Purpose:** Exports active Goals, Methods, and Habits to markdown files for agent context.
+*   **Export Reflections (`exportRecentReflectionsToMD`)**
+    *   **Schedule:** Every Day at 02:00 AM
+    *   **Purpose:** Compiles the last 90 days of reflections into a markdown repository.
 
 ---
 
 ## Manual Scripts (Run On-Demand)
-These scripts are computationally heavy and should only be run manually by the System Architect.
-*   **`syncTaxonomyToSheet()`:** Run whenever you update `TS - Categorisation.md`. Rebuilds the core JSON brain.
+These scripts are computationally heavy or require human oversight and are executed manually:
+*   **`applyManualRevisionsEmail` & `applyManualRevisionsDrive`:** Re-labels or moves files based on manual spreadsheet corrections.
 *   **`syncDriveFoldersFromTaxonomy()`:** Run after updating the taxonomy to ensure Drive folders exist.
 *   **`runTheClerkRetro()` / `runTheClerkArchive()`:** Slow-burn historical backfills.
-*   **`cleanLabelsFromSheetUrls()`:** Emergency utility to reset a batch of emails.
-
----
-
-## Future Pipelines (Pending Build)
-*   *(D.9)* **Hard Delete Sweeper:** Every Sunday at 02:00 (Empties the '99 To be deleted' label).
-*   *(D.11)* **Unsubscribe Pipeline:** Every Day at 03:00 (Executes HTTP unsubs).

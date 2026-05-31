@@ -18,17 +18,17 @@ To integrate a backlog into your workflow, start by following these 5 steps:
 
 To effectively manage your tasks, start by creating a comprehensive list of all your responsibilities, both urgent and non-urgent. This list is called a backlog and serves as a centralized repository for all your tasks, ensuring nothing gets forgotten. It's recommended that you have a digital backlog instead of using post-it notes or handwritten documents since it's easier to move tasks around based on changing priorities. One of the best tools to integrate a backlog with your calendar is Sunsama. If you already have an online to-do list, you can look for ways to integrate it with your calendar and your backlog to make it easier to implement. To keep things organized, your system should allow you to prioritize your tasks by moving what's most important and urgent at the top of the list and leave non-urgent or "desired" tasks for later.
 
-### **2\) Weekly Planning Ritual** 
+### **2\) 7 Day Planning Ritual** 
 
 Dedicate a specific time each week to review and plan your upcoming week. During this planning ritual, revisit your backlog and strategically select non-urgent tasks to integrate into your schedule. This proactive approach allows you to allocate time deliberately and prevents tasks from accumulating. 
 
-### **3\) Daily Planning Ritual** 
+### **3\) 1 Day Planning Ritual** 
 
 It's important to set achievable goals for each day by dedicating 15 minutes the night before or at the beginning of the day to select the "urgent and important" tasks from your backlog that you will do that day. Estimate the time needed to accomplish each task and evaluate if the workload is realistic or if you need to move some tasks to the following day. Then, timebox them into your calendar. Make sure you accommodate the more urgent tasks first in the day. The key is to only see on your calendar the specific tasks you plan to get done that day and at what time you want to do them to help you stay focused while you are executing. 
 
 ### **4\) Timeboxing Non-Urgent Tasks** 
 
-To make progress on non-urgent tasks from your backlog, incorporate time blocking into your weekly schedule. Allocate specific time slots for these activities to prevent them from lingering indefinitely. You can also follow the 2-minute rule, which involves assigning half to one hour every day for tasks that can be completed in 2 minutes. Instead of spreading them across your calendar and keeping your backlog full, wait to do them all at once. This will help you manage your tasks and increase productivity. 
+To make progress on non-urgent tasks from your backlog, incorporate time blocking into your 7 day schedule. Allocate specific time slots for these activities to prevent them from lingering indefinitely. You can also follow the 2-minute rule, which involves assigning half to one hour every day for tasks that can be completed in 2 minutes. Instead of spreading them across your calendar and keeping your backlog full, wait to do them all at once. This will help you manage your tasks and increase productivity. 
 
 ### **5\) Delegating Non-Important tasks** 
 
@@ -36,4 +36,4 @@ Consider reviewing your backlog to identify any tasks that can be delegated to y
 
 \_\_\_
 
-While to-do lists serve a crucial purpose in managing immediate tasks, backlogs offer a more strategic and comprehensive approach to work management. By embracing the power of a backlog together with timeboxing, you can enhance their ability to plan for the long term, prioritize effectively, and reduce the daily stress and frustrations of getting things done. 
+While to-do lists serve a crucial purpose in managing immediate tasks, backlogs offer a more strategic and comprehensive approach to work management. By embracing the power of a backlog together with timeboxing, you can enhance their ability to plan for the long term, prioritize effectively, and reduce the 1 day stress and frustrations of getting things done. 

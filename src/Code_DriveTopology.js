@@ -99,6 +99,8 @@ function traverseAndLog(parentFolder, depth, currentPath, outputData) {
     while (subfolders.hasNext()) {
       const folder = subfolders.next();
       const folderName = folder.getName();
+      if (shouldIgnoreFolder(folderName)) continue;
+
       const absolutePath = `${currentPath}/${folderName}`;
       const prefix = "│   ".repeat(depth - 1) + "├── ";
 
@@ -192,6 +194,7 @@ function traverseAndReset(parentFolder, outputData) {
 
     while (subfolders.hasNext()) {
       const folder = subfolders.next();
+      if (shouldIgnoreFolder(folder.getName())) continue;
       traverseAndReset(folder, outputData);
       checkAndRename(folder, outputData);
     }
@@ -293,10 +296,16 @@ function syncDriveFoldersFromTaxonomy() {
         const currentFolder = DriveApp.getFolderById(currentFolderId);
         const folders = currentFolder.getFoldersByName(part);
 
-        let nextFolder;
-        if (folders.hasNext()) {
-          nextFolder = folders.next();
-        } else {
+        let nextFolder = null;
+        while (folders.hasNext()) {
+          const f = folders.next();
+          if (!f.isTrashed()) {
+            nextFolder = f;
+            break;
+          }
+        }
+
+        if (!nextFolder) {
           nextFolder = currentFolder.createFolder(part);
           createdFolders.push(currentPathStr);
           console.log(`[ACTION] Created new directory: ${part} at ${currentPathStr}`);
@@ -410,4 +419,71 @@ function findRecentlyCreatedFolders() {
       console.error(`Fallback scan failed: ${innerError.message}`);
     }
   }
+}
+
+/**
+ * Resolves an exact Drive folder from a taxonomy Concat (Path) string.
+ * @param {string} concatPath - The AI output path (e.g. "01 01 02 Contracts > Signature")
+ * @param {Array<Object>} taxonomy - The parsed LOS_Taxonomy.json array
+ * @returns {GoogleAppsScript.Drive.Folder|null} - The target folder, or null if not found
+ */
+function resolveFolderFromTaxonomy(concatPath, taxonomy) {
+  if (!concatPath || concatPath === "Unknown" || !taxonomy || !Array.isArray(taxonomy)) return null;
+
+  // Find the exact matching taxonomy item
+  const item = taxonomy.find(t => t["Concat (Path)"] === concatPath);
+  if (!item) {
+    console.warn("Taxonomy mapping not found for path: " + concatPath);
+    return null;
+  }
+
+  // Construct the exact folder hierarchy
+  const folderNames = [];
+  if (item["L1 Code"]) folderNames.push(`${item["L1 Code"]} ${item["L1 Name"] ? item["L1 Name"].trim() : ""}`.trim());
+  if (item["L2 Code"]) folderNames.push(`${item["L2 Code"]} ${item["L2 Name"] ? item["L2 Name"].trim() : ""}`.trim());
+  if (item["L3 Code"]) folderNames.push(`${item["L3 Code"]} ${item["L3 Name"] ? item["L3 Name"].trim() : ""}`.trim());
+  if (item["L4 Name"]) folderNames.push(item["L4 Name"].trim());
+
+  if (folderNames.length === 0) return null;
+
+  // Traverse down from the root
+  let currentFolder = DriveApp.getRootFolder();
+  for (let i = 0; i < folderNames.length; i++) {
+    const part = folderNames[i];
+    if (!part) continue;
+
+    const subfolders = currentFolder.getFoldersByName(part);
+    let found = false;
+    while (subfolders.hasNext()) {
+      const f = subfolders.next();
+      if (!f.isTrashed()) {
+        currentFolder = f;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      console.warn(`Traverse failed: Could not find active folder '${part}' inside '${currentFolder.getName()}'`);
+      return null;
+    }
+  }
+
+  return currentFolder;
+}
+
+/**
+ * Checks if a folder name should be ignored during mapping and resets.
+ * Excludes hidden folders (starting with '.') and build/dependency folders.
+ * @param {string} folderName - The folder name to evaluate.
+ * @returns {boolean} - True if the folder should be ignored, false otherwise.
+ */
+function shouldIgnoreFolder(folderName) {
+  if (!folderName) return true;
+  const lower = folderName.toLowerCase();
+  return (
+    folderName.startsWith(".") ||
+    lower === "node_modules" ||
+    lower === "tempmediastorage" ||
+    lower === "ingestion"
+  );
 }

@@ -10,6 +10,20 @@
  * - 1.0.0: Initial creation from split of Code_Utilities.js. Added standardized documentation header, JSDoc descriptions for all functions, aggressive type checking, and error boundaries.
  */
 
+let _cachedMasterSheet = null;
+
+/**
+ * Retrieves the Master Spreadsheet. Caches the result to prevent redundant API calls
+ * during a single execution context.
+ * @returns {GoogleAppsScript.Spreadsheet.Spreadsheet}
+ */
+function getMasterSpreadsheet() {
+  if (!_cachedMasterSheet) {
+    _cachedMasterSheet = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+  }
+  return _cachedMasterSheet;
+}
+
 /**
  * Programmatically clears all existing triggers and provisions the master schedule.
  * Run this function once from the Apps Script editor to lock in the automated pipelines.
@@ -36,52 +50,127 @@ function setupSystemTriggers() {
       .everyMinutes(1)
       .create();
 
-    // 3. Task Execution Pipeline (Harmonizer) - Every 15 Minutes
-    ScriptApp.newTrigger("runTaskExecutionPipeline")
+    // 3a. The Clerk (Notes Engine) - Every 15 Minutes
+    ScriptApp.newTrigger("runTheClerkNotes")
       .timeBased()
       .everyMinutes(15)
       .create();
 
-    // 3b. Bi-Directional Task Export - Every 15 Minutes
+    // 3b. Bi-Directional Task Export - Daily Backup
     ScriptApp.newTrigger("extractTasksWithConversationDetails")
       .timeBased()
-      .everyMinutes(15)
+      .everyDays(1)
+      .atHour(3)
       .create();
 
-    // 3c. Bi-Directional Task Import (Spreadsheet to Tasks) - Every 15 Minutes
+    // 3c. Bi-Directional Task Import (Spreadsheet to Tasks) - Daily
     ScriptApp.newTrigger("syncRevisionsToTasks")
       .timeBased()
+      .everyDays(1)
+      .atHour(3)
+      .create();
+
+    // 4a. Task Master Engine (Micro-Batch Polisher) - Every 15 Minutes
+    ScriptApp.newTrigger("runTaskMasterEngine")
+      .timeBased()
       .everyMinutes(15)
       .create();
 
-    // 4. Task Master Engine (D.5-D.7) - Every 1 Hour
-    ScriptApp.newTrigger("runTaskMasterEngine")
+    // 4b. Hourly Review (Time-Gated Wrapper) - Every 1 Hour
+    ScriptApp.newTrigger("hourlyReviewTriggerWrapper")
       .timeBased()
       .everyHours(1)
       .create();
 
-    // 4. Manual Revisions Sync (Email) - Every 1 Hour
-    ScriptApp.newTrigger("applyManualRevisionsEmail")
+    // 4c. Weekly Review (Time-Gated Wrapper) - Every 1 Hour (internal logic restricts it to Sun 18:00)
+    ScriptApp.newTrigger("weeklyReviewTriggerWrapper")
       .timeBased()
       .everyHours(1)
       .create();
 
-    // 5. Manual Revisions Sync (Drive) - Every 1 Hour
-    ScriptApp.newTrigger("applyManualRevisionsDrive")
+    // 4d. Monthly 28-Day Review (Time-Gated Wrapper) - Every 1 Hour (internal logic restricts it to every 28 days starting May 10, 2026 at 18:00)
+    ScriptApp.newTrigger("monthlyReviewTriggerWrapper")
       .timeBased()
       .everyHours(1)
       .create();
 
-    // 6. The Clerk (Drive Retro) - Every 2 Hours (Slow Burn)
-    ScriptApp.newTrigger("runTheClerkDriveRetro")
+    // 4e. Quarterly 84-Day Review (Time-Gated Wrapper) - Every 1 Hour (internal logic restricts it to every 84 days starting May 10, 2026 at 18:00)
+    ScriptApp.newTrigger("quarterlyReviewTriggerWrapper")
       .timeBased()
-      .everyHours(2)
+      .everyHours(1)
+      .create();
+
+    // 6. The Clerk (Drive Retro) - PAUSED pending script review
+    // ScriptApp.newTrigger("runTheClerkDriveRetro")
+    //  .timeBased()
+    //  .everyHours(2)
+    //  .create();
+
+    // 7. Daily Reference Data Syncs - Every 1 Day (approx midnight)
+    ScriptApp.newTrigger("updateModelList")
+      .timeBased()
+      .everyDays(1)
+      .atHour(2)
+      .create();
+
+    ScriptApp.newTrigger("updateLabelList")
+      .timeBased()
+      .everyDays(1)
+      .atHour(2)
+      .create();
+
+    ScriptApp.newTrigger("updateTaskList")
+      .timeBased()
+      .everyDays(1)
+      .atHour(2)
+      .create();
+
+    ScriptApp.newTrigger("syncTaxonomyToSheet")
+      .timeBased()
+      .everyDays(1)
+      .atHour(2)
+      .create();
+
+    ScriptApp.newTrigger("exportTriageTasksToDrive")
+      .timeBased()
+      .everyDays(1)
+      .atHour(2)
+      .create();
+
+    // 8. Completed Tasks Maintenance & Log Sync
+    ScriptApp.newTrigger("run1DayTaskMaintenance")
+      .timeBased()
+      .everyDays(1)
+      .atHour(1)
       .create();
 
     console.log("SUCCESS: All system triggers have been provisioned according to the master schedule.");
   } catch (e) {
     console.error(`setupSystemTriggers failed: ${e.message}`);
   }
+}
+
+/**
+ * Determines the best Gemini model to use based on the estimated token count of the payload.
+ * Provides a fallback to the 2M context model (1.5 Pro) if the 1M reasoning flagship (3.1 Pro) is insufficient.
+ * @param {string} payloadStr - The stringified payload to analyze.
+ * @param {string} [preferredModel] - The default model if tokens < 900k.
+ * @returns {string} The recommended model name.
+ */
+function selectModelForPayload(payloadStr, preferredModel) {
+  if (typeof payloadStr !== 'string') return preferredModel || SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_PRO;
+  
+  // High-level estimation (4 chars per token).
+  const estimatedTokens = payloadStr.length / 4;
+  const buffer = 100000; // 100k safety buffer
+  const tier1Limit = 1000000 - buffer;
+
+  if (estimatedTokens > tier1Limit) {
+    console.warn(`Payload estimated at ${Math.round(estimatedTokens)} tokens. This exceeds the 1M limit of Tier 1 models. Diverting to Tier 2 (2M Context) model: ${SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_2M_RETRO}`);
+    return SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_2M_RETRO;
+  }
+  
+  return preferredModel || SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_PRO;
 }
 
 /**
@@ -110,7 +199,8 @@ function callGemini(promptText, modelName, systemInstruction, schema) {
   const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
   if (!apiKey) return { error: "Missing GEMINI_API_KEY" };
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+  let currentModelName = modelName;
+  let url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModelName}:generateContent?key=${apiKey}`;
 
   const payload = {
     systemInstruction: { parts: [{ text: systemInstruction }] },
@@ -132,7 +222,7 @@ function callGemini(promptText, modelName, systemInstruction, schema) {
     muteHttpExceptions: true
   };
 
-  let delay = 2000;
+  let delay = 5000; // Start with a 5 second backoff
   for (let i = 0; i < 4; i++) {
     try {
       const response = UrlFetchApp.fetch(url, options);
@@ -147,18 +237,23 @@ function callGemini(promptText, modelName, systemInstruction, schema) {
           return { error: "callGemini response payload is missing candidate parts." };
         }
       } else if (statusCode === 429 || statusCode >= 500) {
-        Utilities.sleep(delay);
-        delay *= 2;
+        console.warn(`Gemini Error ${statusCode} on ${currentModelName} (Attempt ${i+1}/4): ${response.getContentText()}`);
+        if (i < 3) {
+          console.log(`Waiting ${delay}ms before retrying...`);
+          Utilities.sleep(delay);
+          delay *= 2; // 5s -> 10s -> 20s
+        }
       } else {
         return { error: `HTTP ${statusCode}: ${response.getContentText()}` };
       }
     } catch(e) {
+      console.warn(`UrlFetchApp exception on attempt ${i+1}/4: ${e.message}`);
       if (i === 3) return { error: e.message };
       Utilities.sleep(delay);
       delay *= 2;
     }
   }
-  return { error: "Exhausted retries due to 429/500 errors" };
+  return { error: `Exhausted retries due to API errors on model: ${currentModelName}` };
 }
 
 /**
@@ -233,4 +328,84 @@ function testTaskMasterDryRun() {
   } catch (e) {
     console.error(`testTaskMasterDryRun failed: ${e.message}`);
   }
+}
+
+let _cachedActiveThreadTaskMap = null;
+
+/**
+ * Retrieves a map of active Google Tasks from both the ToDo and Importer lists.
+ * Implements internal memoization to avoid redundant API calls during the same execution.
+ * @returns {Object} A map containing task indices grouped by Thread ID, Title, and ID.
+ */
+function getActiveThreadTaskMap() {
+  if (_cachedActiveThreadTaskMap) {
+    return _cachedActiveThreadTaskMap;
+  }
+
+  const map = { byThread: {}, byTitle: {}, byId: {}, openTasksForAI: [] };
+  const lists = [SYSTEM_CONFIG.TASKS.TODO_LIST_ID, SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID];
+  
+  lists.forEach(listId => {
+    let pageToken;
+    do {
+      try {
+        const res = Tasks.Tasks.list(listId, {
+           showCompleted: false, 
+           showHidden: false, 
+           maxResults: 100, 
+           pageToken: pageToken
+        });
+        const items = res.items || [];
+        items.forEach(t => {
+          map.byId[t.id] = { taskId: t.id, listId: listId, taskObj: t };
+          if (t.title) {
+              map.byTitle[t.title.toLowerCase().trim()] = { taskId: t.id, listId: listId, taskObj: t };
+              map.openTasksForAI.push(`ID: ${t.id} | Title: ${t.title}`);
+          }
+          if (t.notes) {
+            // Find the thread ID at the end of the URL
+            const match = t.notes.match(/https:\/\/mail\.google\.com\/mail\/u\/0\/#all\/([a-zA-Z0-9]+)/);
+            if (match) map.byThread[match[1]] = { taskId: t.id, listId: listId, taskObj: t };
+          }
+        });
+        pageToken = res.nextPageToken;
+      } catch (e) {
+        console.error(`Failed to fetch tasks for duplicate prevention mapping: ${e.message}`);
+        pageToken = null;
+      }
+    } while (pageToken);
+  });
+
+  _cachedActiveThreadTaskMap = map;
+  return map;
+}
+
+/**
+ * Safely fetches the text content of a Google Document or File by ID.
+ * Falls back to fetching the raw blob as string if DocumentApp fails.
+ * @param {string} id - The ID of the Google Drive document.
+ * @returns {string} The text content of the document.
+ */
+function getSafeDocText(id) {
+  try {
+    return DocumentApp.openById(id).getBody().getText();
+  } catch (e) {
+    return DriveApp.getFileById(id).getBlob().getDataAsString();
+  }
+}
+
+/**
+ * Helper to fetch the taxonomy JSON string from Drive.
+ * @returns {string} The raw taxonomy JSON string.
+ */
+function getTaxonomyStr() {
+  return getSafeDocText(SYSTEM_CONFIG.DOCS.TAXONOMY_JSON_ID);
+}
+
+/**
+ * Helper to fetch the Drive instructions document text.
+ * @returns {string} The instructions document text.
+ */
+function getDrivePromptStr() {
+  return getSafeDocText(SYSTEM_CONFIG.DOCS.CLERK_DRIVE_INSTRUCTIONS);
 }

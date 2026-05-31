@@ -3,10 +3,10 @@
 | Agent | Role | When to Summon (Triggers) | The "Magic Phrase" |
 | --- | --- | --- | --- |
 | **System Architect** | The Governor (Legislative) | • You need a new Project Code.<br>• You have a complex item that fits nowhere.<br>• You have messy notes to turn into a Protocol. | "Where does this new project fit in the LOS?"<br>"Here are some ramblings, turn this into a Protocol." |
-| **Taskmaster** | The Doer (Executive) | • You need to add/check tasks.<br>• You want to run your Daily/Weekly Review.<br>• You have a Report to process. | "Start daily review."<br>"Remember this: [Fact]." |
+| **Taskmaster** | The Doer (Executive) | • You need to add/check tasks.<br>• You want to run your 1 Day/7 Day Review.<br>• You have a Report to process. | "Start 1 day review."<br>"Remember this: [Fact]." |
 | **The Clerk** | The Filer (Administrative) | • You have files/PDFs to rename.<br>• You need to know the folder path for an email.<br>• Batch Processing documents. | (Paste Text/Attachment)<br>"File this." |
 | **Vantage** | The Auditor (Clinical) | • You need to extract metrics from statements/apps.<br>• You want to audit a URN goal against a target.<br>• You want to process performance data. | "Extract metrics from this PDF."<br>"Run Performance Audit." |
-| **Atlas** | The Analyst (Reflective) | • You want to run a Daily Reflection.<br>• You want to synthesize qualitative journals with Vantage data.<br>• You need strategic realignment for goals. | "Start daily reflection."<br>"Review my 90-day progress." |
+| **Atlas** | The Analyst (Reflective) | • You want to run a 1 Day Reflection.<br>• You want to synthesize qualitative journals with Vantage data.<br>• You need strategic realignment for goals. | "Start 1 day reflection."<br>"Review my 84 day progress." |
 
 ### 🔄 THE WORKFLOW LOOP
 

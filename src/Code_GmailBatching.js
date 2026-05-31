@@ -29,7 +29,7 @@ function backfillDatesInLog() {
   const LOG_GID = "2131515996";
 
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheet = ss.getSheets().find(s => s.getSheetId().toString() === LOG_GID);
 
     if (!sheet) {
@@ -153,7 +153,7 @@ function cleanLabelsFromSheetUrls() {
   const CLEANUP_GID = '1593358623';
 
   try {
-    const ss = SpreadsheetApp.openById(SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheet = ss.getSheets().find(s => s.getSheetId().toString() === CLEANUP_GID);
 
     if (!sheet) {

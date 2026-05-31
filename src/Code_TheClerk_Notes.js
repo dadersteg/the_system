@@ -30,8 +30,8 @@ function runTheClerkNotes() {
         const routeFolders = SYSTEM_CONFIG.CLERK_NOTES_FOLDERS.ROUTE_MODE;
         const cleanFolders = SYSTEM_CONFIG.CLERK_NOTES_FOLDERS.CLEAN_MODE;
         
-        const NOTES_ROUTE_PROMPT_ID = PropertiesService.getScriptProperties().getProperty("CLERK_NOTES_ROUTE_PROMPT_ID") || "PLACEHOLDER_ROUTE_ID";
-        const NOTES_CLEAN_PROMPT_ID = PropertiesService.getScriptProperties().getProperty("CLERK_NOTES_CLEAN_PROMPT_ID") || "PLACEHOLDER_CLEAN_ID";
+        const NOTES_ROUTE_PROMPT_ID = SYSTEM_CONFIG.DOCS.NOTES_ROUTE_PROMPT_ID;
+        const NOTES_CLEAN_PROMPT_ID = SYSTEM_CONFIG.DOCS.NOTES_CLEAN_PROMPT_ID;
         
         const routePromptDoc = getPromptText(NOTES_ROUTE_PROMPT_ID, getFallbackRoutePrompt());
         const cleanPromptDoc = getPromptText(NOTES_CLEAN_PROMPT_ID, getFallbackCleanPrompt());
@@ -62,6 +62,7 @@ function runTheClerkNotes() {
     } finally {
         lock.releaseLock();
         console.log(`<<< [NOTES END] Completed in ${((Date.now() - sessionStart) / 1000).toFixed(1)}s`);
+        return "Successfully swept Notes and executed extraction engine.";
     }
 }
 
@@ -124,7 +125,7 @@ function processRunningNoteById(fileId, batchLogs, recentContext = "") {
             return;
         }
         
-        const NOTES_CLEAN_PROMPT_ID = PropertiesService.getScriptProperties().getProperty("CLERK_NOTES_CLEAN_PROMPT_ID") || "PLACEHOLDER_CLEAN_ID";
+        const NOTES_CLEAN_PROMPT_ID = SYSTEM_CONFIG.DOCS.NOTES_CLEAN_PROMPT_ID;
         const systemPrompt = getPromptText(NOTES_CLEAN_PROMPT_ID, getFallbackCleanPrompt());
         const taxonomyJson = getTaxonomyJson();
         

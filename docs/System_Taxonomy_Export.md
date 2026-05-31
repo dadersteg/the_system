@@ -22,10 +22,11 @@
 - 01 Private/04 Finances/Tax
 - 01 Private/05 Other
 - 01 Private/05 Other/01 Projects
-- 01 Private/05 Other/01 Projects/2027 W
+- 01 Private/05 Other/01 Projects/2027 Wedding
 - 01 Private/05 Other/02 Relationships
 - 01 Private/05 Other/02 Relationships/CMA
 - 01 Private/05 Other/02 Relationships/Mamma och Pappa
+- 01 Private/05 Other/02 Relationships/Niklas Johansson
 - 01 Private/05 Other/03 Collections
 - 01 Private/05 Other/03 Collections/Newsletters
 - 01 Private/05 Other/03 Collections/Useful & Helpful
@@ -132,7 +133,7 @@
         - 2025 09 Visa
         - 202601 M
         - 20260411 Housewarming C&D
-        - 2027 W
+        - 2027 Wedding
         - AI
         - Colab Notebooks
         - Declutter
@@ -140,6 +141,7 @@
         - 01 05 02 Alexander / Gabriel
         - 01 05 02 CMA
         - 01 05 02 Mamma och Pappa
+        - 01 05 02 Niklas Johansson
       - 01 05 03 Collections
         - Clothes
         - Cooking
@@ -347,11 +349,9 @@
       - WhatsApp Chat - Amorina S
       - WhatsApp Chat - Charlotte A
       - WhatsApp Chat - Daff Kjellström
-      - WhatsApp Chat - Dr Eleanor Drage (PhD)
       - WhatsApp Chat - Emily Moffitt
       - WhatsApp Chat - Flora Macdonald Johnston
       - WhatsApp Chat - Lauren Beckingham
-      - WhatsApp Chat - Ludwig Svennerstål
       - WhatsApp Chat - Nima S
       - WhatsApp Chat - Tabatha
     - 02 00 99 Archive

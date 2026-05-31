@@ -27,7 +27,7 @@ Examples are a deadline-driven work project, crisis management, or an immediate 
 
 These are important but not urgent tasks. Schedule these for later so you have a trusted plan to complete them (and stop looping in your head). 
 
-Examples are a recurring exercise routine, a weekly dinner date, or an upcoming vacation (to name a few). 
+Examples are a recurring exercise routine, a 7 day dinner date, or an upcoming vacation (to name a few). 
 
 ### **Tips:** 
 

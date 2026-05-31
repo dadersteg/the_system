@@ -5,7 +5,7 @@
 
 const BATCH_CONFIG = {
   maxBatchSize: 5, // Set to 5 for testing. Increase to 1000 when ready to process the backlog.
-  geminiModel: "gemini-3.0-flash", // Update to whichever model you are using
+  geminiModel: SYSTEM_CONFIG.SECRETS.GEMINI_RETRO_MODEL,
   qaSheetHeaders: ["Type", "ID", "Original Name/Subject", "Proposed Name", "Original Path", "Proposed Path/Labels", "Summary", "Status"],
 };
 
@@ -174,11 +174,18 @@ function pollBatchJobStatus() {
 // STEP 4: EXECUTION ENGINE (HUMAN-APPROVED)
 // ==========================================
 
+
 function executeApprovedBatchItems() {
   const props = PropertiesService.getScriptProperties();
   const ssId = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
   const ss = SpreadsheetApp.openById(ssId);
   
+  // Retro Logs
+  const driveLogId = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_RETRO_LOG;
+  const emailLogId = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_RETRO_LOG;
+  let driveLog = driveLogId ? ss.getSheets().find(s => s.getSheetId().toString() === driveLogId) : null;
+  let emailLog = emailLogId ? ss.getSheets().find(s => s.getSheetId().toString() === emailLogId) : null;
+
   // Find all QA Sheets
   const sheets = ss.getSheets().filter(s => s.getName().startsWith("Batch QA"));
   
@@ -188,16 +195,19 @@ function executeApprovedBatchItems() {
     const statusIdx = headers.indexOf("Status");
     const idIdx = headers.indexOf("ID");
     const typeIdx = headers.indexOf("Type");
+    const nameIdx = headers.indexOf("Original Name/Subject");
     const propNameIdx = headers.indexOf("Proposed Name");
     const propPathIdx = headers.indexOf("Proposed Path/Labels");
     const summaryIdx = headers.indexOf("Summary");
 
+    let driveLogsToWrite = [];
+    let emailLogsToWrite = [];
+
     for (let i = 1; i < data.length; i++) {
-      // Execute automatically! No need for the user to manually change to 'APPROVED'.
-      // If the user manually edits the proposed name/path before this runs, it will use their edits.
       if (data[i][statusIdx] === "PENDING" || data[i][statusIdx] === "APPROVED") {
         const type = data[i][typeIdx];
         const itemId = data[i][idIdx];
+        const origName = data[i][nameIdx];
         const newName = data[i][propNameIdx];
         const newPath = data[i][propPathIdx];
         const summary = data[i][summaryIdx];
@@ -205,26 +215,29 @@ function executeApprovedBatchItems() {
         try {
           if (type === "DRIVE") {
             const file = DriveApp.getFileById(itemId);
-            // CRITICAL REVISION: DO NOT MOVE FILE. 
-            // 1. Rename to match taxonomy
             file.setName(newName);
-            // 2. Inject summary + processed flag into description
-            file.setDescription(`[CLERK PROCESSED]\nTaxonomy: ${newPath}\nSummary: ${summary}`);
+            file.setDescription(`[CLERK PROCESSED]
+Taxonomy: ${newPath}
+Summary: ${summary}`);
             
+            if (driveLog) {
+              driveLogsToWrite.push([file.getUrl(), origName, file.getDescription(), newName, "N/A", newPath, summary, "RETRO PROCESSED", "Batch Approved", 0, "SUCCESS", "N/A", "N/A", "N/A", "None", "", "", ""]);
+            }
           } else if (type === "EMAIL") {
             const thread = GmailApp.getThreadById(itemId);
-            // 1. Apply L4 Labels based on taxonomy
             const labels = newPath.split(",").map(l => l.trim());
             labels.forEach(labelName => {
               let label = GmailApp.getUserLabelByName(labelName) || GmailApp.createLabel(labelName);
               thread.addLabel(label);
             });
-            // Mark as processed
             let processedLabel = GmailApp.getUserLabelByName("Label_Reviewed") || GmailApp.createLabel("Label_Reviewed");
             thread.addLabel(processedLabel);
+            
+            if (emailLog) {
+              emailLogsToWrite.push([new Date(), thread.getPermalink(), "N/A", origName, "RETRO PROCESSED", newPath, summary, "N/A", "Batch Approved", "SUCCESS"]);
+            }
           }
 
-          // Mark as DONE in sheet
           sheet.getRange(i + 1, statusIdx + 1).setValue("DONE");
 
         } catch (e) {
@@ -233,5 +246,56 @@ function executeApprovedBatchItems() {
         }
       }
     }
+    
+    // Batch write logs
+    if (driveLogsToWrite.length > 0 && driveLog) {
+      if (driveLog.getLastRow() === 0) {
+        driveLog.appendRow(["URL", "Original Name", "Description", "Final Name", "Path Code", "Context ID", "Summary", "Metadata Description", "Reasoning", "Tokens", "Status", "Source Folder Path", "Target Folder ID", "Target Folder Path", "Shortcuts Generated", "Revised Path (Override)", "Revised Name (Override)", "Override Status"]);
+      }
+      driveLog.getRange(driveLog.getLastRow() + 1, 1, driveLogsToWrite.length, driveLogsToWrite[0].length).setValues(driveLogsToWrite);
+    }
+    if (emailLogsToWrite.length > 0 && emailLog) {
+      if (emailLog.getLastRow() === 0) {
+        emailLog.appendRow(["Timestamp", "Thread Link", "Sender", "Subject", "Assigned Action", "Labels Applied", "Summary", "Reasoning", "Tokens", "Status"]);
+      }
+      emailLog.getRange(emailLog.getLastRow() + 1, 1, emailLogsToWrite.length, emailLogsToWrite[0].length).setValues(emailLogsToWrite);
+    }
   });
 }
+/**
+ * Processes a batch of legacy/backlog emails in retro mode.
+ * Retro mode categorizes, summarizes, and labels emails, but does NOT create action items.
+ *
+ * @param {number} limit - Maximum number of email threads to process in this batch.
+ * @returns {Object} JSON response indicating success.
+ */
+function runTheClerkEmailRetroBatch(limit) {
+  // Ensure system labels exist
+  getLabelIdByName(PROCESSED_FLAG);
+  getLabelIdByName(TEMP_DELETE_LABEL);
+  
+  // Query to target emails without the processed flag
+  const query = `-label:"${PROCESSED_FLAG}"`;
+  
+  console.log(`Starting retro email sweep with query: ${query}, limit: ${limit}`);
+  
+  // Hoist API configurations
+  const configPayload = {
+    sheetRules: getSheetRules(),
+    subjectRules: getSubjectRules(),
+    allowedAliases: getAllowedAliases(),
+    fullDocPrompt: getSafeDocText(DOC_ID),
+    taxonomyJsonStr: getSafeDocText(TAXONOMY_JSON_ID),
+    personalGoalsStr: getSafeDocText(SYSTEM_CONFIG.DOCS.PERSONAL_GOALS_FILE_ID),
+    workGoalsStr: getSafeDocText(SYSTEM_CONFIG.DOCS.WORK_GOALS_FILE_ID)
+  };
+  
+  // Run triage engine in retro mode (isRetro = true)
+  executeTriageEngine(query, limit, true, configPayload);
+  
+  return {
+    success: true,
+    message: `Executed retro triage batch successfully (limit: ${limit}).`
+  };
+}
+

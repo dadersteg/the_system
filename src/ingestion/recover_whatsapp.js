@@ -2,22 +2,28 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
+const { getAccessToken } = require('./google_auth');
 
 // Load environment variables
 dotenv.config();
 
 const GMAIL_USER = process.env.GMAIL_USER;
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
+const WEBAPP_URL = process.env.WEBAPP_URL;
 
-if (!GMAIL_USER || !GMAIL_APP_PASSWORD) {
-    console.error("CRITICAL ERROR: Please set GMAIL_USER and GMAIL_APP_PASSWORD in your .env file.");
+if (!GMAIL_USER || !WEBAPP_URL) {
+    console.error("CRITICAL ERROR: Please set GMAIL_USER and WEBAPP_URL in your .env file.");
     process.exit(1);
 }
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD }
-});
+// --- BLOCKED THREADS ---
+let blockedThreads = [];
+try {
+    const fs = require('fs');
+    const blockedData = fs.readFileSync(__dirname + '/blocked_threads.json', 'utf8');
+    blockedThreads = JSON.parse(blockedData).map(t => t.toLowerCase());
+} catch (e) {
+    console.log("No blocked_threads.json found or invalid format.");
+}
 
 // --- BUFFERING LOGIC ---
 const messageBuffer = {};
@@ -45,28 +51,49 @@ async function sendToGmail(compiledText, threadName, attachments = []) {
     const textToPrint = compiledText || "[Media Attached]";
     const now = new Date();
     const todayDate = now.toLocaleDateString('en-CA'); 
-    const subject = `[WhatsApp Recovery] ${threadName} - ${todayDate}`;
+    const subject = `[WhatsApp] ${threadName} - ${todayDate}`;
 
-    const threadString = `${threadName}-${todayDate}-recovery`;
+    const formattedAttachments = attachments.map(att => ({
+        filename: att.filename,
+        mimeType: att.contentType,
+        base64: att.content
+    }));
+
+    // Deterministic threading ID (same scheme as live bridge)
+    const crypto = require('crypto');
+    const threadString = `${threadName}-${todayDate}`;
     const threadHash = crypto.createHash('md5').update(threadString, 'utf-8').digest('hex');
     const deterministicId = `<${threadHash}@whatsapp.bridge>`;
 
-    const mailOptions = {
-        from: `"WhatsApp: ${threadName}" <${GMAIL_USER}>`,
+    const payload = {
+        secret: "MOW_BRIDGE_SECRET_2026",
         to: GMAIL_USER,
-        subject: subject,
-        text: textToPrint,
-        messageId: `<${crypto.randomBytes(16).toString('hex')}@whatsapp.bridge>`, 
-        references: deterministicId, 
-        inReplyTo: deterministicId,  
-        attachments: attachments
+        subject: Buffer.from(subject, 'utf-8').toString('base64'),
+        body: Buffer.from(textToPrint, 'utf-8').toString('base64'),
+        name: Buffer.from(`WhatsApp: ${threadName}`, 'utf-8').toString('base64'),
+        references: deterministicId,
+        attachments: formattedAttachments,
+        b64: true
     };
 
     try {
-        await transporter.sendMail(mailOptions);
-        console.log(`Forwarded recovered messages for [${threadName}] to Gmail.`);
+        const accessToken = await getAccessToken();
+        const response = await fetch(WEBAPP_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + accessToken
+            },
+            body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (result.success) {
+            console.log(`Forwarded recovered messages for [${threadName}] to Webhook.`);
+        } else {
+            console.error(`Webhook failed to send email for ${threadName}:`, result.error);
+        }
     } catch (error) {
-        console.error(`Failed to send email for ${threadName}:`, error);
+        console.error(`Failed to trigger Webhook for ${threadName}:`, error);
     }
 }
 
@@ -76,6 +103,11 @@ async function processHistoricalMessage(msg) {
     try {
         const chat = await msg.getChat();
         let threadName = chat.isGroup ? chat.name : (chat.name || "Unknown");
+
+        // Check if thread is blocked
+        if (blockedThreads.includes(threadName.toLowerCase())) {
+            return;
+        }
 
         let senderName = "Unknown";
         if (msg.fromMe) {

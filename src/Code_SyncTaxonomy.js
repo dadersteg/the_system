@@ -10,7 +10,24 @@ function syncTaxonomyToSheet() {
   const files = DriveApp.getFilesByName("TS - Categorisation.md");
   if (!files.hasNext()) throw new Error("Could not find TS - Categorisation.md in Google Drive. Make sure it exists.");
   const file = files.next();
-  const text = file.getBlob().getDataAsString();
+  let text = file.getBlob().getDataAsString();
+  
+  // 1. Add Niklas Johansson if not present
+  if (!text.includes("Niklas Johansson")) {
+    text = text.replace(
+      "| **Mamma & Pappa** | Parents. |",
+      "| **Mamma & Pappa** | Parents. |\n\n| **Niklas Johansson** | Friend. |"
+    );
+  }
+
+  // 2. Update 98 to 99 for SMS, Telegram, WhatsApp
+  text = text.replace(/\* \*\*98 SMS:\*\*/g, "* **99 SMS:**");
+  text = text.replace(/\* \*\*98 Telegram:\*\*/g, "* **99 Telegram:**");
+  text = text.replace(/\* \*\*98 WhatsApp:\*\*/g, "* **99 WhatsApp:**");
+
+  // Save the updated text back to Google Drive
+  file.setContent(text);
+
   const lines = text.split("\n");
 
   const l1Map = {};
@@ -187,11 +204,17 @@ function syncTaxonomyToSheet() {
               let desc = cols[2];
               
               if (currentContextCode) {
+                  // Explicitly handle contexts: an L4 item can be attached to an L3 context (e.g. '01 01 01') 
+                  // or directly to an L2 context (e.g. '01 04 00').
+                  // This is intentional logic to allow skipping L3 for broad categories like Finances or Career Management.
                   let inferredL2 = currentContextCode.substring(0, 5) + " 00";
                   let inferredL1 = currentContextCode.substring(0, 2) + " 00 00";
                   
                   let l1Name = l1Map[inferredL1] || "";
                   let l2Name = l2Map[inferredL2] ? l2Map[inferredL2].name : "";
+                  
+                  // If currentContextCode ends in "00", it is an L2 node and was skipped in L3 parsing, 
+                  // making l3Name intentionally empty.
                   let l3Name = l3Map[currentContextCode] ? l3Map[currentContextCode].name : "";
                   
                   let p1 = `${inferredL1.substring(0,2)} ${clean(l1Name)}`;

@@ -28,6 +28,8 @@ You must cross-reference all inputs against two external knowledge files:
 
 2. **'TS - Master Asset Naming Protocol.md':** The syntax rules for Google Drive file naming.
 
+**Note on Direct L2 Contexts:** In specific broad categories like Finances (`01 04 00`) and Career Management (`02 02 00`), the taxonomy intentionally skips the L3 level. L4 nodes are grouped directly under the L2 code. In the JSON taxonomy, you will see the L3 Code and L3 Name as empty strings for these items. This is normal and expected.
+
 
 # 3. OPERATIONAL LOGIC (THE GRAVITY PROTOCOLS)
 
@@ -36,9 +38,9 @@ To ensure 100% efficacy, you must apply reasoning in the following priority orde
 
 ## 3.1. Project Gravity (Absolute Override)
 
-- **Rule:** If the file content relates to an active L4 Project (e.g., '2027 W', 'AI', 'TS', '202509 Visa'), you MUST use that L4 Context ID and its associated L1-L3 path.
+- **Rule:** If the file content relates to an active L4 Project (e.g., '2027 Wedding', 'AI', 'TS', '202509 Visa'), you MUST use that L4 Context ID and its associated L1-L3 path.
 
-- **Priority:** This overrides Domain and Functional gravity. Even if a document is an Amex statement, if it explicitly mentions "Wedding Flowers" or "Catering," it belongs to '2027 W'.
+- **Priority:** This overrides Domain and Functional gravity. Even if a document is an Amex statement, if it explicitly mentions "Wedding Flowers" or "Catering," it belongs to '2027 Wedding'.
 
 
 ## 3.2. Domain Gravity
@@ -51,19 +53,21 @@ To ensure 100% efficacy, you must apply reasoning in the following priority orde
 - **Rule:** If neither Project nor Domain gravity applies, categorize based on the fundamental "function" of the document using the L1-L3 hierarchy (e.g., Health, Personal Growth, Relationships).
 
 
-# 3.4. The Dynamic Archive Protocol (18-Month Rule)
+# 3.4. The Dynamic Archive Protocol (24-Month Rule)
 
-- **Threshold:** 18 Months relative to the "current system date" provided in metadata.
+- **Threshold:** 24 Months relative to the "current system date" provided in metadata.
 
 - **Evergreen Exception:** Documents with permanent relevance (NIN, Passport, Insurance, Deeds) RETAIN their active LOS code regardless of age.
 
-- **Archive Logic:** If a file is >18 months old AND is NOT Evergreen:
+- **Archive Logic:** If a file is >24 months old AND is NOT Evergreen:
 
   - **L3 Suffix Rule:** The third pair of the code MUST be changed to `99`.
 
   - **Hierarchy Retention:** The L1 (Domain) and L2 (Category) must remain accurate to the file's subject.
 
-  - **Project Archival:** Even if a file matches a specific project (Active or Inactive), if it is >18 months old, it uses the `XX XX 99` format (e.g., `01 05 99`).
+  - **Project Archival:** Even if a file matches a specific project (Active or Inactive), if it is >24 months old, it uses the `XX XX 99` format (e.g., `01 05 99`).
+
+- **Archive Folder Override:** If the `folder_context` explicitly contains the word 'Archive' or 'Archived', the file MUST be treated under the Archive Logic (assigned an `XX XX 99` code) regardless of its creation date or the 24-month threshold. It MUST NOT be re-categorized into a newer active category.
 
 - **Metadata Flag:** The `description` field MUST start with the `99` code and include the word "Archive" immediately followed by the Context ID/Identifier.
 
@@ -80,7 +84,7 @@ To ensure 100% efficacy, you must apply reasoning in the following priority orde
 
   - **Example (Archive Fallback):** A file sits in `/Uppsala Universitet/År 1/` and is a 10-year-old exam.
 
-    - **Logic:** Identify the context as 'Studies'. Apply the 18-Month Archive Rule. Because the taxonomy defines a flat archive for this domain (**03 00 99**), you must use that exact code.
+    - **Logic:** Identify the context as 'Studies'. Apply the 24-Month Archive Rule. Because the taxonomy defines a flat archive for this domain (**03 00 99**), you must use that exact code.
 
 - **Code Supremacy:** You are strictly PROHIBITED from "calculating" or inventing any 6-digit code that is not explicitly listed in the 'TS - Categorisation.md' file. Never combine a sub-category index with an archive suffix (e.g., creating 03 03 99) unless that specific string is in the provided taxonomy.
 
@@ -134,6 +138,8 @@ If you cannot identify a code with high confidence, you must signal your ignoran
 
 - **Filename Syntax:** `[Identifier] - [Descriptive Name].[extension]`
 
+- **Legacy Context Preservation (Crucial):** If a file has a vague original name (e.g., "Summary.pdf", "Invoice.pdf") but sits within deeply descriptive legacy folders (e.g., `/Customs & Logistics/JCL/`), you MUST inject those critical folder names into the `[Descriptive Name]` to prevent data loss when the folder structure is flattened. (e.g., `202601 M - JCL Customs Logistics Summary.pdf`).
+
 - **The Identifier Rule:** The `Identifier` (Prefix) MUST be the textual L4 Context ID (e.g., 'Home', 'TS') or the L3 Functional Name (e.g., 'Health', 'Purchase'). 
 
 - **Numerical Code Ban:** You are strictly PROHIBITED from putting 6-digit LOS codes (e.g., 01 02 01) in the filename. Numerical codes are reserved exclusively for the metadata description field.
@@ -147,13 +153,13 @@ If you cannot identify a code with high confidence, you must signal your ignoran
 
 ## 5.1. THE DATE PRIORITY PROTOCOL
 
-When determining the [Date YYYYMM] for filenames or calculating the 18-Month Archive Rule:
+When determining the [Date YYYYMM] for filenames or calculating the 24-Month Archive Rule:
 
 1. **Primary (Content Date):** Use the date found explicitly within the file text (e.g., invoice date, letter date).
 
 2. **Secondary (Metadata Fallback):** If NO date is found in the content, MUST use the dateCreated value` provided in the METADATA_CONTEXT.
 
-3. **Archive Calculation:** Always compare the chosen date (Primary or Secondary) against the `current_system_date` provided in the metadata to determine if the 18-month threshold has been passed.
+3. **Archive Calculation:** Always compare the chosen date (Primary or Secondary) against the `current_system_date` provided in the metadata to determine if the 24-month threshold has been passed.
 
 
 
@@ -171,6 +177,7 @@ You must return a valid JSON object. You are PROHIBITED from omitting any keys. 
 - `summary`: A precise 1-2 sentence overview of the document's specific content and purpose.
 - `description`: The full string for the Drive description field: `[6-Digit Code] [Context ID] #[Tags]`
 - `reasoning`: A concise explanation of which Gravity protocol was applied.
+- `manual_review_reason`: If `concat_path` is "Unknown", specify "Unknown Category". If you confidently know the category but believe a new folder needs to be created for it, specify "Folder Creation Required". Otherwise, return "None".
 
 
 # 7. EXEMPLARS FOR EFFICACY
@@ -178,12 +185,12 @@ You must return a valid JSON object. You are PROHIBITED from omitting any keys. 
 - **Scenario:** An Amex PDF mentioning "Wedding Venue Deposit".
 
   - **Output:** {
-    "filename": "2027 W - Venue Deposit Amex.pdf",
-    "concat_path": "01 05 01 > Projects > 2027 W",
+    "filename": "2027 Wedding - Venue Deposit Amex.pdf",
+    "concat_path": "01 05 01 > Projects > 2027 Wedding",
     "aggregator_paths": ["01 04 01 Purchase > Purchase Receipts [AGGREGATOR]"],
     "summary": "Credit card statement showing a successful deposit payment to the wedding venue for the 2027 event.",
-    "description": "01 05 01 2027 W #Wedding #Amex #Deposit",
-    "reasoning": "Project Gravity ('2027 W') detected in content; overrides financial domain."
+    "description": "01 05 01 2027 Wedding #Wedding #Amex #Deposit",
+    "reasoning": "Project Gravity ('2027 Wedding') detected in content; overrides financial domain."
   }
 
 
@@ -195,7 +202,7 @@ You must return a valid JSON object. You are PROHIBITED from omitting any keys. 
     "filename": "Unknown - Masterclass Subscription Receipt 2026.pdf",
     "concat_path": "Unknown",
     "aggregator_paths": [],
-    "summary": "Annual subscription invoice for an online learning platform (Masterclass) for 2026.",
+    "summary": "360 day subscription invoice for an online learning platform (Masterclass) for 2026.",
     "description": "01 0Y ZW Masterclass #Learning #Subscription",
     "reasoning": "Uncertainty Protocol: Subject 'Masterclass' identified, but specific L3 code is missing from LOS."
   }

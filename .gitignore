@@ -5,6 +5,9 @@ creds.json
 System_Taxonomy_Export_*.md
 .clasp.json
 
+# Sensitive personal data
+context_personal_details.md
+
 # Python / Security
 .env
 *.session
@@ -17,3 +20,10 @@ __pycache__/
 # Scratch folder
 scratch/
 tmp_logs*.txt
+
+# Combined tasks and OAuth tokens
+Google Tasks (Combined).md
+token_tasks_private.json
+token_tasks_work.json
+creds_private.json
+creds_work.json

@@ -26,7 +26,7 @@ All tasks must be mapped to a quadrant.
     *   *Definition:* Distractions, vague ideas, obsolete notes.
     *   *Routing:* `PROPOSE_DELETE`.
 
-## 3. "Eat the Frog" (The Daily Apex)
+## 3. "Eat the Frog" (The 1 Day Apex)
 When synthesizing the `TODAY'S FOCUS` list for the Priority One-Pager, you must identify the single most critical task.
 *   **The Frog:** This is the hardest, highest-leverage task that advances a massive goal. It is usually a Q2 task that the user is avoiding.
 *   **Action:** Extract this task, place it at the very top of `TODAY'S FOCUS`, and flag it explicitly with `🐸 [THE FROG]`.

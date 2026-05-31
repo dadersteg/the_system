@@ -77,7 +77,7 @@ The immutable skeleton of the system.
 
 * **02 01 00 Employment** 
 
-    * 02 01 01 Quantum 21
+    * 02 01 01 Playmetech
 
 * **02 02 00 Career Management**
 
@@ -119,6 +119,7 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 *   **The Drop Zone:** Automated agents (The Clerk) will only ever route files to the root of an L4 context folder. 
 *   **Human Flexibility:** If an L4 folder becomes cluttered, you are free to manually create L5 subfolders (e.g., `Reference Material`, `Invoices`, `Drafts`). 
 *   **Rule of Thumb:** L5 folders should be generic groupings. If you need to create a highly specific L5 folder, it likely needs to be escalated to a brand new L4 project node. Never place an L4 node inside another L4 node.
+*   **Direct L2 Contexts (Intentional Skip of L3):** In specific broad categories (like `01 04 00 Finances` or `02 02 00 Career Management`), L4 items may be attached *directly* to the L2 code context heading. This intentionally skips the L3 level to keep broad categories flat. The sync scripts parse this properly by leaving the L3 data empty.
 
 
 ### 01 01 01 Task Management (Standing Contexts)
@@ -139,6 +140,7 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 | Code | Description |
 | :--- | :--- |
 | **Medical Appointments & Tests** | Ongoing medical appointments, blood tests (BT), and health tracking. |
+| **2026 Pregnancy** | Planning and tracking for the 2026 pregnancy. |
 
 ### 01 04 00 Finances (Standing Contexts)
 
@@ -161,6 +163,8 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 | **Pension** | Long-term savings. |
 
 | **Revolut Equity** | Revolut shareholdings. |
+
+| **Services & Subscriptions** | Ongoing service contracts, SaaS, mobile, and broadband. |
 
 | **Tax** | Returns and correspondence. |
 
@@ -204,13 +208,15 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 
 | **202608 M&N** | **Project: Wedding for Mimmi & Nils.** August 2026. |
 
+| **202606 Passport** | **Project: Swedish & British Passport Renewal & Name Change.** |
+
 | **Clothes** | Wardrobe management. |
 
 | **Cooking** | Recipes and meal planning. |
 
 | **Declutter** | Physical/Digital cleanup. |
 
-| **2027 W** | **Project: Wedding Celebration.** Wedding party/events (2027). |
+| **2027 Wedding** | **Project: Wedding Celebration.** Wedding party/events (2027). |
 
 | **202604-202605 Staycation** | Project: Staycation/spend quality time with Carry during my gardening leave |  
 
@@ -226,11 +232,17 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 
 | :--- | :--- |
 
-| **Alexander & Gabriel** | Brothers. |
+| **Alexander & Gabriel** | Brothers (surname Adersteg). Do not use for other people named Alexander or Gabriel. |
 
 | **CMA** | Carry Martens Adersteg. |
 
+| **Jim Cargill** | Friend / Father-in-law. |
+
 | **Mamma & Pappa** | Parents. |
+
+| **Niklas Johansson** | Friend. |
+
+| **Messages** | [AGGREGATOR] All relationship messages. |
 
 
 ### 01 05 03 Collections (Passive)
@@ -246,8 +258,8 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 | **Star Wars** | Collection/Interest. |
 
 | **Useful/Helpful** | Useful information, tools, software setups, tips and tricks |
-
 | **Data** | Data exports, backups, and dumps. |
+
 
 | **Memories** | Photos, keepsakes, and personal historical data. |
 
@@ -257,9 +269,9 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 
 ---
 
-### 02 01 01 Quantum 21
+### 02 01 01 Playmetech
 
-*Active employment (also referred to as Playmetech). Categories mimic the 01 Private L2 structure.*
+*Active employment (also referred to as Playmetech or Q21). Playmetech / Quantum 21 operates as a highly sophisticated sports betting and i-gaming wagering syndicate. This category serves as the central repository for all professional materials related to quantitative wagering, betting market analytics, sports betting strategies, and syndicate execution blueprints. Categories mimic the 01 Private L2 structure.*
 
 | Code | Description |
 | :--- | :--- |
@@ -327,7 +339,7 @@ The `99` suffix at the L3 level designates a record as "Archived." These files a
 | 01 04 01 | **NCS** | Nordea Close Services. | **Closed** (Downgraded to Task) |
 | 01 04 02 | **202510 M** | The Move (To Paris). | **Closed** |
 | 01 04 02 | **W23DY** | London Flat (Previous). | **Closed** |
-| 01 05 01 | **2025 W** | Wedding & Engagement Dinners. | **Closed** (See 2027 W) |
+| 01 05 01 | **2025 Wedding** | Wedding & Engagement Dinners. | **Closed** (See 2027 Wedding) |
 | 01 05 01 | **UKC** | UK Citizenship/Visa. | **Closed/Dormant** |
 | 01 05 01 | **Blackjack** | Hobby/Skill development. | **Closed** |
 | 01 05 01 | **2025 09 Visa** | Carry's Visa Application. | **Closed** |
@@ -369,9 +381,10 @@ These tags are used strictly for triage, automation pipelines, and system mainte
 ### 99 System Operational (Processing & Deletion)
 * **99 Google Comments:** Automated notifications from Google Docs/Drive that require a quick read but no permanent storage.
 * **99 Label_Reviewed:** A vital system flag applied by the Apps Scripts to indicate an item has been successfully processed and should not be analyzed again in the next batch.
-* **98 SMS:** Funnel endpoint for incoming routed SMS messages awaiting processing or task extraction.
-* **98 Telegram:** Funnel endpoint for incoming routed Telegram messages awaiting processing or task extraction.
-* **98 WhatsApp:** Funnel endpoint for incoming routed WhatsApp messages awaiting processing or task extraction.
+* **99 SMS:** Funnel endpoint for incoming routed SMS messages awaiting processing or task extraction.
+* **99 Telegram:** Funnel endpoint for incoming routed Telegram messages awaiting processing or task extraction.
+* **99 Messenger:** Funnel endpoint for incoming routed Facebook Messenger messages awaiting processing or task extraction.
+* **99 WhatsApp:** Funnel endpoint for incoming routed WhatsApp messages awaiting processing or task extraction.
 * **99 To be deleted:** Temporary storage and the purge queue. Items that are needed briefly or marked for the next automated/manual trash cycle.
 
 ### Routing Tags (Legacy & Alias Emails)

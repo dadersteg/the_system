@@ -1,7 +1,7 @@
 # The System
 
 ## 1. Purpose
-"The System" is an AI-powered Executive Suite functioning as a comprehensive "Second Brain." Its primary goal is to unburden the mind by managing the administrative friction of daily life—triage, file categorization, task processing, and reflective planning. By handling the noise, The System allows the user to focus purely on meaningful execution and strategic growth.
+"The System" is an AI-powered Executive Suite functioning as a comprehensive "Second Brain." Its primary goal is to unburden the mind by managing the administrative friction of 1 day life—triage, file categorization, task processing, and reflective planning. By handling the noise, The System allows the user to focus purely on meaningful execution and strategic growth.
 
 ## 2. Core Philosophy: Separation of State
 The System enforces a strict boundary between different types of information to prevent clutter and ensure clarity:
@@ -16,8 +16,8 @@ The System enforces a strict boundary between different types of information to 
 The System is powered by a team of specialized AI "Personas." Rather than being monolithic scripts or static prompts, these Personas are cognitive frameworks. To prevent hallucination and ensure high-fidelity outputs, each Persona has a strictly defined scope.
 
 A Persona can exist in two forms, depending on the need:
-1.  **Automated Workflows:** Background processes running asynchronously (e.g., scanning emails, categorizing files, generating daily action reports).
-2.  **Conversational Workflows:** Interactive chat sessions (e.g., via Gemini Gems) for complex problem-solving, daily review, or strategic reflection.
+1.  **Automated Workflows:** Background processes running asynchronously (e.g., scanning emails, categorizing files, generating 1 day action reports).
+2.  **Conversational Workflows:** Interactive chat sessions (e.g., via Gemini Gems) for complex problem-solving, 1 day review, or strategic reflection.
 
 ### The 5 Personas
 
@@ -39,7 +39,7 @@ A Persona can exist in two forms, depending on the need:
 
 #### 5. Atlas (The Analyst / Reflective)
 *   **Role:** Strategic goal alignment and journaling.
-*   **Focus:** It guides subjective daily/weekly reflection frameworks. By synthesizing qualitative journaling with Vantage’s objective audit data, Atlas ensures that daily habits are actually moving the needle on long-term goals.
+*   **Focus:** It guides subjective 1 day/7 day reflection frameworks. By synthesizing qualitative journaling with Vantage’s objective audit data, Atlas ensures that 1 day habits are actually moving the needle on long-term goals.
 
 ---
 

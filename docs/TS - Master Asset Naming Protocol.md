@@ -20,7 +20,7 @@ This master protocol governs the naming of all digital assets within the Life Or
 ### A.1. The Identifier Logic (The Prefix)
 The "Identifier" is the anchor of the filename. It must be the most specific TEXTUAL value identified. It is the only part of the name that precedes the mandatory ` - ` separator.
 
-1. **L4 Context ID (Priority):** Use if the file relates to a specific Project, Person, or Residence. (e.g., '2027 W', 'Home', 'TS').
+1. **L4 Context ID (Priority):** Use if the file relates to a specific Project, Person, or Residence. (e.g., '2027 Wedding', 'Home', 'TS').
 2. **L3 Functional Name:** Use if no L4 context exists or is identifiable. (e.g., 'Health', 'Purchase', 'Insurance').
 3. **Total Uncertainty:** Use the word 'Unknown'.
 
@@ -66,7 +66,7 @@ If the content cannot find a 1:1 match in the Categorisation hierarchy:
 Albums function as Folders. They must inherit the Full LOS Code to ensure numerical sorting.
 - Syntax: `[L1-L3 Code] [L4 Context] > [Description]`
 - Examples: 
-  - `01 05 01 2027 W > Venue Scouting`
+  - `01 05 01 2027 Wedding > Venue Scouting`
   - `01 05 02 Friends > 2025 Events`
 
 ### B.2. Gemini (Conversations)

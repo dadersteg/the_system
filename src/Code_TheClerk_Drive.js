@@ -95,8 +95,11 @@ function executeEngine(mode, currentModel) {
         
         if (!log) throw new Error("Execution Log sheet not found.");
         const knowledge = loadKnowledgeDocs();
+        const activeTaskMap = getActiveThreadTaskMap();
+        const openTasksStr = activeTaskMap.openTasksForAI.join('\n');
         const recentContext = fetchRecentContext(ss);
-        const fullRules = knowledge.text + "\n\n" + recentContext;
+        let tasksContext = "\n\n--- OPEN GOOGLE TASKS ---\nIf any file processed is a confirmation of or update to an existing task in this list, map it to the task by returning the task's EXACT ID in the 'mapped_task_id' field of the JSON output and provide a detailed reason in 'mark_completed_reason' why it is completed. Otherwise, use 'None' for both.\n\n" + openTasksStr;
+        const fullRules = knowledge.text + "\n\n" + recentContext + tasksContext;
         let parsedTaxonomy = [];
         try { parsedTaxonomy = JSON.parse(knowledge.taxonomyJson); } catch (e) { console.warn("Failed to parse taxonomy JSON"); }
         
@@ -164,6 +167,7 @@ function executeEngine(mode, currentModel) {
         } catch(e2){}
     } finally { 
         lock.releaseLock(); 
+        return "Successfully swept Drive and executed The Clerk engine.";
     }
 }
 
@@ -172,6 +176,7 @@ function executeEngine(mode, currentModel) {
 
 function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, folderCache, parsedTaxonomy) {
     console.log(`   > Extracting: ${batch.map(b => b.name).join(", ")}`);
+    const activeTaskMap = getActiveThreadTaskMap();
     const batchLogs = [];
     let validFiles = [];
 
@@ -269,6 +274,30 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
 
             file.setName(finalName);
             file.setDescription(`${data.description}\n\nSummary: ${data.summary}`);
+            
+            // Task mapping and completion check (Task 6 confirmation mapping)
+            if (data.mapped_task_id && data.mapped_task_id !== "None") {
+                let existingRef = activeTaskMap.byId[data.mapped_task_id];
+                if (existingRef) {
+                    console.log(`   [MAPPED] File maps to existing task: ${data.mapped_task_id}`);
+                    try {
+                        let existingTask = existingRef.taskObj;
+                        existingTask.notes = (existingTask.notes || "") + `\n\n[UPDATE]: File "${finalName}" uploaded to Drive.\nLink: ${file.getUrl()}`;
+                        
+                        if (data.mark_completed_reason && data.mark_completed_reason !== "None") {
+                            if (!existingTask.title.startsWith("99 Done ")) {
+                                existingTask.title = "99 Done - " + existingTask.title;
+                            }
+                            existingTask.notes += `\n\nSYS: To be marked as Done because: ${data.mark_completed_reason}`;
+                        }
+                        
+                        Tasks.Tasks.patch({ notes: existingTask.notes, title: existingTask.title }, existingRef.listId, existingTask.id);
+                        console.log(`   [MAPPED] Successfully updated task.`);
+                    } catch (err) {
+                        console.error("Error updating mapped task from Drive: " + err.message);
+                    }
+                }
+            }
             
             // Extract and create nuanced actions/tasks
             let tasksCreated = 0;
@@ -550,9 +579,21 @@ function askGeminiStable(rules, batch, currentModel) {
     
     // Add instruction to extract tasks
     const taskInstruction = `
-## ACTION EXTRACTION
-Determine if any specific, nuanced action is required FROM the file added. Do NOT suggest generic actions like "review the file". If an action is required, provide it in the \`tasks\` array with a clear \`title\` (Action Verb + Object) and \`notes\`. If no action is needed, return an empty array.
-Output schema must include \`tasks: [ { "title": "...", "notes": "..." } ]\` alongside \`filename\`, \`concat_path\`, \`summary\`, \`description\`, and \`reasoning\`.
+## ACTION EXTRACTION & CONFIRMATION MAPPING
+1. Determine if any specific, nuanced action is required FROM the file added. Do NOT suggest generic actions like "review the file". If an action is required, provide it in the \`tasks\` array with a clear \`title\` (Action Verb + Object) and \`notes\`. If no action is needed, return an empty array.
+2. If the file is a confirmation or update for an existing task from the "OPEN GOOGLE TASKS" list, output its EXACT ID in the \`mapped_task_id\` field. If this file confirms the mapped task is complete (e.g. it is a receipt, ticket, confirmation letter, or result document), provide a detailed explanation in \`mark_completed_reason\`. Otherwise, output "None" for both.
+
+Output schema for each file object must include:
+{
+  "filename": "...",
+  "concat_path": "...",
+  "summary": "...",
+  "description": "...",
+  "reasoning": "...",
+  "mapped_task_id": "...", // Task ID or "None"
+  "mark_completed_reason": "...", // Reason or "None"
+  "tasks": [ { "title": "...", "notes": "..." } ]
+}
 `;
 
     const parts = [{ text: rules + taskInstruction }, { text: `Analyze ${batch.length} files. Return JSON ARRAY.` }];
@@ -820,3 +861,4 @@ function fetchRecentContext(ss) {
     }
     return contextStr;
 }
+
