@@ -89,9 +89,11 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *   **[x] Task H.5:** Rule Refinement & Edge Case Handling (Continuous): Implemented mandatory rules in `macgyver.md` requiring Calendar/Task pre-flight checks and prohibiting browser-based manual data gathering.
 
 ### Phase I: Multi-Tenant & Family Expansion (Future Scope)
-*Scaling The System from a personal Second Brain to a Family Hub.*
+*Scaling The System from a personal Second Brain to a Family Hub & Work Environment.*
 *   **[ ] Task I.1:** Deploy decentralized instances of The Clerk to secondary Google Accounts (e.g., Wife's accounts) using custom, tailored taxonomies.
 *   **[ ] Task I.2:** Build an aggregation bridge that routes 'need to know' action items and calendar logistics from secondary accounts into a centralized family dashboard on the Master Spreadsheet.
+*   **[ ] Task I.3:** Deploy work-specific instance of The System to Playmetech / Quantum 21 Google Account using clasp on work-macbook and separate GCP credentials.
+*   **[ ] Task I.4:** Build local task aggregator script (`sync_tasks_combined.py`) running strictly on work-macbook to safely merge personal and work tasks.
 
 ### Phase J: Event-Driven Webhook Architecture (Future Scope)
 *Transitioning from polling to real-time event-driven updates using Gemini API Webhooks.*

@@ -25,7 +25,7 @@
 - [ ] **Water plants** *(Due: 2026-05-30)*
   - **Notes:** SYS: DA:  [DEADLINE: 2026-05-30] | [DURATION: 10m] | [GOAL: 2024-3-041A]
 - [ ] **Execute AXA Health Plan Extension Signup** *(Due: 2026-05-31)*
-  - **Notes:** Complete the signup and payment setup for the AXA personal health plan extension once Simon Dews replies. Thread Link: https://mail.google.com/mail/u/0/#all/19e740dff3285093 [UPDATE]: Track AXA Health plan activation and policy start date alignment Link: https://mail.google.com/mail/u/0/#all/19e740dff3285093 SYS: Task is dependent on Simon Dews. If no reply is received by end of day, I will move this to the backlog. DA:  [DEADLINE: 2026-05-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-002]
+  - **Notes:** Complete the signup and payment setup for the AXA personal health plan extension once Simon Dews replies. Thread Link: https://mail.google.com/mail/u/0/#all/19e740dff3285093 [UPDATE]: Track AXA Health plan activation and policy start date alignment Link: https://mail.google.com/mail/u/0/#all/19e740dff3285093 [UPDATE 31 May 2026]: Replied to Simon Dews proposing a concluding phone call at 16:00 on Monday, 1 June. SYS: Task is dependent on Simon Dews. If no reply is received by end of day, I will move this to the backlog. DA:  [DEADLINE: 2026-05-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-002]
 - [ ] **Join Carry Google Chat Space**
   - **Notes:** https://mail.google.com/mail/u/0/#all/19e753de6d29aee3 Context: 01 05 02 Relationships > CMA Join the Carry Google Chat space SYS: Migrated to V6 structure. DA:  [DEADLINE: None] | [DURATION: 5m] | [GOAL: 2026-MD-NEW-043]
 - [ ] **Set up The Clerk and Task Master for Work** *(Due: 2026-05-29)*
@@ -134,7 +134,7 @@
   - **Notes:** https://mail.google.com/mail/#all/19e07711152a156a SYS: Execution set to 20 May as requested. DA:  [DEADLINE: 2026-06-03] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-043]
 - [ ] **Open UK Revolut Account for Carina**
   - **Notes:** Context: 01 04 00 Finances > Banking SYS: Calendar capacity is sufficient for this lunch break task. DA:  [DEADLINE: 2099-12-31] | [DURATION: 30m] | [GOAL: 01 04 00 Finances]
-- [ ] **Migrate Reading List to Google Interests**
+- [x] **Migrate Reading List to Google Interests**
   - **Notes:** Context: 01 01 01 Projects > AI SYS: Migrated to V6 structure. DA:  [DEADLINE: 2099-12-31] | [DURATION: 1h] | [GOAL: 01 03 00 Personal Growth]
 - [ ] **Create Gem for Business Idea**
   - **Notes:** Context: 01 05 02 Relationships > CMA SYS: Aligning with AI EA development goals as requested. DA:  [DEADLINE: 2099-12-31] | [DURATION: 2h] | [GOAL: 01 03 00 Personal Growth]
@@ -146,8 +146,6 @@
   - **Notes:** SYS: DA:  [DEADLINE: 2026-09-29] | [DURATION: 3h] | [GOAL: 01 05 00 Other]
 - [ ] **Set up The_Clerk retro for files and Gmail**
   - **Notes:** This is not an urgent / prioritiy task and should not be in the way of anything related to starting my new job SYS: DA:  [DEADLINE: 2099-12-31] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-026]
-- [ ] **Review Alisson 'My Story' series** *(Due: 2026-05-31)*
-  - **Notes:** Context: 01 05 03 Collections > Liverpool FC Review details for the new LFC original series 'Alisson: My Story'. SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-05-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-045]
 - [ ] **Check Gemini projects and notebook functionality** *(Due: 2026-06-15)*
   - **Notes:** Context: 01 05 01 Projects > AI SYS: Scheduled for deep work block. DA:  [DEADLINE: 2026-06-15] | [DURATION: 1h] | [GOAL: 2026-MD-NEW-023]
 - [ ] **Review Gemini UK personalization features**
@@ -211,3 +209,5 @@
   - **Notes:** https://docs.google.com/document/d/1RZWAliL-v9LnIm7uoTU9AiL1zF29TsH-x1BIWS-kBWM/edit?usp=drivesdk [Source: Health - 202605 AXA Health Policy Continuation] Settle £100.00 excess shortfall to Alusi Ent Ltd for consultation with Prof. Ghassan Alusi (Invoice Ref: GA97726344959Y).
 - [ ] **Update on claim GB26CFAJ00108**
   - **Notes:** https://mail.google.com/mail/#all/19e707d696e22209 --- Attached Links --- Update on your claim GB26CFAJ00108 with Qover:  SYS: Duplicate of task amVzbFBDcXpyOTRmbVA1Sw. DA:  [DEADLINE: None] | [DURATION: 0m] | [GOAL: Maintenance]
+- [ ] **Review Alisson 'My Story' series** *(Due: 2026-05-31)*
+  - **Notes:** Context: 01 05 03 Collections > Liverpool FC Review details for the new LFC original series 'Alisson: My Story'. SYS: Migrated to V6 structure. DA:  [DEADLINE: 2026-05-31] | [DURATION: 30m] | [GOAL: 2026-MD-NEW-045]
