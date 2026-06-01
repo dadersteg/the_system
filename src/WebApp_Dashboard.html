@@ -1648,10 +1648,24 @@
         oscillator.stop(audioCtx.currentTime + 2);
       } catch(e) {}
     }
-
-        
+    function playTick() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 600;
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
+      } catch(e) {}
+    }
     function renderLotus() {
-      const container = document.getElementById('streak-lotus-container');
+      const container = document.getElementById('breathe-lotus');
       if (!container) return;
       container.innerHTML = '';
       
