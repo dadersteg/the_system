@@ -1122,7 +1122,6 @@
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
           <button class="btn btn-secondary" onclick="runPipeline('syncTaxonomyToSheet')">↺ Sync Taxonomy (MD → Sheet)</button>
           <button class="btn btn-secondary" onclick="runPipeline('syncDriveFoldersFromTaxonomy')">▶ Build Missing Drive Folders</button>
-          <button class="btn btn-secondary" onclick="runPipeline('executeFolderMapping')">Map Drive Topology</button>
           <button class="btn btn-secondary" onclick="runPipeline('executeDoneReset')">Reset [DONE] Folders</button>
         </div>
         <div id="pipeline-status" style="margin-top: 16px; font-weight: 500; font-size: 14px; color: var(--color-primary);"></div>
@@ -1381,7 +1380,10 @@
           completedTasksCount: (docs && docs.completedTasksCount) ? docs.completedTasksCount : 0,
           manualReviewCount: (docs && docs.manualReviewCount) ? docs.manualReviewCount : 0,
           activeMinutes: (docs && docs.activeMinutes) ? docs.activeMinutes : 0,
-          sleepHours: (docs && docs.sleepHours) ? docs.sleepHours : 0
+          sleepHours: (docs && docs.sleepHours) ? docs.sleepHours : 0,
+          totalSteps: (docs && docs.totalSteps) ? docs.totalSteps : 0,
+          totalCalories: (docs && docs.totalCalories) ? docs.totalCalories : 0,
+          avgHeartRate: (docs && docs.avgHeartRate) ? docs.avgHeartRate : 0
         };
         
         const existingLoader = document.getElementById('dashboard-loader');
