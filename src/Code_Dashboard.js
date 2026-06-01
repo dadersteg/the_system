@@ -1674,11 +1674,44 @@ function getDashboardDocs() { const startT = Date.now();
           res.vantageReport = v2.getBlob().getDataAsString();
           
           const vantageJson = parseVantageJson(res.vantageReport);
+          
+          let parsedHr = 0, parsedSteps = 0, parsedCal = 0;
+          if (res.vantageReport) {
+            const lines = res.vantageReport.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              if (/steps/i.test(line)) {
+                let m = line.match(/[\d,.]+/g);
+                if (m) parsedSteps = parseInt(m[m.length - 1].replace(/,/g, ''), 10);
+                else if (i + 1 < lines.length) {
+                  let m2 = lines[i+1].match(/[\d,.]+/);
+                  if (m2) parsedSteps = parseInt(m2[0].replace(/,/g, ''), 10);
+                }
+              }
+              if (/calories|kcal/i.test(line)) {
+                let m = line.match(/[\d,.]+/g);
+                if (m) parsedCal = parseInt(m[m.length - 1].replace(/,/g, ''), 10);
+                else if (i + 1 < lines.length) {
+                  let m2 = lines[i+1].match(/[\d,.]+/);
+                  if (m2) parsedCal = parseInt(m2[0].replace(/,/g, ''), 10);
+                }
+              }
+              if (/heart rate|\bhr\b/i.test(line) && !/hrv/i.test(line)) {
+                let m = line.match(/[\d,.]+/g);
+                if (m) parsedHr = parseInt(m[m.length - 1].replace(/,/g, ''), 10);
+                else if (i + 1 < lines.length) {
+                  let m2 = lines[i+1].match(/[\d,.]+/);
+                  if (m2) parsedHr = parseInt(m2[0].replace(/,/g, ''), 10);
+                }
+              }
+            }
+          }
+          
           res.activeMinutes = vantageJson ? vantageJson.activeMinutes : parseActiveMinutesFromVantage(res.vantageReport);
           res.sleepHours = vantageJson ? vantageJson.sleepHours : parseSleepHoursFromVantage(res.vantageReport);
-          res.totalSteps = vantageJson ? vantageJson.totalSteps : 0;
-          res.totalCalories = vantageJson ? vantageJson.totalCalories : 0;
-          res.avgHeartRate = vantageJson ? vantageJson.avgHeartRate : 0;
+          res.totalSteps = vantageJson ? vantageJson.totalSteps : parsedSteps;
+          res.totalCalories = vantageJson ? vantageJson.totalCalories : parsedCal;
+          res.avgHeartRate = vantageJson ? vantageJson.avgHeartRate : parsedHr;
         }
       } catch(e) { console.error("Error loading 2-day report: " + e.message); }
     }
