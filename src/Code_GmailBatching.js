@@ -37,14 +37,16 @@ function backfillDatesInLog() {
       return;
     }
 
-    const data = sheet.getDataRange().getValues();
-    if (data.length <= 1) return;
+    const range = sheet.getDataRange();
+    const values = range.getValues();
+    const formulas = range.getFormulas();
+    if (values.length <= 1) return;
 
     let headerRowIdx = 0;
-    if (data[0].findIndex(h => h && h.toString().trim().toLowerCase() === "link") === -1 && data.length > 1) {
+    if (values[0].findIndex(h => h && h.toString().trim().toLowerCase() === "link") === -1 && values.length > 1) {
       headerRowIdx = 1;
     }
-    const headers = data[headerRowIdx];
+    const headers = values[headerRowIdx];
     const linkCol = headers.findIndex(h => h && h.toString().trim().toLowerCase() === "link");
     const firstMsgCol = headers.findIndex(h => h && h.toString().trim().toLowerCase().includes("first message"));
     const lastMsgCol = headers.findIndex(h => h && h.toString().trim().toLowerCase().includes("last message"));
@@ -55,9 +57,10 @@ function backfillDatesInLog() {
     }
 
     let updates = 0;
+    let sheetUpdated = false;
 
-    for (let i = headerRowIdx + 1; i < data.length; i++) {
-      const row = data[i];
+    for (let i = headerRowIdx + 1; i < values.length; i++) {
+      const row = values[i];
       const link = row[linkCol];
       const firstMsgDate = row[firstMsgCol];
       const lastMsgDate = row[lastMsgCol];
@@ -74,8 +77,9 @@ function backfillDatesInLog() {
                 const firstMsg = Utilities.formatDate(messages[0].getDate(), "GMT", "yyyy-MM-dd HH:mm:ss");
                 const lastMsg = Utilities.formatDate(messages[messages.length - 1].getDate(), "GMT", "yyyy-MM-dd HH:mm:ss");
 
-                sheet.getRange(i + 1, firstMsgCol + 1).setValue(firstMsg);
-                sheet.getRange(i + 1, lastMsgCol + 1).setValue(lastMsg);
+                values[i][firstMsgCol] = firstMsg;
+                values[i][lastMsgCol] = lastMsg;
+                sheetUpdated = true;
                 updates++;
                 Utilities.sleep(100);
               }
@@ -85,6 +89,18 @@ function backfillDatesInLog() {
           }
         }
       }
+    }
+
+    if (sheetUpdated) {
+      // Re-apply formulas to values grid to preserve hyperlinks and dynamic formulas
+      for (let r = 0; r < values.length; r++) {
+        for (let c = 0; c < values[r].length; c++) {
+          if (formulas[r][c]) {
+            values[r][c] = formulas[r][c];
+          }
+        }
+      }
+      range.setValues(values);
     }
 
     console.log(`Backfill complete. Updated ${updates} rows.`);
@@ -161,7 +177,9 @@ function cleanLabelsFromSheetUrls() {
       return;
     }
 
-    const data = sheet.getDataRange().getValues();
+    const range = sheet.getDataRange();
+    const values = range.getValues();
+    const formulas = range.getFormulas();
 
     const processedLabel = GmailApp.getUserLabelByName("99 Label_Reviewed");
     const manualLabel = GmailApp.getUserLabelByName("00 Manual Review");
@@ -169,17 +187,18 @@ function cleanLabelsFromSheetUrls() {
 
     let count = 0;
     const BATCH_LIMIT = 100; // Process 100 per run to prevent timeout
+    let sheetUpdated = false;
 
-    console.log(`Starting cleanup... Found ${data.length} total rows in the spreadsheet.`);
+    console.log(`Starting cleanup... Found ${values.length} total rows in the spreadsheet.`);
 
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < values.length; i++) {
       if (count >= BATCH_LIMIT) {
         console.log(`\n⏸️ Hit batch limit of ${BATCH_LIMIT}. Run script again to continue.`);
         break;
       }
 
-      const url = data[i][0] ? data[i][0].toString().trim() : "";
-      const status = data[i][1] ? data[i][1].toString().trim() : "";
+      const url = values[i][0] ? values[i][0].toString().trim() : "";
+      const status = values[i][1] ? values[i][1].toString().trim() : "";
 
       if (url.includes("mail.google.com/mail/")) {
         if (status === "DONE") {
@@ -199,19 +218,34 @@ function cleanLabelsFromSheetUrls() {
             if (manualLabel) thread.removeLabel(manualLabel);
             if (tempDeleteLabel) thread.removeLabel(tempDeleteLabel);
 
-            sheet.getRange(i + 1, 2).setValue("DONE");
+            values[i][1] = "DONE";
+            sheetUpdated = true;
             count++;
             console.log(`✅ Success: Removed labels from Thread ${threadId}. Marked DONE.`);
             Utilities.sleep(100);
           } else {
-             sheet.getRange(i + 1, 2).setValue("ERROR: NOT FOUND");
+             values[i][1] = "ERROR: NOT FOUND";
+             sheetUpdated = true;
              console.log(`❌ Error: Thread not found for Row ${i + 1}`);
           }
         } catch (e) {
-          sheet.getRange(i + 1, 2).setValue(`ERROR: ${e.message}`);
+          values[i][1] = `ERROR: ${e.message}`;
+          sheetUpdated = true;
           console.error(`❌ Failed for Row ${i + 1} - Error: ${e.message}`);
         }
       }
+    }
+
+    if (sheetUpdated) {
+      // Re-apply formulas to values grid to preserve hyperlinks and dynamic formulas
+      for (let r = 0; r < values.length; r++) {
+        for (let c = 0; c < values[r].length; c++) {
+          if (formulas[r][c]) {
+            values[r][c] = formulas[r][c];
+          }
+        }
+      }
+      range.setValues(values);
     }
 
     console.log(`\n🏁 Finished execution. Successfully processed ${count} threads this run.`);

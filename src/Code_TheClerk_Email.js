@@ -824,14 +824,16 @@ function applyManualRevisionsEmail() {
     const sheet = ss.getSheets().find(s => s.getSheetId().toString() === gid);
     if (!sheet) return;
     
-    const data = sheet.getDataRange().getValues();
-    if (data.length <= 1) return;
+    const range = sheet.getDataRange();
+    const values = range.getValues();
+    const formulas = range.getFormulas();
+    if (values.length <= 1) return;
     
     let headerRowIdx = 0;
-    if (data[0].findIndex(h => h.toString().trim().toLowerCase() === "link") === -1 && data.length > 1) {
+    if (values[0].findIndex(h => h.toString().trim().toLowerCase() === "link") === -1 && values.length > 1) {
       headerRowIdx = 1;
     }
-    const headers = data[headerRowIdx];
+    const headers = values[headerRowIdx];
     const linkCol = headers.findIndex(h => h.toString().trim().toLowerCase() === "link");
     const revisedCol = headers.findIndex(h => h.toString().trim().toLowerCase() === "revised labels (override)");
     const statusCol = headers.findIndex(h => h.toString().trim().toLowerCase() === "override status");
@@ -839,17 +841,20 @@ function applyManualRevisionsEmail() {
     
     if (linkCol === -1 || revisedCol === -1 || statusCol === -1) return;
     
-    for (let i = headerRowIdx + 1; i < data.length; i++) {
-      const row = data[i];
+    let sheetUpdated = false;
+    
+    for (let i = headerRowIdx + 1; i < values.length; i++) {
+      const row = values[i];
       const link = row[linkCol];
       const revisedLabelsStr = row[revisedCol];
       const status = row[statusCol];
       const originalLabelsStr = row[finalLabelCol];
       
       if (revisedLabelsStr && status !== "SYNCED") {
-        const threadIdMatch = link ? link.match(/#all\/(.+)$/) : null;
+        const threadIdMatch = link ? link.toString().match(/#all\/(.+)$/) : null;
         if (!threadIdMatch) {
-           sheet.getRange(i + 1, statusCol + 1).setValue("ERROR: Invalid Link");
+           values[i][statusCol] = "ERROR: Invalid Link";
+           sheetUpdated = true;
            continue;
         }
         const threadId = threadIdMatch[1];
@@ -857,7 +862,8 @@ function applyManualRevisionsEmail() {
         try {
           const thread = GmailApp.getThreadById(threadId);
           if (!thread) {
-             sheet.getRange(i + 1, statusCol + 1).setValue("ERROR: Thread Not Found");
+             values[i][statusCol] = "ERROR: Thread Not Found";
+             sheetUpdated = true;
              continue;
           }
           
@@ -876,15 +882,29 @@ function applyManualRevisionsEmail() {
             thread.addLabel(userLabel);
           });
           
-          sheet.getRange(i + 1, finalLabelCol + 1).setValue(revisedLabelsStr);
-          sheet.getRange(i + 1, statusCol + 1).setValue("SYNCED");
+          values[i][finalLabelCol] = revisedLabelsStr;
+          values[i][statusCol] = "SYNCED";
+          sheetUpdated = true;
           totalUpdates++;
           console.log(`Applied manual override to thread ${threadId}: ${revisedLabels.join(', ')}`);
           
         } catch (e) {
-          sheet.getRange(i + 1, statusCol + 1).setValue(`ERROR: ${e.message}`);
+          values[i][statusCol] = `ERROR: ${e.message}`;
+          sheetUpdated = true;
         }
       }
+    }
+    
+    if (sheetUpdated) {
+      // Re-apply formulas to values grid to preserve hyperlinks and dynamic formulas
+      for (let r = 0; r < values.length; r++) {
+        for (let c = 0; c < values[r].length; c++) {
+          if (formulas[r][c]) {
+            values[r][c] = formulas[r][c];
+          }
+        }
+      }
+      range.setValues(values);
     }
   });
   

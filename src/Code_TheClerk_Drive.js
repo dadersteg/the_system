@@ -758,9 +758,11 @@ function applyManualRevisionsDrive() {
         return;
     }
     
-    const data = sheet.getDataRange().getValues();
-    if (data.length <= 1) return;
-    const headers = data[0];
+    const range = sheet.getDataRange();
+    const values = range.getValues();
+    const formulas = range.getFormulas();
+    if (values.length <= 1) return;
+    const headers = values[0];
     
     const urlCol = headers.indexOf("URL");
     const revisedPathCol = headers.indexOf("Revised Path (Override)");
@@ -773,18 +775,20 @@ function applyManualRevisionsDrive() {
     }
     
     let updates = 0;
+    let sheetUpdated = false;
     
-    for (let i = 1; i < data.length; i++) {
-        const row = data[i];
+    for (let i = 1; i < values.length; i++) {
+        const row = values[i];
         const url = row[urlCol];
         const revisedPath = row[revisedPathCol];
         const revisedName = row[revisedNameCol];
         const status = row[statusCol];
         
         if ((revisedPath || revisedName) && status !== "SYNCED") {
-            const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/);
+            const idMatch = url ? url.toString().match(/id=([a-zA-Z0-9_-]+)/) : null;
             if (!idMatch) {
-                 sheet.getRange(i + 1, statusCol + 1).setValue("ERROR: Invalid Link");
+                 values[i][statusCol] = "ERROR: Invalid Link";
+                 sheetUpdated = true;
                  continue;
             }
             const fileId = idMatch[1];
@@ -805,14 +809,28 @@ function applyManualRevisionsDrive() {
                     }
                 }
                 
-                sheet.getRange(i + 1, statusCol + 1).setValue("SYNCED");
+                values[i][statusCol] = "SYNCED";
+                sheetUpdated = true;
                 updates++;
                 console.log(`Applied manual override to file ${fileId}`);
                 
             } catch (e) {
-                sheet.getRange(i + 1, statusCol + 1).setValue(`ERROR: ${e.message}`);
+                values[i][statusCol] = `ERROR: ${e.message}`;
+                sheetUpdated = true;
             }
         }
+    }
+    
+    if (sheetUpdated) {
+        // Re-apply formulas to values grid to preserve hyperlinks and dynamic formulas
+        for (let r = 0; r < values.length; r++) {
+            for (let c = 0; c < values[r].length; c++) {
+                if (formulas[r][c]) {
+                    values[r][c] = formulas[r][c];
+                }
+            }
+        }
+        range.setValues(values);
     }
     
     console.log(`Manual Revisions Complete. Updated ${updates} files.`);

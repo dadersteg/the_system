@@ -847,7 +847,9 @@ function syncRevisionsToTasks() {
   }
 
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const data = sheet.getRange(3, 1, lastRow - 2, headers.length).getValues();
+  const range = sheet.getRange(3, 1, lastRow - 2, headers.length);
+  const values = range.getValues();
+  const formulas = range.getFormulas();
 
   const taskListIdx = headers.indexOf("Task List");
   const taskListRevIdx = headers.indexOf("Task List (Revised)");
@@ -878,9 +880,10 @@ function syncRevisionsToTasks() {
   allTaskLists.forEach(l => listNameToIdMap[l.title.toLowerCase()] = l.id);
 
   let updateCount = 0;
+  let sheetUpdated = false;
 
-  for (let i = 0; i < data.length; i++) {
-    const row = data[i];
+  for (let i = 0; i < values.length; i++) {
+    const row = values[i];
     let taskId = row[taskIdIdx];
     let taskListId = row[taskListIdIdx];
     
@@ -974,8 +977,6 @@ function syncRevisionsToTasks() {
 
     if (hasUpdates) {
       try {
-        const rowNum = i + 3;
-
         if (listMigrated) {
           const oldTask = executeWithRetry(() => Tasks.Tasks.get(taskListId, taskId));
           
@@ -1009,9 +1010,9 @@ function syncRevisionsToTasks() {
                       currentNotes += "\n";
                    }
                    currentNotes += linkStr;
-                }
-             });
-             oldTask.notes = currentNotes;
+                 }
+              });
+              oldTask.notes = currentNotes;
           }
           
           delete oldTask.id;
@@ -1024,71 +1025,87 @@ function syncRevisionsToTasks() {
           const migratedTask = executeWithRetry(() => Tasks.Tasks.insert(oldTask, newTaskListId));
           executeWithRetry(() => Tasks.Tasks.remove(taskListId, taskId));
           
-          sheet.getRange(rowNum, taskIdIdx + 1).setValue(migratedTask.id);
-          sheet.getRange(rowNum, taskListIdIdx + 1).setValue(newTaskListId);
+          values[i][taskIdIdx] = migratedTask.id;
+          values[i][taskListIdIdx] = newTaskListId;
           
           const actualNewListTitle = allTaskLists.find(l => l.id === newTaskListId)?.title || newTaskListTitle;
-          sheet.getRange(rowNum, taskListIdx + 1).setValue(actualNewListTitle);
-          sheet.getRange(rowNum, taskListRevIdx + 1).clearContent();
+          values[i][taskListIdx] = actualNewListTitle;
+          values[i][taskListRevIdx] = "";
           
-          if (resource.title) sheet.getRange(rowNum, titleIdx + 1).setValue(resource.title);
-          if (resource.notes) sheet.getRange(rowNum, notesIdx + 1).setValue(resource.notes);
-          if (resource.due) sheet.getRange(rowNum, dateIdx + 1).setValue(resource.due);
+          if (resource.title) values[i][titleIdx] = resource.title;
+          if (resource.notes) values[i][notesIdx] = resource.notes;
+          if (resource.due) values[i][dateIdx] = resource.due;
           if (resource.status) {
-            sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
-            sheet.getRange(rowNum, statusIdx + 1).setValue(resource.status);
+            values[i][originalStatusIdx] = resource.status;
+            values[i][statusIdx] = resource.status;
           }
           
           if (resource.title) {
-            if (losCodeRevIdx !== -1) sheet.getRange(rowNum, losCodeRevIdx + 1).clearContent();
-            if (actionTitleRevIdx !== -1) sheet.getRange(rowNum, actionTitleRevIdx + 1).clearContent();
+            if (losCodeRevIdx !== -1) values[i][losCodeRevIdx] = "";
+            if (actionTitleRevIdx !== -1) values[i][actionTitleRevIdx] = "";
           }
-          if (resource.notes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
-          if (resource.due) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
-          if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
+          if (resource.notes) values[i][notesRevIdx] = "";
+          if (resource.due) values[i][deadlineRevIdx] = "";
+          if (resource.status) values[i][statusRevIdx] = "";
           
           const currentTitle = resource.title || originalTitle;
           const statusStr = resource.status ? ` | Status: ${resource.status}` : "";
           console.log(`[SUCCESS] Migrated task ID: ${taskId} | Title: "${currentTitle}"${statusStr} | To list: '${actualNewListTitle}'`);
-          if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Migrated to '${actualNewListTitle}' successfully.${statusStr}`);
+          if (sysCommentIdx !== -1) values[i][sysCommentIdx] = `Migrated to '${actualNewListTitle}' successfully.${statusStr}`;
         } else {
            // Normal in-place patch
           executeWithRetry(() => Tasks.Tasks.patch(resource, taskListId, taskId));
           
           // Mark as synced by clearing the revised columns (but keep the user formula in Task (Revised) alone)
           if (newTitle) {
-            if (losCodeRevIdx !== -1) sheet.getRange(rowNum, losCodeRevIdx + 1).clearContent();
-            if (actionTitleRevIdx !== -1) sheet.getRange(rowNum, actionTitleRevIdx + 1).clearContent();
+            if (losCodeRevIdx !== -1) values[i][losCodeRevIdx] = "";
+            if (actionTitleRevIdx !== -1) values[i][actionTitleRevIdx] = "";
           }
-          if (newNotes) sheet.getRange(rowNum, notesRevIdx + 1).clearContent();
-          if (newDeadline) sheet.getRange(rowNum, deadlineRevIdx + 1).clearContent();
-          if (resource.status) sheet.getRange(rowNum, statusRevIdx + 1).clearContent();
+          if (newNotes) values[i][notesRevIdx] = "";
+          if (newDeadline) values[i][deadlineRevIdx] = "";
+          if (resource.status) values[i][statusRevIdx] = "";
           
           // Update the original data columns to reflect the new state
-          if (newTitle) sheet.getRange(rowNum, titleIdx + 1).setValue(newTitle);
-          if (newNotes) sheet.getRange(rowNum, notesIdx + 1).setValue(newNotes);
-          if (newDeadline) sheet.getRange(rowNum, dateIdx + 1).setValue(newDeadline);
+          if (newTitle) values[i][titleIdx] = newTitle;
+          if (newNotes) values[i][notesIdx] = newNotes;
+          if (newDeadline) values[i][dateIdx] = newDeadline;
           
           // Update the original status column if status was changed
           if (resource.status) {
-            sheet.getRange(rowNum, originalStatusIdx + 1).setValue(resource.status);
-            sheet.getRange(rowNum, statusIdx + 1).setValue(resource.status);
+            values[i][originalStatusIdx] = resource.status;
+            values[i][statusIdx] = resource.status;
           }
           
           const currentTitle = resource.title || originalTitle;
           const statusStr = resource.status ? ` | Status: ${resource.status}` : "";
           console.log(`[SUCCESS] Patched task ID: ${taskId} | Title: "${currentTitle}"${statusStr} | In place.`);
-          if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Synced changes successfully.${statusStr}`);
+          if (sysCommentIdx !== -1) values[i][sysCommentIdx] = `Synced changes successfully.${statusStr}`;
         }
 
+        sheetUpdated = true;
         updateCount++;
         Utilities.sleep(100); 
       } catch (e) {
         const currentTitle = resource.title || originalTitle;
         console.error(`[ERROR] Failed to sync task ID: ${taskId} | Title: "${currentTitle}" | Error: ${e.message}`);
-        if (sysCommentIdx !== -1) sheet.getRange(rowNum, sysCommentIdx + 1).setValue(`Error: ${e.message}`);
+        if (sysCommentIdx !== -1) {
+          values[i][sysCommentIdx] = `Error: ${e.message}`;
+          sheetUpdated = true;
+        }
       }
     }
+  }
+
+  if (sheetUpdated) {
+    // Re-apply formulas to values grid to preserve hyperlinks and dynamic formulas
+    for (let r = 0; r < values.length; r++) {
+      for (let c = 0; c < values[r].length; c++) {
+        if (formulas[r][c]) {
+          values[r][c] = formulas[r][c];
+        }
+      }
+    }
+    range.setValues(values);
   }
 
   console.log(`Sync complete. Updated ${updateCount} tasks.`);
