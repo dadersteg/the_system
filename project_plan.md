@@ -3,7 +3,7 @@
 To successfully build "The System," we must define our starting point, our destination, and the concrete steps to bridge the gap.
 
 ## 1. Current State
-The project has successfully completed **Phase A (Foundation)** and is now preparing to execute **Phase B (Data Ingestion)**.
+As of June 2, 2026, the project has successfully completed Phases A, B, C, D, F, and H, and is actively executing Phase E (Reflection, Auditing & Metrics).
 *   **Concepts & Architecture:** Highly developed. The "Second Brain" philosophy (Separation of State) and the Life Organisation System (LOS) taxonomy are fully established and operational.
 *   **Documentation:** Consolidated and unified. All overlapping protocols (e.g., Asset Naming) have been merged. The 5 Personas (System Architect, Task Master, The Clerk, Vantage, Atlas) are strictly defined and their instruction files perfectly cross-reference the exact `.md` files in the repository.
 *   **Execution Mechanisms:** Transitioned from drafts to production. The core engine runs on fully developed Google Apps Scripts (`Code_TheClerk_Email.js`, `Code_TheClerk_Drive.js`, `Code_Tasks.js`, `Code_SyncTaxonomy.js`) that are version-controlled locally and synced directly via `clasp`.
@@ -34,7 +34,7 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *   **[x] Task B.4:** Integrate the Gemini API to autonomously categorize the tasks within the spreadsheet.
 *   **[ ] Task B.5:** Timeboxing MVP: Add functionality to the sync that allows assigning an "Estimated Duration" to a task in the spreadsheet and automatically creating a corresponding Calendar Event block.
 
-### Phase C: Set Up the Funnel (Data Ingestion)
+### Phase C: Set Up the Funnel (Data Ingestion) [✅ COMPLETED]
 *Ensuring all incoming data ends up in one place.*
 *   **[x] Task C.1:** Build the functionality to capture external messages (WhatsApp, SMS, Telegram) and route them into the system (e.g., into Gmail or Google Tasks).
 *   **[x] Task C.2:** Guarantee all incoming "noise" is funneled into a single triage gateway ready for The Clerk to process.
@@ -42,8 +42,9 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *   **[ ] Task C.4:** Unstructured Data Parsing (MarkItDown Pipeline): Integrate Microsoft's Python `markitdown` utility as a core ingestion tool. Develop a local script or webhook that intercepts complex attachments (PDFs, PPTs, Excel sheets) identified by The Clerk, converts them into clean `.md` format, and stores them in the Second Brain for seamless LLM referencing.
 *   **[ ] Task C.5:** Web Ingestion Pipeline (Bookmarks): Develop a continuous pipeline (e.g., a periodic script or browser extension) to capture newly saved Chrome bookmarks, run them through The Clerk for auto-categorization according to the LOS Taxonomy, and route them to their appropriate system folders or the triage gateway.
 *   **[x] Task C.6:** Unstructured Note Ingestion (The Clerk Notes): Built a dual-mode engine (`Code_TheClerk_Notes.js`) to parse raw scratchpad notes. 'Route Mode' scans designated drop-zones (e.g. `00 Notes & Scratchpad`), extracts actionable tasks, and routes clean Markdown docs to their strict L4 context folder using absolute Taxonomy resolution. 'Clean Mode' formats running notes in-place (e.g. `_Notes`) without routing.
+*   **[x] Task C.7:** Gmail Rule Consolidation: Merge Gmail sender/subject rules into a single "Email Rules" tab across both personal and work spreadsheets.
 
-### Phase D: Task Analysis & Synthesis (The Doer) [📍 CURRENT PHASE]
+### Phase D: Task Analysis & Synthesis (The Doer) [✅ COMPLETED]
 *Extracting the signal from the noise (High Priority).*
 *   **[x] Task D.1:** Incoming Triage (The Clerk): Automate The Clerk to actively categorize, label, and intelligently rename all *new* incoming emails and files to match the LOS Taxonomy. *(Completed: Code_TheClerk_Email.js and Code_TheClerk_Drive.js are live and using the strict JSON Taxonomy array).*
 *   **[x] Task D.2:** Historical Backfill Audit: Build a slow-burn background script to retroactively scan, label, and rename the existing bloated inbox and Drive files to align with the new taxonomy without hitting API rate limits. *(Completed: runTheClerkRetro and runTheClerkArchive handle this with batching).*
@@ -60,15 +61,28 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *   **[x] Task D.13:** Drive Aggregation Engine & L4 Routing: Updated the Drive Clerk to natively route files to their specific L4 context folders. Implemented the `resolveFolderFromTaxonomy` utility to eliminate name-collision ambiguity by natively traversing Google Drive from the root folder. Files are accurately mapped, shortcuts generated across `aggregator_paths`, and all movement is perfectly captured in the Execution Log.
 *   **[x] Task D.14:** Historical Bookmark Audit & Pruning: Build a one-off or slow-burn script to ingest the existing, massive `Bookmarks.json` export. The script must parse the links, categorize them against the existing LOS Taxonomy, route valuable reference material into the Second Brain (`docs/` or Drive), and permanently purge dead or irrelevant links.
 *   **[ ] Task D.15:** The Clerk (Multimodal File Processing): Upgrade The Clerk to utilize Gemini's Multimodal capabilities via the Inline Data (Base64) protocol. This will allow the Apps Script engine to automatically parse receipt images, attached invoices, and standard PDFs (<20MB) to extract transaction values and merchants natively without relying on external OCR bridges.
-### Phase E: Reflection & Auditing
+*   **[x] Task D.16:** Performance Refactoring: Optimize batch writing in Code_Tasks.js, Code_TheClerk_Email.js, and Code_TheClerk_Drive.js.
+
+### Phase E: Reflection, Auditing & Metrics (Active Work Streams) [📍 CURRENT PHASE]
 *Semi-automating the strategic review cycle.*
-*   **[ ] Task E.1:** Build the Vantage Extraction Pipeline to read receipts/stats and produce the "Performance Audit Table."
-*   **[ ] Task E.2:** Semi-automate the reflection process using Atlas to cross-reference the Audit Table with your subjective journaling to ensure alignment with your goals.
-*   **[ ] Task E.3:** Time Auditing (Calendar): Develop a script to extract historical Calendar events, calculate total hours spent per "Category" (based on LOS Taxonomy), and feed this objective data into the Vantage Audit.
-*   **[x] Task E.4:** Taxonomy Omni-Sync (Bidirectional Maintenance): Categorization processes are established. Financial taxonomy and recurring service utilities have been synchronized across the LOS documentation and Google Drive infrastructure.
-*   **[ ] Task E.5:** Biological & Digital Metrics Extraction (Future): Build pipelines to automatically pull data from Fitbit and Apple Screen Time to add objective biological/digital metrics to the Vantage Audit.
-*   **[x] Task E.6:** Unified Historic Timeline & Persona Building: Develop a comprehensive data-fusion pipeline (combining exports from Email, Drive, Photos, and other sources) to construct a massive, searchable JSON timeline. This timeline will feed directly into Atlas and Vantage to build an objective, omni-channel "persona" of your life history. *(Completed: Initial integration via Photo Archiver and Second Brain integration)*
-### Phase F: Conversational Personas (Gemini Gems Setup)
+
+#### Stream 1: Photo Archiving & Timeline Integration
+*   **[/] Task E.1:** Photo Archiver Pipeline: Local metadata processing active on scripts/categorize_photos_local.py for ~38k takeout photos.
+*   **[x] Task E.2:** Unified Historic Timeline & Persona Building: Develop a comprehensive data-fusion pipeline (combining exports from Email, Drive, Photos, and other sources) to construct a massive, searchable JSON timeline. This timeline will feed directly into Atlas and Vantage to build an objective, omni-channel "persona" of your life history.
+
+#### Stream 2: Work/Personal Task Sync Consolidation
+*   **[x] Task E.3:** Deploy work-specific instance of The System using clasp and separate GCP credentials.
+*   **[x] Task E.4:** Build and run local task aggregator script sync_tasks_combined.py.
+
+#### Stream 3: Dashboard Metrics & Reflection
+*   **[ ] Task E.5:** Vantage Extraction Pipeline: Build the Vantage Extraction Pipeline to read receipts/stats and produce the "Performance Audit Table."
+*   **[ ] Task E.6:** Time Auditing (Calendar): Develop a script to extract historical Calendar events, calculate total hours spent per "Category" (based on LOS Taxonomy), and feed this objective data into the Vantage Audit.
+*   **[ ] Task E.7:** Biological & Digital Metrics Extraction: Build pipelines to automatically pull data from Fitbit and Apple Screen Time to add objective biological/digital metrics to the Vantage Audit.
+*   **[ ] Task E.8:** Semi-automate reflection: Semi-automate the reflection process using Atlas to cross-reference the Audit Table with your subjective journaling to ensure alignment with your goals.
+*   **[x] Task E.9:** Dashboard Design Polish: Polish interactive buttons, navigation items, and dropdown menus with custom transition animations and direct state binding fixes.
+*   **[x] Task E.10:** Taxonomy Omni-Sync: Bidirectional Maintenance: Categorization processes are established. Financial taxonomy and recurring service utilities have been synchronized across the LOS documentation and Google Drive infrastructure.
+
+### Phase F: Conversational Personas (Gemini Gems Setup) [✅ COMPLETED]
 *Bringing the static personas to life as interactive consultants.*
 *   **[x] Task F.1:** The System Architect Gem: Configured the master builder persona to maintain and evolve the architecture.
 *   **[x] Task F.2:** Task Master Gem: Configured the workflow manager persona with direct links to the latest categorisation and rules.
@@ -80,7 +94,7 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *   **[ ] Task G.1:** "The System" Notebook: Set up a continuous sync between the `docs/` folder and Notebook LM so that deliverables, manuals, and artifacts can be generated about the system architecture itself.
 *   **[ ] Task G.2:** "The Deliverables" Notebook: Set up a continuous sync between the outputs of the system (1 day context summaries, to-do lists, audit tables) and a separate Notebook LM to analyze behavioral attributes and output strategic insights.
 
-### Phase H: Autonomous Execution
+### Phase H: Autonomous Execution [✅ COMPLETED]
 *Moving beyond management to actual "doing."*
 *   **[x] Task H.1:** Build the Generalist Executor Persona (MacGyver). Create the system instructions (`macgyver.md`) and Gem Wrapper to establish an orchestration protocol where MacGyver acts as the doer, tagging in James (Strategy) and Penny (Copywriting) to execute tasks. *(Completed: Aliased into the_system workspace).*
 *   **[x] Task H.2:** Manual Execution Pipeline. Since MacGyver can be run locally via Antigravity or via the Gemini App, we will forgo automated Apps Script triggers for now. MacGyver will read the live `Google Tasks.md` file to understand the active queue.
@@ -88,12 +102,12 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *   **[x] Task H.4:** Full Autonomy Pipeline: Transitioned MacGyver from a human-triggered tool to a proactive agent capable of digital proxy execution for physical errands via native Apps Script `clasp` calls.
 *   **[x] Task H.5:** Rule Refinement & Edge Case Handling (Continuous): Implemented mandatory rules in `macgyver.md` requiring Calendar/Task pre-flight checks and prohibiting browser-based manual data gathering.
 
+## Deferred / Under Review
+
 ### Phase I: Multi-Tenant & Family Expansion (Future Scope)
 *Scaling The System from a personal Second Brain to a Family Hub & Work Environment.*
 *   **[ ] Task I.1:** Deploy decentralized instances of The Clerk to secondary Google Accounts (e.g., Wife's accounts) using custom, tailored taxonomies.
 *   **[ ] Task I.2:** Build an aggregation bridge that routes 'need to know' action items and calendar logistics from secondary accounts into a centralized family dashboard on the Master Spreadsheet.
-*   **[ ] Task I.3:** Deploy work-specific instance of The System to Playmetech / Quantum 21 Google Account using clasp on work-macbook and separate GCP credentials.
-*   **[ ] Task I.4:** Build local task aggregator script (`sync_tasks_combined.py`) running strictly on work-macbook to safely merge personal and work tasks.
 
 ### Phase J: Event-Driven Webhook Architecture (Future Scope)
 *Transitioning from polling to real-time event-driven updates using Gemini API Webhooks.*
@@ -111,4 +125,3 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *Integrating Google Chat as a consolidated messaging workspace.*
 *   **[ ] Task L.1:** Set up one-way ingestion routing from WhatsApp/Telegram/Messenger bridges to dedicated Google Chat spaces (utilizing webhook endpoints on a Business Standard Google Workspace account).
 *   **[ ] Task L.2:** Build a bidirectional sync daemon that polls the Apps Script outbound queue and dispatches replies written inside Google Chat back to the messaging bridges.
-
