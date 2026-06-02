@@ -48,15 +48,18 @@ This document outlines the automated trigger schedule for the Life Organisation 
     *   **Execution Time:** Every 84 days (starting May 10, 2026) at 18:00.
     *   **Purpose:** Generates a macro-trajectory and goal alignment report.
 
-### 4. Daily Reference Syncs (System Architect)
+
+### 4. Hourly Reference Syncs (System Architect)
+*   **Taxonomy Sync (`syncTaxonomyToSheet`)**
+    *   **Schedule:** Every 1 Hour
+    *   **Purpose:** Rebuilds the LOS_Taxonomy JSON and updates the Master Spreadsheet from the markdown categorisation file.
+
+### 5. Daily Reference Syncs (System Architect)
 *   **Schedule:** Every Day at 02:00 AM
     *   `updateModelList()`: Exports active Gemini Models to Google Drive JSON and Sheets.
     *   `updateLabelList()`: Exports Gmail Labels to Google Drive JSON and Sheets.
     *   `updateTaskList()`: Exports Google Task List IDs to Google Drive JSON.
-    *   `syncTaxonomyToSheet()`: Rebuilds the LOS_Taxonomy JSON and updates the Master Spreadsheet from the markdown file.
     *   `exportTriageTasksToDrive()`: Exports tasks with missing metadata or placeholder goals to a JSON file for agent analysis.
-
-## Active Automated Pipelines (Reflection Workspace)
 
 *   **Vantage Reflection AI (`runDailyMaintenance`)**
     *   **Schedule:** Every 1 Hour

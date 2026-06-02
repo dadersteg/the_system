@@ -10,107 +10,7 @@
  * - 1.0.0: Initial creation from split of Code_Utilities.js. Added standardized documentation header, JSDoc descriptions for all functions, aggressive type checking, and error boundaries.
  */
 
-/**
- * Executes a folder mapping starting from the target workspace folder, logging the output to a specific sheet.
- * @returns {void}
- */
-function executeFolderMapping() {
-  const UTIL_PROPS = typeof PropertiesService !== 'undefined' ? PropertiesService.getScriptProperties() : null;
-  const TARGET_FOLDER_ID = UTIL_PROPS ? UTIL_PROPS.getProperty("WORKSPACE_FOLDER_ID") : null;
-  const MASTER_SHEET_ID = UTIL_PROPS ? UTIL_PROPS.getProperty("MASTER_SHEET_ID") : null;
-  if (!TARGET_FOLDER_ID) {
-    console.error("executeFolderMapping failed: Missing Script Property WORKSPACE_FOLDER_ID");
-    return;
-  }
-  if (!MASTER_SHEET_ID) {
-    console.error("executeFolderMapping failed: Missing Script Property MASTER_SHEET_ID");
-    return;
-  }
 
-  const MAPPER_GID = "536537641";
-
-  try {
-    const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
-    const sheet = ss.getSheets().find(s => s.getSheetId().toString() === MAPPER_GID);
-    if (!sheet) {
-      console.error(`executeFolderMapping failed: Could not find sheet with GID ${MAPPER_GID}`);
-      return;
-    }
-    sheet.clearContents();
-
-    const headers = ["Depth", "Structure", "Folder ID", "Absolute Path"];
-    const outputData = [headers];
-
-    const rootFolder = DriveApp.getFolderById(TARGET_FOLDER_ID);
-    const rootName = rootFolder.getName();
-
-    outputData.push([0, rootName, rootFolder.getId(), `/${rootName}`]);
-    traverseAndLog(rootFolder, 1, `/${rootName}`, outputData);
-
-    // Batch write to sheet
-    sheet.getRange(1, 1, outputData.length, headers.length).setValues(outputData);
-    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
-
-    console.log(`Topology mapping complete. ${outputData.length - 1} nodes mapped.`);
-  } catch (e) {
-    console.error(`executeFolderMapping execution failed: ${e.message}`);
-    try {
-      const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
-      const sheet = ss.getSheets().find(s => s.getSheetId().toString() === MAPPER_GID);
-      if (sheet) {
-        const headers = ["Depth", "Structure", "Folder ID", "Absolute Path"];
-        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-        sheet.appendRow(["ERROR", e.message, "", ""]);
-      }
-    } catch (innerError) {
-      console.error(`executeFolderMapping failed to log error to sheet: ${innerError.message}`);
-    }
-  }
-}
-
-/**
- * Recursively traverses a folder structure and logs the paths.
- * @param {GoogleAppsScript.Drive.Folder} parentFolder - The parent folder to start traversing.
- * @param {number} depth - The current depth level of the traversal.
- * @param {string} currentPath - The string representing the current absolute path.
- * @param {Array<Array<string|number>>} outputData - The array collecting the mapped data.
- * @returns {void}
- */
-function traverseAndLog(parentFolder, depth, currentPath, outputData) {
-  if (!parentFolder || typeof parentFolder.getFolders !== 'function') {
-    console.error("traverseAndLog failed: Invalid parentFolder provided.");
-    return;
-  }
-  if (typeof depth !== 'number' || depth < 0) {
-    console.error("traverseAndLog failed: Invalid depth provided.");
-    return;
-  }
-  if (typeof currentPath !== 'string') {
-    console.error("traverseAndLog failed: Invalid currentPath provided.");
-    return;
-  }
-  if (!Array.isArray(outputData)) {
-    console.error("traverseAndLog failed: Invalid outputData provided.");
-    return;
-  }
-
-  try {
-    const subfolders = parentFolder.getFolders();
-    while (subfolders.hasNext()) {
-      const folder = subfolders.next();
-      const folderName = folder.getName();
-      if (shouldIgnoreFolder(folderName)) continue;
-
-      const absolutePath = `${currentPath}/${folderName}`;
-      const prefix = "│   ".repeat(depth - 1) + "├── ";
-
-      outputData.push([depth, prefix + folderName, folder.getId(), absolutePath]);
-      traverseAndLog(folder, depth + 1, absolutePath, outputData);
-    }
-  } catch (e) {
-    console.error(`traverseAndLog failed at path ${currentPath}: ${e.message}`);
-  }
-}
 
 /**
  * Scans for folders with a "[DONE]" prefix and removes the prefix, logging changes.
@@ -265,7 +165,10 @@ function syncDriveFoldersFromTaxonomy() {
       return;
     }
 
-    const root = DriveApp.getRootFolder();
+    const isWork = isWorkAccount();
+    const root = isWork ? 
+                 DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) : 
+                 DriveApp.getRootFolder();
 
     let startIndex = parseInt(SYSTEM_CONFIG.STATE.TAXONOMY_SYNC_INDEX, 10);
     if (isNaN(startIndex) || startIndex >= taxonomy.length) {
@@ -333,6 +236,15 @@ function syncDriveFoldersFromTaxonomy() {
         if (item["L2 Code"]) folderNames.push(`${item["L2 Code"]} ${item["L2 Name"] ? item["L2 Name"].trim() : ""}`);
         if (item["L3 Code"]) folderNames.push(`${item["L3 Code"]} ${item["L3 Name"] ? item["L3 Name"].trim() : ""}`);
         folderNames.push(item["L4 Name"].trim());
+
+        if (isWork) {
+          while (folderNames.length > 0 && 
+                 (folderNames[0].indexOf("02 Work") === 0 || 
+                  folderNames[0].indexOf("02 01 00 Employment") === 0 || 
+                  folderNames[0].indexOf("02 01 01 Playmetech") === 0)) {
+            folderNames.shift();
+          }
+        }
 
         console.log(`[CHECKING] /${folderNames.slice(0, TARGET_DEPTH).join('/')}`);
         getOrCreatePath(root, folderNames);
@@ -446,8 +358,20 @@ function resolveFolderFromTaxonomy(concatPath, taxonomy) {
 
   if (folderNames.length === 0) return null;
 
-  // Traverse down from the root
-  let currentFolder = DriveApp.getRootFolder();
+  const isWork = isWorkAccount();
+  if (isWork) {
+    while (folderNames.length > 0 && 
+           (folderNames[0].indexOf("02 Work") === 0 || 
+            folderNames[0].indexOf("02 01 00 Employment") === 0 || 
+            folderNames[0].indexOf("02 01 01 Playmetech") === 0)) {
+      folderNames.shift();
+    }
+  }
+
+  // Traverse down from the root / workspace root
+  let currentFolder = isWork ? 
+                      DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) : 
+                      DriveApp.getRootFolder();
   for (let i = 0; i < folderNames.length; i++) {
     const part = folderNames[i];
     if (!part) continue;

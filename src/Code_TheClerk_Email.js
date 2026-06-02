@@ -26,8 +26,7 @@ const AUDIT_GID = SYSTEM_CONFIG.SHEET_GIDS.LABEL_MANAGEMENT; // Label Management
 const ALIAS_GID = SYSTEM_CONFIG.SHEET_GIDS.ALIAS_WHITELIST; // Alias Whitelist Tab
 const LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG;   // Granular Execution Log (Ongoing)
 const RETRO_LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_RETRO_LOG;       // Retro Execution Log (Leave blank to auto-create)
-const SUBJECT_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_SUBJECT_RULES; // Subject Rules Tab
-const SENDER_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_SENDER_RULES; // Sender Rules Tab
+const DETERMINISTIC_RULES_GID = SYSTEM_CONFIG.SHEET_GIDS.EMAIL_DETERMINISTIC_RULES; // Combined Rules Tab
 
 // System Labels
 const PROCESSED_FLAG = '99 Label_Reviewed'; 
@@ -50,8 +49,7 @@ function runTheClerkEmailOngoing() {
 
   // Hoist API calls outside of the main loop
   const configPayload = {
-    sheetRules: getSheetRules(),
-    subjectRules: getSubjectRules(),
+    deterministicRules: getDeterministicRules(),
     allowedAliases: getAllowedAliases(),
     fullDocPrompt: getSafeDocText(DOC_ID),
     taxonomyJsonStr: getSafeDocText(TAXONOMY_JSON_ID),
@@ -80,8 +78,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
   console.log(`Found ${threads.length} threads. Syncing with ${currentModel}.`);
   if (threads.length === 0) return;
 
-  const sheetRules = configPayload ? configPayload.sheetRules : getSheetRules();
-  const subjectRules = configPayload ? configPayload.subjectRules : getSubjectRules();
+  const deterministicRules = configPayload ? configPayload.deterministicRules : getDeterministicRules();
   const allowedAliases = configPayload ? configPayload.allowedAliases : getAllowedAliases();
   const fullDocPrompt = configPayload ? configPayload.fullDocPrompt : getSafeDocText(DOC_ID);
   const taxonomyJsonStr = configPayload ? configPayload.taxonomyJsonStr : getSafeDocText(TAXONOMY_JSON_ID);
@@ -196,23 +193,32 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
     let markAsReadVals = [];
     let skipAIVals = [];
     
-    for (let ruleKey in sheetRules) {
-      if (sender.includes(ruleKey)) {
-        tempLabels.push(...sheetRules[ruleKey].labels);
-        keepInInboxVals.push(sheetRules[ruleKey].keepInInbox);
-        markAsReadVals.push(sheetRules[ruleKey].markAsRead);
-        skipAIVals.push(sheetRules[ruleKey].skipAI);
-      }
-    }
+    // Evaluate combined deterministic rules
+    const lowerSender = sender.toLowerCase();
+    const lowerSubject = subject.toLowerCase();
+    const lowerBody = body.toLowerCase();
     
-    for (let ruleKey in subjectRules) {
-      if (subject.toLowerCase().includes(ruleKey)) {
-        tempLabels.push(...subjectRules[ruleKey].labels);
-        keepInInboxVals.push(subjectRules[ruleKey].keepInInbox);
-        markAsReadVals.push(subjectRules[ruleKey].markAsRead);
-        skipAIVals.push(subjectRules[ruleKey].skipAI);
+    deterministicRules.forEach(rule => {
+      let isMatch = true;
+      
+      // Check each non-null condition using AND logic
+      if (rule.sender && !lowerSender.includes(rule.sender)) {
+        isMatch = false;
       }
-    }
+      if (rule.subject && !lowerSubject.includes(rule.subject)) {
+        isMatch = false;
+      }
+      if (rule.emailContains && !lowerBody.includes(rule.emailContains)) {
+        isMatch = false;
+      }
+      
+      if (isMatch) {
+        if (rule.labels && rule.labels.length > 0) tempLabels.push(...rule.labels);
+        keepInInboxVals.push(rule.keepInInbox);
+        markAsReadVals.push(rule.markAsRead);
+        skipAIVals.push(rule.skipAI);
+      }
+    });
     
     let ssMatch = null;
     if (tempLabels.length > 0 || keepInInboxVals.length > 0 || skipAIVals.length > 0) {
@@ -693,52 +699,46 @@ function getLabelIdByName(name) {
   return labelIdMap[name];
 }
 
-function getSheetRules() {
+function getDeterministicRules() {
   const ss = getMasterSpreadsheet();
-  const sheet = ss.getSheets().find(s => s.getSheetId().toString() === SENDER_GID);
+  const sheet = ss.getSheets().find(s => s.getSheetId().toString() === DETERMINISTIC_RULES_GID);
   if (!sheet) {
-    console.error(`ERROR: Sender Rules tab with GID ${SENDER_GID} not found!`);
-    return {};
+    console.error(`ERROR: Deterministic Rules tab with GID ${DETERMINISTIC_RULES_GID} not found!`);
+    return [];
   }
   const data = sheet.getDataRange().getValues();
-  const rules = {};
+  const rules = [];
   if (data.length <= 1) return rules;
   
   const headers = data[0].map(h => h.toString().toLowerCase().trim());
+  
+  // Find column indices dynamically
+  const senderIdx = headers.findIndex(h => h.includes('sender'));
+  const subjectIdx = headers.findIndex(h => h.includes('subject'));
+  const emailContainsIdx = headers.findIndex(h => h.includes('email contains') || h.includes('body contains') || h.includes('body') || h.includes('contains'));
+  const labelsIdx = headers.findIndex(h => h.includes('label'));
+  const keepInInboxIdx = headers.findIndex(h => h.includes('keep in inbox') || h.includes('inbox'));
+  const markAsReadIdx = headers.findIndex(h => h.includes('mark as read') || h.includes('read'));
   const skipAiIdx = headers.findIndex(h => h.includes('skip') && h.includes('ai'));
   
   data.forEach((row, i) => { 
-    if (row[0] && i > 0) {
-      rules[row[0].toString().trim().toLowerCase()] = { 
-        labels: row[1] ? row[1].toString().split(',').map(s => s.trim()) : [], 
-        keepInInbox: row[2] === true || row[2].toString().toUpperCase() === 'T', 
-        markAsRead: row[3] === true || row[3].toString().toUpperCase() === 'T',
-        skipAI: skipAiIdx !== -1 ? (row[skipAiIdx] === true || row[skipAiIdx].toString().toUpperCase() === 'T' || row[skipAiIdx].toString().toUpperCase() === 'TRUE') : false
-      }; 
-    }
-  });
-  return rules;
-}
-
-function getSubjectRules() {
-  const ss = getMasterSpreadsheet();
-  const sheet = ss.getSheets().find(s => s.getSheetId().toString() === SUBJECT_GID);
-  if (!sheet) return {};
-  const data = sheet.getDataRange().getValues();
-  const rules = {};
-  if (data.length <= 1) return rules;
-  
-  const headers = data[0].map(h => h.toString().toLowerCase().trim());
-  const skipAiIdx = headers.findIndex(h => h.includes('skip') && h.includes('ai'));
-  
-  data.forEach((row, i) => { 
-    if (row[0] && i > 0) {
-      rules[row[0].toString().trim().toLowerCase()] = { 
-        labels: row[1] ? row[1].toString().split(',').map(s => s.trim()) : [], 
-        keepInInbox: row[2] === true || row[2].toString().toUpperCase() === 'T', 
-        markAsRead: row[3] === true || row[3].toString().toUpperCase() === 'T',
-        skipAI: skipAiIdx !== -1 ? (row[skipAiIdx] === true || row[skipAiIdx].toString().toUpperCase() === 'T' || row[skipAiIdx].toString().toUpperCase() === 'TRUE') : false
-      }; 
+    if (i > 0) {
+      // Only add rule if at least one condition is defined
+      const senderVal = (senderIdx !== -1 && row[senderIdx]) ? row[senderIdx].toString().trim().toLowerCase() : null;
+      const subjectVal = (subjectIdx !== -1 && row[subjectIdx]) ? row[subjectIdx].toString().trim().toLowerCase() : null;
+      const emailContainsVal = (emailContainsIdx !== -1 && row[emailContainsIdx]) ? row[emailContainsIdx].toString().trim().toLowerCase() : null;
+      
+      if (senderVal || subjectVal || emailContainsVal) {
+        rules.push({
+          sender: senderVal,
+          subject: subjectVal,
+          emailContains: emailContainsVal,
+          labels: (labelsIdx !== -1 && row[labelsIdx]) ? row[labelsIdx].toString().split(',').map(s => s.trim()) : [], 
+          keepInInbox: (keepInInboxIdx !== -1) ? (row[keepInInboxIdx] === true || row[keepInInboxIdx].toString().toUpperCase() === 'T' || row[keepInInboxIdx].toString().toUpperCase() === 'TRUE') : false,
+          markAsRead: (markAsReadIdx !== -1) ? (row[markAsReadIdx] === true || row[markAsReadIdx].toString().toUpperCase() === 'T' || row[markAsReadIdx].toString().toUpperCase() === 'TRUE') : false,
+          skipAI: (skipAiIdx !== -1) ? (row[skipAiIdx] === true || row[skipAiIdx].toString().toUpperCase() === 'T' || row[skipAiIdx].toString().toUpperCase() === 'TRUE') : false
+        });
+      }
     }
   });
   return rules;

@@ -27,3 +27,6 @@ token_tasks_private.json
 token_tasks_work.json
 creds_private.json
 creds_work.json
+
+# Local Puppeteer/Chrome cache
+chrome_profile/

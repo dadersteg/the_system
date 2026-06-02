@@ -276,6 +276,20 @@ function syncTaxonomyToSheet() {
       }
   }
 
+  // Adjust labels for Work account context (remove redundant Playmetech nested path prefix)
+  const isWork = isWorkAccount();
+  if (isWork) {
+    const workPrefix = "02 Work/01 Employment/01 Playmetech/";
+    for (let i = 1; i < data.length; i++) {
+      let label = data[i][8];
+      if (label && label.indexOf(workPrefix) === 0) {
+        data[i][8] = label.substring(workPrefix.length);
+      } else if (label === "02 Work/01 Employment/01 Playmetech") {
+        data[i][8] = "Playmetech";
+      }
+    }
+  }
+
   // Dump to sheet
   const ss = SpreadsheetApp.openById(sheetId);
   const sheets = ss.getSheets();

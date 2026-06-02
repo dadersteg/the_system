@@ -127,8 +127,7 @@ function setupSystemTriggers() {
 
     ScriptApp.newTrigger("syncTaxonomyToSheet")
       .timeBased()
-      .everyDays(1)
-      .atHour(2)
+      .everyHours(1)
       .create();
 
     ScriptApp.newTrigger("exportTriageTasksToDrive")
@@ -408,4 +407,17 @@ function getTaxonomyStr() {
  */
 function getDrivePromptStr() {
   return getSafeDocText(SYSTEM_CONFIG.DOCS.CLERK_DRIVE_INSTRUCTIONS);
+}
+
+/**
+ * Checks if the executing account is the Work account (daniel@playmetech.net).
+ * @returns {boolean} True if Work account, false otherwise.
+ */
+function isWorkAccount() {
+  try {
+    var email = Session.getEffectiveUser().getEmail();
+    return email && (email.indexOf("playmetech.net") !== -1 || email.indexOf("work") !== -1);
+  } catch(e) {
+    return false;
+  }
 }

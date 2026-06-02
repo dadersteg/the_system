@@ -95,11 +95,6 @@ function doGet(e) {
      run1DayTaskMaintenance();
      return ContentService.createTextOutput("Successfully ran Task Master Engine.");
   }
-  if (e && e.parameter && e.parameter.action === "runTheClerkEmailRetro") {
-     const limit = parseInt(e.parameter.limit || "15", 10);
-     const result = runTheClerkEmailRetroBatch(limit);
-     return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
-  }
 
   if (e && e.parameter && e.parameter.action === "getTasks") {
      const result = listTasksFromCLI("all");
