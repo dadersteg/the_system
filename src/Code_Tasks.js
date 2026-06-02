@@ -1234,6 +1234,7 @@ function syncCompletedTasksLog() {
   if (!taskLists) return;
   
   let addedCount = 0;
+  const rowsToAdd = [];
   
   taskLists.forEach(list => {
     let pageToken = null;
@@ -1260,7 +1261,7 @@ function syncCompletedTasksLog() {
                   if (match) link = match[0];
                 }
                 
-                completedSheet.appendRow([task.id, task.title, task.notes || "", link, task.completed || task.updated]);
+                rowsToAdd.push([task.id, task.title, task.notes || "", link, task.completed || task.updated]);
                 existingIds.add(task.id);
                 addedCount++;
               }
@@ -1282,6 +1283,11 @@ function syncCompletedTasksLog() {
       }
     } while (pageToken);
   });
+  
+  if (rowsToAdd.length > 0) {
+    const lastRow = completedSheet.getLastRow();
+    completedSheet.getRange(lastRow + 1, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
+  }
   
   console.log(`Synced ${addedCount} new completed tasks to the log.`);
 }
