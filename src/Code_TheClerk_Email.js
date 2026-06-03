@@ -870,17 +870,28 @@ function applyManualRevisionsEmail() {
           const revisedLabels = revisedLabelsStr.toString().split(',').map(s => s.trim()).filter(Boolean);
           
           const currentThreadLabels = thread.getLabels();
+          const addIds = [];
+          const removeIds = [];
+          
+          revisedLabels.forEach(labelName => {
+            const id = getLabelIdByName(labelName);
+            if (id) addIds.push(id);
+          });
+          
           currentThreadLabels.forEach(l => {
-            if (l.getName() !== '99 Label_Reviewed') {
-              thread.removeLabel(l);
+            const name = l.getName();
+            if (!revisedLabels.includes(name) && name !== '99 Label_Reviewed') {
+              const id = getLabelIdByName(name);
+              if (id) removeIds.push(id);
             }
           });
           
-          revisedLabels.forEach(labelName => {
-            let userLabel = GmailApp.getUserLabelByName(labelName);
-            if (!userLabel) userLabel = GmailApp.createLabel(labelName);
-            thread.addLabel(userLabel);
-          });
+          if (addIds.length > 0 || removeIds.length > 0) {
+            Gmail.Users.Threads.modify({
+              "addLabelIds": [...new Set(addIds)],
+              "removeLabelIds": [...new Set(removeIds)]
+            }, "me", threadId);
+          }
           
           values[i][finalLabelCol] = revisedLabelsStr;
           values[i][statusCol] = "SYNCED";

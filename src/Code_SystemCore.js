@@ -350,7 +350,7 @@ function getActiveThreadTaskMap() {
       try {
         const res = Tasks.Tasks.list(listId, {
            showCompleted: false, 
-           showHidden: false, 
+           showHidden: false, showAssigned: true, 
            maxResults: 100, 
            pageToken: pageToken
         });
@@ -414,6 +414,14 @@ function getDrivePromptStr() {
  * @returns {boolean} True if Work account, false otherwise.
  */
 function isWorkAccount() {
+  try {
+    const props = typeof PropertiesService !== 'undefined' ? PropertiesService.getUserProperties() : null;
+    if (props && props.getProperty("IS_WORK_ACCOUNT") === "true") {
+      return true;
+    }
+  } catch(e) {
+    // Ignore
+  }
   try {
     var email = Session.getEffectiveUser().getEmail();
     return email && (email.indexOf("playmetech.net") !== -1 || email.indexOf("work") !== -1);

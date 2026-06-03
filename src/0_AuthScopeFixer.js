@@ -350,12 +350,14 @@ function setWorkWorkspaceFolderProperty() {
   try {
     const props = PropertiesService.getUserProperties();
     props.setProperty("WORKSPACE_FOLDER_ID", workWorkspaceFolderId);
+    props.setProperty("IS_WORK_ACCOUNT", "true");
     console.log("======================================================================");
-    console.log("SUCCESS: WORKSPACE_FOLDER_ID has been successfully set to:");
-    console.log(workWorkspaceFolderId);
+    console.log("SUCCESS: WORKSPACE_FOLDER_ID and IS_WORK_ACCOUNT properties configured!");
+    console.log("WORKSPACE_FOLDER_ID: " + workWorkspaceFolderId);
+    console.log("IS_WORK_ACCOUNT: true");
     console.log("======================================================================");
   } catch (e) {
-    console.error("Failed to set WORKSPACE_FOLDER_ID: " + e.message);
+    console.error("Failed to set properties: " + e.message);
   }
 }
 

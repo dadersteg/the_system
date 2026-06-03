@@ -370,7 +370,12 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                         if (targetFolder) folderCache.byName[data.concat_path] = targetFolder;
                     }
 
+                    let outOfScope = false;
                     if (targetFolder) {
+                        outOfScope = isFolderOutOfScope(targetFolder);
+                    }
+
+                    if (targetFolder && !outOfScope) {
                         file.moveTo(targetFolder);
                         targetFolderId = targetFolder.getId();
 
@@ -380,6 +385,8 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                         }
                         targetFolderPath = targetFolder.fullPath;
                         moved = true;
+                    } else if (outOfScope) {
+                        console.warn(`   [WARNING] Resolved folder '${targetFolder.getName()}' is OUT OF SCOPE. Routing to Manual Review.`);
                     }
                 }
                 
@@ -1038,5 +1045,33 @@ function getExistingShortcutTargets() {
     }
   } while (pageToken);
   return targets;
+}
+
+/**
+ * Checks recursively if a folder is marked as "OUT OF SCOPE" or is a child/descendant
+ * of any of the configured OUT OF SCOPE folder IDs.
+ * @param {GoogleAppsScript.Drive.Folder} folder - The resolved folder to check.
+ * @returns {boolean} True if the folder is out of scope, false otherwise.
+ */
+function isFolderOutOfScope(folder) {
+  if (!folder) return false;
+  
+  const outOfScopeProp = (SYSTEM_CONFIG && SYSTEM_CONFIG.DRIVE_FOLDERS && SYSTEM_CONFIG.DRIVE_FOLDERS.OUT_OF_SCOPE) || "";
+  const outOfScopeIds = outOfScopeProp.split(",").map(id => id.trim()).filter(Boolean);
+  if (outOfScopeIds.length === 0) return false;
+
+  let current = folder;
+  while (current) {
+    if (outOfScopeIds.indexOf(current.getId()) !== -1) {
+      return true;
+    }
+    const parents = current.getParents();
+    if (parents.hasNext()) {
+      current = parents.next();
+    } else {
+      break;
+    }
+  }
+  return false;
 }
 

@@ -38,7 +38,7 @@ function doGet(e) {
   }
    if (e && e.parameter && e.parameter.debugActualTasks === "true") {
       const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
-      const response = Tasks.Tasks.list(todoListId, { showCompleted: true, showHidden: true, maxResults: 10 });
+      const response = Tasks.Tasks.list(todoListId, { showCompleted: true, showHidden: true, showAssigned: true, maxResults: 10 });
       return ContentService.createTextOutput(JSON.stringify(response.items));
    }
 
@@ -249,7 +249,7 @@ function doGet(e) {
       const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
       const response = Tasks.Tasks.list(todoListId, {
         showCompleted: true,
-        showHidden: true,
+        showHidden: true, showAssigned: true,
         maxResults: 100
       });
       return ContentService.createTextOutput(JSON.stringify(response.items || [])).setMimeType(ContentService.MimeType.JSON);
@@ -268,7 +268,7 @@ function doGet(e) {
         try {
           const response = Tasks.Tasks.list(id, {
             showCompleted: true,
-            showHidden: true,
+            showHidden: true, showAssigned: true,
             maxResults: 100
           });
           results[name] = response.items || [];
@@ -666,7 +666,7 @@ function completeTaskByTitle(title) {
     do {
       const response = Tasks.Tasks.list(listId, {
         showCompleted: false,
-        showHidden: false,
+        showHidden: false, showAssigned: true,
         maxResults: 100,
         pageToken: pageToken
       });
@@ -747,7 +747,7 @@ function getDashboardData() {
     // Open Tasks (max 50)
     const openResponse = Tasks.Tasks.list(todoListId, {
       showCompleted: false,
-      showHidden: false,
+      showHidden: false, showAssigned: true,
       maxResults: 50
     });
     
@@ -768,7 +768,7 @@ function getDashboardData() {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const recentResponse = Tasks.Tasks.list(todoListId, {
       showCompleted: true,
-      showHidden: true,
+      showHidden: true, showAssigned: true,
       updatedMin: thirtyDaysAgo.toISOString(),
       maxResults: 100
     });
@@ -1319,6 +1319,7 @@ function fixSpreadsheetTypos(ssId) {
   sheets.forEach(sheet => {
     const range = sheet.getDataRange();
     const values = range.getValues();
+    const changedCells = [];
     let updated = false;
     
     for (let r = 0; r < values.length; r++) {
@@ -1331,6 +1332,7 @@ function fixSpreadsheetTypos(ssId) {
           });
           if (val !== original) {
             values[r][c] = val;
+            changedCells.push({ r, c, val });
             updated = true;
           }
         }
@@ -1340,15 +1342,14 @@ function fixSpreadsheetTypos(ssId) {
       try {
         range.setValues(values);
       } catch (e) {
-        for (let r = 0; r < values.length; r++) {
-          for (let c = 0; c < values[r].length; c++) {
-            try {
-              sheet.getRange(r + 1, c + 1).setValue(values[r][c]);
-            } catch (cellError) {
-              // Ignore validation exceptions for specific cells
-            }
+        // Fallback: update only the cells that actually changed to avoid timeout/validation issues
+        changedCells.forEach(cell => {
+          try {
+            sheet.getRange(cell.r + 1, cell.c + 1).setValue(cell.val);
+          } catch (cellError) {
+            // Ignore validation exceptions for specific cells
           }
-        }
+        });
       }
     }
   });
@@ -1388,14 +1389,14 @@ function getDashboardTasks() { const startT = Date.now();
   const res = { tasks: [], recentTasks: [], workoutsTasks: [], workouts: [] };
   try {
     const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
-    const openResponse = Tasks.Tasks.list(todoListId, { showCompleted: false, showHidden: false, maxResults: 50 });
+    const openResponse = Tasks.Tasks.list(todoListId, { showCompleted: false, showHidden: false, showAssigned: true, maxResults: 50 });
     const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
     const openTasks = openResponse.items || [];
     const filteredOpen = openTasks.filter(t => t.status !== 'completed' && (!t.due || new Date(t.due) <= todayEnd));
     res.tasks = filteredOpen.slice(0, 25).map(t => ({ id: t.id, title: t.title, due: t.due || null, url: 'https://mail.google.com/tasks/canvas' }));
 
     const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const recentResponse = Tasks.Tasks.list(todoListId, { showCompleted: true, showHidden: true, updatedMin: thirtyDaysAgo.toISOString(), maxResults: 100 });
+    const recentResponse = Tasks.Tasks.list(todoListId, { showCompleted: true, showHidden: true, showAssigned: true, updatedMin: thirtyDaysAgo.toISOString(), maxResults: 100 });
     const allRecent = recentResponse.items || [];
     const updatedTasks = allRecent.sort((a, b) => new Date(b.updated).getTime() - new Date(a.updated).getTime());
     res.recentTasks = updatedTasks.slice(0, 25).map(t => ({ id: t.id, title: t.title, updated: t.updated, status: t.status, notesSnippet: (t.notes || "").substring(0, 50).replace(/\n/g, " ") }));
@@ -1505,7 +1506,7 @@ function getDashboardClerkLogs() { const startT = Date.now();
         try {
           const response = Tasks.Tasks.list(listInfo.id, {
             showCompleted: true,
-            showHidden: true,
+            showHidden: true, showAssigned: true,
             maxResults: 50
           });
           const items = response.items || [];
@@ -1724,7 +1725,7 @@ function getDashboardDocs() { const startT = Date.now();
     
     const todayStart = new Date(); todayStart.setHours(0,0,0,0);
     const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
-    const completedTasksResponse = Tasks.Tasks.list(todoListId, { showCompleted: true, showHidden: true, maxResults: 100 });
+    const completedTasksResponse = Tasks.Tasks.list(todoListId, { showCompleted: true, showHidden: true, showAssigned: true, maxResults: 100 });
     if (completedTasksResponse.items) {
        res.completedTasksCount = completedTasksResponse.items.filter(t => t.status === 'completed' && t.completed && new Date(t.completed) >= todayStart).length;
     }

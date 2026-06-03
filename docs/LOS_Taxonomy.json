@@ -2,6 +2,438 @@
   {
     "L1 Code": "01 00 00",
     "L1 Name": "Private",
+    "L2 Code": "",
+    "L2 Name": "",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private",
+    "Concat (Path)": "01 00 00 Private"
+  },
+  {
+    "L1 Code": "02 00 00",
+    "L1 Name": "Work",
+    "L2 Code": "",
+    "L2 Name": "",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "02 Work",
+    "Concat (Path)": "02 00 00 Work"
+  },
+  {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "",
+    "L2 Name": "",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies",
+    "Concat (Path)": "03 00 00 Studies"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 01 00",
+    "L2 Name": "Personal Admin",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/01 Personal Admin",
+    "Concat (Path)": "01 01 00 Personal Admin"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 02 00",
+    "L2 Name": "Health",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/02 Health",
+    "Concat (Path)": "01 02 00 Health"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 03 00",
+    "L2 Name": "Personal Growth",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/03 Personal Growth",
+    "Concat (Path)": "01 03 00 Personal Growth"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 04 00",
+    "L2 Name": "Finances",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/04 Finances",
+    "Concat (Path)": "01 04 00 Finances"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 05 00",
+    "L2 Name": "Other",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/05 Other",
+    "Concat (Path)": "01 05 00 Other"
+  },
+  {
+    "L1 Code": "02 00 00",
+    "L1 Name": "Work",
+    "L2 Code": "02 01 00",
+    "L2 Name": "Employment",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "02 Work/01 Employment",
+    "Concat (Path)": "02 01 00 Employment"
+  },
+  {
+    "L1 Code": "02 00 00",
+    "L1 Name": "Work",
+    "L2 Code": "02 02 00",
+    "L2 Name": "Career Management",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "02 Work/02 Career Management",
+    "Concat (Path)": "02 02 00 Career Management"
+  },
+  {
+    "L1 Code": "02 00 00",
+    "L1 Name": "Work",
+    "L2 Code": "02 03 00",
+    "L2 Name": "Collections",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "02 Work/03 Collections",
+    "Concat (Path)": "02 03 00 Collections"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 01 00",
+    "L2 Name": "Personal Admin",
+    "L3 Code": "01 01 01",
+    "L3 Name": "Task Management",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/01 Personal Admin/01 Task Management",
+    "Concat (Path)": "01 01 01 Task Management"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 01 00",
+    "L2 Name": "Personal Admin",
+    "L3 Code": "01 01 02",
+    "L3 Name": "Contracts",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/01 Personal Admin/02 Contracts",
+    "Concat (Path)": "01 01 02 Contracts"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 02 00",
+    "L2 Name": "Health",
+    "L3 Code": "01 02 01",
+    "L3 Name": "Physical Health",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/02 Health/01 Physical Health",
+    "Concat (Path)": "01 02 01 Physical Health"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 02 00",
+    "L2 Name": "Health",
+    "L3 Code": "01 02 02",
+    "L3 Name": "Mental Health",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/02 Health/02 Mental Health",
+    "Concat (Path)": "01 02 02 Mental Health"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 03 00",
+    "L2 Name": "Personal Growth",
+    "L3 Code": "01 03 01",
+    "L3 Name": "Principles, Goals & Methods",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/03 Personal Growth/01 Principles, Goals & Methods",
+    "Concat (Path)": "01 03 01 Principles, Goals & Methods"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 03 00",
+    "L2 Name": "Personal Growth",
+    "L3 Code": "01 03 02",
+    "L3 Name": "Reflection",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/03 Personal Growth/02 Reflection",
+    "Concat (Path)": "01 03 02 Reflection"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 03 00",
+    "L2 Name": "Personal Growth",
+    "L3 Code": "01 03 03",
+    "L3 Name": "Personal Growth Theory",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/03 Personal Growth/03 Personal Growth Theory",
+    "Concat (Path)": "01 03 03 Personal Growth Theory"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 04 00",
+    "L2 Name": "Finances",
+    "L3 Code": "01 04 01",
+    "L3 Name": "Purchase",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/04 Finances/01 Purchase",
+    "Concat (Path)": "01 04 01 Purchase"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 04 00",
+    "L2 Name": "Finances",
+    "L3 Code": "01 04 02",
+    "L3 Name": "House",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/04 Finances/02 House",
+    "Concat (Path)": "01 04 02 House"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 05 00",
+    "L2 Name": "Other",
+    "L3 Code": "01 05 01",
+    "L3 Name": "Projects",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/05 Other/01 Projects",
+    "Concat (Path)": "01 05 01 Projects"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 05 00",
+    "L2 Name": "Other",
+    "L3 Code": "01 05 02",
+    "L3 Name": "Relationships",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/05 Other/02 Relationships",
+    "Concat (Path)": "01 05 02 Relationships"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 05 00",
+    "L2 Name": "Other",
+    "L3 Code": "01 05 03",
+    "L3 Name": "Collections",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/05 Other/03 Collections",
+    "Concat (Path)": "01 05 03 Collections"
+  },
+  {
+    "L1 Code": "02 00 00",
+    "L1 Name": "Work",
+    "L2 Code": "02 01 00",
+    "L2 Name": "Employment",
+    "L3 Code": "02 01 01",
+    "L3 Name": "Playmetech",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "02 Work/01 Employment/01 Playmetech",
+    "Concat (Path)": "02 01 01 Playmetech"
+  },
+  {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "03 02 00",
+    "L2 Name": "",
+    "L3 Code": "03 02 01",
+    "L3 Name": "År 1 | (2009-2010)",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies/01 År 1 | (2009-2010)",
+    "Concat (Path)": "03 02 01 År 1 | (2009-2010)"
+  },
+  {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "03 02 00",
+    "L2 Name": "",
+    "L3 Code": "03 02 02",
+    "L3 Name": "År 2 | (2010-2011)",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies/02 År 2 | (2010-2011)",
+    "Concat (Path)": "03 02 02 År 2 | (2010-2011)"
+  },
+  {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "03 02 00",
+    "L2 Name": "",
+    "L3 Code": "03 02 03",
+    "L3 Name": "År 3 | (2011-2012)",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies/03 År 3 | (2011-2012)",
+    "Concat (Path)": "03 02 03 År 3 | (2011-2012)"
+  },
+  {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "03 02 00",
+    "L2 Name": "",
+    "L3 Code": "03 02 04",
+    "L3 Name": "År 4 | (2012, 2014)",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies/04 År 4 | (2012, 2014)",
+    "Concat (Path)": "03 02 04 År 4 | (2012, 2014)"
+  },
+  {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "03 02 00",
+    "L2 Name": "",
+    "L3 Code": "03 02 05",
+    "L3 Name": "År 5 | (2014-2015)",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies/05 År 5 | (2014-2015)",
+    "Concat (Path)": "03 02 05 År 5 | (2014-2015)"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 01 00",
+    "L2 Name": "Personal Admin",
+    "L3 Code": "01 01 99",
+    "L3 Name": "Archive",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/01 Personal Admin/99 Archive",
+    "Concat (Path)": "01 01 99 Archive"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 02 00",
+    "L2 Name": "Health",
+    "L3 Code": "01 02 99",
+    "L3 Name": "Archive",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/02 Health/99 Archive",
+    "Concat (Path)": "01 02 99 Archive"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 03 00",
+    "L2 Name": "Personal Growth",
+    "L3 Code": "01 03 99",
+    "L3 Name": "Archive",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/03 Personal Growth/99 Archive",
+    "Concat (Path)": "01 03 99 Archive"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 04 00",
+    "L2 Name": "Finances",
+    "L3 Code": "01 04 99",
+    "L3 Name": "Archive",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/04 Finances/99 Archive",
+    "Concat (Path)": "01 04 99 Archive"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 05 00",
+    "L2 Name": "Other",
+    "L3 Code": "01 05 99",
+    "L3 Name": "Archive",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "01 Private/05 Other/99 Archive",
+    "Concat (Path)": "01 05 99 Archive"
+  },
+  {
+    "L1 Code": "02 00 00",
+    "L1 Name": "Work",
+    "L2 Code": "02 01 00",
+    "L2 Name": "Employment",
+    "L3 Code": "02 01 99",
+    "L3 Name": "Archive",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "02 Work/01 Employment/99 Archive",
+    "Concat (Path)": "02 01 99 Archive"
+  },
+  {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "03 00 00",
+    "L2 Name": "",
+    "L3 Code": "03 00 99",
+    "L3 Name": "Studies Archive",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies/99 Studies Archive",
+    "Concat (Path)": "03 00 99 Studies Archive"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
     "L2 Code": "01 01 00",
     "L2 Name": "Personal Admin",
     "L3 Code": "01 01 01",
@@ -414,6 +846,18 @@
     "L2 Name": "Other",
     "L3 Code": "01 05 02",
     "L3 Name": "Relationships",
+    "L4 Name": "Jim Cargill",
+    "L4 Description": "Friend / Father-in-law.",
+    "Concat (Label)": "01 Private/05 Other/02 Relationships/Jim Cargill",
+    "Concat (Path)": "01 05 02 Relationships > Jim Cargill"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 05 00",
+    "L2 Name": "Other",
+    "L3 Code": "01 05 02",
+    "L3 Name": "Relationships",
     "L4 Name": "Mamma & Pappa",
     "L4 Description": "Parents.",
     "Concat (Label)": "01 Private/05 Other/02 Relationships/Mamma & Pappa",
@@ -430,6 +874,18 @@
     "L4 Description": "Friend.",
     "Concat (Label)": "01 Private/05 Other/02 Relationships/Niklas Johansson",
     "Concat (Path)": "01 05 02 Relationships > Niklas Johansson"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 05 00",
+    "L2 Name": "Other",
+    "L3 Code": "01 05 02",
+    "L3 Name": "Relationships",
+    "L4 Name": "Messages",
+    "L4 Description": "[AGGREGATOR] All relationship messages.",
+    "Concat (Label)": "01 Private/05 Other/02 Relationships/Messages",
+    "Concat (Path)": "01 05 02 Relationships > Messages"
   },
   {
     "L1 Code": "01 00 00",
@@ -466,6 +922,18 @@
     "L4 Description": "Useful information, tools, software setups, tips and tricks",
     "Concat (Label)": "01 Private/05 Other/03 Collections/Useful/Helpful",
     "Concat (Path)": "01 05 03 Collections > Useful/Helpful"
+  },
+  {
+    "L1 Code": "01 00 00",
+    "L1 Name": "Private",
+    "L2 Code": "01 05 00",
+    "L2 Name": "Other",
+    "L3 Code": "01 05 03",
+    "L3 Name": "Collections",
+    "L4 Name": "Data",
+    "L4 Description": "Data exports, backups, and dumps.",
+    "Concat (Label)": "01 Private/05 Other/03 Collections/Data",
+    "Concat (Path)": "01 05 03 Collections > Data"
   },
   {
     "L1 Code": "01 00 00",
@@ -819,25 +1287,25 @@
     "L1 Code": "03 00 00",
     "L1 Name": "Studies",
     "L2 Code": "03 00 00",
-    "L2 Name": "Studies",
+    "L2 Name": "",
     "L3 Code": "03 00 99",
-    "L3 Name": "Archive",
+    "L3 Name": "Studies Archive",
     "L4 Name": "Stockholms Nation",
     "L4 Description": "Historical Studies",
-    "Concat (Label)": "03 Studies/00 Studies/99 Archive/Stockholms Nation",
-    "Concat (Path)": "03 00 99 Archive > Stockholms Nation"
+    "Concat (Label)": "03 Studies/99 Studies Archive/Stockholms Nation",
+    "Concat (Path)": "03 00 99 Studies Archive > Stockholms Nation"
   },
   {
     "L1 Code": "03 00 00",
     "L1 Name": "Studies",
     "L2 Code": "03 00 00",
-    "L2 Name": "Studies",
+    "L2 Name": "",
     "L3 Code": "03 00 99",
-    "L3 Name": "Archive",
+    "L3 Name": "Studies Archive",
     "L4 Name": "Uppsala University",
     "L4 Description": "Historical Studies",
-    "Concat (Label)": "03 Studies/00 Studies/99 Archive/Uppsala University",
-    "Concat (Path)": "03 00 99 Archive > Uppsala University"
+    "Concat (Label)": "03 Studies/99 Studies Archive/Uppsala University",
+    "Concat (Path)": "03 00 99 Studies Archive > Uppsala University"
   },
   {
     "L1 Code": "02 00 00",
@@ -1040,7 +1508,7 @@
     "L3 Name": "",
     "L4 Name": "00 Manual Review",
     "L4 Description": "Items that the automated pipelines could not confidently categorize and require human intervention.",
-    "Concat (Label)": "00 System/00 Manual Review",
+    "Concat (Label)": "00 Manual Review",
     "Concat (Path)": "00 Manual Review"
   },
   {
@@ -1052,7 +1520,7 @@
     "L3 Name": "",
     "L4 Name": "00 No Filter",
     "L4 Description": "Raw incoming items that intentionally bypass standard automated filtering rules.",
-    "Concat (Label)": "00 System/00 No Filter",
+    "Concat (Label)": "00 No Filter",
     "Concat (Path)": "00 No Filter"
   },
   {
@@ -1064,7 +1532,7 @@
     "L3 Name": "",
     "L4 Name": "00 Test",
     "L4 Description": "Safe sandbox label used for testing automations, scripts, and Gem workflows without affecting real data.",
-    "Concat (Label)": "00 System/00 Test",
+    "Concat (Label)": "00 Test",
     "Concat (Path)": "00 Test"
   },
   {
@@ -1076,7 +1544,7 @@
     "L3 Name": "",
     "L4 Name": "99 Google Comments",
     "L4 Description": "Automated notifications from Google Docs/Drive that require a quick read but no permanent storage.",
-    "Concat (Label)": "00 System/99 Google Comments",
+    "Concat (Label)": "99 Google Comments",
     "Concat (Path)": "99 Google Comments"
   },
   {
@@ -1088,7 +1556,7 @@
     "L3 Name": "",
     "L4 Name": "99 Label_Reviewed",
     "L4 Description": "A vital system flag applied by the Apps Scripts to indicate an item has been successfully processed and should not be analyzed again in the next batch.",
-    "Concat (Label)": "00 System/99 Label_Reviewed",
+    "Concat (Label)": "99 Label_Reviewed",
     "Concat (Path)": "99 Label_Reviewed"
   },
   {
@@ -1100,7 +1568,7 @@
     "L3 Name": "",
     "L4 Name": "99 SMS",
     "L4 Description": "Funnel endpoint for incoming routed SMS messages awaiting processing or task extraction.",
-    "Concat (Label)": "00 System/99 SMS",
+    "Concat (Label)": "99 SMS",
     "Concat (Path)": "99 SMS"
   },
   {
@@ -1112,7 +1580,7 @@
     "L3 Name": "",
     "L4 Name": "99 Telegram",
     "L4 Description": "Funnel endpoint for incoming routed Telegram messages awaiting processing or task extraction.",
-    "Concat (Label)": "00 System/99 Telegram",
+    "Concat (Label)": "99 Telegram",
     "Concat (Path)": "99 Telegram"
   },
   {
@@ -1124,7 +1592,7 @@
     "L3 Name": "",
     "L4 Name": "99 Messenger",
     "L4 Description": "Funnel endpoint for incoming routed Facebook Messenger messages awaiting processing or task extraction.",
-    "Concat (Label)": "00 System/99 Messenger",
+    "Concat (Label)": "99 Messenger",
     "Concat (Path)": "99 Messenger"
   },
   {
@@ -1136,7 +1604,7 @@
     "L3 Name": "",
     "L4 Name": "99 WhatsApp",
     "L4 Description": "Funnel endpoint for incoming routed WhatsApp messages awaiting processing or task extraction.",
-    "Concat (Label)": "00 System/99 WhatsApp",
+    "Concat (Label)": "99 WhatsApp",
     "Concat (Path)": "99 WhatsApp"
   },
   {
@@ -1148,7 +1616,7 @@
     "L3 Name": "",
     "L4 Name": "99 To be deleted",
     "L4 Description": "Temporary storage and the purge queue. Items that are needed briefly or marked for the next automated/manual trash cycle.",
-    "Concat (Label)": "00 System/99 To be deleted",
+    "Concat (Label)": "99 To be deleted",
     "Concat (Path)": "99 To be deleted"
   }
 ]

@@ -231,6 +231,10 @@ function syncDriveFoldersFromTaxonomy() {
       endIndex = i;
       const item = taxonomy[i];
 
+      if (isWork && !item["L4 Code"]) {
+        continue;
+      }
+
       if (item && item["Concat (Label)"]) {
         const folderNames = item["Concat (Label)"].split("/").map(s => s.trim());
         const firstPart = folderNames[0] || "";

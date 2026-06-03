@@ -185,6 +185,10 @@ function cleanLabelsFromSheetUrls() {
     const manualLabel = GmailApp.getUserLabelByName("00 Manual Review");
     const tempDeleteLabel = GmailApp.getUserLabelByName("99 To be deleted");
 
+    const threadsToCleanProcessed = [];
+    const threadsToCleanManual = [];
+    const threadsToCleanTempDelete = [];
+
     let count = 0;
     const BATCH_LIMIT = 100; // Process 100 per run to prevent timeout
     let sheetUpdated = false;
@@ -214,15 +218,14 @@ function cleanLabelsFromSheetUrls() {
         try {
           const thread = GmailApp.getThreadById(threadId);
           if (thread) {
-            if (processedLabel) thread.removeLabel(processedLabel);
-            if (manualLabel) thread.removeLabel(manualLabel);
-            if (tempDeleteLabel) thread.removeLabel(tempDeleteLabel);
+            if (processedLabel) threadsToCleanProcessed.push(thread);
+            if (manualLabel) threadsToCleanManual.push(thread);
+            if (tempDeleteLabel) threadsToCleanTempDelete.push(thread);
 
             values[i][1] = "DONE";
             sheetUpdated = true;
             count++;
-            console.log(`✅ Success: Removed labels from Thread ${threadId}. Marked DONE.`);
-            Utilities.sleep(100);
+            console.log(`✅ Success: Found Thread ${threadId}. Scheduled for label removal.`);
           } else {
              values[i][1] = "ERROR: NOT FOUND";
              sheetUpdated = true;
@@ -233,6 +236,32 @@ function cleanLabelsFromSheetUrls() {
           sheetUpdated = true;
           console.error(`❌ Failed for Row ${i + 1} - Error: ${e.message}`);
         }
+      }
+    }
+
+    // Perform batch label removal calls
+    if (threadsToCleanProcessed.length > 0 && processedLabel) {
+      try {
+        processedLabel.removeFromThreads(threadsToCleanProcessed);
+        console.log(`✅ Batch removed "99 Label_Reviewed" from ${threadsToCleanProcessed.length} threads.`);
+      } catch (err) {
+        console.error(`Failed batch removing processedLabel: ${err.message}`);
+      }
+    }
+    if (threadsToCleanManual.length > 0 && manualLabel) {
+      try {
+        manualLabel.removeFromThreads(threadsToCleanManual);
+        console.log(`✅ Batch removed "00 Manual Review" from ${threadsToCleanManual.length} threads.`);
+      } catch (err) {
+        console.error(`Failed batch removing manualLabel: ${err.message}`);
+      }
+    }
+    if (threadsToCleanTempDelete.length > 0 && tempDeleteLabel) {
+      try {
+        tempDeleteLabel.removeFromThreads(threadsToCleanTempDelete);
+        console.log(`✅ Batch removed "99 To be deleted" from ${threadsToCleanTempDelete.length} threads.`);
+      } catch (err) {
+        console.error(`Failed batch removing tempDeleteLabel: ${err.message}`);
       }
     }
 
