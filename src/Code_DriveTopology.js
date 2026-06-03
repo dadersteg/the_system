@@ -138,6 +138,11 @@ function checkAndRename(folder, outputData) {
  * @returns {void}
  */
 function syncDriveFoldersFromTaxonomy() {
+  if (isWorkAccount()) {
+    console.warn("syncDriveFoldersFromTaxonomy skipped: The Work taxonomy (WoS) is still a WIP. Folder creation is blocked.");
+    return;
+  }
+  
   if (typeof SYSTEM_CONFIG === 'undefined' || !SYSTEM_CONFIG || !SYSTEM_CONFIG.STATE) {
     console.error("syncDriveFoldersFromTaxonomy failed: SYSTEM_CONFIG or SYSTEM_CONFIG.STATE is undefined");
     return;

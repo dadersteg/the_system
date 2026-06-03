@@ -346,7 +346,7 @@ function checkEverything() {
  * Run this function once from the dropdown in your Work Google Apps Script editor.
  */
 function setWorkWorkspaceFolderProperty() {
-  const workWorkspaceFolderId = "1W1VyU1ANNNgoq3KrIq1spT_DOpDFyq3A";
+  const workWorkspaceFolderId = "1Jb5PhZnrqsP3uoUE20Lv75eO4zySPyTr";
   try {
     const props = PropertiesService.getUserProperties();
     props.setProperty("WORKSPACE_FOLDER_ID", workWorkspaceFolderId);

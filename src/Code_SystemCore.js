@@ -386,11 +386,13 @@ function getActiveThreadTaskMap() {
  * @returns {string} The text content of the document.
  */
 function getSafeDocText(id) {
+  let text = "";
   try {
-    return DocumentApp.openById(id).getBody().getText();
+    text = DocumentApp.openById(id).getBody().getText();
   } catch (e) {
-    return DriveApp.getFileById(id).getBlob().getDataAsString();
+    text = DriveApp.getFileById(id).getBlob().getDataAsString();
   }
+  return processPromptText(text);
 }
 
 /**
@@ -416,8 +418,25 @@ function getDrivePromptStr() {
 function isWorkAccount() {
   try {
     const props = typeof PropertiesService !== 'undefined' ? PropertiesService.getUserProperties() : null;
-    if (props && props.getProperty("IS_WORK_ACCOUNT") === "true") {
-      return true;
+    if (props) {
+      if (props.getProperty("IS_WORK_ACCOUNT") === "true") {
+        return true;
+      }
+      const folderId = props.getProperty("WORKSPACE_FOLDER_ID");
+      if (folderId === "1Jb5PhZnrqsP3uoUE20Lv75eO4zySPyTr" || folderId === "1W1VyU1ANNNgoq3KrIq1spT_DOpDFyq3A") {
+        return true;
+      }
+    }
+  } catch(e) {
+    // Ignore
+  }
+  try {
+    const scriptProps = typeof PropertiesService !== 'undefined' ? PropertiesService.getScriptProperties() : null;
+    if (scriptProps) {
+      const folderId = scriptProps.getProperty("WORKSPACE_FOLDER_ID");
+      if (folderId === "1Jb5PhZnrqsP3uoUE20Lv75eO4zySPyTr" || folderId === "1W1VyU1ANNNgoq3KrIq1spT_DOpDFyq3A") {
+        return true;
+      }
     }
   } catch(e) {
     // Ignore
@@ -428,4 +447,25 @@ function isWorkAccount() {
   } catch(e) {
     return false;
   }
+}
+
+/**
+ * Dynamically translates LOS references to WoS references when running on the Work account.
+ * 
+ * @param {string} textStr The prompt template text.
+ * @returns {string} The translated prompt template text.
+ */
+function processPromptText(textStr) {
+  if (!textStr) return "";
+  if (typeof isWorkAccount === 'function' && isWorkAccount()) {
+    return textStr
+      .replace(/\bLife Organisation System \(LOS\)/g, "Work Organisation System (WoS)")
+      .replace(/\bLife Organisation System\b/g, "Work Organisation System")
+      .replace(/\bLOS_Taxonomy\b/g, "WoS_Taxonomy")
+      .replace(/\bLOS taxonomy\b/g, "WoS taxonomy")
+      .replace(/\bLOS Taxonomy\b/g, "WoS Taxonomy")
+      .replace(/\bLOS\b/g, "WoS")
+      .replace(/\blos\b/g, "wos");
+  }
+  return textStr;
 }

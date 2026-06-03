@@ -26,7 +26,7 @@ function getTaskMasterSystemPrompt() {
      if (!docId) return "SYSTEM PROMPT MISSING";
      
      const file = DriveApp.getFileById(docId);
-     const text = file.getBlob().getDataAsString();
+     const text = processPromptText(file.getBlob().getDataAsString());
      
      cache.put("TASK_MASTER_PROMPT_V2", text.substring(0, 100000), 21600); // 6 hours
      return text;
@@ -51,7 +51,7 @@ function getTaskMasterDailyPrompt() {
      if (!docId) return "SYSTEM PROMPT MISSING";
      
      const file = DriveApp.getFileById(docId);
-     const text = file.getBlob().getDataAsString();
+     const text = processPromptText(file.getBlob().getDataAsString());
      
      cache.put("TASK_MASTER_DAILY_PROMPT", text.substring(0, 100000), 21600); // 6 hours
      return text;
@@ -294,6 +294,7 @@ function runHourlyReview() {
      const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
      systemPrompt = DriveApp.getFileById(promptId).getBlob().getDataAsString();
   }
+  systemPrompt = processPromptText(systemPrompt);
   
   const payloadStr = JSON.stringify(payload);
   // Use the smartest model available for full-context reasoning, with fallback to 2M context if needed
@@ -825,7 +826,9 @@ function writeOnePager(markdownStr, isDailyPlan) {
      const folderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
      const folder = DriveApp.getFolderById(folderId);
      
-     const fileName = isDailyPlan ? "TS - Task Master > 1 Day Execution Plan.md" : "TS - Task Master > Global Priority Review.md";
+     const suffix = isWorkAccount() ? " (Work)" : " (Private)";
+     const baseName = isDailyPlan ? "TS - Task Master > 1 Day Execution Plan" : "TS - Task Master > Global Priority Review";
+     const fileName = baseName + suffix + ".md";
      const files = folder.getFilesByName(fileName);
      let file;
      if (files.hasNext()) {

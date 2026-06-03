@@ -810,10 +810,10 @@
     "L2 Name": "Other",
     "L3 Code": "01 05 01",
     "L3 Name": "Projects",
-    "L4 Name": "Colab Notebooks",
-    "L4 Description": "Active coding/notebook projects.",
-    "Concat (Label)": "01 Private/05 Other/01 Projects/Colab Notebooks",
-    "Concat (Path)": "01 05 01 Projects > Colab Notebooks"
+    "L4 Name": "Data Analysis & Software Development",
+    "L4 Description": "Active coding, data analysis, and software development projects.",
+    "Concat (Label)": "01 Private/05 Other/01 Projects/Data Analysis & Software Development",
+    "Concat (Path)": "01 05 01 Projects > Data Analysis & Software Development"
   },
   {
     "L1 Code": "01 00 00",

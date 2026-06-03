@@ -135,7 +135,7 @@
         - 20260411 Housewarming C&D
         - 2027 Wedding
         - AI
-        - Colab Notebooks
+        - Data Analysis & Software Development
         - Declutter
       - 01 05 02 Relationships
         - 01 05 02 Alexander / Gabriel

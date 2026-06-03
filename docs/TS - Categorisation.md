@@ -223,7 +223,7 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 | **Upgrade Office** | Project: Home office setup and improvements. |
 
 
-| **Colab Notebooks** | Active coding/notebook projects. |
+| **Data Analysis & Software Development** | Active coding, data analysis, and software development projects. |
 
 
 ### 01 05 02 Relationships
