@@ -88,6 +88,15 @@ function executeEngine(mode, currentModel) {
         const sessionLog = ss.getSheets().find(s => s.getSheetId().toString() === DRIVE_SESSION_LOG_GID);
         
         if (!log) throw new Error("Execution Log sheet not found.");
+
+        // Ingest shared files as shortcuts if running in ONGOING mode
+        if (mode === "ONGOING") {
+            try {
+                ingestSharedFilesToInbox();
+            } catch (err) {
+                console.error("Error running shared files ingestion: " + err.message);
+            }
+        }
         const knowledge = loadKnowledgeDocs();
         const activeTaskMap = getActiveThreadTaskMap();
         const openTasksStr = activeTaskMap.openTasksForAI.join('\n');
@@ -108,10 +117,25 @@ function executeEngine(mode, currentModel) {
                 const files = folder.getFiles();
                 while (files.hasNext() && allFiles.length < DRIVE_TOTAL_FILES_LIMIT) {
                     const f = files.next();
+                    const mimeType = f.getMimeType();
+                    const isShortcut = mimeType === "application/vnd.google-apps.shortcut";
+                    let targetId = f.getId();
+                    let targetMime = mimeType;
+                    if (isShortcut) {
+                        try {
+                            targetId = f.getTargetId();
+                            targetMime = f.getTargetMimeType();
+                        } catch (err) {
+                            console.error(`Failed to resolve shortcut target for ${f.getName()}: ${err.message}`);
+                        }
+                    }
                     allFiles.push({ 
                         id: f.getId(), 
                         name: f.getName(), 
-                        mime: f.getMimeType(), 
+                        mime: mimeType, 
+                        isShortcut: isShortcut,
+                        targetId: targetId,
+                        targetMime: targetMime,
                         desc: f.getDescription() || "", 
                         sourceFolderId: id,
                         folderPath: folderPath,
@@ -131,7 +155,8 @@ function executeEngine(mode, currentModel) {
         for (let f of allFiles) {
             if (Date.now() - sessionStart > DRIVE_MAX_EXECUTION_TIME_MS) break;
 
-            const needsIsolation = f.mime.includes("image/") || f.mime === "application/pdf" || f.mime.includes("officedocument") || f.mime.includes("ms-");
+            const effectiveMime = f.targetMime || f.mime;
+            const needsIsolation = effectiveMime.includes("image/") || effectiveMime === "application/pdf" || effectiveMime.includes("officedocument") || effectiveMime.includes("ms-");
 
             if (needsIsolation) {
                 if (currentBatch.length > 0) { 
@@ -223,7 +248,8 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
             } else {
                 const f = filesForAI[0];
                 console.error(`   [API REJECTED] ${f.name}: ${aiResult.message}`);
-                batchLogs.push([`https://drive.google.com/open?id=${f.id}`, f.name, f.desc, "[REJECTED]", "N/A", "N/A", "API Error", aiResult.message, "Review Required", 0, "API_ERROR", f.sourceFolderId, "N/A", "N/A", "None", "", "", ""]);
+                const fUrl = f.isShortcut ? `https://drive.google.com/open?id=${f.targetId}` : `https://drive.google.com/open?id=${f.id}`;
+                batchLogs.push([fUrl, f.name, f.desc, "[REJECTED]", "N/A", "N/A", "API Error", aiResult.message, "Review Required", 0, "API_ERROR", f.sourceFolderId, "N/A", "N/A", "None", "", "", ""]);
                 moveToReview(f.id, aiResult.message);
                 filesForAI = [];
             }
@@ -269,6 +295,8 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
             file.setName(finalName);
             file.setDescription(`${data.description}\n\nSummary: ${data.summary}`);
             
+            const targetFileUrl = f.isShortcut ? DriveApp.getFileById(f.targetId).getUrl() : file.getUrl();
+
             // Task mapping and completion check (Task 6 confirmation mapping)
             if (data.mapped_task_id && data.mapped_task_id !== "None") {
                 let existingRef = activeTaskMap.byId[data.mapped_task_id];
@@ -276,7 +304,7 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                     console.log(`   [MAPPED] File maps to existing task: ${data.mapped_task_id}`);
                     try {
                         let existingTask = existingRef.taskObj;
-                        existingTask.notes = (existingTask.notes || "") + `\n\n[UPDATE]: File "${finalName}" uploaded to Drive.\nLink: ${file.getUrl()}`;
+                        existingTask.notes = (existingTask.notes || "") + `\n\n[UPDATE]: File "${finalName}" uploaded to Drive.\nLink: ${targetFileUrl}`;
                         
                         if (data.mark_completed_reason && data.mark_completed_reason !== "None") {
                             if (!existingTask.title.startsWith("99 Done ")) {
@@ -299,7 +327,7 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                 data.tasks.forEach(t => {
                     if (t.title) {
                         try {
-                            const taskNotes = `${file.getUrl()}\n[Source: ${file.getName()}]\n\n${t.notes || ""}`;
+                            const taskNotes = `${targetFileUrl}\n[Source: ${file.getName()}]\n\n${t.notes || ""}`;
                             const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
                             Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
                             tasksCreated++;
@@ -427,10 +455,11 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
             const targetFolderUrl = targetFolderId === "Root" || targetFolderId === "N/A" ? "https://drive.google.com/drive/my-drive" : `https://drive.google.com/drive/folders/${targetFolderId}`;
             const targetFolderLink = `=HYPERLINK("${targetFolderUrl}", "${targetFolderPath.replace(/"/g, '""')}")`;
             
-            batchLogs.push([file.getUrl(), f.name, f.desc, finalName, data.path_code, data.context_id, data.summary, data.description, data.reasoning, isBypass ? 0 : tpf, successMsg, sourceFolderPath, targetFolderId, targetFolderLink, shortcutsLog, "", "", ""]);
+            batchLogs.push([targetFileUrl, f.name, f.desc, finalName, data.path_code, data.context_id, data.summary, data.description, data.reasoning, isBypass ? 0 : tpf, successMsg, sourceFolderPath, targetFolderId, targetFolderLink, shortcutsLog, "", "", ""]);
             console.log(`   [OK] Processed: ${finalName}`);
         } catch (e) {
-            batchLogs.push([`https://drive.google.com/open?id=${f.id}`, f.name, f.desc, "[SYSTEM ERROR]", "N/A", "N/A", "Update Failed", e.message, "N/A", 0, "SYSTEM_ERROR", f.sourceFolderId, "N/A", "N/A", "None", "", "", ""]);
+            const errUrl = f.isShortcut ? `https://drive.google.com/open?id=${f.targetId}` : `https://drive.google.com/open?id=${f.id}`;
+            batchLogs.push([errUrl, f.name, f.desc, "[SYSTEM ERROR]", "N/A", "N/A", "Update Failed", e.message, "N/A", 0, "SYSTEM_ERROR", f.sourceFolderId, "N/A", "N/A", "None", "", "", ""]);
             moveToReview(f.id, e.message);
         }
     });
@@ -528,11 +557,13 @@ function checkDeterministicRules(f, driveRules) {
 
 
 // --- 5. THE V3 CONTENT EXTRACTOR ---
-
-function extractContentV3(fileObj) {
-    const { id, mime, name } = fileObj;
-    try {
-        const file = DriveApp.getFileById(id);
+ 
+ function extractContentV3(fileObj) {
+     const id = fileObj.targetId || fileObj.id;
+     const mime = fileObj.targetMime || fileObj.mime;
+     const { name } = fileObj;
+     try {
+         const file = DriveApp.getFileById(id);
         const blob = file.getBlob();
 
         // 1. Vision
@@ -872,5 +903,140 @@ function fetchRecentContext(ss) {
         console.error("Error fetching recent context: " + e.message);
     }
     return contextStr;
+}
+
+
+// =============================================================================
+// 10. SHARED FILES INGESTION & SHORTCUT MANAGEMENT
+// =============================================================================
+
+/**
+ * Automatically detects files shared with the user ("shared with me") and creates
+ * shortcuts for them in the standard "00 Inbox" folder so they can be processed
+ * and categorized by the Drive Clerk.
+ */
+function ingestSharedFilesToInbox() {
+  console.log("Checking for recently shared files...");
+  
+  let inboxFolder = null;
+  const inboxFolders = DriveApp.getFoldersByName("00 Inbox");
+  while (inboxFolders.hasNext()) {
+    const f = inboxFolders.next();
+    if (!f.isTrashed()) {
+      inboxFolder = f;
+      break;
+    }
+  }
+  
+  if (!inboxFolder) {
+    const sourceId = SYSTEM_CONFIG.DRIVE_FOLDERS.STND_SOURCES[0];
+    if (sourceId) {
+      inboxFolder = DriveApp.getFolderById(sourceId);
+    }
+  }
+  
+  if (!inboxFolder) {
+    console.error("Could not find a valid Inbox folder to place shortcuts.");
+    return;
+  }
+  
+  console.log(`Inbox folder for shortcuts: ${inboxFolder.getName()} (ID: ${inboxFolder.getId()})`);
+
+  let files = [];
+  try {
+    const response = Drive.Files.list({
+      q: "sharedWithMe = true and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+      orderBy: "sharedWithMeTime desc",
+      pageSize: 50,
+      fields: "files(id, name, mimeType)"
+    });
+    files = response.files || [];
+  } catch (e) {
+    console.error("Failed to query shared files using Drive API: " + e.message);
+    return;
+  }
+  
+  if (files.length === 0) {
+    console.log("No shared files found.");
+    return;
+  }
+  
+  console.log(`Found ${files.length} shared files. Checking for existing shortcuts...`);
+  
+  const existingTargets = getExistingShortcutTargets();
+  
+  // Also scan STND_SOURCES folders for existing files/shortcuts just to be safe
+  SYSTEM_CONFIG.DRIVE_FOLDERS.STND_SOURCES.forEach(folderId => {
+    try {
+      const folder = DriveApp.getFolderById(folderId);
+      const items = folder.getFiles();
+      while (items.hasNext()) {
+        const item = items.next();
+        const mime = item.getMimeType();
+        if (mime === "application/vnd.google-apps.shortcut") {
+          existingTargets.add(item.getTargetId());
+        } else {
+          existingTargets.add(item.getId());
+        }
+      }
+    } catch(err) {
+      console.warn(`Failed to scan folder ${folderId} for existing items: ${err.message}`);
+    }
+  });
+  
+  let createdCount = 0;
+  files.forEach(sharedFile => {
+    if (!existingTargets.has(sharedFile.id)) {
+      try {
+        console.log(`Creating shortcut for: "${sharedFile.name}" (ID: ${sharedFile.id})`);
+        
+        const resource = {
+          name: sharedFile.name,
+          mimeType: "application/vnd.google-apps.shortcut",
+          shortcutDetails: { targetId: sharedFile.id },
+          parents: [inboxFolder.getId()]
+        };
+        Drive.Files.create(resource);
+        
+        createdCount++;
+      } catch (err) {
+        console.error(`Failed to create shortcut for "${sharedFile.name}": ${err.message}`);
+      }
+    } else {
+      console.log(`Shortcut/file already exists for: "${sharedFile.name}" (ID: ${sharedFile.id})`);
+    }
+  });
+  
+  console.log(`Successfully ingested shared files. Created ${createdCount} shortcuts.`);
+}
+
+/**
+ * Searches the entire Google Drive for existing shortcuts, retrieving their target IDs.
+ * Used client-side to prevent recreating shortcuts for files already processed or in progress.
+ */
+function getExistingShortcutTargets() {
+  const targets = new Set();
+  let pageToken = null;
+  do {
+    try {
+      const response = Drive.Files.list({
+        q: "mimeType = 'application/vnd.google-apps.shortcut' and trashed = false",
+        fields: "nextPageToken, files(shortcutDetails)",
+        pageToken: pageToken,
+        pageSize: 1000
+      });
+      const files = response.files || [];
+      files.forEach(f => {
+        if (f.shortcutDetails && f.shortcutDetails.targetId) {
+          targets.add(f.shortcutDetails.targetId);
+        }
+      });
+      pageToken = response.nextPageToken;
+    } catch (e) {
+      console.error("Error retrieving existing shortcuts: " + e.message);
+      break;
+    }
+  } while (pageToken);
+  return targets;
 }
 

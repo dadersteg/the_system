@@ -97,7 +97,7 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 ### Phase H: Autonomous Execution [✅ COMPLETED]
 *Moving beyond management to actual "doing."*
 *   **[x] Task H.1:** Build the Generalist Executor Persona (MacGyver). Create the system instructions (`macgyver.md`) and Gem Wrapper to establish an orchestration protocol where MacGyver acts as the doer, tagging in James (Strategy) and Penny (Copywriting) to execute tasks. *(Completed: Aliased into the_system workspace).*
-*   **[x] Task H.2:** Manual Execution Pipeline. Since MacGyver can be run locally via Antigravity or via the Gemini App, we will forgo automated Apps Script triggers for now. MacGyver will read the live `Google Tasks.md` file to understand the active queue.
+*   **[x] Task H.2:** Manual Execution Pipeline. Since MacGyver can be run locally via Antigravity or via the Gemini App, we will forgo automated Apps Script triggers for now. MacGyver will read the live `Google Tasks (Private).md` or `Google Tasks (Work).md` file to understand the active queue.
 *   **[x] Task H.3:** Task Status Updates (Skill/Workflow). Built the `edit_task.md` skill utilizing `Code_Tasks.js` (updateAdHocTaskFromCLI) to allow MacGyver to natively patch task statuses and append execution notes directly to the cloud without editing local read-only exports.
 *   **[x] Task H.4:** Full Autonomy Pipeline: Transitioned MacGyver from a human-triggered tool to a proactive agent capable of digital proxy execution for physical errands via native Apps Script `clasp` calls.
 *   **[x] Task H.5:** Rule Refinement & Edge Case Handling (Continuous): Implemented mandatory rules in `macgyver.md` requiring Calendar/Task pre-flight checks and prohibiting browser-based manual data gathering.
@@ -113,7 +113,7 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *Transitioning from polling to real-time event-driven updates using Gemini API Webhooks.*
 *   **[ ] Task J.1:** Deploy a centralized Webhook Listener (e.g., Flask/Express) to serve as the Antigravity system's event receiver.
 *   **[ ] Task J.2:** Refactor Batch Processing (e.g., The Clerk Retro Audit) to use static webhooks (`batch.succeeded`) instead of active polling, instantly triggering spreadsheet ingestion.
-*   **[ ] Task J.3:** Implement a Push-to-Agent architecture using dynamic webhooks. Tag Jules sessions and long-running tasks with metadata to instantly awaken MacGyver or update `Google Tasks.md` upon completion without constant status checking.
+*   **[ ] Task J.3:** Implement a Push-to-Agent architecture using dynamic webhooks. Tag Jules sessions and long-running tasks with metadata to instantly awaken MacGyver or update `Google Tasks (Private/Work).md` upon completion without constant status checking.
 
 ### Phase K: Gemini Spark & Antigravity 2.0 Background Task Integration (Future / UK Availability)
 *Transitioning background engines to native 24/7 background tasks once Gemini Spark is available in the UK.*

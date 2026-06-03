@@ -134,6 +134,7 @@ function syncTaxonomyToSheet() {
 
   // 4. L4 Nodes (Markdown tables)
   let currentContextCode = "";
+  let currentL4Parent = "";
   let isArchiveTable = false;
   
   for (let i = 0; i < lines.length; i++) {
@@ -143,6 +144,14 @@ function syncTaxonomyToSheet() {
     let ctxMatch = line.match(/^(?:###|##)\s+(\d{2}\s\d{2}\s\d{2})\s+(.+)$/);
     if (ctxMatch) {
       currentContextCode = ctxMatch[1];
+      currentL4Parent = ""; // Reset L4 parent nesting
+      continue;
+    }
+
+    let l4ParentMatch = line.match(/^####\s+(\d{2}\s\d{2}\s\d{2})\s+[^>]+>\s*(\d{2}\s[^(\n\r]+)/);
+    if (l4ParentMatch) {
+      currentContextCode = l4ParentMatch[1];
+      currentL4Parent = l4ParentMatch[2].split("(")[0].trim();
       continue;
     }
 
@@ -225,8 +234,13 @@ function syncTaxonomyToSheet() {
                   let concatPath = "";
                   
                   if (l3Name) {
-                      concatLabel = p2 ? `${p1}/${p2}/${p3}/${code}` : `${p1}/${p3}/${code}`;
-                      concatPath = `${currentContextCode} ${clean(l3Name)} > ${code}`;
+                      if (currentL4Parent) {
+                          concatLabel = p2 ? `${p1}/${p2}/${p3}/${currentL4Parent}/${code}` : `${p1}/${p3}/${currentL4Parent}/${code}`;
+                          concatPath = `${currentContextCode} ${clean(l3Name)} > ${currentL4Parent} > ${code}`;
+                      } else {
+                          concatLabel = p2 ? `${p1}/${p2}/${p3}/${code}` : `${p1}/${p3}/${code}`;
+                          concatPath = `${currentContextCode} ${clean(l3Name)} > ${code}`;
+                      }
                   } else if (l2Name) {
                       concatLabel = p2 ? `${p1}/${p2}/${code}` : `${p1}/${code}`;
                       concatPath = `${inferredL2} ${clean(l2Name)} > ${code}`;
@@ -325,19 +339,21 @@ function syncTaxonomyToSheet() {
      csvRows.push(row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","));
   }
 
-  const jsonBlob = Utilities.newBlob(JSON.stringify(jsonOutput, null, 2), "application/json", "LOS_Taxonomy.json");
-  const csvBlob = Utilities.newBlob(csvRows.join("\n"), "text/csv", "LOS_Taxonomy.csv");
+  const taxPrefix = isWork ? "WoS_Taxonomy" : "LOS_Taxonomy";
+
+  const jsonBlob = Utilities.newBlob(JSON.stringify(jsonOutput, null, 2), "application/json", taxPrefix + ".json");
+  const csvBlob = Utilities.newBlob(csvRows.join("\n"), "text/csv", taxPrefix + ".csv");
 
   const parentFolder = file.getParents().next();
   
-  const existingJson = parentFolder.getFilesByName("LOS_Taxonomy.json");
+  const existingJson = parentFolder.getFilesByName(taxPrefix + ".json");
   if(existingJson.hasNext()) {
       existingJson.next().setContent(jsonBlob.getDataAsString());
   } else {
       parentFolder.createFile(jsonBlob);
   }
   
-  const existingCsv = parentFolder.getFilesByName("LOS_Taxonomy.csv");
+  const existingCsv = parentFolder.getFilesByName(taxPrefix + ".csv");
   if(existingCsv.hasNext()) {
       existingCsv.next().setContent(csvBlob.getDataAsString());
   } else {
@@ -345,5 +361,6 @@ function syncTaxonomyToSheet() {
   }
 
   Logger.log("Successfully synced " + (data.length - 1) + " taxonomy rows to the Google Sheet.");
-  Logger.log("Successfully exported LOS_Taxonomy.json and LOS_Taxonomy.csv to Google Drive.");
+  Logger.log("Successfully exported " + taxPrefix + ".json and " + taxPrefix + ".csv to Google Drive.");
+
 }

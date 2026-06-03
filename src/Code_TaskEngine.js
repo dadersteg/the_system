@@ -330,7 +330,23 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
   })();
   
   updates.forEach(u => {
+    if (!u || typeof u !== 'object') {
+       console.warn("Invalid task update object: ", JSON.stringify(u));
+       return;
+    }
     try {
+      if (typeof u.taskId !== 'string' || typeof u.routingTarget !== 'string') {
+          console.warn("Skipping update with invalid types:", JSON.stringify(u));
+          return;
+      }
+      
+      // Reject non-string fields
+      ['estimatedDuration', 'alignedGoal', 'category_path', 'recommendedTitle', 'recommendedDeadline', 'systemComment'].forEach(key => {
+          if (u[key] !== undefined && u[key] !== null && typeof u[key] !== 'string') {
+              u[key] = undefined;
+          }
+      });
+      
       const listId = taskIdMap[u.taskId];
       if (!listId) return;
       
@@ -341,7 +357,12 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       
       // Move from Importer to ToDo if verified and not explicitly retaining/deleting
       if (listId === importerListId && u.routingTarget !== "RETAIN_IMPORTER" && u.routingTarget !== "DELETE") {
-          targetListId = todoListId;
+          if (task.webViewLink || (task.links && task.links.length > 0) || task.assignmentInfo) {
+              // Assigned tasks (from Docs/Gmail) cannot be deleted via API. Do not move them.
+              targetListId = listId;
+          } else {
+              targetListId = todoListId;
+          }
       }
       
       let daComment = "DA:";
@@ -384,7 +405,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
           } else {
              sysComment = trimmed;
           }
-        } else if (trimmed !== "") {
+        } else {
           otherNotes.push(line);
         }
       });
@@ -467,7 +488,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       }
       
       const finalNotes = [];
-      if (otherNotes.length > 0) finalNotes.push(otherNotes.join('\n'));
+      if (otherNotes.length > 0) finalNotes.push(otherNotes.join('\n').trimEnd());
       
       const visibleDeadline = existingMetadata.deadline || "None";
       const visibleDuration = existingMetadata.duration || "N/A";
@@ -510,13 +531,13 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       
       if (targetListId !== listId) {
          console.log(`Moving task ${task.title} from Importer to ToDo`);
-         delete task.links;
-         delete task.id;
-         delete task.etag;
-         delete task.position;
-         delete task.updated;
-         delete task.selfLink;
-         Tasks.Tasks.insert(task, targetListId);
+         const newTask = {
+           title: task.title,
+           notes: task.notes,
+           due: task.due,
+           status: task.status
+         };
+         Tasks.Tasks.insert(newTask, targetListId);
          Tasks.Tasks.remove(listId, u.taskId);
       } else {
          const patchObj = {

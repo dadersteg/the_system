@@ -1,6 +1,7 @@
 import os
 import re
 import datetime
+import json
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -72,6 +73,21 @@ def strip_system_metadata(text):
         return text[:idx].strip()
     return text
 
+def get_los_code_from_metadata(notes):
+    """Extracts the category_path from the V6 JSON metadata block."""
+    if not notes:
+        return ""
+    marker = '---SYSTEM_METADATA---'
+    idx = notes.find(marker)
+    if idx != -1:
+        json_str = notes[idx + len(marker):].strip()
+        try:
+            metadata = json.loads(json_str)
+            return metadata.get('category_path', '')
+        except ValueError:
+            pass
+    return ""
+
 def redact_text(text):
     """Anonymizes sensitive details from titles and notes."""
     if not text:
@@ -101,8 +117,9 @@ def check_and_route_tasks(private_service, work_service):
             for task in tasks:
                 title = task.get('title', '')
                 notes = task.get('notes', '')
+                category_path = get_los_code_from_metadata(notes)
                 
-                if f"Context: {WORK_LOS_CODE}" in notes or f"Context:{WORK_LOS_CODE}" in notes:
+                if f"Context: {WORK_LOS_CODE}" in notes or f"Context:{WORK_LOS_CODE}" in notes or WORK_LOS_CODE in category_path:
                     print(f"[Gateway] Found Quantum 21 task (LOS: {WORK_LOS_CODE}) in private list '{list_title}': '{title}'")
                     try:
                         work_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}
@@ -129,8 +146,9 @@ def check_and_route_tasks(private_service, work_service):
             for task in tasks:
                 title = task.get('title', '')
                 notes = task.get('notes', '')
+                category_path = get_los_code_from_metadata(notes)
                 
-                if f"Context: {PRIVATE_LOS_CODE}" in notes or f"Context:{PRIVATE_LOS_CODE}" in notes:
+                if f"Context: {PRIVATE_LOS_CODE}" in notes or f"Context:{PRIVATE_LOS_CODE}" in notes or PRIVATE_LOS_CODE in category_path:
                     print(f"[Gateway] Found Personal task (LOS: {PRIVATE_LOS_CODE}) in work list '{list_title}': '{title}'")
                     try:
                         private_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}

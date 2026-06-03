@@ -150,12 +150,14 @@ function syncDriveFoldersFromTaxonomy() {
       return;
     }
 
+    const isWork = isWorkAccount();
+    const taxonomyFilename = isWork ? "WoS_Taxonomy.json" : "LOS_Taxonomy.json";
     const BATCH_SIZE = 10;
     const TARGET_DEPTH = 4;
 
-    const files = DriveApp.getFilesByName("LOS_Taxonomy.json");
+    const files = DriveApp.getFilesByName(taxonomyFilename);
     if (!files.hasNext()) {
-      console.error("LOS_Taxonomy.json not found. Please run syncTaxonomyToSheet() first.");
+      console.error(taxonomyFilename + " not found. Please run syncTaxonomyToSheet() first.");
       return;
     }
 
@@ -165,7 +167,6 @@ function syncDriveFoldersFromTaxonomy() {
       return;
     }
 
-    const isWork = isWorkAccount();
     const root = isWork ? 
                  DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) : 
                  DriveApp.getRootFolder();
@@ -230,20 +231,13 @@ function syncDriveFoldersFromTaxonomy() {
       endIndex = i;
       const item = taxonomy[i];
 
-      if (item && item["L4 Name"]) {
-        const folderNames = [];
-        if (item["L1 Code"]) folderNames.push(`${item["L1 Code"]} ${item["L1 Name"] ? item["L1 Name"].trim() : ""}`);
-        if (item["L2 Code"]) folderNames.push(`${item["L2 Code"]} ${item["L2 Name"] ? item["L2 Name"].trim() : ""}`);
-        if (item["L3 Code"]) folderNames.push(`${item["L3 Code"]} ${item["L3 Name"] ? item["L3 Name"].trim() : ""}`);
-        folderNames.push(item["L4 Name"].trim());
+      if (item && item["Concat (Label)"]) {
+        const folderNames = item["Concat (Label)"].split("/").map(s => s.trim());
+        const firstPart = folderNames[0] || "";
 
-        if (isWork) {
-          while (folderNames.length > 0 && 
-                 (folderNames[0].indexOf("02 Work") === 0 || 
-                  folderNames[0].indexOf("02 01 00 Employment") === 0 || 
-                  folderNames[0].indexOf("02 01 01 Playmetech") === 0)) {
-            folderNames.shift();
-          }
+        // Ignore system triage (00) and system operational (99) tags in Drive
+        if (firstPart.indexOf("00 ") === 0 || firstPart.indexOf("99 ") === 0 || item["L1 Code"] === "00 00 00" || item["L1 Name"] === "System") {
+          continue;
         }
 
         console.log(`[CHECKING] /${folderNames.slice(0, TARGET_DEPTH).join('/')}`);
@@ -349,24 +343,11 @@ function resolveFolderFromTaxonomy(concatPath, taxonomy) {
     return null;
   }
 
-  // Construct the exact folder hierarchy
-  const folderNames = [];
-  if (item["L1 Code"]) folderNames.push(`${item["L1 Code"]} ${item["L1 Name"] ? item["L1 Name"].trim() : ""}`.trim());
-  if (item["L2 Code"]) folderNames.push(`${item["L2 Code"]} ${item["L2 Name"] ? item["L2 Name"].trim() : ""}`.trim());
-  if (item["L3 Code"]) folderNames.push(`${item["L3 Code"]} ${item["L3 Name"] ? item["L3 Name"].trim() : ""}`.trim());
-  if (item["L4 Name"]) folderNames.push(item["L4 Name"].trim());
-
+  // Construct the exact folder hierarchy by splitting Concat (Label)
+  const folderNames = item["Concat (Label)"] ? item["Concat (Label)"].split("/").map(s => s.trim()) : [];
   if (folderNames.length === 0) return null;
 
   const isWork = isWorkAccount();
-  if (isWork) {
-    while (folderNames.length > 0 && 
-           (folderNames[0].indexOf("02 Work") === 0 || 
-            folderNames[0].indexOf("02 01 00 Employment") === 0 || 
-            folderNames[0].indexOf("02 01 01 Playmetech") === 0)) {
-      folderNames.shift();
-    }
-  }
 
   // Traverse down from the root / workspace root
   let currentFolder = isWork ? 
@@ -395,12 +376,6 @@ function resolveFolderFromTaxonomy(concatPath, taxonomy) {
   return currentFolder;
 }
 
-/**
- * Checks if a folder name should be ignored during mapping and resets.
- * Excludes hidden folders (starting with '.') and build/dependency folders.
- * @param {string} folderName - The folder name to evaluate.
- * @returns {boolean} - True if the folder should be ignored, false otherwise.
- */
 function shouldIgnoreFolder(folderName) {
   if (!folderName) return true;
   const lower = folderName.toLowerCase();
@@ -408,6 +383,129 @@ function shouldIgnoreFolder(folderName) {
     folderName.startsWith(".") ||
     lower === "node_modules" ||
     lower === "tempmediastorage" ||
-    lower === "ingestion"
+    lower === "ingestion" ||
+    lower === "the system ingestion"
   );
+}
+
+/**
+ * Audits physical folders in the Drive workspace and lists any that do not match the taxonomy.
+ * Does not delete or rename anything. It logs results to the logger.
+ * @returns {Array<Object>} List of unmapped/incorrect folders.
+ */
+function auditWorkspaceFolders() {
+  try {
+    const isWork = isWorkAccount();
+    const root = (isWork && SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) ? 
+                 DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) : 
+                 DriveApp.getRootFolder();
+                 
+    console.log(`Starting Drive Workspace Audit... Root Folder: ${root.getName()} (ID: ${root.getId()})`);
+
+    const taxonomyFilename = isWork ? "WoS_Taxonomy.json" : "LOS_Taxonomy.json";
+    const files = DriveApp.getFilesByName(taxonomyFilename);
+    if (!files.hasNext()) {
+      console.error(taxonomyFilename + " not found. Please run syncTaxonomyToSheet() first.");
+      return [];
+    }
+
+    const taxonomy = JSON.parse(files.next().getBlob().getDataAsString());
+    if (!Array.isArray(taxonomy)) {
+      console.error("auditWorkspaceFolders failed: Parsed taxonomy is not an array.");
+      return [];
+    }
+
+    // Build set of valid relative paths from the taxonomy
+    const validPaths = new Set();
+    const TARGET_DEPTH = 4;
+
+    taxonomy.forEach(item => {
+      if (item && item["Concat (Label)"]) {
+        const path = item["Concat (Label)"].trim();
+        if (!path) return;
+
+        const parts = path.split("/").map(s => s.trim());
+        const firstPart = parts[0] || "";
+
+        // Ignore system triage (00) and system operational (99) tags
+        if (firstPart.indexOf("00 ") === 0 || firstPart.indexOf("99 ") === 0 || item["L1 Code"] === "00 00 00" || item["L1 Name"] === "System") {
+          return;
+        }
+
+        // Add the path itself up to TARGET_DEPTH, and all its parent prefixes
+        const limitParts = parts.slice(0, TARGET_DEPTH);
+        let currentPath = "";
+        for (let j = 0; j < limitParts.length; j++) {
+          currentPath = currentPath ? (currentPath + "/" + limitParts[j]) : limitParts[j];
+          validPaths.add(currentPath);
+        }
+      }
+    });
+
+    console.log(`Compiled ${validPaths.size} valid taxonomy paths for matching.`);
+
+    const incorrectFolders = [];
+    
+    // Recursive traversal function
+    function traverseAndAudit(folder, currentRelativePath) {
+      const folderName = folder.getName();
+      if (shouldIgnoreFolder(folderName)) return;
+
+      const path = currentRelativePath ? (currentRelativePath + "/" + folderName) : folderName;
+
+      // Only audit folders below root
+      if (currentRelativePath) {
+        // If the path starts with a folder starting with "00 " or "99 ", skip auditing it entirely (e.g. "00 Inbox")
+        const parts = path.split("/");
+        const firstPart = parts[0];
+        if (firstPart.startsWith("00 ") || firstPart.startsWith("99 ")) {
+          return;
+        }
+
+        if (!validPaths.has(path)) {
+          incorrectFolders.push({
+            name: folderName,
+            relativePath: path,
+            id: folder.getId(),
+            url: folder.getUrl()
+          });
+        }
+      }
+
+      // Continue traversing subfolders
+      try {
+        const subfolders = folder.getFolders();
+        while (subfolders.hasNext()) {
+          const nextFolder = subfolders.next();
+          traverseAndAudit(nextFolder, path);
+        }
+      } catch (e) {
+        console.error(`Error traversing subfolders of ${folderName}: ${e.message}`);
+      }
+    }
+
+    // Start traversal from children of the root folder (so the relative path of children is just their name)
+    const subfolders = root.getFolders();
+    while (subfolders.hasNext()) {
+      traverseAndAudit(subfolders.next(), "");
+    }
+
+    console.log(`\n================ AUDIT RESULTS ================`);
+    console.log(`Incorrect / Unmapped Folders Found: ${incorrectFolders.length}`);
+    if (incorrectFolders.length > 0) {
+      console.log(`\nList of physical folders not matching active taxonomy:`);
+      incorrectFolders.forEach((f, idx) => {
+        console.log(`${idx + 1}. [UNMAPPED] Path: "/${f.relativePath}" | ID: ${f.id} | Link: ${f.url}`);
+      });
+    } else {
+      console.log(`🎉 No incorrect or unmapped folders found! All physical folders match the taxonomy.`);
+    }
+    console.log(`==============================================\n`);
+
+    return incorrectFolders;
+
+  } catch (e) {
+    console.error(`auditWorkspaceFolders failed: ${e.message}`);
+    return [];
+  }
 }

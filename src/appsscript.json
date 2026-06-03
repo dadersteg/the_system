@@ -41,9 +41,6 @@
     "https://www.googleapis.com/auth/tasks",
     "https://www.googleapis.com/auth/script.external_request",
     "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly",
-    "https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly",
-    "https://www.googleapis.com/auth/googlehealth.sleep.readonly",
     "https://www.googleapis.com/auth/chat.messages.create",
     "https://www.googleapis.com/auth/chat.spaces.readonly",
     "https://www.googleapis.com/auth/script.scriptapp"

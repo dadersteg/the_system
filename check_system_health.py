@@ -76,41 +76,75 @@ def check_clasp():
         return False
 
 def check_manifest_alignment():
-    log_section("Manifest Alignment Diagnostics")
+    log_section("GCP Project & Scope Separation Diagnostics")
     sys_manifest_path = "src/appsscript.json"
     ref_manifest_path = "../reflection/appsscript.json"
+    sys_clasp_path = ".clasp.json"
+    ref_clasp_path = "../reflection/.clasp.json"
     
+    success = True
+    
+    # 1. Check Manifests existence
     if not os.path.exists(sys_manifest_path):
         log_status(False, "the_system manifest", f"Not found at: {sys_manifest_path}")
-        return False
-        
+        success = False
     if not os.path.exists(ref_manifest_path):
         log_warning("reflection manifest", f"Not found at: {ref_manifest_path}")
+        success = False
+        
+    # 2. Check Clasp settings existence
+    if not os.path.exists(sys_clasp_path):
+        log_status(False, "the_system clasp config", f"Not found at: {sys_clasp_path}")
+        success = False
+    if not os.path.exists(ref_clasp_path):
+        log_warning("reflection clasp config", f"Not found at: {ref_clasp_path}")
+        success = False
+        
+    if not success:
         return False
         
     try:
+        # Load manifests
         with open(sys_manifest_path, 'r') as f:
             sys_data = json.load(f)
         with open(ref_manifest_path, 'r') as f:
             ref_data = json.load(f)
             
-        sys_scopes = set(sys_data.get("oauthScopes", []))
-        ref_scopes = set(ref_data.get("oauthScopes", []))
+        # Load clasp configs
+        with open(sys_clasp_path, 'r') as f:
+            sys_clasp = json.load(f)
+        with open(ref_clasp_path, 'r') as f:
+            ref_clasp = json.load(f)
+            
+        # Verify separate GCP project IDs
+        sys_project = sys_clasp.get("projectId", "")
+        ref_project = ref_clasp.get("projectId", "")
         
-        if sys_scopes == ref_scopes:
-            log_status(True, "Manifest Scopes Sync", "the_system and reflection manifests have identical oauthScopes")
-            return True
+        if sys_project and ref_project and sys_project != ref_project:
+            log_status(True, "GCP Project Separation", f"Decoupled. system: '{sys_project}', reflection: '{ref_project}'")
         else:
-            diff_sys = sys_scopes - ref_scopes
-            diff_ref = ref_scopes - sys_scopes
-            log_status(False, "Manifest Scopes Sync", "Manifest oauthScopes are mismatched! This causes scope-downgrade loops.")
-            if diff_sys:
-                print(f"    Missing in reflection: {list(diff_sys)}")
-            if diff_ref:
-                print(f"    Missing in the_system: {list(diff_ref)}")
-            return False
+            log_status(False, "GCP Project Separation", f"mismatch or shared project detected! system: '{sys_project}', reflection: '{ref_project}'")
+            success = False
+            
+        # Verify Google Health scopes are excluded from the_system
+        health_scopes = [
+            "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly",
+            "https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly",
+            "https://www.googleapis.com/auth/googlehealth.sleep.readonly"
+        ]
+        
+        sys_scopes = sys_data.get("oauthScopes", [])
+        system_has_health = any(s in sys_scopes for s in health_scopes)
+        
+        if not system_has_health:
+            log_status(True, "Health Scope Exclusion", "Google Health API scopes successfully excluded from the_system manifest.")
+        else:
+            log_status(False, "Health Scope Exclusion", "Warning: Google Health API scopes detected in the_system manifest! This can block standard clasp command execution.")
+            success = False
+            
+        return success
     except Exception as e:
-        log_status(False, "Manifest Scopes Sync", f"Error checking manifest alignment: {str(e)}")
+        log_status(False, "GCP Project/Scope Check", f"Error running separation diagnostics: {str(e)}")
         return False
 
 def check_token_file(filepath, token_name):
