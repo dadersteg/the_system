@@ -87,6 +87,11 @@ function doGet(e) {
      runHourlyReview();
      return ContentService.createTextOutput("Successfully ran the hourly review and timeboxing pipeline.");
   }
+  if (e && e.parameter && e.parameter.runSyncTaxonomy === "true") {
+     syncTaxonomyToSheet();
+     updateLabelList();
+     return ContentService.createTextOutput("Successfully ran taxonomy sync, label alignment, and label export.");
+  }
   if (e && e.parameter && e.parameter.runTaskFixer === "true") {
      generateCorrectionDossier();
      return ContentService.createTextOutput("Fixer complete");
@@ -191,6 +196,9 @@ function doGet(e) {
      const result = fixSpreadsheetTypos(ssId);
      return ContentService.createTextOutput(result).setMimeType(ContentService.MimeType.TEXT);
   }
+  if (e && e.parameter && e.parameter.action === "applyGoal5Update") {
+     return applyGoal5Update();
+  }
   if (e && e.parameter && e.parameter.action === "listSheets") {
      const ssId = e.parameter.ssId;
      const ss = SpreadsheetApp.openById(ssId);
@@ -260,7 +268,6 @@ function doGet(e) {
         'ToDo': SYSTEM_CONFIG.TASKS.TODO_LIST_ID,
         'Importer': SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID,
         'AI_Review': SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID,
-        'Backlog': SYSTEM_CONFIG.TASKS.BACKLOG_LIST_ID,
         'To_Be_Deleted': SYSTEM_CONFIG.TASKS.TO_BE_DELETED_LIST_ID,
         'Recurring': SYSTEM_CONFIG.TASKS.RECURRING_LIST_ID
       };
@@ -1062,7 +1069,7 @@ function logHabit(habitName) {
       sheet = ss.getSheets()[0];
     }
     const now = new Date();
-    const dateStr = now.toISOString().split('T')[0];
+    const dateStr = "'" + Utilities.formatDate(now, "Europe/London", "yyyy-MM-dd");
     sheet.appendRow([now.toISOString(), habitName, dateStr]);
     return { success: true };
   } catch (e) {
@@ -1080,60 +1087,54 @@ function getHabitStreak(habitName) {
     const data = sheet.getDataRange().getValues();
     if (data.length < 2) return 0;
     
+    function getLondonDateStr(d) {
+      return Utilities.formatDate(d, "Europe/London", "yyyy-MM-dd");
+    }
+
     const dates = data.slice(1)
       .filter(row => row[1] === habitName)
       .map(row => {
-        const val = row[2];
-        if (!val) return null;
-        if (val instanceof Date || (val && typeof val.getMonth === 'function' && typeof val.getFullYear === 'function')) {
-          try {
-            if (isNaN(val.getTime())) return null;
-            return val.toISOString().split('T')[0];
-          } catch (e) {
-            try {
-              const y = val.getFullYear();
-              const m = String(val.getMonth() + 1).padStart(2, '0');
-              const d = String(val.getDate()).padStart(2, '0');
-              return `${y}-${m}-${d}`;
-            } catch (inner) {
-              return null;
-            }
-          }
+        const timestamp = row[0]; // Use column A (timestamp) as source of truth
+        if (!timestamp) return null;
+        
+        let d;
+        if (timestamp instanceof Date) {
+          d = timestamp;
+        } else {
+          d = new Date(timestamp);
         }
-        const match = val.toString().match(/^\d{4}-\d{2}-\d{2}/);
-        return match ? match[0] : null;
+        
+        if (isNaN(d.getTime())) return null;
+        return getLondonDateStr(d);
       })
       .filter(d => d !== null);
       
     if (dates.length === 0) return 0;
     
-    // Sort chronological descending (localeCompare works perfectly for YYYY-MM-DD format)
     dates.sort((a, b) => b.localeCompare(a));
-    
     const uniqueDates = [...new Set(dates)];
     
-    let streak = 0;
-    const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
+    const todayStr = getLondonDateStr(new Date());
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = getLondonDateStr(yesterday);
     
-    const lastLoggedStr = uniqueDates[0];
-    const lastLoggedDate = new Date(lastLoggedStr);
-    const todayDate = new Date(todayStr);
+    if (uniqueDates[0] !== todayStr && uniqueDates[0] !== yesterdayStr) {
+      return 0; // Streak broken
+    }
     
-    const diffDays = Math.round((todayDate - lastLoggedDate) / (1000 * 60 * 60 * 24));
-    if (diffDays > 1) return 0; // Streak broken
-    
-    let checkDate = new Date(lastLoggedStr);
-    for (let i = 0; i < uniqueDates.length; i++) {
-      const dStr = uniqueDates[i];
-      const checkStr = checkDate.toISOString().split('T')[0];
-      if (dStr === checkStr) {
+    let streak = 1;
+    for (let i = 0; i < uniqueDates.length - 1; i++) {
+      const curr = new Date(uniqueDates[i]);
+      const next = new Date(uniqueDates[i + 1]);
+      const diff = Math.round((curr - next) / (1000 * 60 * 60 * 24));
+      if (diff === 1) {
         streak++;
-        checkDate.setDate(checkDate.getDate() - 1);
       } else {
         break;
       }
     }
+    
     return streak;
   } catch (e) {
     console.error("Error calculating habit streak: " + e.stack);
