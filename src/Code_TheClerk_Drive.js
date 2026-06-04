@@ -77,10 +77,13 @@ function runTheClerkDriveOngoing() {
 }
 
 function executeEngine(mode, currentModel) {
+    console.log(`>>> [${mode} START] v26.0 using ${currentModel} - acquiring lock...`);
     const lock = LockService.getScriptLock();
-    if (!lock.tryLock(10000)) return;
+    if (!lock.tryLock(10000)) {
+        console.warn("Could not acquire script lock. Another execution is likely running.");
+        return;
+    }
     const sessionStart = Date.now();
-    console.log(`>>> [${mode} START] v26.0 using ${currentModel}`);
     
     try {
         const ss = SpreadsheetApp.openById(DRIVE_MASTER_SHEET_ID);
@@ -178,7 +181,7 @@ function executeEngine(mode, currentModel) {
             sessionLog.appendRow([new Date(), mode, currentModel, allFiles.length, "Completed", `${((Date.now() - sessionStart) / 1000).toFixed(1)}s`]);
         }
     } catch (e) { 
-        console.error("FATAL: " + e.message); 
+        console.error("FATAL: " + e.message + "\nStack: " + e.stack); 
         try {
             const ss = SpreadsheetApp.openById(DRIVE_MASTER_SHEET_ID);
             const sessionLog = ss.getSheets().find(s => s.getSheetId().toString() === DRIVE_SESSION_LOG_GID);
@@ -739,23 +742,23 @@ function loadKnowledgeDocs() {
     let instructions = "";
     try {
         const iter1 = DriveApp.getFilesByName("TS - Clerk > System Instructions.md");
-        if (iter1.hasNext()) instructions = iter1.next().getBlob().getDataAsString();
+        if (iter1.hasNext()) instructions = processPromptText(iter1.next().getBlob().getDataAsString());
     } catch(e){}
     
     let protocol = "";
     try {
         const iter2 = DriveApp.getFilesByName("TS - Master Asset Naming Protocol.md");
-        if (iter2.hasNext()) protocol = iter2.next().getBlob().getDataAsString();
+        if (iter2.hasNext()) protocol = processPromptText(iter2.next().getBlob().getDataAsString());
     } catch(e){}
     
     if (!instructions) {
-        instructions = DocumentApp.openById(DRIVE_DOC_IDS.INSTRUCTIONS).getBody().getText();
+        instructions = getSafeDocText(DRIVE_DOC_IDS.INSTRUCTIONS);
     }
     if (!protocol) {
-        protocol = DocumentApp.openById(DRIVE_DOC_IDS.PROTOCOL).getBody().getText();
+        protocol = getSafeDocText(DRIVE_DOC_IDS.PROTOCOL);
     }
 
-    const taxonomyJson = DriveApp.getFileById(DRIVE_DOC_IDS.TAXONOMY_JSON).getBlob().getDataAsString();
+    const taxonomyJson = getSafeDocText(DRIVE_DOC_IDS.TAXONOMY_JSON);
     
     return {
         text: [instructions, "--- VALID TAXONOMY CATEGORIES (Use 'Concat' logic) ---", taxonomyJson, protocol].join("\n\n"),

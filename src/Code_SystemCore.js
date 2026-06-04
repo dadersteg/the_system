@@ -443,7 +443,7 @@ function isWorkAccount() {
   }
   try {
     var email = Session.getEffectiveUser().getEmail();
-    return email && (email.indexOf("playmetech.net") !== -1 || email.indexOf("work") !== -1);
+    return email && (email.indexOf("playmetech.net") !== -1 || email.indexOf("playmetech.com") !== -1 || email.indexOf("work") !== -1);
   } catch(e) {
     return false;
   }

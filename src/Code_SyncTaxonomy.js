@@ -12,286 +12,381 @@ function syncTaxonomyToSheet() {
   const file = DriveApp.getFileById(fileId);
   let text = file.getBlob().getDataAsString();
   
-  // 1. Add Niklas Johansson if not present
-  if (!text.includes("Niklas Johansson")) {
+  const isWork = isWorkAccount();
+
+  // 1. Add Niklas Johansson if not present (Private/LOS only)
+  if (!isWork && !text.includes("Niklas Johansson")) {
     text = text.replace(
       "| **Mamma & Pappa** | Parents. |",
       "| **Mamma & Pappa** | Parents. |\n\n| **Niklas Johansson** | Friend. |"
     );
   }
 
-  // 2. Update 98 to 99 for SMS, Telegram, WhatsApp
-  text = text.replace(/\* \*\*98 SMS:\*\*/g, "* **99 SMS:**");
-  text = text.replace(/\* \*\*98 Telegram:\*\*/g, "* **99 Telegram:**");
-  text = text.replace(/\* \*\*98 WhatsApp:\*\*/g, "* **99 WhatsApp:**");
-
-  // Save the updated text back to Google Drive
-  file.setContent(text);
-
-  const lines = text.split("\n");
-
-  const l1Map = {};
-  const l2Map = {};
-  const l3Map = {};
-
-  let l1Regex = /^(?:###|##)\s+(\d{2}\s00\s00)\s+(.+)$/;
-  let l2Regex = /^(?:###|##|\*|-)\s+\*\*?(?:\[.+?\]\s)?(\d{2}\s[XY\d]{2}\s00)\s+(.+?)\*?\*?$/;
-  let l3DetailedRegex = /^-\s+\*\*(\d{2}\s\d{2}\s\d{2})\s+([^:]+):\*\*(.*)$/;
-  let l3SkeletonRegex = /^\s*(?:\*|-)\s+(\d{2}\s\d{2}\s\d{2})\s+(.+)$/;
-  let l3HeadingRegex = /^###\s+(\d{2}\s\d{2}\s\d{2})\s+(.+)$/;
-  let systemRegex = /^\*\s+\*\*(\d{2}\s[^\*:]+):\*\*(.*)$/;
-
-  let currentL1 = "";
-  let currentL2 = "";
-
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i].trim();
-    if (!line) continue;
-
-    let m1 = line.match(l1Regex);
-    if (m1) {
-      currentL1 = m1[1];
-      l1Map[m1[1]] = m1[2].trim();
-      currentL2 = "";
-      continue;
-    }
-
-    let m2 = line.match(l2Regex);
-    if (m2) {
-      currentL2 = m2[1];
-      l2Map[m2[1]] = { name: m2[2].replace(/\[AGGREGATOR\]/gi, "").trim(), l1: currentL1 };
-      continue;
-    }
-
-    let m3 = line.match(l3DetailedRegex) || line.match(l3SkeletonRegex) || line.match(l3HeadingRegex);
-    if (m3) {
-      if (m3[1].endsWith("00") && !line.includes("03 00 99")) continue;
-      
-      let l3Code = m3[1];
-      let rawName = m3[2].trim();
-      
-      rawName = rawName.replace(/^\*\*/, '').replace(/\*\*:.*$/, '').replace(/:.*$/, '').replace("(Standing Contexts)", "").replace("(Active)", "").replace("(Passive)", "").replace(/\[AGGREGATOR\]/gi, "").trim();
-
-      if (!l3Map[l3Code] || (l3Map[l3Code] && l3Map[l3Code].name === "")) {
-          let inferredL2 = l3Code.substring(0, 5) + " 00";
-          let inferredL1 = l3Code.substring(0, 2) + " 00 00";
-          l3Map[l3Code] = { name: rawName, l2: inferredL2, l1: inferredL1 };
-      }
-    }
+  // 2. Update 98 to 99 for SMS, Telegram, WhatsApp (Private/LOS only)
+  if (!isWork) {
+    text = text.replace(/\* \*\*98 SMS:\*\*/g, "* **99 SMS:**");
+    text = text.replace(/\* \*\*98 Telegram:\*\*/g, "* **99 Telegram:**");
+    text = text.replace(/\* \*\*98 WhatsApp:\*\*/g, "* **99 WhatsApp:**");
+    // Save the updated text back to Google Drive
+    file.setContent(text);
   }
 
+  const lines = text.split("\n");
   const data = [];
   data.push(["L1 Code", "L1 Name", "L2 Code", "L2 Name", "L3 Code", "L3 Name", "L4 Name", "L4 Description", "Concat (Label)", "Concat (Path)"]);
 
   const clean = (name) => name ? name.replace("(Standing Contexts)", "").replace("(Active)", "").replace("(Passive)", "").replace(/\[AGGREGATOR\]/gi, "").trim() : "";
 
-  // 1. L1 Nodes
-  for (let l1Code in l1Map) {
-      data.push([
-          l1Code, l1Map[l1Code],
-          "", "", "", "", "", "",
-          `${l1Code.substring(0,2)} ${clean(l1Map[l1Code])}`,
-          `${l1Code} ${clean(l1Map[l1Code])}`
-      ]);
-  }
-
-  // 2. L2 Nodes
-  for (let l2Code in l2Map) {
-      let l2Data = l2Map[l2Code];
-      let l1Code = l2Data.l1;
-      let l1Name = l1Map[l1Code] || "";
-      data.push([
-          l1Code, l1Name,
-          l2Code, l2Data.name,
-          "", "", "", "",
-          `${l1Code.substring(0,2)} ${clean(l1Name)}/${l2Code.substring(3,5)} ${clean(l2Data.name)}`,
-          `${l2Code} ${clean(l2Data.name)}`
-      ]);
-  }
-
-  // 3. L3 Nodes
-  for (let l3Code in l3Map) {
-      let l3Data = l3Map[l3Code];
-      let l2Code = l3Data.l2;
-      let l1Code = l3Data.l1;
-      let l2Name = l2Map[l2Code] ? l2Map[l2Code].name : "";
-      let l1Name = l1Map[l1Code] || "";
-      
-      let p1 = `${l1Code.substring(0,2)} ${clean(l1Name)}`;
-      let p2 = l2Name ? `${l2Code.substring(3,5)} ${clean(l2Name)}` : "";
-      let p3 = `${l3Code.substring(6,8)} ${clean(l3Data.name)}`;
-      let label = p2 ? `${p1}/${p2}/${p3}` : `${p1}/${p3}`;
-      
-      data.push([
-          l1Code, l1Name,
-          l2Code, l2Name,
-          l3Code, l3Data.name,
-          "", "",
-          label,
-          `${l3Code} ${clean(l3Data.name)}`
-      ]);
-  }
-
-  // 4. L4 Nodes (Markdown tables)
-  let currentContextCode = "";
-  let currentL4Parent = "";
-  let isArchiveTable = false;
-  
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i].trim();
-    if (!line) continue;
-
-    let ctxMatch = line.match(/^(?:###|##)\s+(\d{2}\s\d{2}\s\d{2})\s+(.+)$/);
-    if (ctxMatch) {
-      currentContextCode = ctxMatch[1];
-      currentL4Parent = ""; // Reset L4 parent nesting
-      continue;
-    }
-
-    let l4ParentMatch = line.match(/^####\s+(\d{2}\s\d{2}\s\d{2})\s+[^>]+>\s*(\d{2}\s[^(\n\r]+)/);
-    if (l4ParentMatch) {
-      currentContextCode = l4ParentMatch[1];
-      currentL4Parent = l4ParentMatch[2].split("(")[0].trim();
-      continue;
-    }
-
-    if (line.startsWith("|")) {
-      if (line.includes("---")) continue;
-      
-      if (line.includes("Code | Description")) {
-          isArchiveTable = false;
-          continue;
-      }
-      if (line.includes("Parent | Code | Original Description")) {
-          isArchiveTable = true;
-          continue;
-      }
-
-      if (isArchiveTable) {
-          let cols = line.split("|").map(s => s.trim());
-          if (cols.length >= 5) {
-              let parentCode = cols[1];
-              let code = cols[2].replace(/\*/g, '');
-              let desc = cols[3];
-              
-              if (l3Map[parentCode]) {
-                  let l2Code = l3Map[parentCode].l2;
-                  let l1Code = l3Map[parentCode].l1;
-                  
-                  // Calculate the correct 99 Archive parent node
-                  let archiveL3Code = `${parentCode.substring(0, 5)} 99`;
-                  if (!l3Map[archiveL3Code]) {
-                    // Fallback for special cases like Studies (03 00 99)
-                    let altArchive = `${parentCode.substring(0, 2)} 00 99`;
-                    if (l3Map[altArchive]) archiveL3Code = altArchive;
-                  }
-                  
-                  // If we found a valid archive parent, use it. Otherwise, fallback to original.
-                  let targetParentCode = l3Map[archiveL3Code] ? archiveL3Code : parentCode;
-                  l3Map[targetParentCode].hasL4 = true;
-                  
-                  let p1 = `${l1Code.substring(0,2)} ${clean(l1Map[l1Code])}`;
-                  let p2 = l2Map[l2Code] ? `${l2Code.substring(3,5)} ${clean(l2Map[l2Code].name)}` : "";
-                  let p3 = `${targetParentCode.substring(6,8)} ${clean(l3Map[targetParentCode].name)}`;
-                  
-                  let label = p2 ? `${p1}/${p2}/${p3}/${code}` : `${p1}/${p3}/${code}`;
-                  let path = `${targetParentCode} ${clean(l3Map[targetParentCode].name)} > ${code}`;
-                  
-                  data.push([
-                      l1Code, l1Map[l1Code] || "",
-                      l2Code, l2Map[l2Code] ? l2Map[l2Code].name : "",
-                      targetParentCode, l3Map[targetParentCode].name,
-                      code, desc,
-                      label, path
-                  ]);
-              }
-          }
-      } else {
-          let cols = line.split("|").map(s => s.trim());
-          if (cols.length >= 4) {
-              let code = cols[1].replace(/\*/g, '');
-              let desc = cols[2];
-              
-              if (currentContextCode) {
-                  // Explicitly handle contexts: an L4 item can be attached to an L3 context (e.g. '01 01 01') 
-                  // or directly to an L2 context (e.g. '01 04 00').
-                  // This is intentional logic to allow skipping L3 for broad categories like Finances or Career Management.
-                  let inferredL2 = currentContextCode.substring(0, 5) + " 00";
-                  let inferredL1 = currentContextCode.substring(0, 2) + " 00 00";
-                  
-                  let l1Name = l1Map[inferredL1] || "";
-                  let l2Name = l2Map[inferredL2] ? l2Map[inferredL2].name : "";
-                  
-                  // If currentContextCode ends in "00", it is an L2 node and was skipped in L3 parsing, 
-                  // making l3Name intentionally empty.
-                  let l3Name = l3Map[currentContextCode] ? l3Map[currentContextCode].name : "";
-                  
-                  let p1 = `${inferredL1.substring(0,2)} ${clean(l1Name)}`;
-                  let p2 = l2Name ? `${inferredL2.substring(3,5)} ${clean(l2Name)}` : "";
-                  let p3 = `${currentContextCode.substring(6,8)} ${clean(l3Name)}`;
-                  
-                  let concatLabel = "";
-                  let concatPath = "";
-                  
-                  if (l3Name) {
-                      if (currentL4Parent) {
-                          concatLabel = p2 ? `${p1}/${p2}/${p3}/${currentL4Parent}/${code}` : `${p1}/${p3}/${currentL4Parent}/${code}`;
-                          concatPath = `${currentContextCode} ${clean(l3Name)} > ${currentL4Parent} > ${code}`;
-                      } else {
-                          concatLabel = p2 ? `${p1}/${p2}/${p3}/${code}` : `${p1}/${p3}/${code}`;
-                          concatPath = `${currentContextCode} ${clean(l3Name)} > ${code}`;
-                      }
-                  } else if (l2Name) {
-                      concatLabel = p2 ? `${p1}/${p2}/${code}` : `${p1}/${code}`;
-                      concatPath = `${inferredL2} ${clean(l2Name)} > ${code}`;
-                  } else {
-                      concatLabel = `${p1}/${code}`;
-                      concatPath = `${inferredL1} ${clean(l1Name)} > ${code}`;
-                  }
-                  
-                  data.push([
-                      inferredL1, l1Name,
-                      inferredL2, l2Name,
-                      currentContextCode !== inferredL2 ? currentContextCode : "", l3Name,
-                      code, desc,
-                      concatLabel, concatPath
-                  ]);
-              }
-          }
-      }
-    }
-  }
-
-  // 5. System Tags
-  let inSystemTags = false;
-  let currentSystemParent = "";
-  for (let i = 0; i < lines.length; i++) {
+  if (isWork) {
+    // Parse using WOS flat taxonomy logic
+    let currentSection = null; // 'core', 'strategies', 'goals'
+    let currentL1Code = "";
+    let currentL1Name = "";
+    
+    let l1Regex = /^###\s+`?(\d{2})\s+([^`\n]+)`?/;
+    let subfolderRegex = /^\s*[\*\-]\s+\*\*`?([^`:\n]+)`?\*\*:\s*(.*)$/;
+    let stratHeaderRegex = /^###\s+4\.1\.\s+Actual\s+Trading/i;
+    let goalsHeaderRegex = /^###\s+4\.2\.\s+Actual\s+Strategic/i;
+    
+    let addedCrossDimensionalHeader = false;
+    
+    for (let i = 0; i < lines.length; i++) {
       let line = lines[i].trim();
-      if (line.includes("## 5. System & Operational Tags")) {
-          inSystemTags = true;
+      if (!line) continue;
+      
+      if (line.indexOf("## 2. The Core Hierarchy") !== -1) {
+        currentSection = 'core';
+        continue;
+      } else if (stratHeaderRegex.test(line)) {
+        currentSection = 'strategies';
+        currentL1Code = "Cross-Dimensional";
+        currentL1Name = "4. Cross-Dimensional Labels & Aggregators";
+        if (!addedCrossDimensionalHeader) {
+          data.push([
+            currentL1Code, currentL1Name,
+            "", "", "", "", "", "",
+            "4. Cross-Dimensional Labels & Aggregators",
+            "4. Cross-Dimensional Labels & Aggregators"
+          ]);
+          addedCrossDimensionalHeader = true;
+        }
+        continue;
+      } else if (goalsHeaderRegex.test(line)) {
+        currentSection = 'goals';
+        currentL1Code = "Cross-Dimensional";
+        currentL1Name = "4. Cross-Dimensional Labels & Aggregators";
+        if (!addedCrossDimensionalHeader) {
+          data.push([
+            currentL1Code, currentL1Name,
+            "", "", "", "", "", "",
+            "4. Cross-Dimensional Labels & Aggregators",
+            "4. Cross-Dimensional Labels & Aggregators"
+          ]);
+          addedCrossDimensionalHeader = true;
+        }
+        continue;
+      } else if (line.indexOf("## ") === 0 || line.indexOf("---") === 0) {
+        if (line.indexOf("Actual Trading") === -1 && line.indexOf("Actual Strategic") === -1) {
+          currentSection = null;
+        }
+      }
+      
+      if (currentSection === 'core') {
+        let m1 = line.match(l1Regex);
+        if (m1) {
+          currentL1Code = m1[1].trim();
+          currentL1Name = m1[2].trim();
+          
+          data.push([
+            currentL1Code, currentL1Name,
+            "", "", "", "", "", "",
+            `${currentL1Code} ${currentL1Name}`,
+            `${currentL1Code} ${currentL1Name}`
+          ]);
           continue;
+        }
+        
+        let mSub = line.match(subfolderRegex);
+        if (mSub && currentL1Code) {
+          let folderName = mSub[1].replace(/`/g, '').trim();
+          let desc = mSub[2].trim();
+          
+          data.push([
+            currentL1Code, currentL1Name,
+            "", "", "", "",
+            folderName, desc,
+            `${currentL1Code} ${currentL1Name}/${folderName}`,
+            `${currentL1Code} ${currentL1Name} > ${folderName}`
+          ]);
+        }
+      } else if (currentSection === 'strategies' || currentSection === 'goals') {
+        let mSub = line.match(subfolderRegex);
+        if (mSub) {
+          let labelCode = mSub[1].replace(/`/g, '').trim();
+          let desc = mSub[2].trim();
+          
+          data.push([
+            currentL1Code, currentL1Name,
+            "", "", "", "",
+            labelCode, desc,
+            labelCode, labelCode
+          ]);
+        }
       }
-      if (inSystemTags) {
-          if (line.startsWith("###")) {
-              currentSystemParent = line.replace("###", "").trim();
-          } else if (line.match(systemRegex)) {
-              let m = line.match(systemRegex);
-              let code = m[1].trim();
-              let desc = m[2].trim();
-              data.push([
-                  "00 00 00", "System",
-                  "", "",
-                  "", "",
-                  code, desc,
-                  code,
-                  code
-              ]);
-          }
+    }
+  } else {
+    // Keep existing LOS parsing logic
+    const l1Map = {};
+    const l2Map = {};
+    const l3Map = {};
+
+    let l1Regex = /^(?:###|##)\s+(\d{2}\s00\s00)\s+(.+)$/;
+    let l2Regex = /^(?:###|##|\*|-)\s+\*\*?(?:\[.+?\]\s)?(\d{2}\s[XY\d]{2}\s00)\s+(.+?)\*?\*?$/;
+    let l3DetailedRegex = /^-\s+\*\*(\d{2}\s\d{2}\s\d{2})\s+([^:]+):\*\*(.*)$/;
+    let l3SkeletonRegex = /^\s*(?:\*|-)\s+(\d{2}\s\d{2}\s\d{2})\s+(.+)$/;
+    let l3HeadingRegex = /^###\s+(\d{2}\s\d{2}\s\d{2})\s+(.+)$/;
+    let systemRegex = /^\*\s+\*\*(\d{2}\s[^\*:]+):\*\*(.*)$/;
+
+    let currentL1 = "";
+    let currentL2 = "";
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i].trim();
+      if (!line) continue;
+
+      let m1 = line.match(l1Regex);
+      if (m1) {
+        currentL1 = m1[1];
+        l1Map[m1[1]] = m1[2].trim();
+        currentL2 = "";
+        continue;
       }
+
+      let m2 = line.match(l2Regex);
+      if (m2) {
+        currentL2 = m2[1];
+        l2Map[m2[1]] = { name: m2[2].replace(/\[AGGREGATOR\]/gi, "").trim(), l1: currentL1 };
+        continue;
+      }
+
+      let m3 = line.match(l3DetailedRegex) || line.match(l3SkeletonRegex) || line.match(l3HeadingRegex);
+      if (m3) {
+        if (m3[1].endsWith("00") && !line.includes("03 00 99")) continue;
+        
+        let l3Code = m3[1];
+        let rawName = m3[2].trim();
+        
+        rawName = rawName.replace(/^\*\*/, '').replace(/\*\*:.*$/, '').replace(/:.*$/, '').replace("(Standing Contexts)", "").replace("(Active)", "").replace("(Passive)", "").replace(/\[AGGREGATOR\]/gi, "").trim();
+
+        if (!l3Map[l3Code] || (l3Map[l3Code] && l3Map[l3Code].name === "")) {
+            let inferredL2 = l3Code.substring(0, 5) + " 00";
+            let inferredL1 = l3Code.substring(0, 2) + " 00 00";
+            l3Map[l3Code] = { name: rawName, l2: inferredL2, l1: inferredL1 };
+        }
+      }
+    }
+
+    // 1. L1 Nodes
+    for (let l1Code in l1Map) {
+        data.push([
+            l1Code, l1Map[l1Code],
+            "", "", "", "", "", "",
+            `${l1Code.substring(0,2)} ${clean(l1Map[l1Code])}`,
+            `${l1Code} ${clean(l1Map[l1Code])}`
+        ]);
+    }
+
+    // 2. L2 Nodes
+    for (let l2Code in l2Map) {
+        let l2Data = l2Map[l2Code];
+        let l1Code = l2Data.l1;
+        let l1Name = l1Map[l1Code] || "";
+        data.push([
+            l1Code, l1Name,
+            l2Code, l2Data.name,
+            "", "", "", "",
+            `${l1Code.substring(0,2)} ${clean(l1Name)}/${l2Code.substring(3,5)} ${clean(l2Data.name)}`,
+            `${l2Code} ${clean(l2Data.name)}`
+        ]);
+    }
+
+    // 3. L3 Nodes
+    for (let l3Code in l3Map) {
+        let l3Data = l3Map[l3Code];
+        let l2Code = l3Data.l2;
+        let l1Code = l3Data.l1;
+        let l2Name = l2Map[l2Code] ? l2Map[l2Code].name : "";
+        let l1Name = l1Map[l1Code] || "";
+        
+        let p1 = `${l1Code.substring(0,2)} ${clean(l1Name)}`;
+        let p2 = l2Name ? `${l2Code.substring(3,5)} ${clean(l2Name)}` : "";
+        let p3 = `${l3Code.substring(6,8)} ${clean(l3Data.name)}`;
+        let label = p2 ? `${p1}/${p2}/${p3}` : `${p1}/${p3}`;
+        
+        data.push([
+            l1Code, l1Name,
+            l2Code, l2Name,
+            l3Code, l3Data.name,
+            "", "",
+            label,
+            `${l3Code} ${clean(l3Data.name)}`
+        ]);
+    }
+
+    // 4. L4 Nodes (Markdown tables)
+    let currentContextCode = "";
+    let currentL4Parent = "";
+    let isArchiveTable = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i].trim();
+      if (!line) continue;
+
+      let ctxMatch = line.match(/^(?:###|##)\s+(\d{2}\s\d{2}\s\d{2})\s+(.+)$/);
+      if (ctxMatch) {
+        currentContextCode = ctxMatch[1];
+        currentL4Parent = ""; // Reset L4 parent nesting
+        continue;
+      }
+
+      let l4ParentMatch = line.match(/^####\s+(\d{2}\s\d{2}\s\d{2})\s+[^>]+>\s*(\d{2}\s[^(\n\r]+)/);
+      if (l4ParentMatch) {
+        currentContextCode = l4ParentMatch[1];
+        currentL4Parent = l4ParentMatch[2].split("(")[0].trim();
+        continue;
+      }
+
+      if (line.startsWith("|")) {
+        if (line.includes("---")) continue;
+        
+        if (line.includes("Code | Description")) {
+            isArchiveTable = false;
+            continue;
+        }
+        if (line.includes("Parent | Code | Original Description")) {
+            isArchiveTable = true;
+            continue;
+        }
+
+        if (isArchiveTable) {
+            let cols = line.split("|").map(s => s.trim());
+            if (cols.length >= 5) {
+                let parentCode = cols[1];
+                let code = cols[2].replace(/\*/g, '');
+                let desc = cols[3];
+                
+                if (l3Map[parentCode]) {
+                    let l2Code = l3Map[parentCode].l2;
+                    let l1Code = l3Map[parentCode].l1;
+                    
+                    // Calculate the correct 99 Archive parent node
+                    let archiveL3Code = `${parentCode.substring(0, 5)} 99`;
+                    if (!l3Map[archiveL3Code]) {
+                      // Fallback for special cases like Studies (03 00 99)
+                      let altArchive = `${parentCode.substring(0, 2)} 00 99`;
+                      if (l3Map[altArchive]) archiveL3Code = altArchive;
+                    }
+                    
+                    // If we found a valid archive parent, use it. Otherwise, fallback to original.
+                    let targetParentCode = l3Map[archiveL3Code] ? archiveL3Code : parentCode;
+                    l3Map[targetParentCode].hasL4 = true;
+                    
+                    let p1 = `${l1Code.substring(0,2)} ${clean(l1Map[l1Code])}`;
+                    let p2 = l2Map[l2Code] ? `${l2Code.substring(3,5)} ${clean(l2Map[l2Code].name)}` : "";
+                    let p3 = `${targetParentCode.substring(6,8)} ${clean(l3Map[targetParentCode].name)}`;
+                    
+                    let label = p2 ? `${p1}/${p2}/${p3}/${code}` : `${p1}/${p3}/${code}`;
+                    let path = `${targetParentCode} ${clean(l3Map[targetParentCode].name)} > ${code}`;
+                    
+                    data.push([
+                        l1Code, l1Map[l1Code] || "",
+                        l2Code, l2Map[l2Code] ? l2Map[l2Code].name : "",
+                        targetParentCode, l3Map[targetParentCode].name,
+                        code, desc,
+                        label, path
+                    ]);
+                }
+            }
+        } else {
+            let cols = line.split("|").map(s => s.trim());
+            if (cols.length >= 4) {
+                let code = cols[1].replace(/\*/g, '');
+                let desc = cols[2];
+                
+                if (currentContextCode) {
+                    let inferredL2 = currentContextCode.substring(0, 5) + " 00";
+                    let inferredL1 = currentContextCode.substring(0, 2) + " 00 00";
+                    
+                    let l1Name = l1Map[inferredL1] || "";
+                    let l2Name = l2Map[inferredL2] ? l2Map[inferredL2].name : "";
+                    let l3Name = l3Map[currentContextCode] ? l3Map[currentContextCode].name : "";
+                    
+                    let p1 = `${inferredL1.substring(0,2)} ${clean(l1Name)}`;
+                    let p2 = l2Name ? `${inferredL2.substring(3,5)} ${clean(l2Name)}` : "";
+                    let p3 = `${currentContextCode.substring(6,8)} ${clean(l3Name)}`;
+                    
+                    let concatLabel = "";
+                    let concatPath = "";
+                    
+                    if (l3Name) {
+                        if (currentL4Parent) {
+                            concatLabel = p2 ? `${p1}/${p2}/${p3}/${currentL4Parent}/${code}` : `${p1}/${p3}/${currentL4Parent}/${code}`;
+                            concatPath = `${currentContextCode} ${clean(l3Name)} > ${currentL4Parent} > ${code}`;
+                        } else {
+                            concatLabel = p2 ? `${p1}/${p2}/${p3}/${code}` : `${p1}/${p3}/${code}`;
+                            concatPath = `${currentContextCode} ${clean(l3Name)} > ${code}`;
+                        }
+                    } else if (l2Name) {
+                        concatLabel = p2 ? `${p1}/${p2}/${code}` : `${p1}/${code}`;
+                        concatPath = `${inferredL2} ${clean(l2Name)} > ${code}`;
+                    } else {
+                        concatLabel = `${p1}/${code}`;
+                        concatPath = `${inferredL1} ${clean(l1Name)} > ${code}`;
+                    }
+                    
+                    data.push([
+                        inferredL1, l1Name,
+                        inferredL2, l2Name,
+                        currentContextCode !== inferredL2 ? currentContextCode : "", l3Name,
+                        code, desc,
+                        concatLabel, concatPath
+                    ]);
+                }
+            }
+        }
+      }
+    }
+
+    // 5. System Tags
+    let inSystemTags = false;
+    let currentSystemParent = "";
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line.includes("## 5. System & Operational Tags")) {
+            inSystemTags = true;
+            continue;
+        }
+        if (inSystemTags) {
+            if (line.startsWith("###")) {
+                currentSystemParent = line.replace("###", "").trim();
+            } else if (line.match(systemRegex)) {
+                let m = line.match(systemRegex);
+                let code = m[1].trim();
+                let desc = m[2].trim();
+                data.push([
+                    "00 00 00", "System",
+                    "", "",
+                    "", "",
+                    code, desc,
+                    code,
+                    code
+                ]);
+            }
+        }
+    }
   }
 
   // Adjust labels for Work account context (remove redundant Playmetech nested path prefix)
-  const isWork = isWorkAccount();
   if (isWork) {
     const workPrefix = "02 Work/01 Employment/01 Playmetech/";
     for (let i = 1; i < data.length; i++) {
@@ -335,6 +430,9 @@ function syncTaxonomyToSheet() {
      for(let j=0; j<data[0].length; j++) {
         obj[data[0][j]] = row[j];
      }
+     if (isWork && row[6]) {
+        obj["L4 Code"] = row[6];
+     }
      jsonOutput.push(obj);
      csvRows.push(row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","));
   }
@@ -363,4 +461,12 @@ function syncTaxonomyToSheet() {
   Logger.log("Successfully synced " + (data.length - 1) + " taxonomy rows to the Google Sheet.");
   Logger.log("Successfully exported " + taxPrefix + ".json and " + taxPrefix + ".csv to Google Drive.");
 
+  // Automatically align Gmail labels in the work profile
+  if (isWork) {
+    try {
+      cleanAndCreateGmailLabels();
+    } catch(e) {
+      Logger.log("Failed to sync Gmail labels: " + e.message);
+    }
+  }
 }

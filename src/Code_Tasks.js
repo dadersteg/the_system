@@ -1239,7 +1239,7 @@ function getTaxonomyDocument() {
  * @returns {string|null} System prompt text string, or null on execution error.
  */
 function getTaskMasterPrompt() {
-  const docId = SYSTEM_CONFIG.DOCS.PROMPT_TASKMASTER_DOC_ID;
+  const docId = SYSTEM_CONFIG.DOCS.TASK_MASTER_PROMPT_ID;
   if (docId) {
     try {
       try {

@@ -138,10 +138,6 @@ function checkAndRename(folder, outputData) {
  * @returns {void}
  */
 function syncDriveFoldersFromTaxonomy() {
-  if (isWorkAccount()) {
-    console.warn("syncDriveFoldersFromTaxonomy skipped: The Work taxonomy (WoS) is still a WIP. Folder creation is blocked.");
-    return;
-  }
   
   if (typeof SYSTEM_CONFIG === 'undefined' || !SYSTEM_CONFIG || !SYSTEM_CONFIG.STATE) {
     console.error("syncDriveFoldersFromTaxonomy failed: SYSTEM_CONFIG or SYSTEM_CONFIG.STATE is undefined");
@@ -172,9 +168,7 @@ function syncDriveFoldersFromTaxonomy() {
       return;
     }
 
-    const root = isWork ? 
-                 DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) : 
-                 DriveApp.getRootFolder();
+    const root = DriveApp.getRootFolder();
 
     let startIndex = parseInt(SYSTEM_CONFIG.STATE.TAXONOMY_SYNC_INDEX, 10);
     if (isNaN(startIndex) || startIndex >= taxonomy.length) {
@@ -359,9 +353,7 @@ function resolveFolderFromTaxonomy(concatPath, taxonomy) {
   const isWork = isWorkAccount();
 
   // Traverse down from the root / workspace root
-  let currentFolder = isWork ? 
-                      DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) : 
-                      DriveApp.getRootFolder();
+  let currentFolder = DriveApp.getRootFolder();
   for (let i = 0; i < folderNames.length; i++) {
     const part = folderNames[i];
     if (!part) continue;
@@ -404,10 +396,7 @@ function shouldIgnoreFolder(folderName) {
  */
 function auditWorkspaceFolders() {
   try {
-    const isWork = isWorkAccount();
-    const root = (isWork && SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) ? 
-                 DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) : 
-                 DriveApp.getRootFolder();
+    const root = DriveApp.getRootFolder();
                  
     console.log(`Starting Drive Workspace Audit... Root Folder: ${root.getName()} (ID: ${root.getId()})`);
 

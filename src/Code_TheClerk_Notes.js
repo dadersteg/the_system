@@ -12,11 +12,14 @@ const MASTER_SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
 const ARCHIVE_ROOT = SYSTEM_CONFIG.ROOTS.DRIVE_RETRO_ROOT_ID;
 
 function runTheClerkNotes() {
+    console.log(">>> [NOTES START] The Clerk Notes Engine - acquiring lock...");
     const lock = LockService.getScriptLock();
-    if (!lock.tryLock(10000)) return;
+    if (!lock.tryLock(10000)) {
+        console.warn("Could not acquire script lock. Another execution is likely running.");
+        return;
+    }
     
     const sessionStart = Date.now();
-    console.log(">>> [NOTES START] The Clerk Notes Engine");
     
     try {
         const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
@@ -58,7 +61,7 @@ function runTheClerkNotes() {
         }
         
     } catch (e) {
-        console.error("FATAL in Notes Processing: " + e.message);
+        console.error("FATAL in Notes Processing: " + e.message + "\nStack: " + e.stack);
     } finally {
         lock.releaseLock();
         console.log(`<<< [NOTES END] Completed in ${((Date.now() - sessionStart) / 1000).toFixed(1)}s`);
@@ -399,15 +402,15 @@ function askGeminiNotes(mode, text, systemPrompt, taxonomyJson, recentContext = 
 
 function getPromptText(promptId, fallback) {
     try {
-        return DocumentApp.openById(promptId).getBody().getText();
+        return getSafeDocText(promptId);
     } catch (e) {
-        return fallback;
+        return processPromptText(fallback);
     }
 }
 
 function getTaxonomyJson() {
     try {
-        return DriveApp.getFileById(SYSTEM_CONFIG.DOCS.TAXONOMY_JSON_ID).getBlob().getDataAsString();
+        return getSafeDocText(SYSTEM_CONFIG.DOCS.TAXONOMY_JSON_ID);
     } catch (e) {
         return "{}";
     }

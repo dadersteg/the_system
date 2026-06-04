@@ -119,7 +119,7 @@
 
     .nav-item {
       position: relative;
-      padding: 13px 16px;
+      padding: 13px 18px;
       min-height: 44px;
       border-radius: 12px;
       cursor: pointer;
@@ -133,6 +133,8 @@
       background: transparent;
       border: 1px solid transparent;
       letter-spacing: -0.2px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
       transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
                   background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
                   border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
@@ -151,7 +153,7 @@
       background: linear-gradient(180deg, var(--color-accent), #a5b4fc);
       border-radius: 99px;
       opacity: 0;
-      box-shadow: 0 0 8px rgba(99, 102, 241, 0.6);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
                   opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
                   height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -160,27 +162,33 @@
     @media (prefers-color-scheme: dark) {
       .nav-item::before {
         background: linear-gradient(180deg, var(--color-accent), #c7d2fe);
-        box-shadow: 0 0 12px rgba(129, 140, 248, 0.8);
+        box-shadow: 0 0 14px rgba(129, 140, 248, 0.7);
       }
     }
     
     .nav-item:hover { 
-      background: rgba(99, 102, 241, 0.04); 
+      background: rgba(99, 102, 241, 0.05); 
       color: var(--color-text);
-      transform: translateX(6px);
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.02);
+      transform: translateX(8px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.03);
     }
 
     @media (prefers-color-scheme: dark) {
       .nav-item:hover {
-        background: rgba(129, 140, 248, 0.06);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        background: rgba(129, 140, 248, 0.07);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
       }
     }
 
     .nav-item:hover::before {
-      opacity: 0.5;
-      transform: translateY(-50%) scaleY(0.7);
+      opacity: 0.6;
+      transform: translateY(-50%) scaleY(0.8);
+      height: 20px;
+    }
+
+    .nav-item:active {
+      transform: translateX(4px) scale(0.96);
+      transition: transform 0.1s ease;
     }
 
     .nav-item.active { 
@@ -189,38 +197,49 @@
       color: var(--color-accent); 
       box-shadow: 0 6px 16px rgba(99, 102, 241, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.8);
       font-weight: 600;
-      transform: translateX(4px);
+      transform: translateX(6px);
     }
 
     @media (prefers-color-scheme: dark) {
       .nav-item.active {
         background: linear-gradient(135deg, rgba(129, 140, 248, 0.12) 0%, rgba(129, 140, 248, 0.03) 100%);
         border-color: rgba(129, 140, 248, 0.25);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       }
     }
 
     .nav-item.active::before {
       transform: translateY(-50%) scaleY(1);
       opacity: 1;
-      height: 22px;
+      height: 24px;
     }
     
     .nav-item.active:hover {
-      transform: translateX(4px) translateY(-1px);
-      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+      transform: translateX(6px) translateY(-1px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.8);
     }
 
     @media (prefers-color-scheme: dark) {
       .nav-item.active:hover {
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
       }
     }
 
     .nav-item.active:hover::before {
       opacity: 1;
       transform: translateY(-50%) scaleY(1);
-      height: 24px;
+      height: 26px;
+    }
+
+    .nav-item.active:active {
+      transform: translateX(4px) scale(0.96);
+      transition: transform 0.1s ease;
+    }
+
+    .nav-item:focus-visible {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
     }
 
     /* Main Content */
