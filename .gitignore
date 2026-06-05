@@ -40,3 +40,6 @@ venv/
 token.json
 token_tasks.json
 token_work_setup.json
+
+# Sync duplicates/conflict folders
+_archive/sync_duplicates/
