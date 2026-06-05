@@ -321,7 +321,7 @@ function runHourlyReview() {
   let success = false;
   let finalModelUsed = MODEL_NAME;
   const maxRetries = 2; // Try each model up to 2 times
-  const modelsToTry = [MODEL_NAME, SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH];
+  const modelsToTry = [MODEL_NAME, SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE];
   
   for (const currentModel of modelsToTry) {
     if (success) break;
@@ -442,7 +442,7 @@ function executeTaskMasterGemini(payloadObj, systemInstruction) {
   };
 
   const payloadStr = JSON.stringify(payloadObj);
-  const TM_MODEL_NAME = selectModelForPayload(payloadStr, SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH);
+  const TM_MODEL_NAME = selectModelForPayload(payloadStr, SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE);
   const result = callGemini(payloadStr, TM_MODEL_NAME, systemInstruction, schema);
   if (!result || result.error) {
      console.error("AI Routing failed with error:", result ? result.error : "Unknown/Undefined");

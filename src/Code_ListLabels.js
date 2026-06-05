@@ -76,12 +76,8 @@ const ss = getMasterSpreadsheet();
  */
 function cleanAndCreateGmailLabels() {
   const isWork = isWorkAccount();
-  if (!isWork) {
-    console.log("cleanAndCreateGmailLabels: Not in Work account, skipping label cleanup.");
-    return;
-  }
   
-  console.log("Starting Gmail Labels cleanup and alignment for Work profile...");
+  console.log(`Starting Gmail Labels cleanup and alignment for ${isWork ? "Work" : "Private"} profile...`);
   const labels = GmailApp.getUserLabels();
   
   // 1. Delete legacy/messed up labels
@@ -97,65 +93,48 @@ function cleanAndCreateGmailLabels() {
     }
   });
   
-  // 2. Fetch the taxonomy to determine the valid labels to create
-  const fileId = SYSTEM_CONFIG.DOCS.TAXONOMY_DOC_ID;
-  if (!fileId) return;
-  const file = DriveApp.getFileById(fileId);
-  const text = file.getBlob().getDataAsString();
-  const lines = text.split("\n");
+  // 2. Fetch the taxonomy JSON dynamically
+  const taxonomyFilename = isWork ? "WoS_Taxonomy.json" : "LOS_Taxonomy.json";
+  const files = DriveApp.getFilesByName(taxonomyFilename);
+  if (!files.hasNext()) {
+    console.error(taxonomyFilename + " not found. Please run syncTaxonomyToSheet() first.");
+    return;
+  }
+  
+  let taxonomy;
+  try {
+    taxonomy = JSON.parse(files.next().getBlob().getDataAsString());
+  } catch (e) {
+    console.error(`Failed to parse ${taxonomyFilename}: ${e.message}`);
+    return;
+  }
   
   const validLabels = new Set();
   
-  // Basic WOS folders
-  const basicCategories = [
-    "01 Professional Admin",
-    "02 Team & Operations",
-    "03 Professional Growth",
-    "04 Finances",
-    "05 Projects"
-  ];
-  basicCategories.forEach(c => validLabels.add(c));
-  
-  let currentSection = null;
-  let currentL1Code = "";
-  let currentL1Name = "";
-  
-  let l1Regex = /^###\s+`?(\d{2})\s+([^`\n]+)`?/;
-  let subfolderRegex = /^\s*[\*\-]\s+\*\*`?([^`:\n]+)`?\*\*:\s*(.*)$/;
-  
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i].trim();
-    if (!line) continue;
-    
-    if (line.indexOf("## 2. The Core Hierarchy") !== -1) {
-      currentSection = 'core';
-      continue;
-    } else if (line.indexOf("## ") === 0 || line.indexOf("---") === 0) {
-      currentSection = null;
-    }
-    
-    if (currentSection === 'core') {
-      let m1 = line.match(l1Regex);
-      if (m1) {
-        currentL1Code = m1[1].trim();
-        currentL1Name = m1[2].trim();
-        validLabels.add(`${currentL1Code} ${currentL1Name}`);
-        continue;
+  taxonomy.forEach(item => {
+    if (item && item["Drive Path"]) {
+      const parts = item["Drive Path"].split("/").map(s => s.trim()).filter(Boolean);
+      const firstPart = parts[0] || "";
+      
+      // Ignore system triage (00) and system operational (99) tags
+      if (firstPart.indexOf("00 ") === 0 || firstPart.indexOf("99 ") === 0 || item["L1 Code"] === "00 00 00" || item["L1 Name"] === "System") {
+        return;
       }
       
-      let mSub = line.match(subfolderRegex);
-      if (mSub && currentL1Code) {
-        let folderName = mSub[1].replace(/`/g, '').trim();
-        validLabels.add(`${currentL1Code} ${currentL1Name}/${folderName}`);
+      // Build nested labels for all levels automatically
+      let currentPath = "";
+      for (let i = 0; i < parts.length; i++) {
+        currentPath = currentPath ? currentPath + "/" + parts[i] : parts[i];
+        validLabels.add(currentPath);
       }
     }
-  }
+  });
   
   // 3. Create the valid labels if missing
   validLabels.forEach(name => {
     let existing = GmailApp.getUserLabelByName(name);
     if (!existing) {
-      console.log(`[ACTION] Creating WOS label: ${name}`);
+      console.log(`[ACTION] Creating label: ${name}`);
       try {
         GmailApp.createLabel(name);
       } catch(e) {

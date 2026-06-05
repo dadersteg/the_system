@@ -99,7 +99,7 @@ function setup1DayTaskTriggers() {
  */
 function extractTasksWithConversationDetails() {
   const exportTs = Utilities.formatDate(new Date(), "GMT", "yyyyMMdd-HHmmss");
-  const ss = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  const ss = getMasterSpreadsheet();
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === CONFIG.targetGid);
   
   if (!sheet) {
@@ -431,7 +431,7 @@ function getExportDescriptions() {
  * pushes updates back to the Google Tasks API. Resolves list migrations when specified.
  */
 function syncRevisionsToTasks() {
-  const ss = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  const ss = getMasterSpreadsheet();
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === CONFIG.targetGid);
   if (!sheet) {
     console.error("Error: Target GID not found.");
@@ -755,7 +755,7 @@ function loadExistingTaskMap(sheet, headers) {
  * spreadsheet sheet, and deletes them from Google Tasks to avoid performance degradation.
  */
 function syncCompletedTasksLog() {
-  const ss = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  const ss = getMasterSpreadsheet();
   const COMPLETED_LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.COMPLETED_TASKS_LOG;
   
   let completedSheet = ss.getSheets().find(s => s.getSheetId().toString() === COMPLETED_LOG_GID);
@@ -1311,7 +1311,7 @@ function batchAnalyzeTasksWithGemini(tasksBatch, existingTaskContext = "") {
   if (!tasksBatch || tasksBatch.length === 0) return {};
 
   const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
-  const modelId = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH;
+  const modelId = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE;
   
   if (!apiKey) {
     console.warn("No GEMINI_API_KEY found in Script Properties.");
