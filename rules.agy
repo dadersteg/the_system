@@ -46,5 +46,16 @@ Local integration scripts (e.g., Python sync scripts) rely on client credentials
 ---
 
 ## 5. Gemini Models Reference
-* **CRITICAL:** When answering questions about Gemini models, their specs, context windows, or availability, ALWAYS reference the [Actual_Gemini_Models.json](Actual_Gemini_Models.json) file in this workspace. 
+* **CRITICAL:** When answering questions about Gemini models, their specs, context windows, or availability, ALWAYS reference the [data/Actual_Gemini_Models.json](data/Actual_Gemini_Models.json) file in this workspace. 
 * Do not rely on outdated files like `context_gemini_models.md` or internal training data for this information.
+
+---
+
+## 6. Workspace Organization Protocol
+To prevent directory clutter, all agents must adhere to the following file placement rules:
+1. **One-Off Scripts:** Any temporary or utility script (e.g., test files, single-use data parsers) MUST be placed in `scripts/utils/` or the `scratch/` directory. Do NOT create Python scripts in the root directory unless they are core system executables.
+2. **Data & State Files:** JSON exports, state files, and data dumps MUST be placed in `data/`.
+3. **Documentation:** Markdown documentation MUST be placed in `docs/`. Agent prompts and system instructions MUST go in `docs/prompts/`.
+4. **Logs & Output:** Output logs, tree dumps, and process tracking files MUST be placed in `logs/`.
+5. **Assets:** PDFs, images, and non-text artifacts MUST be placed in `assets/`.
+6. **Configuration & Credentials:** Only core system configurations (e.g., `.env`, `fca-config.json`, `rules.agy`, `.clasp.json`) and credentials (`token.json`, `client_secret.json`) are permitted in the root directory.
