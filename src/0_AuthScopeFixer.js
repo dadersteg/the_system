@@ -421,6 +421,8 @@ function setupWorkClerkRunningNotesDoc() {
  * Run this function once from the dropdown in your Work Google Apps Script editor.
  */
 function setWorkGeminiAPIKey() {
+  // ⚠️ SECURITY WARNING: Never hardcode API keys. 
+  // Please set the GEMINI_API_KEY manually via Project Settings > Script Properties in the Apps Script editor.
   const newApiKey = "REPLACE_WITH_YOUR_KEY";
   try {
     const props = PropertiesService.getScriptProperties();
