@@ -38,7 +38,7 @@ function syncTaxonomyToSheet() {
   const clean = (name) => name ? name.replace("(Standing Contexts)", "").replace("(Active)", "").replace("(Passive)", "").replace(/\[AGGREGATOR\]/gi, "").trim() : "";
 
   if (isWork) {
-    // Parse using WOS flat taxonomy logic
+    // Parse using PMT flat taxonomy logic
     let currentSection = null; // 'core', 'strategies', 'goals'
     let currentL1Code = "";
     let currentL1Name = "";
@@ -386,6 +386,43 @@ function syncTaxonomyToSheet() {
     }
   }
 
+  // --- GENERATE DRIVE PATH COLUMN ---
+  data[0].push("Drive Path");
+  for (let i = 1; i < data.length; i++) {
+    let row = data[i];
+    let l1Code = row[0];
+    let l1Name = clean(row[1]);
+    let l2Code = row[2];
+    let l2Name = clean(row[3]);
+    let l3Code = row[4];
+    let l3Name = clean(row[5]);
+    
+    if (l1Code === "00 00 00" || l1Code === "Cross-Dimensional") {
+      row.push(row[8]); // System tags and cross-dimensional labels keep their base label
+      continue;
+    }
+
+    let concatLabel = row[8];
+    if (!concatLabel) {
+       row.push("");
+       continue;
+    }
+
+    let parts = concatLabel.split("/");
+    let driveParts = [];
+    let prefixCount = 0;
+    
+    if (l1Code) { driveParts.push(`${l1Code} ${l1Name}`); prefixCount++; }
+    if (l2Code) { driveParts.push(`${l2Code} ${l2Name}`); prefixCount++; }
+    if (l3Code) { driveParts.push(`${l3Code} ${l3Name}`); prefixCount++; }
+    
+    for (let j = prefixCount; j < parts.length; j++) {
+       driveParts.push(parts[j]);
+    }
+
+    row.push(driveParts.join("/"));
+  }
+
   // Adjust labels for Work account context (remove redundant Playmetech nested path prefix)
   if (isWork) {
     const workPrefix = "02 Work/01 Employment/01 Playmetech/";
@@ -437,7 +474,7 @@ function syncTaxonomyToSheet() {
      csvRows.push(row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","));
   }
 
-  const taxPrefix = isWork ? "WoS_Taxonomy" : "LOS_Taxonomy";
+  const taxPrefix = isWork ? "PMTOS_Taxonomy" : "LOS_Taxonomy";
 
   const jsonBlob = Utilities.newBlob(JSON.stringify(jsonOutput, null, 2), "application/json", taxPrefix + ".json");
   const csvBlob = Utilities.newBlob(csvRows.join("\n"), "text/csv", taxPrefix + ".csv");
@@ -461,12 +498,10 @@ function syncTaxonomyToSheet() {
   Logger.log("Successfully synced " + (data.length - 1) + " taxonomy rows to the Google Sheet.");
   Logger.log("Successfully exported " + taxPrefix + ".json and " + taxPrefix + ".csv to Google Drive.");
 
-  // Automatically align Gmail labels in the work profile
-  if (isWork) {
-    try {
-      cleanAndCreateGmailLabels();
-    } catch(e) {
-      Logger.log("Failed to sync Gmail labels: " + e.message);
-    }
+  // Automatically align Gmail labels in both environments
+  try {
+    cleanAndCreateGmailLabels();
+  } catch(e) {
+    Logger.log("Failed to sync Gmail labels: " + e.message);
   }
 }

@@ -4,7 +4,7 @@
  */
 
 const NOTES_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
-const NOTES_MODEL = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH;
+const NOTES_MODEL = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE;
 
 const NOTES_LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.NOTES_LOG;
 const MASTER_SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
@@ -22,7 +22,7 @@ function runTheClerkNotes() {
     const sessionStart = Date.now();
     
     try {
-        const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
+        const ss = getMasterSpreadsheet();
         let logSheet = null;
         if (NOTES_LOG_GID !== "TODO_NOTES_LOG_GID") {
             logSheet = ss.getSheets().find(s => s.getSheetId().toString() === NOTES_LOG_GID);
@@ -81,7 +81,7 @@ function runCleanRunningNotes() {
     
     let recentContext = "";
     try {
-        const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
+        const ss = getMasterSpreadsheet();
         recentContext = typeof fetchRecentContext === 'function' ? fetchRecentContext(ss) : "";
     } catch(e) {}
 
@@ -93,7 +93,7 @@ function runCleanRunningNotes() {
     
     if (batchLogs.length > 0) {
         try {
-            const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
+            const ss = getMasterSpreadsheet();
             const logSheet = ss.getSheets().find(s => s.getSheetId().toString() === NOTES_LOG_GID);
             if (logSheet) {
                 writeNotesLogBatch(logSheet, batchLogs);
@@ -206,7 +206,7 @@ function processRunningNoteById(fileId, batchLogs, recentContext = "") {
             } else {
                 // Log to Master Sheet immediately if run manually
                 try {
-                    const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
+                    const ss = getMasterSpreadsheet();
                     const logSheet = ss.getSheets().find(s => s.getSheetId().toString() === NOTES_LOG_GID);
                     if (logSheet) {
                         writeNotesLogBatch(logSheet, [logRow]);

@@ -13,7 +13,7 @@
 
 // --- 1. CONFIGURATION ---
 const DRIVE_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
-const DRIVE_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH;
+const DRIVE_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE;
 
 const DRIVE_MASTER_SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
 const DRIVE_LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_LOG;
@@ -86,7 +86,7 @@ function executeEngine(mode, currentModel) {
     const sessionStart = Date.now();
     
     try {
-        const ss = SpreadsheetApp.openById(DRIVE_MASTER_SHEET_ID);
+        const ss = getMasterSpreadsheet();
         const log = ss.getSheets().find(s => s.getSheetId().toString() === DRIVE_LOG_GID);
         const sessionLog = ss.getSheets().find(s => s.getSheetId().toString() === DRIVE_SESSION_LOG_GID);
         
@@ -183,7 +183,7 @@ function executeEngine(mode, currentModel) {
     } catch (e) { 
         console.error("FATAL: " + e.message + "\nStack: " + e.stack); 
         try {
-            const ss = SpreadsheetApp.openById(DRIVE_MASTER_SHEET_ID);
+            const ss = getMasterSpreadsheet();
             const sessionLog = ss.getSheets().find(s => s.getSheetId().toString() === DRIVE_SESSION_LOG_GID);
             if (sessionLog) sessionLog.appendRow([new Date(), mode, currentModel, 0, "Failed: " + e.message, `${((Date.now() - sessionStart) / 1000).toFixed(1)}s`]);
         } catch(e2){}
@@ -394,22 +394,24 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                 }
                 
                 if (!moved) {
-                    let reviewFolder = null;
-                    if (folderCache.byId[DRIVE_FOLDERS.REVIEW]) {
-                        reviewFolder = folderCache.byId[DRIVE_FOLDERS.REVIEW];
+                    let fallbackFolderId = (data.concat_path && data.concat_path !== "Unknown") ? DRIVE_FOLDERS.STND_DEST : DRIVE_FOLDERS.REVIEW;
+                    let fallbackFolder = null;
+                    if (folderCache.byId[fallbackFolderId]) {
+                        fallbackFolder = folderCache.byId[fallbackFolderId];
                     } else {
-                        reviewFolder = DriveApp.getFolderById(DRIVE_FOLDERS.REVIEW);
-                        folderCache.byId[DRIVE_FOLDERS.REVIEW] = reviewFolder;
+                        fallbackFolder = DriveApp.getFolderById(fallbackFolderId);
+                        folderCache.byId[fallbackFolderId] = fallbackFolder;
                     }
 
-                    file.moveTo(reviewFolder);
-                    targetFolderId = reviewFolder.getId();
+                    file.moveTo(fallbackFolder);
+                    targetFolderId = fallbackFolder.getId();
 
-                    if (!reviewFolder.fullPath) {
-                        reviewFolder.fullPath = getFullFolderPath(reviewFolder);
+                    if (!fallbackFolder.fullPath) {
+                        fallbackFolder.fullPath = getFullFolderPath(fallbackFolder);
                     }
-                    targetFolderPath = reviewFolder.fullPath;
-                    console.log(`   [WARNING] Target folder '${data.context_id}' not found. Moved to Manual Review.`);
+                    targetFolderPath = fallbackFolder.fullPath;
+                    let logLabel = (fallbackFolderId === DRIVE_FOLDERS.STND_DEST) ? "Destination TBC" : "Manual Review";
+                    console.log(`   [WARNING] Target folder '${data.context_id}' not found. Moved to ${logLabel}.`);
                 }
             }
 
@@ -785,7 +787,7 @@ function moveToReview(id, msg) {
  * applies them to the original Drive file, and marks them as synced.
  */
 function applyManualRevisionsDrive() {
-    const ss = SpreadsheetApp.openById(DRIVE_MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     const sheet = ss.getSheets().find(s => s.getSheetId().toString() === DRIVE_LOG_GID);
     
     if (!sheet) {
@@ -1013,7 +1015,7 @@ function ingestSharedFilesToInbox() {
         console.error(`Failed to create shortcut for "${sharedFile.name}": ${err.message}`);
       }
     } else {
-      console.log(`Shortcut/file already exists for: "${sharedFile.name}" (ID: ${sharedFile.id})`);
+      // console.log(`Shortcut/file already exists for: "${sharedFile.name}" (ID: ${sharedFile.id})`);
     }
   });
   
@@ -1026,11 +1028,40 @@ function ingestSharedFilesToInbox() {
  */
 function getExistingShortcutTargets() {
   const targets = new Set();
+  
+  // 1. Read processed files from the Drive Log sheet to populate historical targets
+  try {
+    const ss = getMasterSpreadsheet();
+    const sheet = ss.getSheets().find(s => s.getSheetId().toString() === DRIVE_LOG_GID);
+    if (sheet) {
+      const lastRow = sheet.getLastRow();
+      if (lastRow > 1) {
+        const urls = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+        urls.forEach(row => {
+          const url = row[0] ? row[0].toString().trim() : "";
+          if (url) {
+            const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (idMatch) {
+              targets.add(idMatch[1]);
+            }
+          }
+        });
+      }
+    }
+  } catch (e) {
+    console.error("Error reading Drive Log sheet for shortcut targets: " + e.message);
+  }
+  
+  // 2. Query only shortcuts created in the last 30 days via Drive API to find active recent ones
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const formattedDate = Utilities.formatDate(thirtyDaysAgo, "GMT", "yyyy-MM-dd'T'HH:mm:ss'Z'");
+  
   let pageToken = null;
   do {
     try {
       const response = Drive.Files.list({
-        q: "mimeType = 'application/vnd.google-apps.shortcut' and trashed = false",
+        q: "mimeType = 'application/vnd.google-apps.shortcut' and trashed = false and createdTime > '" + formattedDate + "'",
         fields: "nextPageToken, files(shortcutDetails)",
         pageToken: pageToken,
         pageSize: 1000
@@ -1043,10 +1074,11 @@ function getExistingShortcutTargets() {
       });
       pageToken = response.nextPageToken;
     } catch (e) {
-      console.error("Error retrieving existing shortcuts: " + e.message);
+      console.error("Error retrieving recent shortcuts via API: " + e.message);
       break;
     }
   } while (pageToken);
+  
   return targets;
 }
 

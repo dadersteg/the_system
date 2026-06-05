@@ -33,7 +33,7 @@ function executeDoneReset() {
   let sheet = null;
 
   try {
-    const ss = SpreadsheetApp.openById(MASTER_SHEET_ID);
+    const ss = getMasterSpreadsheet();
     sheet = ss.getSheets().find(s => s.getSheetId().toString() === RESET_GID);
     if (!sheet) {
       console.error(`executeDoneReset failed: Could not find sheet with GID ${RESET_GID}`);
@@ -234,8 +234,8 @@ function syncDriveFoldersFromTaxonomy() {
         continue;
       }
 
-      if (item && item["Concat (Label)"]) {
-        const folderNames = item["Concat (Label)"].split("/").map(s => s.trim());
+      if (item && item["Drive Path"]) {
+        const folderNames = item["Drive Path"].split("/").map(s => s.trim());
         const firstPart = folderNames[0] || "";
 
         // Ignore system triage (00) and system operational (99) tags in Drive
@@ -347,7 +347,7 @@ function resolveFolderFromTaxonomy(concatPath, taxonomy) {
   }
 
   // Construct the exact folder hierarchy by splitting Concat (Label)
-  const folderNames = item["Concat (Label)"] ? item["Concat (Label)"].split("/").map(s => s.trim()) : [];
+  const folderNames = item["Drive Path"] ? item["Drive Path"].split("/").map(s => s.trim()) : [];
   if (folderNames.length === 0) return null;
 
   const isWork = isWorkAccount();
@@ -418,8 +418,8 @@ function auditWorkspaceFolders() {
     const TARGET_DEPTH = 4;
 
     taxonomy.forEach(item => {
-      if (item && item["Concat (Label)"]) {
-        const path = item["Concat (Label)"].trim();
+      if (item && item["Drive Path"]) {
+        const path = item["Drive Path"].trim();
         if (!path) return;
 
         const parts = path.split("/").map(s => s.trim());
