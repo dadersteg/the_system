@@ -1,0 +1,122 @@
+{
+  "name": "F1_T1_5_Mixed",
+  "input": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "DoFirst",
+        "important": true,
+        "urgent": true,
+        "impact": 0,
+        "duration": 30
+      },
+      {
+        "id": "2",
+        "title": "Schedule",
+        "important": true,
+        "urgent": false,
+        "impact": 0,
+        "duration": 30
+      },
+      {
+        "id": "3",
+        "title": "Delegate",
+        "important": false,
+        "urgent": true,
+        "impact": 0,
+        "duration": 30
+      },
+      {
+        "id": "4",
+        "title": "Eliminate",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 30
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [
+        {
+          "id": "1",
+          "title": "DoFirst"
+        }
+      ],
+      "schedule": [
+        {
+          "id": "2",
+          "title": "Schedule"
+        }
+      ],
+      "delegate": [
+        {
+          "id": "3",
+          "title": "Delegate"
+        }
+      ],
+      "eliminate": [
+        {
+          "id": "4",
+          "title": "Eliminate"
+        }
+      ]
+    },
+    "frog": {
+      "id": "1",
+      "title": "DoFirst"
+    },
+    "scheduled": [],
+    "overflow": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "3"
+      },
+      {
+        "id": "4"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "DoFirst"
+      },
+      {
+        "taskId": "2",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Schedule"
+      },
+      {
+        "taskId": "3",
+        "routingTarget": "BACKLOG",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Delegate"
+      },
+      {
+        "taskId": "4",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Eliminate"
+      }
+    ]
+  }
+}

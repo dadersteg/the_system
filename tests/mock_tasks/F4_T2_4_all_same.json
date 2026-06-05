@@ -1,0 +1,259 @@
+{
+  "name": "F4_T2_4_all_same",
+  "input": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      },
+      {
+        "id": "2",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      },
+      {
+        "id": "3",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      },
+      {
+        "id": "4",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      },
+      {
+        "id": "5",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      },
+      {
+        "id": "6",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      },
+      {
+        "id": "7",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      },
+      {
+        "id": "8",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      },
+      {
+        "id": "9",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      },
+      {
+        "id": "10",
+        "title": "T1",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 60
+      }
+    ],
+    "capacity_mins": 120
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": [
+        {
+          "id": "1",
+          "title": "T1"
+        },
+        {
+          "id": "2",
+          "title": "T1"
+        },
+        {
+          "id": "3",
+          "title": "T1"
+        },
+        {
+          "id": "4",
+          "title": "T1"
+        },
+        {
+          "id": "5",
+          "title": "T1"
+        },
+        {
+          "id": "6",
+          "title": "T1"
+        },
+        {
+          "id": "7",
+          "title": "T1"
+        },
+        {
+          "id": "8",
+          "title": "T1"
+        },
+        {
+          "id": "9",
+          "title": "T1"
+        },
+        {
+          "id": "10",
+          "title": "T1"
+        }
+      ]
+    },
+    "frog": {
+      "id": "1",
+      "title": "T1"
+    },
+    "scheduled": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      }
+    ],
+    "overflow": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "3"
+      },
+      {
+        "id": "4"
+      },
+      {
+        "id": "5"
+      },
+      {
+        "id": "6"
+      },
+      {
+        "id": "7"
+      },
+      {
+        "id": "8"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      },
+      {
+        "taskId": "2",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      },
+      {
+        "taskId": "3",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      },
+      {
+        "taskId": "4",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      },
+      {
+        "taskId": "5",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      },
+      {
+        "taskId": "6",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      },
+      {
+        "taskId": "7",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      },
+      {
+        "taskId": "8",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      },
+      {
+        "taskId": "9",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      },
+      {
+        "taskId": "10",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "T1"
+      }
+    ]
+  }
+}

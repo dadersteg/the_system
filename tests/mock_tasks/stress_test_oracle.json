@@ -1,0 +1,142 @@
+{
+  "name": "stress_test_oracle",
+  "importer": [
+    {
+      "id": "1",
+      "title": "Task Normal 1",
+      "notes": "DA: Do something",
+      "status": "needsAction"
+    },
+    {
+      "id": "2",
+      "title": "Task Hallucinated Targets 2",
+      "notes": "DA: Do something",
+      "status": "needsAction"
+    },
+    {
+      "id": "3",
+      "title": "Task Invalid Deadline 3",
+      "notes": "DA: Do something",
+      "status": "needsAction",
+      "due": "2026-06-01T00:00:00Z"
+    },
+    {
+      "id": "4",
+      "title": "Task Arrays Every Where 4",
+      "notes": "DA: Do something",
+      "status": "needsAction"
+    },
+    {
+      "id": "5",
+      "title": "Task RETAIN 5",
+      "notes": "DA: stay",
+      "status": "needsAction"
+    }
+  ],
+  "todo": [],
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "30m",
+        "alignedGoal": "2026-GOAL-1",
+        "category_path": "01 01 01 Test",
+        "recommendedTitle": "Task Normal Polished 1",
+        "recommendedDeadline": "2026-07-01",
+        "systemComment": "Looks good"
+      },
+      {
+        "taskId": "2",
+        "routingTarget": "HALLUCINATED_TARGET",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-GOAL-2",
+        "category_path": "01 01 01 Test",
+        "recommendedTitle": "Task Hallucinated Targets 2"
+      },
+      {
+        "taskId": "3",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-GOAL-2",
+        "category_path": "01 01 01 Test",
+        "recommendedTitle": "Task Invalid Deadline 3",
+        "recommendedDeadline": "NOT_A_DATE"
+      },
+      {
+        "taskId": "4",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": [
+          "15m"
+        ],
+        "alignedGoal": {
+          "foo": "bar"
+        },
+        "category_path": [
+          "01 01 01 Test"
+        ],
+        "recommendedTitle": [
+          "Task Arrays Every Where 4"
+        ],
+        "systemComment": {
+          "this_is": "object"
+        }
+      },
+      {
+        "taskId": "5",
+        "routingTarget": "RETAIN_IMPORTER",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-GOAL-3",
+        "category_path": "01 01 01 Test",
+        "recommendedTitle": "Task RETAIN 5"
+      }
+    ]
+  },
+  "expected_importer_count": 1,
+  "expected_todo_count": 4,
+  "expected_todo_items": [
+    {
+      "title": "Task Normal Polished 1"
+    },
+    {
+      "title": "Task Hallucinated Targets 2"
+    },
+    {
+      "title": "Task Invalid Deadline 3"
+    },
+    {
+      "title": "Task Arrays Every Where 4"
+    }
+  ],
+  "expected_metadata": {
+    "1": {
+      "duration": "30m",
+      "goal": "2026-GOAL-1",
+      "category_path": "01 01 01 Test",
+      "deadline": "2026-07-01"
+    },
+    "2": {
+      "duration": "15m",
+      "goal": "2026-GOAL-2",
+      "category_path": "01 01 01 Test",
+      "deadline": "None"
+    },
+    "3": {
+      "duration": "15m",
+      "goal": "2026-GOAL-2",
+      "category_path": "01 01 01 Test",
+      "deadline": "2026-06-01"
+    },
+    "4": {
+      "duration": "N/A",
+      "goal": "TBD",
+      "deadline": "None"
+    },
+    "5": {
+      "duration": "15m",
+      "goal": "2026-GOAL-3",
+      "category_path": "01 01 01 Test",
+      "deadline": "None"
+    }
+  }
+}

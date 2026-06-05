@@ -1,0 +1,147 @@
+{
+  "name": "T4_1_standard_daily",
+  "input": {
+    "capacity_mins": 240,
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Morning Routine",
+        "important": true,
+        "urgent": true,
+        "impact": 3,
+        "duration": 30
+      },
+      {
+        "id": "2",
+        "title": "Write Report",
+        "important": true,
+        "urgent": false,
+        "impact": 8,
+        "duration": 120
+      },
+      {
+        "id": "3",
+        "title": "Team Sync",
+        "important": true,
+        "urgent": true,
+        "impact": 5,
+        "duration": 60
+      },
+      {
+        "id": "4",
+        "title": "Read News",
+        "important": false,
+        "urgent": false,
+        "impact": 1,
+        "duration": 30
+      },
+      {
+        "id": "5",
+        "title": "Reply Emails",
+        "important": false,
+        "urgent": true,
+        "impact": 2,
+        "duration": 45
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [
+        {
+          "id": "1",
+          "title": "Morning Routine"
+        },
+        {
+          "id": "3",
+          "title": "Team Sync"
+        }
+      ],
+      "schedule": [
+        {
+          "id": "2",
+          "title": "Write Report"
+        }
+      ],
+      "delegate": [
+        {
+          "id": "5",
+          "title": "Reply Emails"
+        }
+      ],
+      "eliminate": [
+        {
+          "id": "4",
+          "title": "Read News"
+        }
+      ]
+    },
+    "frog": {
+      "id": "2",
+      "title": "Write Report"
+    },
+    "scheduled": [
+      {
+        "id": "2"
+      },
+      {
+        "id": "3"
+      },
+      {
+        "id": "1"
+      },
+      {
+        "id": "4"
+      }
+    ],
+    "overflow": [
+      {
+        "id": "5"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Morning Routine"
+      },
+      {
+        "taskId": "3",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Team Sync"
+      },
+      {
+        "taskId": "2",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Write Report"
+      },
+      {
+        "taskId": "5",
+        "routingTarget": "BACKLOG",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Reply Emails"
+      },
+      {
+        "taskId": "4",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Read News"
+      }
+    ]
+  }
+}

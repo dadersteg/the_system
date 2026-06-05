@@ -1,0 +1,48 @@
+{
+  "name": "F5_T2_4_string_dur",
+  "input": {
+    "capacity_mins": 100,
+    "tasks": [
+      {
+        "id": "1",
+        "title": "S",
+        "duration": "60"
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": [
+        {
+          "id": "1",
+          "title": "S"
+        }
+      ]
+    },
+    "frog": {
+      "id": "1",
+      "title": "S"
+    },
+    "scheduled": [
+      {
+        "id": "1"
+      }
+    ],
+    "overflow": []
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "S"
+      }
+    ]
+  }
+}

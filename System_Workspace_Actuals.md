@@ -1,0 +1,488 @@
+# The System: Workspace Actual Taxonomy
+
+## 1. Gmail Labels
+
+- 00 Manual Review
+- 00 No Filter
+- 00 Test
+- 01 Private
+- 01 Private/01 Personal Admin
+- 01 Private/01 Personal Admin/01 Task Management
+- 01 Private/01 Personal Admin/01 Task Management/The System (TS)
+- 01 Private/01 Personal Admin/02 Contracts
+- 01 Private/01 Personal Admin/02 Contracts/Signature
+- 01 Private/01 Personal Admin/99 Archive
+- 01 Private/02 Health
+- 01 Private/02 Health/01 Physical Health
+- 01 Private/02 Health/01 Physical Health/Medical Appointments & Tests
+- 01 Private/02 Health/02 Mental Health
+- 01 Private/03 Personal Growth
+- 01 Private/03 Personal Growth/03 Personal Growth Theory
+- 01 Private/04 Finances
+- 01 Private/04 Finances/01 Purchase
+- 01 Private/04 Finances/01 Purchase/Instructions
+- 01 Private/04 Finances/01 Purchase/Passes & Tickets
+- 01 Private/04 Finances/01 Purchase/Receipts
+- 01 Private/04 Finances/02 House
+- 01 Private/04 Finances/02 House/SW1V 4QE
+- 01 Private/04 Finances/02 Investing
+- 01 Private/04 Finances/03 Investing
+- 01 Private/04 Finances/Banking
+- 01 Private/04 Finances/Budgeting & Planning
+- 01 Private/04 Finances/Crypto
+- 01 Private/04 Finances/Insurance
+- 01 Private/04 Finances/Investing
+- 01 Private/04 Finances/Payslips
+- 01 Private/04 Finances/Pension
+- 01 Private/04 Finances/Revolut Equity
+- 01 Private/04 Finances/Tax
+- 01 Private/05 Other
+- 01 Private/05 Other/01 Projects
+- 01 Private/05 Other/01 Projects/202604-202605 Staycation
+- 01 Private/05 Other/01 Projects/20260411 Housewarming C&D
+- 01 Private/05 Other/01 Projects/20260509 LFC-CFC
+- 01 Private/05 Other/01 Projects/202606 P&E
+- 01 Private/05 Other/01 Projects/2027 Wedding
+- 01 Private/05 Other/01 Projects/AI
+- 01 Private/05 Other/01 Projects/Cooking
+- 01 Private/05 Other/01 Projects/The System (TS)
+- 01 Private/05 Other/02 Relationships
+- 01 Private/05 Other/02 Relationships/Alexander & Gabriel
+- 01 Private/05 Other/02 Relationships/Carry Martens Adersteg
+- 01 Private/05 Other/02 Relationships/Mamma & Pappa
+- 01 Private/05 Other/03 Collections
+- 01 Private/05 Other/03 Collections/History
+- 01 Private/05 Other/03 Collections/Liverpool FC
+- 01 Private/05 Other/03 Collections/Memories
+- 01 Private/05 Other/03 Collections/Newsletters
+- 01 Private/05 Other/03 Collections/Useful & Helpful
+- 01 Private/05 Other/99 Archive
+- 01 Private/05 Other/99 Archive/20200605-20200608 Lisbon
+- 01 Private/05 Other/99 Archive/20200611 Nice
+- 01 Private/05 Other/99 Archive/20200730-20200809 Tokyo
+- 01 Private/05 Other/99 Archive/20200812-20200816 - Stockholm
+- 01 Private/05 Other/99 Archive/20200829-20200902 Mykonos
+- 01 Private/05 Other/99 Archive/20200925-20200927 D&L 30th
+- 01 Private/05 Other/99 Archive/20210708 Bröllop
+- 01 Private/05 Other/99 Archive/20220610-20220610 R & H
+- 01 Private/05 Other/99 Archive/Alex
+- 01 Private/05 Other/99 Archive/Amy
+- 01 Private/05 Other/99 Archive/Daff
+- 01 Private/05 Other/99 Archive/Körkort
+- 02 Work
+- 02 Work/01 Employment
+- 02 Work/01 Employment/01 Quantum 21
+- 02 Work/01 Employment/01 Quantum 21/01 Professional Admin
+- 02 Work/01 Employment/01 Quantum 21/02 Team & Operations
+- 02 Work/01 Employment/01 Quantum 21/04 Finances
+- 02 Work/01 Employment/99 Archive
+- 02 Work/01 Employment/99 Archive/201102 S&P
+- 02 Work/01 Employment/99 Archive/201108 Sveriges Ingenjörer
+- 02 Work/01 Employment/99 Archive/201312 Nova 100
+- 02 Work/01 Employment/99 Archive/201406 Brooklyn OpCo
+- 02 Work/01 Employment/99 Archive/201508 Deloitte
+- 02 Work/01 Employment/99 Archive/201611 Efficio
+- 02 Work/01 Employment/99 Archive/201908 Inverto
+- 02 Work/01 Employment/99 Archive/201911 Revolut
+- 02 Work/02 Career Management
+- 02 Work/02 Career Management/2012
+- 02 Work/02 Career Management/2013
+- 02 Work/02 Career Management/2014
+- 02 Work/02 Career Management/2015
+- 02 Work/03 Collections
+- 02 Work/03 Collections/Newsletters
+- 02 Work/99 Archive
+- 03 Studies
+- 03 Studies/99 Archive
+- 03 Studies/99 Archive/Stockholms Nation
+- 03 Studies/99 Archive/Uppsala University
+- 98 SMS
+- 98 Telegram
+- 98 WhatsApp
+- 99 Google Comments
+- 99 Label_Reviewed
+- 99 SMS
+- 99 Telegram
+- 99 Temp / To be deleted
+- 99 To be deleted
+- 99 WhatsApp
+- daniel.adersteg@revolut.com
+- daniel@martens-adersteg.com
+- danieladersteg@hotmail.com
+
+## 2. Google Drive Folders
+
+*Note: Limited to a depth of 4 and max 100 folders per query to prevent server timeouts.*
+
+- My Drive
+  - 01 00 00 Private
+    - 01 01 00 Personal Admin
+      - 01 01 01 Task Management
+        - Productivity Frameworks
+        - The System (TS)
+      - 01 01 02 Contracts
+        - Loyds
+        - Nordnet
+        - Signature
+    - 01 02 00 Health
+      - 01 02 01 Physical Health
+        - Fit Data
+        - Medical Appointments & Tests
+      - 01 02 02 Mental Health
+    - 01 03 00 Personal Growth
+      - 01 03 00 Goals, Habits & Routines
+      - 01 03 00 Personal Growth Theory
+        - Ben Meer "A System"
+      - 01 03 00 Reflection
+        - Data Files
+        - Prompts/Instructions for Journal/Reflection 
+    - 01 04 00 Finances
+      - 01 04 01 Purchase
+        - Instructions
+        - Passes & Tickets
+        - Receipts
+      - 01 04 02 House
+        - 202510 M
+        - 202601 M
+        - 75006 
+        - SW1V 4QE
+      - 01 04 99 Archive
+        - 202510 M
+        - 75006
+        - NCS
+        - W23DY
+      - Banking
+      - Budgeting & Planning
+      - Crypto
+      - Insurance
+        - 01 04 00 > Insurance > Rimowa Bag (IR)
+      - Investing
+      - Payslips
+      - Pension
+      - Revolut Equity
+      - Sources for NotebookLM
+      - Tax
+        - 16/17 UK Taxes
+        - 17/18 UK Taxes
+        - 18/19 UK Taxes
+        - 19/20 UK Taxes
+        - 20/21 UK Taxes
+        - 2019
+        - 22/23 UK Taxes
+        - 23/24 UK Taxes
+        - 24/25 UK Taxes
+        - 25/26 UK Taxes
+    - 01 05 00 Other
+      - 01 05 01 Projects
+        - 2025 09 Visa
+        - 202601 M
+        - 202604-202605 Staycation
+        - 20260509 LFC-CFC
+        - 20260510-20260514 Lisbon
+        - 202606 P&E
+        - 202608 M&N
+        - 2027 Wedding
+        - AI
+        - Clothes
+        - Data Analysis & Software Development
+        - Cooking
+        - Declutter
+        - Upgrade Office
+      - 01 05 02 Relationships
+        - Alexander & Gabriel
+        - Carry Martens Adersteg
+        - Mamma & Pappa
+      - 01 05 03 Collections
+        - Clothes
+        - Cooking
+        - Data
+        - History
+        - Liverpool FC
+        - Memories
+        - Newsletters
+        - Star Wars
+        - Useful/Helpful
+      - 01 05 99 Archive
+        - 20200605-20200608 Lisbon
+        - 20200611 Nice
+        - 20200730-20200809 Tokyo
+        - 20200812-20200816 - Stockholm
+        - 20200829-20200902 Mykonos
+        - 20200925-20200927 D&L 30th
+        - 20210708 Bröllop
+        - 20220610-20220610 R & H
+        - 2025 09 Visa
+        - 2025 Wedding
+        - 2025 Xmas
+        - 202601 M
+        - 20260411 Housewarming C&D
+        - Alex
+        - Amy
+        - Blackjack
+        - Daff
+        - Körkort
+        - UKC
+  - 02 00 00 Work
+    - 02 01 00 Employment
+      - 02 01 01 Quantum 21
+        - 01 Professional Admin
+        - 02 Team & Operations
+        - 03 Professional Growth
+        - 04 Finances
+        - 05 Projects
+      - 02 01 99 Archive
+        - 201102 S&P
+        - 201108 Sveriges Ingenjörer
+        - 201312 Nova 100
+        - 201404 bConnected
+        - 201406 Brooklyn OpCo
+        - 201508 Deloitte
+        - 201611 Efficio
+        - 201908 Inverto
+        - 201911 Revolut
+    - 02 02 00 Career Management
+      - 201905 DB
+        - Archive
+        - Articles
+      - 202603 Airwallex
+      - 202603 OLIX
+      - 202604 Deel
+      - CVs & Cover Letters
+        - 99 Archive
+      - Grades & Certificates
+    - 02 03 00 Collections
+      - Newsletters
+  - 03 00 00 Studier
+  - 03 00 00 Studies
+    - 03 00 00 
+      - 03 00 99 Studies Archive
+        - Stockholms Nation
+        - Uppsala University
+  - 99 Archive
+    - [File Review]
+      - 03 00 99 Archive
+        - C++
+        - Levern
+        - MATLAB
+        - Östra Real
+        - Stockholms Nation
+        - Uppsala Universitet
+      - Batch Retro Test
+    - 01 00 99 Archive
+      - Contacts
+    - 01 01 99 Archive
+      - PoA 2020-09-07
+    - 01 02 99 Archive
+      - 01 02 00 Phimosis
+    - 01 03 99 Archive
+      - 22 Jan
+      - Excel - Training
+        - VBA
+      - ML
+        - Coursera - Machine Learning - Stanford
+      - SQL
+    - 01 04 99 Archive
+      - 01 04 00 Nordea Cancel Services
+      - 01 04 01 BA Reimbursement ARN-LHR
+        - 00 Archive
+      - 01 04 99 Receipts
+      - 202410 Deliveroo Issue
+      - 50A Englands Lane - Repair Log 
+      - Air France
+      - Amazon DD
+      - BA Reimbursement ATL-LHR 
+        - 00 Archive
+        - 20240509
+        - CEDR Files from BA
+      - Bank Statements
+        - Lloyds
+      - Cancel AirBnB
+      - CoinbaseWalletBackups
+      - Eurowings
+        - 00 Archive
+      - Försenad
+      - Housekeeping
+        - Instructions
+      - Hyr ut lägenhet sommar 14
+        - Bilder för överlämning
+      - Inköp av teve
+      - Inköp ny lägenhet HGB
+      - Laundryheap
+      - London
+      - Moving
+        - Pictures for ads
+      - Pictures from Ovo 2 Feb
+      - Return Home speaker
+      - Return Pixel 7
+      - SL
+      - Statements for Amex Gold
+      - Stipendier
+        - Arkiv
+      - SW11 8EQ
+        - 1305 Dawson House - Inventory
+      - Tessin
+      - Tradera
+        - Kläder
+        - MacBook 13'
+      - TradingGuiden
+      - W23DY
+        - 00 Archive
+    - 01 05 99 Archive
+      - 01 01 99 The System [Archived] 
+      - 01 05 01 Amy
+      - 01 05 01 Julmiddagen
+      - 01 05 01 Mushrooms
+      - 01 05 01 UKC
+        - Book
+      - 01 05 02 Daff
+        - 00 Archive
+      - 01 05 20200730-20200809 Tokyo
+      - 01 05 202008 Stockholm 
+      - 01 05 Stag
+        - Peles Tickets
+      - 0105 20230607 Nashville
+      - 202601 M
+      - 20260411 Housewarming C&D
+      - 7
+        - All
+        - Arkiv
+        - Beskrivning, Syfte och Motto
+        - Ekonomi
+        - Kasserat
+        - Members
+        - Möten
+        - Regler och Stadgar
+        - Rekrytering
+        - Seven Photoroom
+      - Alexandra
+        - Arkiv
+      - BA - Baggage Claim
+      - Bali
+      - Bose Headphones
+      - ED
+      - Körkort
+        - Bilder
+        - Farsta Datatester
+      - Maps
+        - Chelsea
+      - Minnesträning
+        - Associationssekvenser
+        - Bokstäver
+        - Ciero-bilder
+        - Månader
+        - Minnesbilder
+        - Nummer
+        - Ordlistor
+        - Veckodagar
+      - Movie Analysis: AI Gender 
+      - Notes
+      - Oseriöst
+        - Ny mapp (2)
+      - Östra Reals Skol IF
+        - Anmälningsblanketter + Brev
+        - Arkiv
+        - Copa 2008
+        - Copa 2009
+        - Copa de la Östra
+        - Final 2009
+        - Lag
+        - Östra Reals Skolidrottsförening
+      - Simone
+      - SMS Export
+      - WhatsApp Chat - Amber
+      - WhatsApp Chat - Amorina S
+      - WhatsApp Chat - Charlotte A
+      - WhatsApp Chat - Daff Kjellström
+      - WhatsApp Chat - Dr Eleanor Drage (PhD)
+      - WhatsApp Chat - Emily Moffitt
+      - WhatsApp Chat - Flora Macdonald Johnston
+      - WhatsApp Chat - Lauren Beckingham
+      - WhatsApp Chat - Ludwig Svennerstål
+      - WhatsApp Chat - Nima S
+      - WhatsApp Chat - Tabatha
+    - 02 00 99 Archive
+      - Adam
+      - Bild
+      - Case
+        - Arkiv
+        - Case från Consulting bible
+        - Case från Preplounge
+        - LOMS Transcripts and Handouts
+        - Presentation1
+      - CV - Behöver uppdateras
+        - Utnarm
+      - Heltid 2015
+        - ABB
+        - Accando
+        - Accenture
+        - Arkiv
+        - AT Kearney
+        - Bain
+        - BCG
+        - Bearingpoint
+        - Capgemini
+        - Centigo
+        - Connecta
+        - Deloitte
+        - EY
+        - ForeFront
+        - IBM
+        - IF
+        - Intressanta annonser
+        - Kontaktsamtal
+        - KPMG
+        - MCKinsey
+        - Nordea
+        - Oliver Wyman
+        - PA - Consulting
+        - Preplounge
+        - Proofread
+        - PWC
+        - Sandvik
+        - Scania
+        - SEB
+        - Strategy&
+        - Tester - Statistik
+        - Tieto
+        - Vattenfall
+      - IB/DB
+        - Archive
+        - Articles
+      - Ideer
+      - Intervjufrågor
+      - JK
+      - Nova 100
+        - ambassadörer 2012-2013
+        - nova 100 -  uppsala
+      - Sommarjobb 2011
+        - Accenture -Deadline 15 jan, Deadline 13 feb
+        - Bearingpoint
+        - Cagermini - Deadline 9 jan
+        - CC
+        - Connecta
+        - Deloitte 18 mars
+        - Ernst & Young - Deadline 12 februari
+        - HM 20 Feb
+        - Klarna 25 feb
+        - Nordea - Deadline 31 dec
+        - Nova 100
+        - PRV - 19 feb
+        - PWC - Deadline 8 jan
+      - Sommarjobb 2014
+        - 00 - Inskickade
+        - 2014xxxx - Consultant for a day - Deloitte
+        - Bemanning
+        - Betyg 201312
+        - Betyg 201405
+        - Capgemini
+        - Kasserat
+        - Nya Canegiebryggeriet
+        - SI
+      - START
+      - Studieintensiven
+        - Matteintensiven
+  - Inbox (Manual)
+    - Inbox (Saved from Chrome)
+    - Manual Review
+      - Manual Review (Retro)
+    - Temporary

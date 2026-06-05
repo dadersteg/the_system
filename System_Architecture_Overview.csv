@@ -1,0 +1,23 @@
+Type,Repository,Name,Path / ID,Description
+Script ID,the_system,The System (Private),1QCKorj4NsrS_fYbPBTIt-aYGlX8lUZFwqBkl8GpT6iX2WIKB4CMeHs75,GCP Project: gemini-project-487511
+Script ID,the_system,The System (Work),1AwxxwzWWy42s8KfgoOq8RzV37ZsnQa6dyVq3eXusTuxVcQDpS8Xyhbjg,GCP Project: 1008524636490
+Script ID,reflection,Reflection (Private),1f3gai1-CeElCC24u7x44kWe5V0QpyfCfGVRTTDu8B4-NgsKLk3b3Nvic,GCP Project: the-system-reflection
+Script ID,reflection,Reflection (Work),1KvIweynK29PqjmEWC8Lln9Dkpfd-sfV2xrOLauChDDG6RtsKtMq6_Lj1,GCP Project: 750769943765
+Deployment,the_system,.clasp-private.json,/AGY/the_system/.clasp-private.json,Points clasp to The System (Private)
+Deployment,the_system,.clasp-work.json,/AGY/the_system/.clasp-work.json,Points clasp to The System (Work)
+Deployment,the_system,push_all.sh,/AGY/the_system/push_all.sh,Script that pushes the_system codebase to both Private and Work
+Deployment,reflection,.clasp-private.json,/AGY/reflection/.clasp-private.json,Points clasp to Reflection (Private)
+Deployment,reflection,.clasp-work.json,/AGY/reflection/.clasp-work.json,Points clasp to Reflection (Work)
+Source Code,the_system,Code_Config.js,/AGY/the_system/src/Code_Config.js,Configuration file for The System
+Source Code,the_system,Code_SystemCore.js,/AGY/the_system/src/Code_SystemCore.js,Core logic for The System
+Source Code,the_system,Code_TaskEngine.js,/AGY/the_system/src/Code_TaskEngine.js,Task engine logic
+Source Code,the_system,Code_Tasks.js,/AGY/the_system/src/Code_Tasks.js,Task management logic
+Source Code,the_system,Code_Dashboard.js,/AGY/the_system/src/Code_Dashboard.js,Dashboard logic
+Source Code,the_system,Code_TheClerk_Email.js,/AGY/the_system/src/Code_TheClerk_Email.js,Email clerk logic
+Source Code,the_system,Code_TheClerk_Drive.js,/AGY/the_system/src/Code_TheClerk_Drive.js,Drive clerk logic
+Source Code,reflection,Code_Vantage.js,/AGY/reflection/src/Code_Vantage.js,Core reflection and vantage logic
+Source Code,reflection,Code_ExportGoals.js,/AGY/reflection/src/Code_ExportGoals.js,Exports goals
+Source Code,reflection,Code_ExportReflections.js,/AGY/reflection/src/Code_ExportReflections.js,Exports reflections
+Source Code,reflection,Code_Config.js,/AGY/reflection/src/Code_Config.js,Configuration file for Reflection
+Source Code,the_system,0_AuthScopeFixer.js,/AGY/the_system/src/0_AuthScopeFixer.js,OAuth scopes fixer for the_system
+Source Code,reflection,0_AuthScopeFixer.js,/AGY/reflection/src/0_AuthScopeFixer.js,OAuth scopes fixer for reflection

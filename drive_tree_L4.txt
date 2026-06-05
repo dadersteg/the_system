@@ -1,0 +1,497 @@
+My Drive
+├── 00 Inbox
+│   ├── Destination TBC
+│   ├── Inbox (Saved from Chrome)
+│   ├── Manual Review
+├── 00 Notes & Scratchpad
+│   ├── _Notes
+├── 01 Private
+│   ├── 01 01 00 Personal Admin
+│   │   ├── 01 01 01 Task Management
+│   │   │   ├── Productivity Frameworks
+│   │   │   ├── The System (TS)
+│   │   ├── 01 01 02 Contracts
+│   │   │   ├── Signature
+│   ├── 01 02 00 Health
+│   │   ├── 01 02 01 Physical Health
+│   │   │   ├── 2026 Pregnancy
+│   │   │   ├── Medical Appointments & Tests
+│   │   ├── 01 02 02 Mental Health
+│   ├── 01 03 00 Personal Growth
+│   │   ├── 01 03 01 Principles, Goals & Methods
+│   │   ├── 01 03 02 Reflection
+│   │   │   ├── Data Files
+│   │   ├── 01 03 03 Personal Growth Theory
+│   │   │   ├── Ben Meer "A System"
+│   ├── 01 04 00 Finances
+│   │   ├── 01 04 01 Purchase
+│   │   │   ├── Instructions
+│   │   │   ├── Passes & Tickets
+│   │   │   ├── Receipts
+│   │   ├── 01 04 02 House
+│   │   │   ├── SW1V 4QE
+│   │   ├── Banking
+│   │   │   ├── Loyds
+│   │   ├── Budgeting & Planning
+│   │   ├── Crypto
+│   │   ├── Insurance
+│   │   │   ├── 01 04 00 > Insurance > Rimowa Bag (IR)
+│   │   ├── Investing
+│   │   │   ├── Nordnet
+│   │   ├── Payslips
+│   │   ├── Pension
+│   │   ├── Revolut Equity
+│   │   ├── Sources for NotebookLM
+│   │   ├── Tax
+│   │   │   ├── 16/17 UK Taxes
+│   │   │   ├── 17/18 UK Taxes
+│   │   │   ├── 18/19 UK Taxes
+│   │   │   ├── 19/20 UK Taxes
+│   │   │   ├── 20/21 UK Taxes
+│   │   │   ├── 2019
+│   │   │   ├── 22/23 UK Taxes
+│   │   │   ├── 23/24 UK Taxes
+│   │   │   ├── 24/25 UK Taxes
+│   │   │   ├── 25/26 UK Taxes
+│   │   │   ├── 26/27 UK Taxes
+│   ├── 01 05 00 Other
+│   │   ├── 01 05 01 Projects
+│   │   │   ├── 202606 P&E
+│   │   │   ├── 202606 Passport
+│   │   │   ├── 202608 M&N
+│   │   │   ├── 2027 Wedding
+│   │   │   ├── AI
+│   │   │   ├── Clothes
+│   │   │   ├── Cooking
+│   │   │   ├── Data Analysis & Software Development
+│   │   │   ├── Declutter
+│   │   │   ├── Upgrade Office
+│   │   ├── 01 05 02 Relationships
+│   │   │   ├── Alexander & Gabriel
+│   │   │   ├── Amadeus Wennström
+│   │   │   ├── CMA
+│   │   │   ├── Dr Eleanor Drage (PhD)
+│   │   │   ├── Jim Cargill
+│   │   │   ├── Ludwig Svennerstål
+│   │   │   ├── Mamma & Pappa
+│   │   │   ├── Messages
+│   │   │   ├── Niklas Johansson
+│   │   ├── 01 05 03 Collections
+│   │   │   ├── Data
+│   │   │   ├── History
+│   │   │   ├── Liverpool FC
+│   │   │   ├── Memories
+│   │   │   ├── Newsletters
+│   │   │   ├── Photo Register
+│   │   │   ├── Photo Register
+│   │   │   ├── Star Wars
+│   │   │   ├── Useful/Helpful
+│   ├── 01 XX 99 Personal Archive
+│   │   ├── Tax
+├── 02 Work
+│   ├── 02 01 00 Employment
+│   │   ├── 02 01 01 Playmetech (Quantum 21)
+│   │   │   ├── Contract, Personal Documents
+│   ├── 02 02 00 Career Management
+│   │   ├── CVs & Cover Letters
+│   │   │   ├── 99 Archive
+│   │   ├── Grades & Certificates
+│   ├── 02 03 00 Collections
+│   │   ├── Newsletters
+│   │   ├── Reports & Articles
+├── 03 Studies
+├── 99 00 00 Archive
+│   ├── 01 00 99 Archive
+│   │   ├── Contacts
+│   ├── 01 01 99 Archive
+│   │   ├── PoA 2020-09-07
+│   │   ├── The System [Archived]
+│   ├── 01 02 99 Archive
+│   │   ├── 01 02 00 Phimosis
+│   ├── 01 03 99 Archive
+│   │   ├── 22 Jan
+│   │   ├── Excel - Training
+│   │   │   ├── VBA
+│   │   ├── Minnesträning
+│   │   │   ├── Associationssekvenser
+│   │   │   ├── Bokstäver
+│   │   │   ├── Ciero-bilder
+│   │   │   ├── Minnesbilder
+│   │   │   ├── Månader
+│   │   │   ├── Nummer
+│   │   │   ├── Ordlistor
+│   │   │   ├── Veckodagar
+│   │   ├── ML
+│   │   │   ├── Coursera - Machine Learning - Stanford
+│   │   ├── Personal Archive
+│   │   ├── Prompts/Instructions for Journal/Reflection 
+│   │   ├── SQL
+│   ├── 01 04 99 Archive
+│   │   ├── 01 04 00 Nordea Cancel Services
+│   │   ├── 01 04 01 BA Reimbursement ARN-LHR
+│   │   │   ├── 00 Archive
+│   │   ├── 202410 Deliveroo Issue
+│   │   ├── 202510 M
+│   │   │   ├── Dexters Mail
+│   │   ├── 202601 M
+│   │   │   ├── Customs & Logistics
+│   │   ├── 50A Englands Lane - Repair Log 
+│   │   ├── 75006
+│   │   │   ├── 75006 
+│   │   ├── Air France
+│   │   ├── Amazon DD
+│   │   ├── BA Reimbursement ATL-LHR 
+│   │   │   ├── 00 Archive
+│   │   │   ├── 20240509
+│   │   │   ├── CEDR Files from BA
+│   │   ├── Bank Statements
+│   │   │   ├── Lloyds
+│   │   ├── Cancel AirBnB
+│   │   ├── CoinbaseWalletBackups
+│   │   ├── Eurowings
+│   │   │   ├── 00 Archive
+│   │   ├── Försenad
+│   │   ├── Housekeeping
+│   │   │   ├── Instructions
+│   │   ├── Hyr ut lägenhet sommar 14
+│   │   │   ├── Bilder för överlämning
+│   │   ├── Inköp av teve
+│   │   ├── Inköp ny lägenhet HGB
+│   │   ├── Laundryheap
+│   │   ├── London
+│   │   ├── Moving
+│   │   │   ├── Pictures for ads
+│   │   ├── NCS
+│   │   ├── Pictures from Ovo 2 Feb
+│   │   ├── Return Home speaker
+│   │   ├── Return Pixel 7
+│   │   ├── SL
+│   │   ├── Statements for Amex Gold
+│   │   ├── Stipendier
+│   │   │   ├── Arkiv
+│   │   ├── SW11 8EQ
+│   │   │   ├── 1305 Dawson House - Inventory
+│   │   ├── Tessin
+│   │   ├── Tradera
+│   │   │   ├── Kläder
+│   │   │   ├── MacBook 13'
+│   │   ├── TradingGuiden
+│   │   ├── W23DY
+│   │   │   ├── 00 Archive
+│   ├── 01 05 99 Archive
+│   │   ├── 20200605-20200608 Lisbon
+│   │   ├── 20200611 Nice
+│   │   ├── 20200730-20200809 Tokyo
+│   │   ├── 20200730-20200809 Tokyo
+│   │   ├── 202008 Stockholm
+│   │   ├── 20200812-20200816 - Stockholm
+│   │   ├── 20200829-20200902 Mykonos
+│   │   ├── 20200925-20200927 D&L 30th
+│   │   ├── 20210708 Bröllop
+│   │   ├── 20220610-20220610 R & H
+│   │   ├── 20230607 Nashville
+│   │   ├── 2025 09 Visa
+│   │   ├── 2025 09 Visa
+│   │   │   ├── 01 05 01 2025 09 Visa > 99 Archive
+│   │   │   ├── 01 05 01 2025 09 Visa > Accommodation Evidence Files and Prep
+│   │   │   ├── 01 05 01 2025 09 Visa > Bankstatements
+│   │   │   ├── 01 05 01 2025 09 Visa > Payslips + P60
+│   │   │   ├── 01 05 01 2025 09 Visa > Working Docs
+│   │   │   ├── Actual Upload
+│   │   │   ├── Final Upload
+│   │   │   ├── Name change Munich
+│   │   │   ├── wetransfer_49-copy-jpg_2025-10-19_1805
+│   │   ├── 2025 W
+│   │   ├── 2025 Xmas
+│   │   ├── 202601 M
+│   │   ├── 202601 M
+│   │   ├── 202601 M 2
+│   │   ├── 202604-202605 Staycation
+│   │   ├── 20260411 Housewarming C&D
+│   │   ├── 20260411 Housewarming C&D
+│   │   ├── 20260509 LFC-CFC
+│   │   ├── 20260510-20260514 Lisbon
+│   │   ├── 7
+│   │   │   ├── All
+│   │   │   ├── Arkiv
+│   │   │   ├── Beskrivning, Syfte och Motto
+│   │   │   ├── Ekonomi
+│   │   │   ├── Kasserat
+│   │   │   ├── Members
+│   │   │   ├── Möten
+│   │   │   ├── Regler och Stadgar
+│   │   │   ├── Rekrytering
+│   │   │   ├── Seven Photoroom
+│   │   ├── Alex
+│   │   ├── Alexandra Lövgren
+│   │   │   ├── Arkiv
+│   │   ├── Amber
+│   │   ├── Amorina S
+│   │   ├── Amy
+│   │   ├── Amy Bird
+│   │   ├── BA - Baggage Claim
+│   │   ├── Bali
+│   │   ├── Blackjack
+│   │   ├── Blackjack
+│   │   ├── Bose Headphones
+│   │   ├── Charlotte A
+│   │   ├── Daff
+│   │   ├── Data
+│   │   ├── Data
+│   │   ├── David Kjellström (Daff)
+│   │   │   ├── 00 Archive
+│   │   ├── ED
+│   │   ├── Emily Moffitt
+│   │   ├── Flora Macdonald Johnston
+│   │   ├── Julmiddagen
+│   │   ├── Körkort
+│   │   ├── Körkort
+│   │   ├── Körkort
+│   │   │   ├── Bilder
+│   │   │   ├── Farsta Datatester
+│   │   ├── Lauren Beckingham
+│   │   ├── Maps
+│   │   │   ├── Chelsea
+│   │   ├── Memories
+│   │   ├── Movie Analysis: AI Gender 
+│   │   ├── Mushrooms
+│   │   ├── Nima S
+│   │   ├── Notes
+│   │   ├── Oseriöst
+│   │   │   ├── Ny mapp (2)
+│   │   ├── Personal Admin
+│   │   │   ├── Archive
+│   │   ├── Personal Archive
+│   │   │   ├── Archive
+│   │   ├── Personal Archive
+│   │   │   ├── Archive
+│   │   ├── Personal Archive
+│   │   │   ├── Archive
+│   │   ├── Relationships
+│   │   │   ├── Hakan Kabatas
+│   │   │   ├── Jim Cargill
+│   │   │   ├── Marcus Schuterman
+│   │   │   ├── Mikkel Birkesö
+│   │   │   ├── Pontus Fahlander
+│   │   ├── Robin
+│   │   ├── Seb
+│   │   ├── Simone Beck-Friis
+│   │   ├── SMS Export
+│   │   ├── Stag
+│   │   │   ├── Peles Tickets
+│   │   ├── Tabatha
+│   │   ├── UKC
+│   │   │   ├── Book
+│   │   ├── UKC
+│   ├── 02 00 99 Archive
+│   │   ├── Adam
+│   │   ├── Bild
+│   │   ├── Case
+│   │   │   ├── Arkiv
+│   │   │   ├── Case från Consulting bible
+│   │   │   ├── Case från Preplounge
+│   │   │   ├── LOMS Transcripts and Handouts
+│   │   │   ├── Presentation1
+│   │   ├── CV - Behöver uppdateras
+│   │   │   ├── Utnarm
+│   │   ├── Heltid 2015
+│   │   │   ├── ABB
+│   │   │   ├── Accando
+│   │   │   ├── Accenture
+│   │   │   ├── Arkiv
+│   │   │   ├── AT Kearney
+│   │   │   ├── Bain
+│   │   │   ├── BCG
+│   │   │   ├── Bearingpoint
+│   │   │   ├── Capgemini
+│   │   │   ├── Centigo
+│   │   │   ├── Connecta
+│   │   │   ├── Deloitte
+│   │   │   ├── EY
+│   │   │   ├── ForeFront
+│   │   │   ├── IBM
+│   │   │   ├── IF
+│   │   │   ├── Intressanta annonser
+│   │   │   ├── Kontaktsamtal
+│   │   │   ├── KPMG
+│   │   │   ├── MCKinsey
+│   │   │   ├── Nordea
+│   │   │   ├── Oliver Wyman
+│   │   │   ├── PA - Consulting
+│   │   │   ├── Preplounge
+│   │   │   ├── Proofread
+│   │   │   ├── PWC
+│   │   │   ├── Sandvik
+│   │   │   ├── Scania
+│   │   │   ├── SEB
+│   │   │   ├── Strategy&
+│   │   │   ├── Tester - Statistik
+│   │   │   ├── Tieto
+│   │   │   ├── Vattenfall
+│   │   ├── IB/DB
+│   │   │   ├── Archive
+│   │   │   ├── Articles
+│   │   ├── Ideer
+│   │   ├── Intervjufrågor
+│   │   ├── JK
+│   │   ├── Nova 100
+│   │   │   ├── ambassadörer 2012-2013
+│   │   │   ├── nova 100 -  uppsala
+│   │   ├── Sommarjobb 2011
+│   │   │   ├── Accenture -Deadline 15 jan, Deadline 13 feb
+│   │   │   ├── Bearingpoint
+│   │   │   ├── Cagermini - Deadline 9 jan
+│   │   │   ├── CC
+│   │   │   ├── Connecta
+│   │   │   ├── Deloitte 18 mars
+│   │   │   ├── Ernst & Young - Deadline 12 februari
+│   │   │   ├── HM 20 Feb
+│   │   │   ├── Klarna 25 feb
+│   │   │   ├── Nordea - Deadline 31 dec
+│   │   │   ├── Nova 100
+│   │   │   ├── PRV - 19 feb
+│   │   │   ├── PWC - Deadline 8 jan
+│   │   ├── Sommarjobb 2014
+│   │   │   ├── 00 - Inskickade
+│   │   │   ├── 2014xxxx - Consultant for a day - Deloitte
+│   │   │   ├── Bemanning
+│   │   │   ├── Betyg 201312
+│   │   │   ├── Betyg 201405
+│   │   │   ├── Capgemini
+│   │   │   ├── Kasserat
+│   │   │   ├── Nya Canegiebryggeriet
+│   │   │   ├── SI
+│   │   ├── START
+│   │   ├── Studieintensiven
+│   │   │   ├── Matteintensiven
+│   │   ├── Work Archive
+│   ├── 02 01 99 Archive
+│   │   ├── 201102 S&P
+│   │   │   ├── Att vara ledare - Resever
+│   │   │   ├── Intervjuer
+│   │   │   ├── S&P (Inte i Dropboxen
+│   │   ├── 201108 Sveriges Ingenjörer
+│   │   │   ├── Arkiv
+│   │   │   ├── Beställningar
+│   │   │   ├── Bra att ha!
+│   │   │   ├── Expomobil
+│   │   │   ├── Från Jonna
+│   │   │   ├── Gamla Timrapporter Etc
+│   │   │   ├── Lathund och annan information
+│   │   │   ├── Presentationer
+│   │   │   ├── Teknik-SM 2013
+│   │   │   ├── Untitled Folder
+│   │   │   ├── VGI
+│   │   │   ├── vt 2013
+│   │   ├── 201202 HM
+│   │   ├── 201202 Klarna
+│   │   ├── 201312 Nova 100
+│   │   ├── 201404 bConnected
+│   │   │   ├── Arkiv
+│   │   ├── 201405 Academic Work
+│   │   ├── 201405 Randstad
+│   │   ├── 201406 Application Consulting Sweden
+│   │   ├── 201406 Applicon
+│   │   ├── 201406 Brooklyn OpCo
+│   │   │   ├── Advanced_Microsoft_Excel_2010_Training_Working_Files
+│   │   │   ├── Anpassade Office-mallar
+│   │   ├── 201508 Deloitte
+│   │   │   ├── AR, PDP etc
+│   │   │   ├── Education
+│   │   │   ├── IoT
+│   │   │   ├── Lön och Reseräkningar
+│   │   ├── 201611 Efficio
+│   │   │   ├── 02 Work 20190731
+│   │   │   ├── 03 Education, Training
+│   │   │   ├── Arkiv
+│   │   ├── 201908 Inverto
+│   │   │   ├── Travel Expenses
+│   │   ├── 201911 Revolut
+│   │   │   ├── Automatic Presentation
+│   │   │   ├── Concerns and grievance
+│   │   │   ├── Gemeni
+│   │   │   ├── R Internal
+│   │   │   ├── R Share
+│   │   ├── Erik Penser
+│   │   ├── Vattenfall
+│   │   ├── Work Archive
+│   │   │   ├── 201108 Sveriges Ingenjörer
+│   │   │   ├── 201406 Brooklyn OpCo
+│   ├── 02 02 99 Archive
+│   │   ├── 201905 DB
+│   │   │   ├── Archive
+│   │   │   ├── Articles
+│   │   ├── 202407 Kraken
+│   │   ├── 202510 Cyber.Fund
+│   │   ├── 202512 BVNK
+│   │   ├── 202602 Dwelly
+│   │   ├── 202603 Airwallex
+│   │   ├── 202603 OLIX
+│   │   ├── 202604 Deel
+│   │   ├── Career Management
+│   │   ├── Case Studies
+│   ├── 03 00 99 Archive
+│   │   ├── Archive
+│   │   ├── Archive
+│   │   ├── C++
+│   │   ├── Levern
+│   │   ├── MATLAB
+│   │   │   ├── Finansmatte
+│   │   ├── Ostra Real
+│   │   ├── Stockholm University
+│   │   ├── Stockholms Nation
+│   │   ├── Stockholms Nation
+│   │   ├── Stockholms Nation
+│   │   ├── Stockholms Nation
+│   │   ├── Stockholms Nation
+│   │   ├── Studies Archive
+│   │   │   ├── Archive
+│   │   │   ├── Stockholms Nation
+│   │   │   ├── Uppsala University
+│   │   │   ├── Östra Real
+│   │   ├── Studies Archive
+│   │   │   ├── Stockholms Nation
+│   │   │   ├── Uppsala University
+│   │   ├── Studies Archive
+│   │   │   ├── Archive
+│   │   │   ├── Stockholms Nation
+│   │   ├── Uppsala Universitet
+│   │   │   ├── 03 01 01 År 1
+│   │   │   ├── 03 01 02 År 2
+│   │   │   ├── 03 01 03 År 3
+│   │   │   ├── 03 01 04 År 4
+│   │   │   ├── 03 01 05 År 5
+│   │   │   ├── Ansökan Examen
+│   │   │   ├── Entreprenörsskolan - Ansökan
+│   │   │   ├── FEM
+│   │   │   ├── Finansiella Derivat
+│   │   │   ├── Programmering av Paralelldatorer
+│   │   │   ├── Stockholms Nation
+│   │   │   ├── Tillämpad Statistik
+│   │   ├── Uppsala University
+│   │   ├── Uppsala University
+│   │   ├── Uppsala University
+│   │   ├── Uppsala University
+│   │   ├── Östra Real
+│   │   ├── Östra Real
+│   │   ├── Östra Real
+│   │   │   ├── Kost
+│   │   │   ├── Sofia
+│   │   │   ├── Östra Reals Skol IF
+├── e2e_tests
+├── meta-2026-May-30-04-46-54
+│   ├── instagram-dadersteg-2026-06-01-yUGtXprT
+│   │   ├── your_instagram_activity
+│   │   │   ├── messages
+├── meta-2026-May-30-12-40-10
+│   ├── facebook-dadersteg-2026-06-02-g3jIaZT0
+│   │   ├── your_facebook_activity
+│   │   │   ├── messages
+│   ├── facebook-dadersteg-2026-06-02-oNeShBtA
+│   │   ├── your_facebook_activity
+│   │   │   ├── messages
+│   │   │   ├── posts
+│   ├── facebook-dadersteg-2026-06-02-TYRXSjWr
+│   │   ├── your_facebook_activity
+│   │   │   ├── messages
+│   │   │   ├── posts

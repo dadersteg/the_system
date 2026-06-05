@@ -1,0 +1,50 @@
+{
+  "name": "F1_T1_2",
+  "input": {
+    "tasks": [
+      {
+        "id": "2",
+        "title": "Schedule",
+        "important": true,
+        "urgent": false,
+        "impact": 0,
+        "duration": 30
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [
+        {
+          "id": "2",
+          "title": "Schedule"
+        }
+      ],
+      "delegate": [],
+      "eliminate": []
+    },
+    "frog": {
+      "id": "2",
+      "title": "Schedule"
+    },
+    "scheduled": [],
+    "overflow": [
+      {
+        "id": "2"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "2",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Schedule"
+      }
+    ]
+  }
+}

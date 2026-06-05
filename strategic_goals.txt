@@ -1,0 +1,97 @@
+﻿Playmetech Strategic Goals
+1. Executive Summary
+Playmetech maximises portfolio Return on Capital (ROC) (the percentage growth efficiency of starting capital) by deploying a high-density team of mathematicians, traders, and developers who execute systematic sports strategies using lean operational infrastructure. Four core strategic goals drive the Playmetech planning system to compound capital efficiently, manage risk dynamically, and preserve elite operational talent.
+	2. Core Strategic Goals
+The planning system comprises 4 core strategic goals:
+Strategic Goal
+	Goal Category
+	Operational Objective
+ 
+	1. Net Profit
+	Primary Financial Value
+	Drive volume with a predictive edge to generate bottom-line monetary revenue after deducting all operational costs.
+	2. Return on Capital (ROC)
+	Capital Efficiency
+	Maximise capital velocity and churn to grow the capital base.
+	3. Risk Capital
+	Risk Containment
+	Maintain total firm financial exposure within a defined percentage band of the total available bankroll using automated risk guardrails.
+	4. Talent Optimisation
+	Human Capital Strategy
+	Systematically track, optimise, and preserve the core intellectual property of the firm (quantitative researchers, data scientists, and elite traders).
+	3. Supporting Data & Operational Metrics
+Core Formulas
+Target Metric
+	Definition & Equation
+ 
+	Net Profit
+	Net Profit = (Turnover * ROT) - Opex
+	Return on Capital (ROC)
+	ROC = Net Profit / Starting Capital
+	Goal 1 & 2: Financial & Capital Efficiency Constituents
+Metric / Parameter
+	Unit
+	Target / Description
+ 
+	Return on Turnover (ROT)
+	%
+	(The baseline mathematical edge that quantitative models or traders hold over the market)
+	Turnover
+	£
+	(The absolute volume of stakes that traders place in the market)
+	Operating Expenses (Opex)
+	£
+	(The strict budget cap on fixed costs, including data feeds, software subscriptions, automated API access, server infrastructure, and base salaries)
+	Starting Capital
+	£
+	(The starting capital base or bankroll allocation)
+	Goal 3: Risk Capital Framework & Constituents
+Risk Component
+	Unit
+	Description / Allocation Rules
+ 
+	Realised Risk Band
+	%
+	(Drawdown Buffer Allocation: The percentage band of the total bankroll that absorbs historical, backward-looking losing streaks before the system pauses a strategy)
+	Unrealised Risk Band
+	%
+	(Open Position Liability Allocation: The percentage band of the total bankroll that live, forward-looking, unsettled market exposure can occupy at any moment)
+	System Stability (Uptime)
+	%
+	(Operational System Availability: The percentage uptime of core execution systems, data ingestion feeds, and training models infrastructure (target >= 99.9%))
+	Risk Threshold Status Table
+Status
+	Risk Threshold
+	Systematic Action
+ 
+	Under-utilised
+	Below Lower Floor ([Insert Specific Data]%)
+	Trigger review to scale turnover volume or expand market coverage.
+	Optimal
+	Within Risk Band
+	Maintain current systematic execution parameters.
+	Over-exposed
+	Above Upper Ceiling ([Insert Specific Data]%)
+	Suspend new positions and execute systematic risk reduction.
+	Goal 4: Talent Optimisation Cadence & Constituents
+Talent Parameter
+	Unit
+	Description / Operational Standard
+ 
+	Talent Density Ratio
+	%
+	(The percentage concentration of top-tier, alpha-generating professionals relative to total headcount)
+	Regrettable Leaver Rate
+	%
+	(The percentage of elite, alpha-generating talent that resigns voluntarily within a rolling 12-month period)
+	Reporting Cadence Timeline
+Phase
+	Cadence
+	Rationale
+ 
+	Initial Phase
+	6-Month tracking cycle
+	Alignment with initial planning boundaries.
+	Strategic Target
+	3-Month cycle
+	Prevents talent metrics from acting as lagging indicators.

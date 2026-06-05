@@ -1,0 +1,47 @@
+{
+  "name": "F5_T2_2_extra_fields",
+  "input": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "E",
+        "random": "data"
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": [
+        {
+          "id": "1",
+          "title": "E"
+        }
+      ]
+    },
+    "frog": {
+      "id": "1",
+      "title": "E"
+    },
+    "scheduled": [],
+    "overflow": [
+      {
+        "id": "1"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "E"
+      }
+    ]
+  }
+}

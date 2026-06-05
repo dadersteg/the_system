@@ -1,0 +1,67 @@
+{
+  "name": "F5_adv_missing_id",
+  "input": {
+    "capacity_mins": 60,
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Task 1",
+        "important": true,
+        "urgent": true,
+        "impact": 10,
+        "duration": 30
+      },
+      {
+        "title": "Task 2 Missing ID",
+        "important": false,
+        "urgent": false,
+        "impact": 5,
+        "duration": 30,
+        "id": "2"
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [
+        {
+          "id": "1",
+          "title": "Task 1"
+        }
+      ],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": []
+    },
+    "frog": {
+      "id": "1",
+      "title": "Task 1"
+    },
+    "scheduled": [
+      {
+        "id": "1"
+      }
+    ],
+    "overflow": []
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Task 1"
+      },
+      {
+        "taskId": "2",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Task 2 Missing ID"
+      }
+    ]
+  }
+}

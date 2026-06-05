@@ -1,0 +1,75 @@
+{
+  "name": "T3_3_combo_large_impact_small_time",
+  "input": {
+    "capacity_mins": 30,
+    "tasks": [
+      {
+        "id": "1",
+        "title": "A",
+        "important": false,
+        "urgent": false,
+        "impact": 100,
+        "duration": 10
+      },
+      {
+        "id": "2",
+        "title": "B",
+        "important": false,
+        "urgent": false,
+        "impact": 1,
+        "duration": 30
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": [
+        {
+          "id": "1",
+          "title": "A"
+        },
+        {
+          "id": "2",
+          "title": "B"
+        }
+      ]
+    },
+    "frog": {
+      "id": "1",
+      "title": "A"
+    },
+    "scheduled": [
+      {
+        "id": "1"
+      }
+    ],
+    "overflow": [
+      {
+        "id": "2"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "A"
+      },
+      {
+        "taskId": "2",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "B"
+      }
+    ]
+  }
+}

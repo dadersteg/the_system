@@ -1,0 +1,20 @@
+{
+  "name": "F4_T2_1_empty",
+  "input": {
+    "tasks": []
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": []
+    },
+    "frog": null,
+    "scheduled": [],
+    "overflow": []
+  },
+  "ai_response": {
+    "taskUpdates": []
+  }
+}
