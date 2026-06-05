@@ -279,10 +279,10 @@ def main():
     verify_google_apis(sys_token, "the_system/token.json")
     
     # Check agy_quantum21 tokens
-    q21_token = check_token_file('/Users/daniel/Documents/agy_quantum21/tools/drive_token.json', "agy_quantum21/drive_token.json")
+    q21_token = check_token_file('../agy_quantum21/tools/drive_token.json', "agy_quantum21/drive_token.json")
     verify_google_apis(q21_token, "agy_quantum21/drive_token.json")
     
-    q21_token_full = check_token_file('/Users/daniel/Documents/agy_quantum21/tools/drive_token_full.json', "agy_quantum21/drive_token_full.json")
+    q21_token_full = check_token_file('../agy_quantum21/tools/drive_token_full.json', "agy_quantum21/drive_token_full.json")
     verify_google_apis(q21_token_full, "agy_quantum21/drive_token_full.json")
         
     print(f"\n{Colors.BOLD}===================================================={Colors.ENDC}")

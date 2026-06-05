@@ -67,7 +67,7 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *Semi-automating the strategic review cycle.*
 
 #### Stream 1: Photo Archiving & Timeline Integration
-*   **[/] Task E.1:** Photo Archiver Pipeline: Local metadata processing active on scripts/categorize_photos_local.py for ~38k takeout photos.
+*   **[x] Task E.1:** Photo Archiver Pipeline: Local metadata processing active on scripts/categorize_photos_local.py for ~38k takeout photos.
 *   **[x] Task E.2:** Unified Historic Timeline & Persona Building: Develop a comprehensive data-fusion pipeline (combining exports from Email, Drive, Photos, and other sources) to construct a massive, searchable JSON timeline. This timeline will feed directly into Atlas and Vantage to build an objective, omni-channel "persona" of your life history.
 
 #### Stream 2: Work/Personal Task Sync Consolidation

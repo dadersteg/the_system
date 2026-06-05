@@ -25,6 +25,48 @@ function debugGetHeaders() {
 function doGet(e) {
   const healthRes = processHealthRequest(e);
   if (healthRes) return healthRes;
+
+  if (e && e.parameter && e.parameter.action === "createManifestSpreadsheet") {
+     try {
+       const url = createManifestSpreadsheet();
+       return ContentService.createTextOutput("Spreadsheet created successfully! Link: " + url);
+     } catch (err) {
+       return ContentService.createTextOutput("Error: " + err.message);
+     }
+  }
+
+  if (e && e.parameter && e.parameter.action === "readManifestSpreadsheet") {
+     try {
+       var ss = SpreadsheetApp.openById("1mT3oV1PcdpkILxYZLiN9e9a7xYiYqeHYVFBZWl9wHzQ");
+       var sheets = ss.getSheets();
+       var data = {};
+       for (var i = 0; i < sheets.length; i++) {
+         var sheet = sheets[i];
+         data[sheet.getName()] = sheet.getDataRange().getValues();
+       }
+       return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+     } catch (err) {
+       return ContentService.createTextOutput("Error: " + err.message);
+     }
+  }
+
+  if (e && e.parameter && e.parameter.action === "syncScriptProperties") {
+     try {
+       var result = syncPropertiesFromManifest();
+       return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+     } catch (err) {
+       return ContentService.createTextOutput("Error: " + err.message);
+     }
+  }
+
+  if (e && e.parameter && e.parameter.action === "moveWorkFiles") {
+     try {
+       var result = moveWorkFilesToNewFolder();
+       return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+     } catch (err) {
+       return ContentService.createTextOutput("Error: " + err.message);
+     }
+  }
   
   if (e && e.parameter && e.parameter.getHeaders === "true") {
      return ContentService.createTextOutput(debugGetHeaders());
@@ -925,11 +967,9 @@ function getDashboardData() {
     // 7. Fetch Content for MD / Docs (Fast)
     try {
       // 1 Day Execution Plan
-      if (workspaceFolder) {
-        const planFiles = workspaceFolder.getFilesByName("TS - Task Master > 1 Day Execution Plan.md");
-        if (planFiles.hasNext()) {
-          data.executionPlan = planFiles.next().getBlob().getDataAsString();
-        }
+      const planId = getExecutionPlanId();
+      if (planId) {
+        data.executionPlan = DriveApp.getFileById(planId).getBlob().getDataAsString();
       }
 
       // 2-Day Vantage Log
@@ -1656,14 +1696,12 @@ function getDashboardDocs() { const startT = Date.now();
     manualReviewCount: 0
   };
   try {
-    const workspaceFolder = DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID);
-    if (workspaceFolder) {
-      const planFiles = workspaceFolder.getFilesByName("TS - Task Master > 1 Day Execution Plan.md");
-      if (planFiles.hasNext()) {
-        let plan = planFiles.next().getBlob().getDataAsString();
-        res.executionPlan = plan;
-        res.executionPlanData = parseExecutionPlan(plan);
-      }
+    const planId = getExecutionPlanId();
+    if (planId) {
+      let plan = DriveApp.getFileById(planId).getBlob().getDataAsString();
+      res.executionPlan = plan;
+      res.executionPlanData = parseExecutionPlan(plan);
+    }
       
       try {
         if (SYSTEM_CONFIG.DOCS.VANTAGE_LOG_ID) {
@@ -1711,7 +1749,7 @@ function getDashboardDocs() { const startT = Date.now();
           res.avgHeartRate = vantageJson ? vantageJson.avgHeartRate : parsedHr;
         }
       } catch(e) { console.error("Error loading 2-day report: " + e.message); }
-    }
+    
     
     try {
       if (SYSTEM_CONFIG.DOCS.RECENT_REFLECTIONS_ID) {

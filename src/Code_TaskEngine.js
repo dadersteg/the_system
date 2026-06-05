@@ -75,7 +75,9 @@ function getTaskMasterDailyPrompt() {
 function runTaskMasterEngine() {
   console.log("Starting Task Master Engine (Global Sweep)...");
   const prompt = getTaskMasterSystemPrompt();
-  return _executeTaskMasterPipeline(prompt, false);
+  const res = _executeTaskMasterPipeline(prompt, false);
+  try { if (typeof purgeToBeDeletedTasks === "function") purgeToBeDeletedTasks(); } catch(e) { console.error(e); }
+  return res;
 }
 
 /**
@@ -86,7 +88,9 @@ function runTaskMasterEngine() {
 function runTaskMasterDailyPlan() {
   console.log("Starting Task Master Engine (1 Day 'Today' Operations)...");
   const prompt = getTaskMasterDailyPrompt();
-  return _executeTaskMasterPipeline(prompt, true);
+  const res = _executeTaskMasterPipeline(prompt, true);
+  try { if (typeof purgeToBeDeletedTasks === "function") purgeToBeDeletedTasks(); } catch(e) { console.error(e); }
+  return res;
 }
 
 /**
@@ -287,12 +291,11 @@ function runHourlyReview() {
   };
 
   let systemPrompt = "";
-  const promptFiles = DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID).getFilesByName("TS - Task Master > 1 Day Operations Prompt.md");
-  if (promptFiles.hasNext()) {
-     systemPrompt = promptFiles.next().getBlob().getDataAsString();
-  } else {
-     const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
+  const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
+  if (promptId) {
      systemPrompt = DriveApp.getFileById(promptId).getBlob().getDataAsString();
+  } else {
+     console.warn("TASK_MASTER_DAILY_PROMPT_ID is not set in SYSTEM_CONFIG.");
   }
   systemPrompt = processPromptText(systemPrompt);
   
@@ -495,7 +498,9 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       finalTitle = finalTitle.replace(/\s*\[.*\]$/, "").trim(); // strip old trailing brackets
       
       let targetListId = listId;
-      if (listId === importerListId && u.routingTarget !== "RETAIN_IMPORTER" && u.routingTarget !== "DELETE") {
+      if (u.routingTarget === "DELETE") {
+          targetListId = SYSTEM_CONFIG.TASKS.TO_BE_DELETED_LIST_ID;
+      } else if (listId === importerListId && u.routingTarget !== "RETAIN_IMPORTER") {
           targetListId = todoListId;
       }
       
@@ -514,7 +519,8 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
          } catch(e) {}
       }
       
-      const topLink = task.webViewLink || (task.links && task.links.length > 0 && task.links.find(l => {
+      const isValidWebView = task.webViewLink && !task.webViewLink.toLowerCase().includes("tasks.google.com") && !task.webViewLink.toLowerCase().includes("/tasks") && !task.webViewLink.toLowerCase().includes("googleapis.com/tasks");
+      const topLink = (isValidWebView ? task.webViewLink : "") || (task.links && task.links.length > 0 && task.links.find(l => {
          const url = (l.link || "").toLowerCase();
          return url && !url.includes("tasks.google.com") && !url.includes("/tasks") && !url.includes("googleapis.com/tasks");
       })?.link) || "";
@@ -829,13 +835,32 @@ function writeOnePager(markdownStr, isDailyPlan) {
      const suffix = isWorkAccount() ? " (Work)" : " (Private)";
      const baseName = isDailyPlan ? "TS - Task Master > 1 Day Execution Plan" : "TS - Task Master > Global Priority Review";
      const fileName = baseName + suffix + ".md";
-     const files = folder.getFilesByName(fileName);
+     
      let file;
-     if (files.hasNext()) {
-        file = files.next();
-        file.setContent(markdownStr);
+     if (isDailyPlan) {
+        const fileId = getExecutionPlanId();
+        if (fileId) {
+           file = DriveApp.getFileById(fileId);
+           file.setContent(markdownStr);
+        } else {
+           const files = folder.getFilesByName(fileName);
+           if (files.hasNext()) {
+              file = files.next();
+              file.setContent(markdownStr);
+           } else {
+              file = folder.createFile(fileName, markdownStr, MimeType.PLAIN_TEXT);
+           }
+           // Save the newly created or found file ID to UserProperties
+           PropertiesService.getUserProperties().setProperty("EXECUTION_PLAN_ID", file.getId());
+        }
      } else {
-        file = folder.createFile(fileName, markdownStr, MimeType.PLAIN_TEXT);
+        const files = folder.getFilesByName(fileName);
+        if (files.hasNext()) {
+           file = files.next();
+           file.setContent(markdownStr);
+        } else {
+           file = folder.createFile(fileName, markdownStr, MimeType.PLAIN_TEXT);
+        }
      }
      return file.getUrl();
   } catch(e) {

@@ -119,8 +119,19 @@ def check_and_route_tasks(private_service, work_service):
                 notes = task.get('notes', '')
                 category_path = get_los_code_from_metadata(notes)
                 
-                if f"Context: {WORK_LOS_CODE}" in notes or f"Context:{WORK_LOS_CODE}" in notes or WORK_LOS_CODE in category_path:
-                    print(f"[Gateway] Found Quantum 21 task (LOS: {WORK_LOS_CODE}) in private list '{list_title}': '{title}'")
+                is_work = False
+                if notes:
+                    match = re.search(r'Context:\s*(\d{2}\s\d{2}\s\d{2})', notes)
+                    if match:
+                        code = match.group(1).strip()
+                        if code.startswith("02") and "02 01 99" not in code:
+                            is_work = True
+                if not is_work and category_path:
+                    if "02 01 01" in category_path and "02 01 99" not in category_path:
+                        is_work = True
+                        
+                if is_work:
+                    print(f"[Gateway] Found Work task in private list '{list_title}': '{title}'")
                     try:
                         work_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}
                         inserted = work_service.tasks().insert(tasklist=WORK_TASKS_DEST, body=work_task_body).execute()
@@ -148,8 +159,19 @@ def check_and_route_tasks(private_service, work_service):
                 notes = task.get('notes', '')
                 category_path = get_los_code_from_metadata(notes)
                 
-                if f"Context: {PRIVATE_LOS_CODE}" in notes or f"Context:{PRIVATE_LOS_CODE}" in notes or PRIVATE_LOS_CODE in category_path:
-                    print(f"[Gateway] Found Personal task (LOS: {PRIVATE_LOS_CODE}) in work list '{list_title}': '{title}'")
+                is_private = False
+                if notes:
+                    match = re.search(r'Context:\s*(\d{2}\s\d{2}\s\d{2})', notes)
+                    if match:
+                        code = match.group(1).strip()
+                        if code.startswith("01") or "02 01 99" in code:
+                            is_private = True
+                if not is_private and category_path:
+                    if re.match(r'^01\s\d{2}\s\d{2}', category_path.strip()) or "02 01 99" in category_path:
+                        is_private = True
+                        
+                if is_private:
+                    print(f"[Gateway] Found Personal task in work list '{list_title}': '{title}'")
                     try:
                         private_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}
                         inserted = private_service.tasks().insert(tasklist=PRIVATE_TASKS_DEST, body=private_task_body).execute()
@@ -247,6 +269,37 @@ def write_combined_markdown(private_tasks, work_tasks, output_path):
 
     print(f"Combined Markdown generated successfully at: {output_path}")
 
+def write_individual_markdown(tasks_dict, output_path, title_header):
+    """Writes an individual tasks list into a beautiful Markdown file."""
+    now_str = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S")
+    
+    with open(output_path, 'w') as f:
+        f.write(f"# {title_header}\n\n")
+        f.write(f"*Last Aggregated: {now_str}*\n")
+        
+        if not tasks_dict:
+            f.write("*No active tasks found.*\n\n")
+        else:
+            for list_title, tasks in tasks_dict.items():
+                f.write(f"## {list_title}\n\n")
+                for task in tasks:
+                    title = task.get('title', 'Untitled Task')
+                    notes = strip_system_metadata(task.get('notes', ''))
+                    due = task.get('due')
+                    
+                    line = f"- [ ] **{title}**"
+                    if due:
+                        due_date = due.split('T')[0]
+                        line += f" *(Due: {due_date})*"
+                    f.write(line + "\n")
+                    
+                    if notes:
+                        clean_notes = notes.replace('\n', ' ').strip()
+                        f.write(f"  - **Notes:** {clean_notes}\n")
+                f.write("\n")
+    
+    print(f"Individual Markdown generated successfully at: {output_path}")
+
 def main():
     print("====================================================")
     print("      Starting Tasks Aggregator & Routing Gateway   ")
@@ -302,6 +355,14 @@ def main():
     if private_service or work_service:
         print("\n[Output] Generating combined Markdown...")
         write_combined_markdown(private_tasks, work_tasks, output_md)
+        
+    if private_service:
+        print("\n[Output] Generating private Markdown...")
+        write_individual_markdown(private_tasks, "Google Tasks (Private).md", "Google Tasks (Private)")
+        
+    if work_service:
+        print("\n[Output] Generating work Markdown...")
+        write_individual_markdown(work_tasks, "Google Tasks (Work).md", "Google Tasks (Work)")
         
     print("\nExecution complete.")
 

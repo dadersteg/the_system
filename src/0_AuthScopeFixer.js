@@ -415,3 +415,20 @@ function setupWorkClerkRunningNotesDoc() {
     console.error("Failed to update Running Notes doc: " + e.message);
   }
 }
+
+/**
+ * Automates the insertion of the new Work Profile API Key into Script Properties.
+ * Run this function once from the dropdown in your Work Google Apps Script editor.
+ */
+function setWorkGeminiAPIKey() {
+  const newApiKey = "REPLACE_WITH_YOUR_KEY";
+  try {
+    const props = PropertiesService.getScriptProperties();
+    props.setProperty("GEMINI_API_KEY", newApiKey);
+    console.log("======================================================================");
+    console.log("SUCCESS: Work Profile GEMINI_API_KEY configured securely in the cloud!");
+    console.log("======================================================================");
+  } catch (e) {
+    console.error("Failed to set GEMINI_API_KEY: " + e.message);
+  }
+}

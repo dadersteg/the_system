@@ -33,117 +33,49 @@ function setupSystemTriggers() {
   try {
     const triggers = ScriptApp.getProjectTriggers();
 
-    console.log(`Found ${triggers.length} existing triggers. Wiping slate clean...`);
+    console.log(`[INIT] Found ${triggers.length} existing triggers. Wiping slate clean for ${IS_WORK_ENV ? 'WORK' : 'PRIVATE'} environment...`);
     for (let i = 0; i < triggers.length; i++) {
       ScriptApp.deleteTrigger(triggers[i]);
     }
 
-    // 1. The Clerk (Email) - Every 10 Minutes
-    ScriptApp.newTrigger("runTheClerkEmailOngoing")
-      .timeBased()
-      .everyMinutes(10)
-      .create();
+    // ========================================================
+    // 1. THE CLERK (Email, Drive, Notes Extraction Engine)
+    // ========================================================
+    ScriptApp.newTrigger("runTheClerkEmailOngoing").timeBased().everyMinutes(10).create();
+    ScriptApp.newTrigger("runTheClerkDriveOngoing").timeBased().everyMinutes(1).create();
+    ScriptApp.newTrigger("runTheClerkNotes").timeBased().everyMinutes(15).create();
 
-    // 2. The Clerk (Drive Ongoing) - Every 1 Minute
-    ScriptApp.newTrigger("runTheClerkDriveOngoing")
-      .timeBased()
-      .everyMinutes(1)
-      .create();
+    // ========================================================
+    // 2. TASK ENGINE & REVIEWS (AI Analysis and Gating)
+    // ========================================================
+    ScriptApp.newTrigger("runTaskMasterEngine").timeBased().everyMinutes(15).create();
+    ScriptApp.newTrigger("hourlyReviewTriggerWrapper").timeBased().everyHours(1).create();
+    ScriptApp.newTrigger("weeklyReviewTriggerWrapper").timeBased().everyHours(1).create();
+    ScriptApp.newTrigger("monthlyReviewTriggerWrapper").timeBased().everyHours(1).create();
+    ScriptApp.newTrigger("quarterlyReviewTriggerWrapper").timeBased().everyHours(1).create();
 
-    // 3a. The Clerk (Notes Engine) - Every 15 Minutes
-    ScriptApp.newTrigger("runTheClerkNotes")
-      .timeBased()
-      .everyMinutes(15)
-      .create();
+    // ========================================================
+    // 3. TAXONOMY & SPREADSHEET SYNC
+    // ========================================================
+    ScriptApp.newTrigger("updateModelList").timeBased().everyDays(1).atHour(2).create();
+    ScriptApp.newTrigger("updateLabelList").timeBased().everyDays(1).atHour(2).create();
+    ScriptApp.newTrigger("updateTaskList").timeBased().everyDays(1).atHour(2).create();
+    ScriptApp.newTrigger("syncTaxonomyToSheet").timeBased().everyHours(1).create();
+    ScriptApp.newTrigger("exportTriageTasksToDrive").timeBased().everyDays(1).atHour(2).create();
 
-    // 3b. Bi-Directional Task Export - Daily Backup
-    ScriptApp.newTrigger("extractTasksWithConversationDetails")
-      .timeBased()
-      .everyDays(1)
-      .atHour(3)
-      .create();
+    // ========================================================
+    // 4. EXCLUDED PIPELINES (Managed by Python / User)
+    // ========================================================
+    // The following scripts are explicitly idled because the local MacMini 
+    // Python script (sync_tasks_combined.py) manages the markdown generation 
+    // and bi-directional cross-LOS routing autonomously.
+    // 
+    // - extractTasksWithConversationDetails
+    // - syncRevisionsToTasks
+    // - run1DayTaskMaintenance
+    // - runTheClerkDriveRetro
 
-    // 3c. Bi-Directional Task Import (Spreadsheet to Tasks) - Daily
-    ScriptApp.newTrigger("syncRevisionsToTasks")
-      .timeBased()
-      .everyDays(1)
-      .atHour(3)
-      .create();
-
-    // 4a. Task Master Engine (Micro-Batch Polisher) - Every 15 Minutes
-    ScriptApp.newTrigger("runTaskMasterEngine")
-      .timeBased()
-      .everyMinutes(15)
-      .create();
-
-    // 4b. Hourly Review (Time-Gated Wrapper) - Every 1 Hour
-    ScriptApp.newTrigger("hourlyReviewTriggerWrapper")
-      .timeBased()
-      .everyHours(1)
-      .create();
-
-    // 4c. Weekly Review (Time-Gated Wrapper) - Every 1 Hour (internal logic restricts it to Sun 18:00)
-    ScriptApp.newTrigger("weeklyReviewTriggerWrapper")
-      .timeBased()
-      .everyHours(1)
-      .create();
-
-    // 4d. Monthly 28-Day Review (Time-Gated Wrapper) - Every 1 Hour (internal logic restricts it to every 28 days starting May 10, 2026 at 18:00)
-    ScriptApp.newTrigger("monthlyReviewTriggerWrapper")
-      .timeBased()
-      .everyHours(1)
-      .create();
-
-    // 4e. Quarterly 84-Day Review (Time-Gated Wrapper) - Every 1 Hour (internal logic restricts it to every 84 days starting May 10, 2026 at 18:00)
-    ScriptApp.newTrigger("quarterlyReviewTriggerWrapper")
-      .timeBased()
-      .everyHours(1)
-      .create();
-
-    // 6. The Clerk (Drive Retro) - PAUSED pending script review
-    // ScriptApp.newTrigger("runTheClerkDriveRetro")
-    //  .timeBased()
-    //  .everyHours(2)
-    //  .create();
-
-    // 7. Daily Reference Data Syncs - Every 1 Day (approx midnight)
-    ScriptApp.newTrigger("updateModelList")
-      .timeBased()
-      .everyDays(1)
-      .atHour(2)
-      .create();
-
-    ScriptApp.newTrigger("updateLabelList")
-      .timeBased()
-      .everyDays(1)
-      .atHour(2)
-      .create();
-
-    ScriptApp.newTrigger("updateTaskList")
-      .timeBased()
-      .everyDays(1)
-      .atHour(2)
-      .create();
-
-    ScriptApp.newTrigger("syncTaxonomyToSheet")
-      .timeBased()
-      .everyHours(1)
-      .create();
-
-    ScriptApp.newTrigger("exportTriageTasksToDrive")
-      .timeBased()
-      .everyDays(1)
-      .atHour(2)
-      .create();
-
-    // 8. Completed Tasks Maintenance & Log Sync
-    ScriptApp.newTrigger("run1DayTaskMaintenance")
-      .timeBased()
-      .everyDays(1)
-      .atHour(1)
-      .create();
-
-    console.log("SUCCESS: All system triggers have been provisioned according to the master schedule.");
+    console.log(`[SUCCESS] All valid system triggers have been provisioned for the ${IS_WORK_ENV ? 'WORK' : 'PRIVATE'} environment.`);
   } catch (e) {
     console.error(`setupSystemTriggers failed: ${e.message}`);
   }
@@ -469,3 +401,38 @@ function processPromptText(textStr) {
   }
   return textStr;
 }
+
+/**
+ * Resolves the Google Drive File ID for the 1 Day Execution Plan.
+ * Dynamically queries and saves the ID to UserProperties if not set.
+ * @returns {string} The Google Drive File ID.
+ */
+function getExecutionPlanId() {
+  try {
+    const props = PropertiesService.getUserProperties();
+    let id = props.getProperty("EXECUTION_PLAN_ID");
+    if (id && id.trim() !== "") {
+      return id;
+    }
+    
+    // Auto-discover the ID in the workspace folder
+    const folderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
+    if (!folderId) return null;
+    
+    const folder = DriveApp.getFolderById(folderId);
+    const suffix = isWorkAccount() ? " (Work)" : " (Private)";
+    const fileName = "TS - Task Master > 1 Day Execution Plan" + suffix + ".md";
+    const files = folder.getFilesByName(fileName);
+    if (files.hasNext()) {
+      const file = files.next();
+      id = file.getId();
+      props.setProperty("EXECUTION_PLAN_ID", id);
+      console.log(`Saved EXECUTION_PLAN_ID to UserProperties: ${id}`);
+      return id;
+    }
+  } catch (e) {
+    console.error("Error in getExecutionPlanId:", e.message);
+  }
+  return null;
+}
+

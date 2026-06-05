@@ -162,10 +162,11 @@ async def flush_buffer(thread_name):
 
 @client.on(events.NewMessage())
 async def handler(event):
-    # Skip broadcast channels (but allow normal groups)
-    if event.is_channel and not event.is_group:
+    sender = await event.get_sender()
+    # RESTRICT TO SMS RELAY BOT ONLY (Beeper bridge handles normal Telegram now)
+    if not sender or getattr(sender, 'id', None) != 8624910336:
         return
-        
+
     chat = await event.get_chat()
     
     # Determine the thread name (Group name or the Other Person's name)
@@ -180,7 +181,6 @@ async def handler(event):
     # When MacroDroid sends SMS via the Telegram bot (id 8624910336),
     # the message starts with "📱 [SMS] <number>". Use "SMS: <number>"
     # as the thread name so it appears correctly in Gmail.
-    sender = await event.get_sender()
     is_sms_relay = False
     if sender and getattr(sender, 'bot', False) and sender.id == 8624910336:
         raw = event.raw_text or ''

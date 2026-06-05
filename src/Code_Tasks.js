@@ -60,7 +60,13 @@ function run1DayTaskMaintenance() {
 
 /**
  * Establishes project triggers for the Task Master daily maintenance schedule.
- * Deletes any duplicate or legacy triggers and sets up a fresh hourly schedule.
+ * Deletes any duplicate or legacy triggers.
+ * 
+ * NOTE: The hourly scheduled trigger for GAS is explicitly IDLED.
+ * We now maintain one source of truth locally on the MacMini, and the Python
+ * script (sync_tasks_combined.py) autonomously handles generating the Combined, 
+ * Work, and Private markdown task logs. The GAS functions remain intact so they 
+ * can be run manually if required, but they should not be scheduled.
  */
 function setup1DayTaskTriggers() {
   const triggers = ScriptApp.getProjectTriggers();
@@ -73,14 +79,13 @@ function setup1DayTaskTriggers() {
     }
   });
 
-  // Schedule the unified maintenance function to run every hour.
-  // This ensures the task list and Markdown export are always up-to-date.
-  ScriptApp.newTrigger('run1DayTaskMaintenance')
-    .timeBased()
-    .everyHours(1)
-    .create();
+  // DO NOT SCHEDULE A NEW TRIGGER HERE
+  // ScriptApp.newTrigger('run1DayTaskMaintenance')
+  //   .timeBased()
+  //   .everyHours(1)
+  //   .create();
     
-  console.log("Trigger established: run1DayTaskMaintenance scheduled for hourly execution.");
+  console.log("Existing triggers cleared. Hourly trigger is currently IDLED per user request. Use Python pipeline.");
 }
 
 
@@ -953,11 +958,9 @@ function exportTasksToMarkdownDrive(results) {
   const blob = Utilities.newBlob(mdContent, 'text/plain', fileName);
   
   try {
-    const q = "name = '" + fileName + "' and '" + TARGET_FOLDER_ID + "' in parents and trashed = false";
-    const existingFiles = Drive.Files.list({q: q, fields: "files(id)"}).files;
+    const fileId = SYSTEM_CONFIG.GENERATED_OUTPUTS.TASKS_EXPORT;
     
-    if (existingFiles && existingFiles.length > 0) {
-      const fileId = existingFiles[0].id;
+    if (fileId) {
       Drive.Files.update({}, fileId, blob);
       console.log(`Updated Markdown file in Drive: ${fileId}`);
     } else {
@@ -967,7 +970,7 @@ function exportTasksToMarkdownDrive(results) {
         parents: [TARGET_FOLDER_ID]
       };
       const file = Drive.Files.create(resource, blob);
-      console.log(`Created new Markdown file in Drive: ${file.id}`);
+      console.log(`CREATED NEW FILE! Update config: ${file.id}`);
     }
   } catch (e) {
     console.error("Failed to save Markdown to Drive: " + e.message);

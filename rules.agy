@@ -11,16 +11,15 @@ This is the central workspace rules file for **The System**. Verne and all other
 
 ---
 
-## 2. Google OAuth & Manifest Synchronization Protocol (CRITICAL)
-Both **The System** (`the_system`) and **Reflection** (`reflection`) Apps Script projects are linked to the **same** Google Cloud Platform (GCP) project (`gemini-project-487511`). Under Google Cloud's identity system, they share a single logical OAuth client application.
+## 2. Google OAuth & Manifest Separation Protocol (CRITICAL)
+Both **The System** (`the_system`) and **Reflection** (`reflection`) Apps Script projects **MUST** be linked to **separate** Google Cloud Platform (GCP) projects with distinct OAuth Client Applications.
 
-To avoid the **Scope Downgrade Loop** (where authorizing one script revokes permission to Gmail, Sheets, or Health APIs for the other):
-
-1. **Strict Manifest Scope Alignment:**
-   - The `oauthScopes` array in [the_system/src/appsscript.json](file:///Users/daniel/Documents/the_system/src/appsscript.json) and [reflection/appsscript.json](file:///Users/daniel/Documents/reflection/appsscript.json) **MUST** remain 100% identical.
-   - Any time you add, modify, or remove a scope in one project's manifest, you **MUST** immediately mirror the exact change to the other manifest.
-2. **Manifest-First Push:**
-   - Always push the manifest changes to the Google Apps Script runtime using `npx clasp push -f` or `npx clasp push` **before** attempting to execute any functions that require the updated scopes.
+This separation prevents the **Scope Downgrade Loop** and headless execution blocks:
+1. **No Shared GCP Project:** `the_system` and `reflection` must have different `projectId` settings in their respective `.clasp.json` configurations.
+2. **Strict Health Scope Exclusion from The System:**
+   - The `oauthScopes` array in [the_system/src/appsscript.json](src/appsscript.json) **MUST NOT** contain any Google Health API scopes (e.g., activity, sleep, or health metrics).
+   - Google Health scopes require a restricted "reauth" (invalid_rapt) challenge, which blocks headless agent tasks and standard `clasp` command execution. 
+   - Only `reflection` (which runs interactively for Vantage auditing) is permitted to include Google Health scopes.
 3. **Invalidating Cached Authorizations:**
    - If a script encounters a permission denied error without prompting the user with an authorization modal, ask the user to open the Apps Script editor, select the `0_AuthScopeFixer` script, choose the `triggerAuthPrompt` function, and click **Run**. This will touch all active services and trigger Google's OAuth consent popup.
 
@@ -42,10 +41,10 @@ Local integration scripts (e.g., Python sync scripts) rely on client credentials
 
 ## 4. Documentation Integrity
 * Always maintain the diagnostic utilities (`0_AuthScopeFixer.js` in Apps Script, `check_system_health.py` locally) as new Google Services or resource endpoints are added to the system.
-* Document any new system sheets, drive folders, or task lists in [TS - Auth & Resource Troubleshooting.md](file:///Users/daniel/Documents/the_system/docs/TS%20-%20Auth%20&%20Resource%20Troubleshooting.md) and inside the verifier scripts.
+* Document any new system sheets, drive folders, or task lists in [TS - Auth & Resource Troubleshooting.md](docs/TS%20-%20Auth%20&%20Resource%20Troubleshooting.md) and inside the verifier scripts.
 
 ---
 
 ## 5. Gemini Models Reference
-* **CRITICAL:** When answering questions about Gemini models, their specs, context windows, or availability, ALWAYS reference the [Actual_Gemini_Models.json](file:///Users/daniel/Documents/the_system/Actual_Gemini_Models.json) file in this workspace. 
+* **CRITICAL:** When answering questions about Gemini models, their specs, context windows, or availability, ALWAYS reference the [Actual_Gemini_Models.json](Actual_Gemini_Models.json) file in this workspace. 
 * Do not rely on outdated files like `context_gemini_models.md` or internal training data for this information.
