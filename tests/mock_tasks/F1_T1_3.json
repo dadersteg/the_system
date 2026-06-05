@@ -1,0 +1,50 @@
+{
+  "name": "F1_T1_3",
+  "input": {
+    "tasks": [
+      {
+        "id": "3",
+        "title": "Delegate",
+        "important": false,
+        "urgent": true,
+        "impact": 0,
+        "duration": 30
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [
+        {
+          "id": "3",
+          "title": "Delegate"
+        }
+      ],
+      "eliminate": []
+    },
+    "frog": {
+      "id": "3",
+      "title": "Delegate"
+    },
+    "scheduled": [],
+    "overflow": [
+      {
+        "id": "3"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "3",
+        "routingTarget": "BACKLOG",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Delegate"
+      }
+    ]
+  }
+}

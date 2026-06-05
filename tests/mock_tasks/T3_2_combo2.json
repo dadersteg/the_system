@@ -1,0 +1,99 @@
+{
+  "name": "T3_2_combo2",
+  "input": {
+    "capacity_mins": 30,
+    "tasks": [
+      {
+        "id": "1",
+        "title": "A",
+        "important": true,
+        "urgent": true,
+        "impact": 10,
+        "duration": 60
+      },
+      {
+        "id": "2",
+        "title": "B",
+        "important": true,
+        "urgent": false,
+        "impact": 5,
+        "duration": 90
+      },
+      {
+        "id": "3",
+        "title": "C",
+        "important": true,
+        "urgent": true,
+        "impact": 8,
+        "duration": 30
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [
+        {
+          "id": "1",
+          "title": "A"
+        },
+        {
+          "id": "3",
+          "title": "C"
+        }
+      ],
+      "schedule": [
+        {
+          "id": "2",
+          "title": "B"
+        }
+      ],
+      "delegate": [],
+      "eliminate": []
+    },
+    "frog": {
+      "id": "1",
+      "title": "A"
+    },
+    "scheduled": [
+      {
+        "id": "3"
+      }
+    ],
+    "overflow": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "A"
+      },
+      {
+        "taskId": "3",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "C"
+      },
+      {
+        "taskId": "2",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "B"
+      }
+    ]
+  }
+}

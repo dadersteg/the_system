@@ -1,0 +1,34 @@
+{
+  "name": "F5_adv_task_string",
+  "input": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "string"
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": []
+    },
+    "frog": null,
+    "scheduled": [],
+    "overflow": []
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Mock Title"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1777 @@
+00 Inbox
+├── Inbox (Saved from Chrome)
+├── Manual Review
+    └── Manual Review (Retro)
+└── Temporary
+00 Notes & Scratchpad
+01 00 00 Private
+├── 01 01 00 Personal Admin
+    ├── 01 01 01 Task Management
+        ├── Productivity Frameworks
+        └── The System (TS)
+            └── 01 01 99 The System [Archived] 
+    ├── 01 01 02 Contracts
+        ├── Loyds
+        ├── Nordnet
+        └── Signature
+    └── 01 01 99 Archive
+        ├── PoA 2020-09-07
+        └── The System [Archived]
+├── 01 02 00 Health
+    ├── 01 02 01 Physical Health
+        ├── 2026 Pregnancy
+            └── 99 Archive
+        ├── Fit Data
+            └── 00 99 Archive
+        └── Medical Appointments & Tests
+    ├── 01 02 02 Mental Health
+    ├── 01 02 90 GP Records Package
+    └── 01 02 99 Archive
+        └── 01 02 00 Phimosis
+├── 01 03 00 Personal Growth
+    ├── 01 03 00 Goals, Habits & Routines
+        └── 01 03 99 Archive
+            ├── 22 Jan
+            ├── Excel - Training
+                └── VBA
+            ├── ML
+                └── Coursera - Machine Learning - Stanford
+                    ├── Lectures
+                    ├── ex 1
+                    ├── ex 2
+                    ├── ex 3
+                    ├── ex 5
+                    ├── ex 6
+                    ├── ex 7
+                    └── ex 8
+            ├── Minnesträning
+                ├── Associationssekvenser
+                ├── Bokstäver
+                ├── Ciero-bilder
+                    ├── Blue
+                    ├── Grönt
+                    ├── Rosa
+                    ├── Rött
+                    ├── Svart
+                    └── Vitt
+                ├── Månader
+                    └── Månader
+                ├── Minnesbilder
+                ├── Nummer
+                    └── Nummer
+                ├── Ordlistor
+                └── Veckodagar
+            └── SQL
+    ├── 01 03 00 Personal Growth Theory
+        └── Ben Meer "A System"
+    ├── 01 03 00 Reflection
+        ├── Data Files
+            ├── 01 03 99 Archive
+                ├── 22 Jan
+                ├── Excel - Training
+                    └── VBA
+                ├── ML
+                    └── Coursera - Machine Learning - Stanford
+                ├── Minnesträning
+                    ├── Associationssekvenser
+                    ├── Bokstäver
+                    ├── Ciero-bilder
+                    ├── Månader
+                    ├── Minnesbilder
+                    ├── Nummer
+                    ├── Ordlistor
+                    └── Veckodagar
+                └── SQL
+            └── Fit Data from Takeout
+                ├── Active Zone Minutes (AZM)
+                ├── Activity Goals
+                ├── Heart Rate Variability
+                ├── Mindfulness
+                └── Sleep Score
+        └── Prompts Instructions for Journal Reflection 
+    └── 01 03 99 Archive
+        ├── 22 Jan
+        ├── Excel - Training
+            └── VBA
+        ├── ML
+            └── Coursera - Machine Learning - Stanford
+                ├── Lectures
+                ├── ex 1
+                    └── lib
+                ├── ex 2
+                    └── lib
+                ├── ex 3
+                    └── lib
+                ├── ex 5
+                    └── lib
+                ├── ex 6
+                    └── lib
+                ├── ex 7
+                    └── lib
+                └── ex 8
+                    └── lib
+        ├── Minnesträning
+            ├── Associationssekvenser
+            ├── Bokstäver
+            ├── Ciero-bilder
+                ├── Blue
+                ├── Grönt
+                ├── Rosa
+                ├── Rött
+                ├── Svart
+                └── Vitt
+                    └── Senare
+            ├── Månader
+                └── Månader
+            ├── Minnesbilder
+            ├── Nummer
+                └── Nummer
+            ├── Ordlistor
+            └── Veckodagar
+        └── SQL
+├── 01 04 00 Finances
+    ├── 01 04 01 Purchase
+        ├── 01 04 99 Archive
+            ├── 01 04 00 Nordea Cancel Services
+            ├── 01 04 01 BA Reimbursement ARN-LHR
+                └── 00 Archive
+            ├── 01 04 99 Receipts
+            ├── 202410 Deliveroo Issue
+            ├── 50A Englands Lane - Repair Log 
+            ├── Air France
+            ├── Amazon DD
+            ├── BA Reimbursement ATL-LHR 
+                ├── 00 Archive
+                ├── 20240509
+                    └── JPEGS
+                └── CEDR Files from BA
+            ├── Bank Statements
+                └── Lloyds
+            ├── Cancel AirBnB
+            ├── CoinbaseWalletBackups
+            ├── Eurowings
+                └── 00 Archive
+            ├── Försenad
+            ├── Housekeeping
+                └── Instructions
+            ├── Hyr ut lägenhet sommar 14
+                └── Bilder för överlämning
+            ├── Inköp av teve
+            ├── Inköp ny lägenhet HGB
+            ├── Laundryheap
+            ├── London
+            ├── Moving
+                └── Pictures for ads
+            ├── Pictures from Ovo 2 Feb
+            ├── Return Home speaker
+            ├── Return Pixel 7
+            ├── SL
+            ├── SW11 8EQ
+                └── 1305 Dawson House - Inventory
+            ├── Statements for Amex Gold
+            ├── Stipendier
+                └── Arkiv
+            ├── Tessin
+            ├── Tradera
+                ├── Kläder
+                └── MacBook 13'
+            ├── TradingGuiden
+            └── W23DY
+                └── 00 Archive
+        ├── 01 04 99 Receipts Tickets
+        ├── Instructions
+        ├── Passes & Tickets
+            └── 01 04 99 Receipts Tickets
+        └── Receipts
+    ├── 01 04 02 House
+        ├── 202510 M
+            └── Dexters Mail
+                ├── Archive
+                └── To Share
+        ├── 202601 M
+            └── Customs & Logistics
+                └── Signed Papers JCL
+                    └── 99 Archive
+        ├── 75006 
+        ├── 99 Archive
+            ├── 01 04 00 Nordea Cancel Services
+            ├── 01 04 01 BA Reimbursement ARN-LHR
+                └── 00 Archive
+            ├── 01 04 99 Receipts
+            ├── 202410 Deliveroo Issue
+            ├── 50A Englands Lane - Repair Log 
+            ├── Air France
+            ├── Amazon DD
+            ├── BA Reimbursement ATL-LHR 
+                ├── 00 Archive
+                ├── 20240509
+                    └── JPEGS
+                └── CEDR Files from BA
+            ├── Bank Statements
+                └── Lloyds
+            ├── Cancel AirBnB
+            ├── CoinbaseWalletBackups
+            ├── Eurowings
+                └── 00 Archive
+            ├── Försenad
+            ├── Housekeeping
+                └── Instructions
+            ├── Hyr ut lägenhet sommar 14
+                └── Bilder för överlämning
+            ├── Inköp av teve
+            ├── Inköp ny lägenhet HGB
+            ├── Laundryheap
+            ├── London
+            ├── Moving
+                └── Pictures for ads
+            ├── Pictures from Ovo 2 Feb
+            ├── Return Home speaker
+            ├── Return Pixel 7
+            ├── SL
+            ├── SW11 8EQ
+                └── 1305 Dawson House - Inventory
+            ├── Statements for Amex Gold
+            ├── Stipendier
+                └── Arkiv
+            ├── Tessin
+            ├── Tradera
+                ├── Kläder
+                └── MacBook 13'
+            ├── TradingGuiden
+            └── W23DY
+                └── 00 Archive
+        └── SW1V 4QE
+            └── Leak
+    ├── 01 04 99 Archive
+        ├── 202510 M
+        ├── 75006
+        ├── NCS
+        └── W23DY
+    ├── 01 04 99 Archive (1)
+        ├── 01 04 00 Nordea Cancel Services
+        ├── 01 04 01 BA Reimbursement ARN-LHR
+            └── 00 Archive
+        ├── 01 04 99 Receipts
+        ├── 202410 Deliveroo Issue
+        ├── 50A Englands Lane - Repair Log 
+        ├── Air France
+        ├── Amazon DD
+        ├── BA Reimbursement ATL-LHR 
+            ├── 00 Archive
+            ├── 20240509
+                └── JPEGS
+            └── CEDR Files from BA
+        ├── Bank Statements
+            └── Lloyds
+        ├── Cancel AirBnB
+        ├── CoinbaseWalletBackups
+        ├── Eurowings
+            └── 00 Archive
+        ├── Försenad
+        ├── Housekeeping
+            └── Instructions
+        ├── Hyr ut lägenhet sommar 14
+            └── Bilder för överlämning
+        ├── Inköp av teve
+        ├── Inköp ny lägenhet HGB
+        ├── Laundryheap
+        ├── London
+        ├── Moving
+            └── Pictures for ads
+        ├── Pictures from Ovo 2 Feb
+        ├── Return Home speaker
+        ├── Return Pixel 7
+        ├── SL
+        ├── SW11 8EQ
+            └── 1305 Dawson House - Inventory
+        ├── Statements for Amex Gold
+        ├── Stipendier
+            └── Arkiv
+        ├── Tessin
+        ├── Tradera
+            ├── Kläder
+            └── MacBook 13'
+        ├── TradingGuiden
+        └── W23DY
+            └── 00 Archive
+    ├── Banking
+    ├── Budgeting & Planning
+    ├── Crypto
+    ├── Insurance
+        └── 01 04 00 > Insurance > Rimowa Bag (IR)
+            └── 01 04 99 > Insurance Rimowa
+    ├── Investing
+    ├── Payslips
+    ├── Pension
+    ├── Revolut Equity
+    ├── Sources for NotebookLM
+    └── Tax
+        ├── 16 17 UK Taxes
+        ├── 17 18 UK Taxes
+        ├── 18 19 UK Taxes
+        ├── 19 20 UK Taxes
+        ├── 20 21 UK Taxes
+        ├── 2019
+            └── Lloyds CC
+        ├── 22 23 UK Taxes
+        ├── 23 24 UK Taxes
+        ├── 24 25 UK Taxes
+        ├── 25 26 UK Taxes
+        └── 26 27 UK Taxes
+└── 01 05 00 Other
+    ├── 01 05 01 Projects
+        ├── 2025 09 Visa
+            ├── 01 05 01 2025 09 Visa > 99 Archive
+            ├── 01 05 01 2025 09 Visa > Accommodation Evidence Files and Prep
+            ├── 01 05 01 2025 09 Visa > Bankstatements
+            ├── 01 05 01 2025 09 Visa > Payslips + P60
+                ├── Visa _ Bankstatements
+                └── Visa _ Payslips + P60
+            ├── 01 05 01 2025 09 Visa > Working Docs
+            ├── Actual Upload
+            ├── Final Upload
+            ├── Name change Munich
+            └── wetransfer_49-copy-jpg_2025-10-19_1805
+        ├── 202601 M
+        ├── 202604-202605 Staycation
+        ├── 20260509 LFC-CFC
+        ├── 20260510-20260514 Lisbon
+        ├── 202606 P&E
+            └── Pontus Svensexa - Videohälsningar
+        ├── 202606 Passport
+        ├── 202608 M&N
+        ├── 2027 Wedding
+            ├── 01 05 2025 Wedding
+                ├── Give Notice Appointment
+                ├── wetransfer_img_5081-png_2025-07-31_1905
+                ├── wetransfer_pics_2025-07-31_1856
+                └── wetransfer_screenshot-2025-07-30-at-13-31-22-png_2025-07-31_1858
+            ├── Org Files
+            └── San Ruffino
+                ├── 2027 Wedding
+                    ├── 01 05 2025 Wedding
+                    ├── Org Files
+                    └── San Ruffino
+                ├── Castello di San Ruffino
+                ├── Flowers
+                ├── Graphics
+                └── Photographer
+        ├── AI
+            ├── Gemini Gems
+            ├── Google AI Studio
+            ├── Prompt Improvements with Deep Think
+            └── Prompts Instructions for Journal Reflection 
+        ├── Archive
+            ├── 20200730-20200809 Tokyo
+            ├── 202008 Stockholm
+            ├── 20230607 Nashville
+            ├── 202601 M 2
+            ├── 20260411 Housewarming C&D
+            ├── 7
+                ├── All
+                    └── 7
+                ├── Arkiv
+                    ├── France 2010
+                    ├── Kasserat
+                    └── Logotype
+                ├── Beskrivning, Syfte och Motto
+                ├── Ekonomi
+                ├── Kasserat
+                ├── Members
+                ├── Möten
+                ├── Regler och Stadgar
+                    └── Stadgar
+                ├── Rekrytering
+                    ├── Arkiv - Rekrytering
+                    └── Invigning
+                └── Seven Photoroom
+            ├── Alexandra Lövgren
+                └── Arkiv
+                    ├── Erik E
+                    └── GMAT
+            ├── Amber
+            ├── Amorina S
+            ├── Amy Bird
+            ├── BA - Baggage Claim
+            ├── Bali
+            ├── Bose Headphones
+            ├── Charlotte A
+            ├── Data
+                └── your_instagram_activity
+                    └── messages
+            ├── David Kjellström (Daff)
+                └── 00 Archive
+                    ├── D&L 30 - Videos to Jim
+                    ├── Dimoso
+                    └── Invoices
+            ├── ED
+            ├── Emily Moffitt
+            ├── Flora Macdonald Johnston
+            ├── Julmiddagen
+            ├── Körkort
+                ├── Bilder
+                └── Farsta Datatester
+            ├── Lauren Beckingham
+            ├── Maps
+                └── Chelsea
+            ├── Movie Analysis: AI Gender 
+            ├── Mushrooms
+            ├── Nima S
+            ├── Notes
+            ├── Oseriöst
+                └── Ny mapp (2)
+            ├── SMS Export
+            ├── Simone Beck-Friis
+            ├── Stag
+                └── Peles Tickets
+            ├── Tabatha
+            └── UKC
+                └── Book
+        ├── Clothes
+        ├── Data Analysis & Software Development
+        ├── Cooking
+        ├── Declutter
+        ├── The System (TS)
+            └── 01 01 99 The System [Archived] 
+        └── Upgrade Office
+    ├── 01 05 02 Relationships
+        ├── 01 05 99 Archive
+            ├── 20200730-20200809 Tokyo
+            ├── 202008 Stockholm
+            ├── 20230607 Nashville
+            ├── 202601 M 2
+            ├── 20260411 Housewarming C&D
+            ├── 7
+                ├── All
+                    └── 7
+                ├── Arkiv
+                    ├── France 2010
+                    ├── Kasserat
+                    └── Logotype
+                ├── Beskrivning, Syfte och Motto
+                ├── Ekonomi
+                ├── Kasserat
+                ├── Members
+                ├── Möten
+                ├── Regler och Stadgar
+                    └── Stadgar
+                ├── Rekrytering
+                    ├── Arkiv - Rekrytering
+                    └── Invigning
+                └── Seven Photoroom
+            ├── Alexandra Lövgren
+                └── Arkiv
+                    ├── Erik E
+                    └── GMAT
+            ├── Amber
+            ├── Amorina S
+            ├── Amy Bird
+            ├── BA - Baggage Claim
+            ├── Bali
+            ├── Bose Headphones
+            ├── Charlotte A
+            ├── Data
+                └── your_instagram_activity
+                    └── messages
+            ├── David Kjellström (Daff)
+                └── 00 Archive
+                    ├── D&L 30 - Videos to Jim
+                    ├── Dimoso
+                    └── Invoices
+            ├── ED
+            ├── Emily Moffitt
+            ├── Flora Macdonald Johnston
+            ├── Julmiddagen
+            ├── Körkort
+                ├── Bilder
+                └── Farsta Datatester
+            ├── Lauren Beckingham
+            ├── Maps
+                └── Chelsea
+            ├── Movie Analysis: AI Gender 
+            ├── Mushrooms
+            ├── Nima S
+            ├── Notes
+            ├── Oseriöst
+                └── Ny mapp (2)
+            ├── SMS Export
+            ├── Simone Beck-Friis
+            ├── Stag
+                └── Peles Tickets
+            ├── Tabatha
+            └── UKC
+                └── Book
+        ├── Alexander & Gabriel
+        ├── Amadeus Wennström
+        ├── CMA
+            └── Whatsapp Convo
+        ├── Dr Eleanor Drage (PhD)
+        ├── Hakan Kabatas
+        ├── Jim Cargill
+        ├── Ludwig Svennerstål
+        ├── Mamma & Pappa
+            ├── Nätverk
+            └── Receipts for Adensor
+                └── 00 Archive
+        ├── Marcus Schuterman
+        ├── Mikkel Birkesö
+        ├── Niklas Johansson
+        └── Pontus Fahlander
+    ├── 01 05 03 Collections
+        ├── Clothes
+        ├── Cooking
+        ├── History
+        ├── Liverpool FC
+            └── 20260509 LFC-CFC
+        ├── Memories
+        ├── Newsletters
+        ├── Star Wars
+        └── Useful Helpful
+    ├── 01 05 99 Archive
+        ├── 20200605-20200608 Lisbon
+        ├── 20200611 Nice
+        ├── 20200730-20200809 Tokyo
+        ├── 20200812-20200816 - Stockholm
+        ├── 20200829-20200902 Mykonos
+        ├── 20200925-20200927 D&L 30th
+        ├── 20210708 Bröllop
+        ├── 20220610-20220610 R & H
+        ├── 2025 09 Visa
+        ├── 2025 W
+        ├── 2025 Xmas
+        ├── 202601 M
+            └── 202601 M - SW1V 4QE.shortcut
+                └── Leak
+        ├── 20260411 Housewarming C&D
+        ├── Alex
+        ├── Amy
+        ├── Blackjack
+        ├── Daff
+        ├── Körkort
+        └── UKC
+    └── 01 05 99 Archive (1)
+        ├── 20200730-20200809 Tokyo
+        ├── 202008 Stockholm
+        ├── 20230607 Nashville
+        ├── 202601 M 2
+        ├── 20260411 Housewarming C&D
+        ├── 7
+            ├── All
+                └── 7
+                    ├── Beskrivning, Syfte och Motto
+                    ├── Möten
+                    └── Rekrytering
+            ├── Arkiv
+                ├── France 2010
+                ├── Kasserat
+                    └── Gamla & Irelevanta Dokument
+                └── Logotype
+                    └── Kasserat
+            ├── Beskrivning, Syfte och Motto
+            ├── Ekonomi
+            ├── Kasserat
+            ├── Members
+            ├── Möten
+            ├── Regler och Stadgar
+                └── Stadgar
+                    └── Hjälp
+            ├── Rekrytering
+                ├── Arkiv - Rekrytering
+                    ├── Bilder på rekryter
+                    └── CV
+                └── Invigning
+            └── Seven Photoroom
+        ├── Alexandra Lövgren
+            └── Arkiv
+                ├── Erik E
+                └── GMAT
+        ├── Amber
+        ├── Amorina S
+        ├── Amy Bird
+        ├── BA - Baggage Claim
+        ├── Bali
+        ├── Bose Headphones
+        ├── Charlotte A
+        ├── Data
+            └── your_instagram_activity
+                └── messages
+        ├── David Kjellström (Daff)
+            └── 00 Archive
+                ├── D&L 30 - Videos to Jim
+                ├── Dimoso
+                    └── 00 Archive
+                └── Invoices
+        ├── ED
+        ├── Emily Moffitt
+        ├── Flora Macdonald Johnston
+        ├── Julmiddagen
+        ├── Körkort
+            ├── Bilder
+            └── Farsta Datatester
+        ├── Lauren Beckingham
+        ├── Maps
+            └── Chelsea
+        ├── Movie Analysis: AI Gender 
+        ├── Mushrooms
+        ├── Nima S
+        ├── Notes
+        ├── Oseriöst
+            └── Ny mapp (2)
+        ├── SMS Export
+        ├── Simone Beck-Friis
+        ├── Stag
+            └── Peles Tickets
+        ├── Tabatha
+        └── UKC
+            └── Book
+02 00 00 Work
+├── 02 00 99 Archive
+    ├── Adam
+    ├── Bild
+    ├── CV - Behöver uppdateras
+        └── Utnarm
+    ├── Case
+        ├── Arkiv
+        ├── Case från Consulting bible
+        ├── Case från Preplounge
+            ├── Bilder till Case 36 - Eyes Inc
+            └── bilderna
+        ├── LOMS Transcripts and Handouts
+            └── LOMS
+                └── __MACOSX
+        └── Presentation1
+    ├── Heltid 2015
+        ├── ABB
+        ├── AT Kearney
+        ├── Accando
+        ├── Accenture
+        ├── Arkiv
+        ├── BCG
+            ├── Från Hemsidan
+            └── Practice Case Interviews to get your consulting dream job_files
+        ├── Bain
+        ├── Bearingpoint
+        ├── Capgemini
+            ├── Arkiv
+            └── Caseacademy
+                └── Ansökan
+        ├── Centigo
+        ├── Connecta
+        ├── Deloitte
+            └── Deloitte FA
+        ├── EY
+        ├── ForeFront
+        ├── IBM
+        ├── IF
+        ├── Intressanta annonser
+            ├── Karriärsidor Utnarm
+                ├── ABB_files
+                ├── Application Consulting Sweden AB_files
+                ├── ÅF_files
+                ├── BearingPoint_files
+                ├── Boliden_files
+                ├── Bombardier Transportation_files
+                ├── Capgemini - Blå_files
+                ├── Centigo_files
+                ├── Connecta_files
+                ├── Forefront Consulting Group_files
+                ├── GE Healthcare_files
+                ├── IBM_files
+                ├── Lloyd's Register Consulting_files
+                ├── Netlight Consulting AB_files
+                ├── SAAB_files
+                ├── SIGMA_files
+                ├── Sandvik AB_files
+                ├── Scania CV AB_files
+                ├── Siemens_files
+                ├── Softronic AB_files
+                └── Vattenfall AB_files
+            └── Nerladdade Hemsidor
+                ├── ABB Sverige AB - ABBs Traineeprogram - Trainee_files
+                ├── ABB Sverige AB - Global trainee in Finance and Business Control - Trainee_files
+                ├── IBM Svenska AB - Consulting by degree - Trainee_files
+                └── Microsoft AB - Microsoft Academy for College Hires - MACH - Trainee_files
+        ├── KPMG
+        ├── Kontaktsamtal
+        ├── MCKinsey
+        ├── Nordea
+        ├── Oliver Wyman
+        ├── PA - Consulting
+        ├── PWC
+        ├── Preplounge
+        ├── Proofread
+        ├── SEB
+            ├── FS
+            ├── IS
+            └── SCM
+        ├── Sandvik
+        ├── Scania
+        ├── Strategy&
+        ├── Tester - Statistik
+            └── Tester
+        ├── Tieto
+        └── Vattenfall
+            ├── Business Analyst
+            ├── Business Controller
+            ├── IT Architecture, Security & Strategy
+            └── Portfolio planning & risk engineer
+    ├── IB DB
+        ├── Archive
+        └── Articles
+    ├── Ideer
+    ├── Intervjufrågor
+    ├── JK
+    ├── Nova 100
+        ├── ambassadörer 2012-2013
+            ├── Ambassadörsavtal
+            ├── Årsplanering
+                └── Lund utgiftsredovisning
+            ├── FTTP
+                ├── AmbassadörsCV
+                ├── Ansökningar
+                    ├── Angelica
+                    ├── Anita
+                    ├── Ellen
+                    ├── Johanna
+                    ├── Kristina
+                    ├── Linnea
+                    ├── Louise
+                    ├── Nina
+                    ├── Sara
+                    └── Victoria
+                └── Feed-back
+            ├── Kompetensöverföring
+                └── KTH
+            ├── Listor av Nova 100-medlemmar
+                ├── Göteborg
+                ├── Linköping
+                ├── Lund
+                ├── Övriga städer
+                ├── Stockholm
+                └── Uppsala
+            ├── Mailinformation
+            ├── NovaAgentum affären
+            ├── Övningar
+            ├── Seminarium-Workshops
+                └── Inbjudan-mall
+            └── Tentascheman 2012-2013
+        └── nova 100 -  uppsala
+    ├── START
+    ├── Sommarjobb 2011
+        ├── Accenture -Deadline 15 jan, Deadline 13 feb
+        ├── Bearingpoint
+        ├── CC
+        ├── Cagermini - Deadline 9 jan
+        ├── Connecta
+        ├── Deloitte 18 mars
+        ├── Ernst & Young - Deadline 12 februari
+        ├── HM 20 Feb
+        ├── Klarna 25 feb
+            └── Futurestars-tävling
+        ├── Nordea - Deadline 31 dec
+        ├── Nova 100
+        ├── PRV - 19 feb
+        └── PWC - Deadline 8 jan
+    ├── Sommarjobb 2014
+        ├── 00 - Inskickade
+            ├── 20131231 Accenture Summer Internship 2014 - Technology Consulting
+            ├── 20140106 BearingPoint Sweden - Sweden - Summer Internship 2014
+            ├── 20140119 Advisory Internship KPMG
+            ├── 20140131 - Nordea
+            ├── 20140131 PWC - Summer Intership
+            ├── 20140206 EY - Advisory Summer Internship 2014
+            ├── 20140221  - Accenture Summer Internship Technology 2014 - OSLO
+            ├── 20140228 - Sandviken
+            ├── 20140301 - Atlas Copco
+            ├── 20140302 - Accenture Strategy Case Day 2014
+            ├── 20140302 - Internship @ Accenture Strategy
+            ├── 20140302 - McKC
+            └── 20140303 - IF
+        ├── 2014xxxx - Consultant for a day - Deloitte
+        ├── Bemanning
+            ├── AW - True Heading
+            ├── DFind - Finance
+            ├── PP
+            ├── Ranstad
+            └── StudentWork
+        ├── Betyg 201312
+        ├── Betyg 201405
+        ├── Capgemini
+        ├── Kasserat
+            ├── 20140216 - HM
+            └── 20140228 - Vattenfall
+        ├── Nya Canegiebryggeriet
+        └── SI
+    └── Studieintensiven
+        └── Matteintensiven
+            ├── Amanda och Elin
+            ├── Ben
+            └── Therese
+├── 02 01 00 Employment
+    ├── 02 01 01 Playmetech (Quantum 21)
+        ├── 01 Professional Admin
+        ├── 03 Professional Growth
+            ├── Betting Intelligence
+            ├── Hiring
+            └── Performance
+        ├── 04 Finances
+        ├── 05 Projects
+        └── _Notes
+    └── 02 01 99 Archive
+        ├── 201102 S&P
+            ├── Att vara ledare - Resever
+            ├── Intervjuer
+                └── Reservkopia Docx
+            └── S&P (Inte i Dropboxen
+        ├── 201108 Sveriges Ingenjörer
+            ├── Arkiv
+                ├── 2009
+                ├── 2010
+                ├── 2011
+                ├── 2012
+                ├── Gamla Timrapporter Etc
+                └── Osorterat
+            ├── Beställningar
+            ├── Bra att ha!
+            ├── Expomobil
+            ├── Från Jonna
+            ├── Gamla Timrapporter Etc
+            ├── Lathund och annan information
+            ├── Presentationer
+            ├── Teknik-SM 2013
+            ├── Untitled Folder
+            ├── VGI
+                └── Till Anna
+            └── vt 2013
+                └── CV Tävling
+        ├── 201312 Nova 100
+        ├── 201404 bConnected
+            └── Arkiv
+        ├── 201406 Brooklyn OpCo
+            ├── Advanced_Microsoft_Excel_2010_Training_Working_Files
+                └── Advanced Microsoft Excel 2010 Training - Working Files
+                    ├── Chapter 01
+                    ├── Chapter 02
+                    ├── Chapter 03
+                    └── Chapter 04
+            └── Anpassade Office-mallar
+                └── 2014-08-13
+        ├── 201508 Deloitte
+            ├── AR, PDP etc
+                ├── AR
+                └── Arkiv
+            ├── Education
+                ├── AGILE
+                ├── Advanced Microsoft Excel 2010 Training - Working Files
+                    ├── Chapter 01
+                    ├── Chapter 02
+                    ├── Chapter 03
+                    ├── Chapter 04
+                    ├── Chapter 05
+                    ├── Chapter 06
+                    ├── Chapter 07
+                    ├── Chapter 08
+                    ├── Chapter 09
+                    ├── Chapter 10
+                    ├── Chapter 11
+                    ├── Chapter 12
+                    ├── Chapter 13
+                    ├── Chapter 14 and 15
+                    ├── Chapter 16
+                    └── Chapter 17
+                ├── Outsystems
+                    ├── BootCamp
+                    ├── Customize the Application Header
+                    ├── Final
+                    ├── Start From a UI Template
+                    └── Use Entities to Model Data
+                ├── SQL
+                └── TS & A - Bootcamp
+                    ├── 1. Introduction to Deloitte capability model
+                    ├── 2. IT - Strategy
+                    ├── 3. Software Development Lifecycle
+                    ├── 4. Service Portfolio Management
+                    ├── 5. IT Service Management
+                    ├── 6. IT Business Management
+                    ├── 7. IT Sourcing
+                    ├── 8. Enterprise Achitecture
+                    └── Notes
+            ├── IoT
+                ├── SAS
+                └── Use_Case
+            └── Lön och Reseräkningar
+                ├── Arkiv
+                    └── 8
+                └── Kvitton och biljetter
+                    ├── Reseräkning 14
+                    ├── Reseräkning 15
+                    ├── Reseräkning 16
+                    └── Reseräkning 17
+        ├── 201611 Efficio
+            ├── 02 Work 20190731
+                ├── 0499 Admin and PM
+                    ├── 0403 EPE, Mentor, etc
+                    ├── 049901 Time-sheet and expenses
+                    └── Payment debacle 20181123
+                ├── Efficio CV
+                    └── Archive
+                └── IB
+            ├── 03 Education, Training
+                ├── 000 Archive
+                    ├── PowerP and DataM
+                    └── VBA Modules 20170623
+                ├── 001 NHO
+                ├── 002 Excel
+                    └── 01 cTool
+                ├── 003 PowerPoint
+                ├── 004 eFlow
+                    └── 01 eFlow Spend Analytics
+                ├── 101 Spend Analytics Training
+                ├── 102 Basket Analytics Training
+                ├── 103 RFP Scoring
+                    └── RFP scoring exercises trainees
+                ├── 104 Negotiation I
+                ├── 105 OA Training
+                ├── 201 SQL
+                ├── 202 Tableau
+                └── 301 Strategic Sourcing Training
+                    ├── Exercises
+                    └── Solutions
+            └── Arkiv
+                ├── Docs
+                └── E
+        ├── 201908 Inverto
+            └── Travel Expenses
+                ├── 00 Archive
+                ├── DAdersteg_0002_RK
+                ├── DAdersteg_0003_RK
+                ├── DAdersteg_0004_RK
+                ├── DAdersteg_0005_RK
+                ├── DAdersteg_0006_RK
+                ├── DAdersteg_0009_RK
+                ├── DAdersteg_0010_RK
+                ├── DAdersteg_0011_RK
+                ├── DAdersteg_0012_RK
+                ├── DAdersteg_0013_RK
+                ├── DAdersteg_0014_RK
+                ├── DAdersteg_0015_RK
+                ├── DAdersteg_0016_RK
+                ├── DAdersteg_0017_RK
+                └── Sent Zips
+        └── 201911 Revolut
+            ├── 99 Personal
+            ├── Automatic Presentation
+                ├── Input - Data
+                ├── Output - HTML
+                └── Output - Slides
+            ├── Concerns and grievance
+                ├── 99 Archive
+                ├── Meeting Notes
+                └── WIP - Not in NotebookLM
+            ├── Gemeni
+            ├── R Internal
+                ├── R
+                    └── hc_data
+                └── R OB Docs
+                    └── 00 Archive
+            └── R Share
+                └── __MACOSX
+                    └── hc_data
+├── 02 02 00 Career Management
+    ├── 201905 DB
+        ├── Archive
+        └── Articles
+    ├── 202603 Airwallex
+    ├── 202603 OLIX
+    ├── 202604 Deel
+    ├── CVs & Cover Letters
+        └── 99 Archive
+    └── Grades & Certificates
+└── 02 03 00 Collections
+    └── Newsletters
+03 00 00 Studies
+└── 03 00 99 Archive
+99 00 00 Archive
+├── 01 00 99 Archive
+    └── Contacts
+├── 01 01 99 Archive
+    ├── PoA 2020-09-07
+    └── The System [Archived]
+├── 01 02 99 Archive
+    └── 01 02 00 Phimosis
+├── 01 03 99 Archive
+    ├── 22 Jan
+    ├── Excel - Training
+        └── VBA
+    ├── ML
+        └── Coursera - Machine Learning - Stanford
+            ├── Lectures
+            ├── ex 1
+                └── lib
+                    └── jsonlab
+            ├── ex 2
+                └── lib
+                    └── jsonlab
+            ├── ex 3
+                └── lib
+                    └── jsonlab
+            ├── ex 5
+                └── lib
+                    └── jsonlab
+            ├── ex 6
+                └── lib
+                    └── jsonlab
+            ├── ex 7
+                └── lib
+                    └── jsonlab
+            └── ex 8
+                └── lib
+                    └── jsonlab
+    ├── Minnesträning
+        ├── Associationssekvenser
+        ├── Bokstäver
+        ├── Ciero-bilder
+            ├── Blue
+            ├── Grönt
+            ├── Rosa
+            ├── Rött
+            ├── Svart
+            └── Vitt
+                └── Senare
+        ├── Månader
+            └── Månader
+        ├── Minnesbilder
+        ├── Nummer
+            └── Nummer
+        ├── Ordlistor
+        └── Veckodagar
+    └── SQL
+├── 01 04 99 Archive
+    ├── 01 04 00 Nordea Cancel Services
+    ├── 01 04 01 BA Reimbursement ARN-LHR
+        └── 00 Archive
+    ├── 01 04 99 Receipts
+    ├── 202410 Deliveroo Issue
+    ├── 50A Englands Lane - Repair Log 
+    ├── Air France
+    ├── Amazon DD
+    ├── BA Reimbursement ATL-LHR 
+        ├── 00 Archive
+        ├── 20240509
+            └── JPEGS
+        └── CEDR Files from BA
+    ├── Bank Statements
+        └── Lloyds
+    ├── Cancel AirBnB
+    ├── CoinbaseWalletBackups
+    ├── Eurowings
+        └── 00 Archive
+    ├── Försenad
+    ├── Housekeeping
+        └── Instructions
+    ├── Hyr ut lägenhet sommar 14
+        └── Bilder för överlämning
+    ├── Inköp av teve
+    ├── Inköp ny lägenhet HGB
+    ├── Laundryheap
+    ├── London
+    ├── Moving
+        └── Pictures for ads
+    ├── Pictures from Ovo 2 Feb
+    ├── Return Home speaker
+    ├── Return Pixel 7
+    ├── SL
+    ├── SW11 8EQ
+        └── 1305 Dawson House - Inventory
+    ├── Statements for Amex Gold
+    ├── Stipendier
+        └── Arkiv
+    ├── Tessin
+    ├── Tradera
+        ├── Kläder
+        └── MacBook 13'
+    ├── TradingGuiden
+    └── W23DY
+        └── 00 Archive
+├── 01 05 99 Archive
+    ├── 20200730-20200809 Tokyo
+    ├── 202008 Stockholm
+    ├── 20230607 Nashville
+    ├── 202601 M 2
+    ├── 20260411 Housewarming C&D
+    ├── 7
+        ├── All
+            └── 7
+                ├── Beskrivning, Syfte och Motto
+                ├── Möten
+                └── Rekrytering
+                    └── Arkiv - Rekrytering
+        ├── Arkiv
+            ├── France 2010
+            ├── Kasserat
+                └── Gamla & Irelevanta Dokument
+            └── Logotype
+                └── Kasserat
+        ├── Beskrivning, Syfte och Motto
+        ├── Ekonomi
+        ├── Kasserat
+        ├── Members
+        ├── Möten
+        ├── Regler och Stadgar
+            └── Stadgar
+                └── Hjälp
+        ├── Rekrytering
+            ├── Arkiv - Rekrytering
+                ├── Bilder på rekryter
+                └── CV
+            └── Invigning
+        └── Seven Photoroom
+    ├── Alexandra Lövgren
+        └── Arkiv
+            ├── Erik E
+            └── GMAT
+    ├── Amber
+    ├── Amorina S
+    ├── Amy Bird
+    ├── BA - Baggage Claim
+    ├── Bali
+    ├── Bose Headphones
+    ├── Charlotte A
+    ├── Data
+        └── your_instagram_activity
+            └── messages
+    ├── David Kjellström (Daff)
+        └── 00 Archive
+            ├── D&L 30 - Videos to Jim
+            ├── Dimoso
+                └── 00 Archive
+            └── Invoices
+    ├── ED
+    ├── Emily Moffitt
+    ├── Flora Macdonald Johnston
+    ├── Julmiddagen
+    ├── Körkort
+        ├── Bilder
+        └── Farsta Datatester
+    ├── Lauren Beckingham
+    ├── Maps
+        └── Chelsea
+    ├── Movie Analysis: AI Gender 
+    ├── Mushrooms
+    ├── Nima S
+    ├── Notes
+    ├── Oseriöst
+        └── Ny mapp (2)
+    ├── SMS Export
+    ├── Simone Beck-Friis
+    ├── Stag
+        └── Peles Tickets
+    ├── Tabatha
+    └── UKC
+        └── Book
+├── 02 00 99 Archive
+    ├── Adam
+    ├── Bild
+    ├── CV - Behöver uppdateras
+        └── Utnarm
+    ├── Case
+        ├── Arkiv
+        ├── Case från Consulting bible
+        ├── Case från Preplounge
+            ├── Bilder till Case 36 - Eyes Inc
+            └── bilderna
+        ├── LOMS Transcripts and Handouts
+            └── LOMS
+                └── __MACOSX
+        └── Presentation1
+    ├── Heltid 2015
+        ├── ABB
+        ├── AT Kearney
+        ├── Accando
+        ├── Accenture
+        ├── Arkiv
+        ├── BCG
+            ├── Från Hemsidan
+            └── Practice Case Interviews to get your consulting dream job_files
+        ├── Bain
+        ├── Bearingpoint
+        ├── Capgemini
+            ├── Arkiv
+            └── Caseacademy
+                └── Ansökan
+        ├── Centigo
+        ├── Connecta
+        ├── Deloitte
+            └── Deloitte FA
+        ├── EY
+        ├── ForeFront
+        ├── IBM
+        ├── IF
+        ├── Intressanta annonser
+            ├── Karriärsidor Utnarm
+                ├── ABB_files
+                ├── Application Consulting Sweden AB_files
+                ├── ÅF_files
+                ├── BearingPoint_files
+                ├── Boliden_files
+                ├── Bombardier Transportation_files
+                ├── Capgemini - Blå_files
+                ├── Centigo_files
+                ├── Connecta_files
+                ├── Forefront Consulting Group_files
+                ├── GE Healthcare_files
+                ├── IBM_files
+                ├── Lloyd's Register Consulting_files
+                ├── Netlight Consulting AB_files
+                ├── SAAB_files
+                ├── SIGMA_files
+                ├── Sandvik AB_files
+                ├── Scania CV AB_files
+                ├── Siemens_files
+                ├── Softronic AB_files
+                └── Vattenfall AB_files
+            └── Nerladdade Hemsidor
+                ├── ABB Sverige AB - ABBs Traineeprogram - Trainee_files
+                ├── ABB Sverige AB - Global trainee in Finance and Business Control - Trainee_files
+                ├── IBM Svenska AB - Consulting by degree - Trainee_files
+                └── Microsoft AB - Microsoft Academy for College Hires - MACH - Trainee_files
+        ├── KPMG
+        ├── Kontaktsamtal
+        ├── MCKinsey
+        ├── Nordea
+        ├── Oliver Wyman
+        ├── PA - Consulting
+        ├── PWC
+        ├── Preplounge
+        ├── Proofread
+        ├── SEB
+            ├── FS
+            ├── IS
+            └── SCM
+        ├── Sandvik
+        ├── Scania
+        ├── Strategy&
+        ├── Tester - Statistik
+            └── Tester
+        ├── Tieto
+        └── Vattenfall
+            ├── Business Analyst
+            ├── Business Controller
+            ├── IT Architecture, Security & Strategy
+            └── Portfolio planning & risk engineer
+    ├── IB DB
+        ├── Archive
+        └── Articles
+    ├── Ideer
+    ├── Intervjufrågor
+    ├── JK
+    ├── Nova 100
+        ├── ambassadörer 2012-2013
+            ├── Ambassadörsavtal
+            ├── Årsplanering
+                └── Lund utgiftsredovisning
+            ├── FTTP
+                ├── AmbassadörsCV
+                ├── Ansökningar
+                    ├── Angelica
+                    ├── Anita
+                    ├── Ellen
+                    ├── Johanna
+                    ├── Kristina
+                    ├── Linnea
+                    ├── Louise
+                    ├── Nina
+                    ├── Sara
+                    └── Victoria
+                └── Feed-back
+            ├── Kompetensöverföring
+                └── KTH
+            ├── Listor av Nova 100-medlemmar
+                ├── Göteborg
+                ├── Linköping
+                ├── Lund
+                ├── Övriga städer
+                ├── Stockholm
+                └── Uppsala
+            ├── Mailinformation
+            ├── NovaAgentum affären
+            ├── Övningar
+            ├── Seminarium-Workshops
+                └── Inbjudan-mall
+            └── Tentascheman 2012-2013
+        └── nova 100 -  uppsala
+    ├── START
+    ├── Sommarjobb 2011
+        ├── Accenture -Deadline 15 jan, Deadline 13 feb
+        ├── Bearingpoint
+        ├── CC
+        ├── Cagermini - Deadline 9 jan
+        ├── Connecta
+        ├── Deloitte 18 mars
+        ├── Ernst & Young - Deadline 12 februari
+        ├── HM 20 Feb
+        ├── Klarna 25 feb
+            └── Futurestars-tävling
+        ├── Nordea - Deadline 31 dec
+        ├── Nova 100
+        ├── PRV - 19 feb
+        └── PWC - Deadline 8 jan
+    ├── Sommarjobb 2014
+        ├── 00 - Inskickade
+            ├── 20131231 Accenture Summer Internship 2014 - Technology Consulting
+            ├── 20140106 BearingPoint Sweden - Sweden - Summer Internship 2014
+            ├── 20140119 Advisory Internship KPMG
+            ├── 20140131 - Nordea
+            ├── 20140131 PWC - Summer Intership
+            ├── 20140206 EY - Advisory Summer Internship 2014
+            ├── 20140221  - Accenture Summer Internship Technology 2014 - OSLO
+            ├── 20140228 - Sandviken
+            ├── 20140301 - Atlas Copco
+            ├── 20140302 - Accenture Strategy Case Day 2014
+            ├── 20140302 - Internship @ Accenture Strategy
+            ├── 20140302 - McKC
+            └── 20140303 - IF
+        ├── 2014xxxx - Consultant for a day - Deloitte
+        ├── Bemanning
+            ├── AW - True Heading
+            ├── DFind - Finance
+            ├── PP
+            ├── Ranstad
+            └── StudentWork
+        ├── Betyg 201312
+        ├── Betyg 201405
+        ├── Capgemini
+        ├── Kasserat
+            ├── 20140216 - HM
+            └── 20140228 - Vattenfall
+        ├── Nya Canegiebryggeriet
+        └── SI
+    └── Studieintensiven
+        └── Matteintensiven
+            ├── Amanda och Elin
+            ├── Ben
+            └── Therese
+├── 03 00 99 Archive
+    ├── C++
+    ├── Levern
+    ├── MATLAB
+        └── Finansmatte
+    ├── Stockholms Nation
+    ├── Uppsala Universitet
+        ├── 03 01 01 År 1
+            ├── Elektromagnetism
+                ├── Arkiv
+                ├── Gamla Duggor och Tentor
+                    ├── Duggor
+                    └── Ny mapp
+                ├── Laborationer
+                ├── Lösningar
+                    ├── A
+                    ├── B
+                    ├── C
+                    └── D
+                ├── Sammanfattningar
+                └── University Physics with Modern Physics 12e with Solutions
+            ├── Envariabelanalys
+                └── Lösningar
+            ├── Flervariabelanalys
+                ├── Föreläsningsanteckningar
+                ├── Inlämningsuppgifter
+                ├── Lösningar
+                ├── Rand
+                    └── Bland
+                └── Tentor
+                    └── Tentor - Inte F
+            ├── Mätteknik
+                ├── Extra
+                ├── Föreläsningar
+                ├── Gamla Tentor
+                ├── Inlupp
+                └── Matlab
+            ├── Mekanik Baskurs
+            └── Mekanik II
+                ├── 21
+                ├── Arkiv
+                    ├── Duggor
+                    ├── Laborationer
+                    └── Lektioner
+                ├── Balistisk Pendel
+                ├── E-Teori
+                ├── Idag
+                ├── Inlupp
+                ├── Lösningar
+                    ├── Dynamics - Solutions Manual
+                    ├── Övrigt
+                    └── Statics  - Solution Manual
+                ├── Ny mapp
+                ├── Problem
+                ├── Svar
+                └── Tentor
+                    ├── Tenta Augusti 09 - Fittus Svår
+                    ├── Tenta Juni 08
+                    ├── Tenta augusti 08
+                    ├── Tenta-2010-04-08
+                    ├── Tenta_090605
+                    ├── Tenta_100111
+                    └── tenta januari 09
+        ├── 03 01 02 År 2
+            ├── Termin 3
+                ├── Period 1
+                    ├── Elektronik I
+                    ├── Företagsekonomi, baskurs AB
+                    └── Transformmetoder
+                └── Period 2
+                    ├── Elektromagnetism II
+                    ├── Mekanik III
+                    └── Presentationsteknik
+            └── Termin 4
+                ├── Period 3
+                    ├── Linjär Algebra II
+                    ├── Programmeringsteknik
+                    └── Vågor och Optik
+                └── Period 4
+                    ├── Bervet
+                    ├── E&M
+                    ├── FEK A
+                    └── Fysikens Matematiska Metoder
+        ├── 03 01 03 År 3
+            ├── NEK A
+                ├── Grundläggande Mikro- och makroekonomi
+                    ├── FL
+                    ├── HO
+                    └── Tentor
+                ├── Internationell Makro
+                    ├── RÖ
+                    └── Tentor
+                ├── PM - NEK
+                └── Utrikeshandel och handelspolitik
+                    └── Utrikeshandel och handelspolitik, 7,5hp
+            ├── Prog II
+                ├── .metadata
+                    ├── .mylyn
+                    └── .plugins
+                ├── Arkiv
+                    ├── Inluppar
+                    └── __MACOSX
+                ├── Avbildningar
+                    ├── .settings
+                    ├── bin
+                    └── src
+                ├── FL
+                ├── Grafik
+                    └── .settings
+                ├── Grafiska användargränssnitt
+                    └── .settings
+                ├── Inluppar 2014
+                ├── Lists
+                    └── .settings
+                ├── OU3
+                    └── .settings
+                ├── OU3Z
+                    ├── .settings
+                    ├── bin
+                    └── src
+                ├── Recursive Descent
+                    └── .settings
+                ├── Rörliga figurer
+                    └── .settings
+                ├── Shapes
+                    ├── .settings
+                    ├── bin
+                    └── src
+                ├── Tentamen 201006
+                    ├── .settings
+                    ├── bin
+                    └── sol
+                ├── Tentamen 201010
+                    ├── .settings
+                    └── sol
+                ├── Tentamen 201106
+                    ├── .settings
+                    ├── sol
+                    └── upp
+                ├── Tentamen 201110
+                    ├── .settings
+                    ├── sol
+                    └── upp
+                ├── Tentamen 201205
+                    ├── .settings
+                    ├── sol
+                    └── upp
+                ├── Tentamen 201210
+                    ├── .settings
+                    ├── bin
+                    └── src
+                ├── Tentamen 201310 & Tentamen 201306
+                    ├── .settings
+                    └── upp1
+                ├── Tentor
+                    ├── 2010-10-19
+                    ├── 2011-06-03
+                    ├── 2011-10-17
+                    ├── 2012-05-31
+                    ├── 2013-06-05
+                    └── 2013-10-22
+                ├── Trees
+                    ├── .settings
+                    ├── bin
+                    └── src
+                ├── Undantag
+                    └── .settings
+                ├── Vehicles
+                    ├── .settings
+                    ├── bin
+                    └── src
+                ├── bookClasses-3-9-10-with-doc
+                    └── bookClasses
+                ├── ou5
+                    ├── .settings
+                    └── bin
+                └── t3
+                    └── .settings
+            ├── Sommartermin
+                └── Finansiell Matematik
+                    ├── Bilder
+                    ├── Hull_6th_Ed
+                    ├── Inför tentan
+                    └── Lösningar
+            ├── Termin 5
+                ├── Fek A II
+                    ├── Arikv
+                    ├── Dugga - Facit
+                    ├── Dugga - Lösningar
+                    ├── Från Emma, Sam och Ama
+                    ├── Gruppuppgift 1
+                    ├── Gruppuppgift 2
+                    ├── Övrigt
+                    ├── SfE
+                    ├── Tenta
+                    └── VF
+                ├── Period 1
+                    ├── Sannolikhet och Statistik
+                    └── Signaler och System
+                └── Period 2
+                    ├── Kvantfysik
+                    ├── Reglerteknik
+                    ├── Teknisk Termodynamik
+                    └── Termodynamik - Rapport
+            └── Termin 6
+                ├── NEK A
+                    ├── Grundläggande Mikro- och makroekonomi
+                    ├── Internationell Makro
+                    ├── PM - NEK
+                    └── Utrikeshandel och handelspolitik
+                ├── Period 3
+                    ├── Bervet III
+                    └── Entreprenörsskap
+                └── SATF
+                    ├── DS2V
+                    ├── Formaila
+                    ├── Projekt
+                    ├── RelativistiskStot
+                    └── solibro
+        ├── 03 01 04 År 4
+            ├── Finansiell Ekonomi
+                ├── A.Kursdel1
+                    ├── ForelasningsanteckningarochOH
+                    └── Ovningsuppgiftermedlosningar
+                ├── Arkiv
+                ├── B.Kursdel2
+                    ├── Avsnitt1
+                    ├── Avsnitt2
+                    ├── Avsnitt3
+                    └── Avsnitt4
+                ├── C.Aldretentamina
+                └── FE HT12
+                    ├── Anteckningar i Corporate Finance
+                    ├── Föreläsningar
+                    ├── Övningar
+                    └── Tidigare tentamina
+            ├── Optimeringsmetoder
+                ├── Assignment
+                ├── Cheat
+                └── Exams
+                    └── Old exam
+            ├── PDE - Intro
+            ├── Period 1
+                ├── Halvledarelektronik
+                └── Mikroteori med tillämpningar
+                    ├── Duggor
+                    ├── Föreläsningar
+                    ├── Gamla duggor (Helenas)
+                    ├── Räkneövningar
+                    └── Tentor
+            ├── Period 2
+            └── Stokastisk Modulering
+                └── tentor
+        ├── 03 01 05 År 5
+            ├── EOD
+                ├── ECONOMICS OF DEVELOPMENT VT13
+                    ├── A. Course litterature and plan
+                    ├── B. Lecture slides
+                    ├── C. Exams
+                    └── D. Updated lecture slides
+                ├── ECONOMICS OF DEVELOPMENT VT14
+                    ├── A. Course litterature and plan
+                    ├── B. Lecture slides
+                    └── C. Exams
+                └── Från Studentportalen
+                    ├── A. Lectures
+                    ├── B. Course outline
+                    ├── C.Homework
+                    └── D. Exam and review questions
+            ├── Entreprenörsskolan
+                ├── Affärsutveckling och entreprenörskap
+                    ├── Basgruppsuppgift
+                    ├── Big Pharma
+                    ├── Forelasningsbilder
+                    ├── Instuderingsfrågor
+                    ├── Introprojekt
+                    ├── Kurslitteratur
+                    └── PM
+                ├── Cenvigo
+                    ├── Analysen
+                    ├── Arkiv
+                    ├── Artiklar
+                    ├── Backuper examensarbete
+                    ├── Bilder PANDA
+                    ├── Examensarbete inför slutredovisning
+                    ├── Exjobbsformalia
+                    ├── Halvtidsredovisning
+                    ├── Information från Cenvigo
+                    ├── Information från David eller Göran
+                    ├── Intervjuer
+                    ├── Redovisning
+                    ├── Teknisk Fördjupning - Daniel
+                    └── Upphandlingsriktlinjer Landsting och regioner
+                ├── Cenvigo - Privat
+                ├── Entreprenörskolans projekt
+                ├── Immaterialrätt och affärsjuridik
+                ├── Kundfokuserad marknadsanalys och metod
+                ├── Ledarskap och styrning
+                    ├── 01Grundbegreppinomekonomi
+                    ├── 02Kalkyleringochprissattning
+                    ├── 03LedarskapforFoU
+                    ├── 04Arsredovisning
+                    ├── 05Klarna
+                    ├── 06Investeringsbedomning
+                    ├── 07Ekonomistyrnings-case
+                    ├── 08Sammanfattning
+                    ├── Arkiv
+                    ├── Case Healon
+                    └── CaseHealonBorjeS
+                ├── Programformalia & introduktion
+                    ├── Exobbsrelaterat
+                    └── Introduktionsveckor
+                └── Värdeteori, samhällsperspektiv & metodologi
+                    ├── S1
+                    ├── S2
+                    ├── S3
+                    ├── S4
+                    ├── S5
+                    └── S6
+            └── Tillämpad statistik
+        ├── Ansökan Examen
+            └── Arkiv
+        ├── Entreprenörsskolan - Ansökan
+        ├── FEM
+            ├── A1
+            ├── A2
+            ├── A3
+            ├── Arkiv
+            ├── Exams
+            └── Lessons
+        ├── Finansiella Derivat
+            └── Gamla tentor
+        ├── Programmering av Paralelldatorer
+            ├── Arkiv
+            ├── Assignments
+            ├── Exams
+            ├── FL 2013
+            ├── FL 2014
+            ├── Från Jacob
+            ├── LAbbar
+            ├── MPIbasic
+            ├── MPIpde
+            └── Project
+                ├── Arkiv
+                ├── Fiver - Kominikation - 2015
+                    └── Ny mapp
+                ├── quick_sort - från papa
+                    └── Arkiv
+                ├── testData
+                └── testDataa
+                    └── testData
+        ├── Stockholms Nation
+            ├── 2Q
+                ├── Anders - Försäkring
+                ├── Avtal
+                ├── Bokslut 2013
+                    ├── Arkiv
+                    └── Slutgiltigt
+                ├── Fixfix
+                ├── LSSPEX
+                ├── Landskap
+                └── Styrelsemöte Okt
+                    ├── 2Q
+                    ├── 3Q
+                    └── Barmästare
+            ├── Recce
+                ├── Affischer
+                    └── I inskrivningen
+                ├── Arkiv
+                ├── HT10
+                ├── Inskrivning
+                ├── Mail
+                ├── Ny 08
+                ├── Pics
+                └── Video
+            ├── SNIF
+            ├── Stocken
+                └── Sundays
+                    ├── Alla hjärtans Dag
+                    ├── Bilder
+                    └── FIFA 10
+            └── Styrelsen
+        └── Tillämpad Statistik
+            ├── Diverse kursdokument 2015-02-25
+            ├── Föreläsningar
+                ├── 2014
+                └── 2015
+            ├── Från fredrik
+                └── Inlupp 1 -  2
+            ├── Inlämningsuppgifter
+                ├── Inlupp 1 -  2
+                ├── Uppgifter 2014
+                └── Uppgifter 2015
+            ├── Övningar och problem
+            └── Tentor
+    └── Östra Real
+        ├── Kost
+        ├── Sofia
+        └── Östra Reals Skol IF
+            ├── Anmälningsblanketter + Brev
+            ├── Arkiv
+            ├── Copa 2008
+            ├── Copa 2009
+                ├── Anmälningsblanketter + Brev
+                ├── Final 2009
+                └── Lag
+            ├── Copa de la Östra
+                ├── Copa 2008
+                └── Copa 2009
+                    ├── Anmälningsblanketter + Brev
+                    ├── Final 2009
+                    └── Lag
+            ├── Final 2009
+            ├── Lag
+            └── Östra Reals Skolidrottsförening
+                ├── Allmänt
+                ├── Arkiv
+                └── Copa de la Östra
+                    ├── Copa 2008
+                    └── Copa 2009
+└── [File Review]
+    ├── 03 00 99 Archive
+    └── Batch Retro Test
+MacMini > Downloads

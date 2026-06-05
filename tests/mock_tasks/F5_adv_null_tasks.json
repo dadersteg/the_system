@@ -1,0 +1,21 @@
+{
+  "name": "F5_adv_null_tasks",
+  "input": {
+    "capacity_mins": 60,
+    "tasks": null
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": []
+    },
+    "frog": null,
+    "scheduled": [],
+    "overflow": []
+  },
+  "ai_response": {
+    "taskUpdates": []
+  }
+}

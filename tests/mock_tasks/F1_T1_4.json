@@ -1,0 +1,50 @@
+{
+  "name": "F1_T1_4",
+  "input": {
+    "tasks": [
+      {
+        "id": "4",
+        "title": "Eliminate",
+        "important": false,
+        "urgent": false,
+        "impact": 0,
+        "duration": 30
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": [
+        {
+          "id": "4",
+          "title": "Eliminate"
+        }
+      ]
+    },
+    "frog": {
+      "id": "4",
+      "title": "Eliminate"
+    },
+    "scheduled": [],
+    "overflow": [
+      {
+        "id": "4"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "4",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Eliminate"
+      }
+    ]
+  }
+}

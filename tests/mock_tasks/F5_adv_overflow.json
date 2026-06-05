@@ -1,0 +1,49 @@
+{
+  "name": "F5_adv_overflow",
+  "input": {
+    "capacity_mins": null,
+    "tasks": [
+      {
+        "id": "1",
+        "title": "A",
+        "duration": null,
+        "impact": null
+      }
+    ]
+  },
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": [
+        {
+          "id": "1",
+          "title": "A"
+        }
+      ]
+    },
+    "frog": {
+      "id": "1",
+      "title": "A"
+    },
+    "scheduled": [],
+    "overflow": [
+      {
+        "id": "1"
+      }
+    ]
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "A"
+      }
+    ]
+  }
+}

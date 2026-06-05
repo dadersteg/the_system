@@ -30,3 +30,13 @@ creds_work.json
 
 # Local Puppeteer/Chrome cache
 chrome_profile/
+chrome_profile_backup/
+
+# Python Virtual Environments
+.venv/
+venv/
+
+# OAuth Token Cache files
+token.json
+token_tasks.json
+token_work_setup.json

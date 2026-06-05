@@ -1,0 +1,25 @@
+{
+  "name": "F6_adv_null_update",
+  "importer": [
+    {
+      "id": "1",
+      "title": "Task 1",
+      "status": "needsAction"
+    }
+  ],
+  "ai_response": {
+    "taskUpdates": [
+      null,
+      {
+        "taskId": "1",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "30m",
+        "alignedGoal": "2026-GOAL-1",
+        "category_path": "01 01 01 Test",
+        "recommendedTitle": "Task Normal Polished 1"
+      }
+    ]
+  },
+  "expected_todo_count": 1,
+  "expected_importer_count": 0
+}

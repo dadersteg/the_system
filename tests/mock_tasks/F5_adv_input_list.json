@@ -1,0 +1,33 @@
+{
+  "name": "F5_adv_input_list",
+  "input": [
+    {
+      "id": "t1",
+      "title": "Task in a list",
+      "duration": 30
+    }
+  ],
+  "expected": {
+    "eisenhower": {
+      "do_first": [],
+      "schedule": [],
+      "delegate": [],
+      "eliminate": []
+    },
+    "frog": null,
+    "scheduled": [],
+    "overflow": []
+  },
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "t1",
+        "routingTarget": "DELETE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-MOCK-GOAL",
+        "category_path": "01 01 Mock > Path",
+        "recommendedTitle": "Task in a list"
+      }
+    ]
+  }
+}

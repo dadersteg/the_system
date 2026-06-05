@@ -1,0 +1,47 @@
+{
+  "name": "T5_adv_hallucinated_types",
+  "importer": [
+    {
+      "id": "1",
+      "title": "Task 1",
+      "notes": "DA: Do something",
+      "status": "needsAction",
+      "due": "2026-06-01T00:00:00Z"
+    }
+  ],
+  "todo": [],
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": 1, 
+        "routingTarget": ["SCHEDULE"],
+        "estimatedDuration": {"time": "30m"},
+        "alignedGoal": null,
+        "category_path": 123,
+        "recommendedTitle": true
+      },
+      {
+        "taskId": "1",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "30m",
+        "alignedGoal": "2026-GOAL-1",
+        "category_path": "01 01 01 Test",
+        "recommendedTitle": "Task 1 (Polished)"
+      }
+    ]
+  },
+  "expected_importer_count": 0,
+  "expected_todo_count": 1,
+  "expected_todo_items": [
+    {
+      "title": "Task 1 (Polished)"
+    }
+  ],
+  "expected_metadata": {
+    "1": {
+      "duration": "30m",
+      "goal": "2026-GOAL-1",
+      "category_path": "01 01 01 Test"
+    }
+  }
+}

@@ -172,7 +172,7 @@ You must return a valid JSON object. You are PROHIBITED from omitting any keys. 
 
 - `filename`: The newly generated name (including extension).
 
-- `concat_path`: The EXACT FULL PATH string from the `Concat (Path)` field in the provided JSON taxonomy (e.g., "01 04 02 > House > SW1V 4QE"). If you cannot confidently categorize it, return "Unknown".
+- `concat_path`: The EXACT FULL PATH string from the `Concat (Path)` field in the provided JSON taxonomy (e.g., "01 04 02 House > SW1V 4QE"). If you cannot confidently categorize it, return "Unknown".
 - `aggregator_paths`: An array of EXACT FULL PATH strings for any `[AGGREGATOR]` nodes the file ALSO belongs to (e.g., "01 04 01 Purchase > Purchase Receipts [AGGREGATOR]"). If the file does not belong in any aggregator, or if the primary `concat_path` is already an aggregator, return an empty array `[]`.
 - `summary`: A precise 1-2 sentence overview of the document's specific content and purpose.
 - `description`: The full string for the Drive description field: `[6-Digit Code] [Context ID] #[Tags]`
@@ -186,7 +186,7 @@ You must return a valid JSON object. You are PROHIBITED from omitting any keys. 
 
   - **Output:** {
     "filename": "2027 Wedding - Venue Deposit Amex.pdf",
-    "concat_path": "01 05 01 > Projects > 2027 Wedding",
+    "concat_path": "01 05 01 Projects > 2027 Wedding",
     "aggregator_paths": ["01 04 01 Purchase > Purchase Receipts [AGGREGATOR]"],
     "summary": "Credit card statement showing a successful deposit payment to the wedding venue for the 2027 event.",
     "description": "01 05 01 2027 Wedding #Wedding #Amex #Deposit",

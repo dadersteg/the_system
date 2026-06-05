@@ -1,0 +1,39 @@
+{
+  "name": "Stress test with null update element",
+  "importer": [
+    {
+      "id": "1",
+      "title": "Task 1",
+      "notes": "Some notes"
+    },
+    {
+      "id": "2",
+      "title": "Task 2",
+      "notes": "Some notes"
+    }
+  ],
+  "todo": [],
+  "ai_response": {
+    "taskUpdates": [
+      {
+        "taskId": "1",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-GOAL-1",
+        "category_path": "01 01 01 Test",
+        "recommendedTitle": "Task 1"
+      },
+      null,
+      {
+        "taskId": "2",
+        "routingTarget": "SCHEDULE",
+        "estimatedDuration": "15m",
+        "alignedGoal": "2026-GOAL-1",
+        "category_path": "01 01 01 Test",
+        "recommendedTitle": "Task 2"
+      }
+    ]
+  },
+  "expected_todo_count": 2,
+  "expected_importer_count": 0
+}
