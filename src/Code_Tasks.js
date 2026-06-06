@@ -1288,8 +1288,11 @@ function loadAllowedAliases(ss) {
   const aliasSheet = ss.getSheets().find(s => s.getSheetId().toString() === "1799689202");
   let allowedAliases = [];
   if (aliasSheet) {
-    const aliasData = aliasSheet.getRange("A:A").getValues();
-    allowedAliases = aliasData.map(row => row[0].toString().trim().toLowerCase()).filter(val => val !== "" && val !== "email");
+    const lastRow = aliasSheet.getLastRow();
+    if (lastRow > 0) {
+      const aliasData = aliasSheet.getRange(1, 1, lastRow, 1).getValues();
+      allowedAliases = aliasData.map(row => row[0].toString().trim().toLowerCase()).filter(val => val !== "" && val !== "email");
+    }
   }
   return allowedAliases;
 }

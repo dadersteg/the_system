@@ -748,7 +748,9 @@ function getAllowedAliases() {
   const ss = getMasterSpreadsheet();
   const sheet = ss.getSheets().find(s => s.getSheetId().toString() === ALIAS_GID);
   if (!sheet) return [];
-  const data = sheet.getRange("A:A").getValues();
+  const lastRow = sheet.getLastRow();
+  if (lastRow === 0) return [];
+  const data = sheet.getRange(1, 1, lastRow, 1).getValues();
   return data.map(row => row[0].toString().trim().toLowerCase()).filter(val => val !== "" && val !== "email");
 }
 
