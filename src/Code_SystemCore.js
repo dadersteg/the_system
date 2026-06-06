@@ -425,7 +425,7 @@ function processPromptText(textStr) {
     return textStr
       .replace(/\bLife Organisation System \(LOS\)/g, "Work Organisation System (WoS)")
       .replace(/\bLife Organisation System\b/g, "Work Organisation System")
-      .replace(/\bLOS_Taxonomy\b/g, "WoS_Taxonomy")
+      .replace(/\bLOS_Taxonomy\b/g, "PMTOS_Taxonomy")
       .replace(/\bLOS taxonomy\b/g, "WoS taxonomy")
       .replace(/\bLOS Taxonomy\b/g, "WoS Taxonomy")
       .replace(/\bLOS\b/g, "WoS")
