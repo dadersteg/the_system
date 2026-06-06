@@ -16,7 +16,7 @@ SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/a
 # Find repo root
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOKEN_PATH = os.path.join(REPO_ROOT, 'token.json')
-OUTPUT_PATH = "/Users/daniel/Documents/the_system/.agents/implementer_1/raw_audit_data.json"
+OUTPUT_PATH = "/Users/daniel/Documents/AGY/the_system/.agents/implementer_1/raw_audit_data.json"
 
 # Inappropriate sheet names for case-insensitive search (single generic words)
 INAPPROPRIATE_CASE_INSENSITIVE = {"index", "dashboard", "log", "data", "sheet"}

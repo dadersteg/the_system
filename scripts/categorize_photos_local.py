@@ -30,8 +30,8 @@ from google.genai import types
 
 # ---------------- CONFIGURATION ----------------
 TAKEOUT_DIR = "/Users/daniel/Temp"
-OUTPUT_CSV = "/Users/daniel/Documents/the_system/scratch/photo_register.csv"
-OUTPUT_JSON = "/Users/daniel/Documents/the_system/scratch/photo_register.json"
+OUTPUT_CSV = "/Users/daniel/Documents/AGY/the_system/scratch/photo_register.csv"
+OUTPUT_JSON = "/Users/daniel/Documents/AGY/the_system/scratch/photo_register.json"
 TEMP_DIR = "/Users/daniel/Temp/processing_frames"
 os.makedirs(TEMP_DIR, exist_ok=True)
 

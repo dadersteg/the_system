@@ -2,7 +2,7 @@ import os, sys
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-ROOT_DIR = '/Users/daniel/Documents/the_system'
+ROOT_DIR = '/Users/daniel/Documents/AGY/the_system'
 TOKEN_FILE = os.path.join(ROOT_DIR, "token_tasks_work.json")
 MARKDOWN_FILE = os.path.join(ROOT_DIR, "../agy_quantum21/artifacts/task_review_table.md")
 
