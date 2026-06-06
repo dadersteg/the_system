@@ -2,7 +2,7 @@ import sys
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-creds = Credentials.from_authorized_user_file('/Users/daniel/Documents/the_system/token_tasks_work.json')
+creds = Credentials.from_authorized_user_file('/Users/daniel/Documents/AGY/the_system/data/token_tasks_work.json')
 service = build('tasks', 'v1', credentials=creds)
 
 lists_results = service.tasklists().list(maxResults=100).execute()
