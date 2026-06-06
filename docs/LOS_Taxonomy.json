@@ -9,7 +9,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private",
-    "Concat (Path)": "01 00 00 Private"
+    "Concat (Path)": "01 00 00 Private",
+    "Drive Path": "01 00 00 Private"
   },
   {
     "L1 Code": "02 00 00",
@@ -21,7 +22,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "02 Work",
-    "Concat (Path)": "02 00 00 Work"
+    "Concat (Path)": "02 00 00 Work",
+    "Drive Path": "02 00 00 Work"
   },
   {
     "L1 Code": "03 00 00",
@@ -33,7 +35,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "03 Studies",
-    "Concat (Path)": "03 00 00 Studies"
+    "Concat (Path)": "03 00 00 Studies",
+    "Drive Path": "03 00 00 Studies"
   },
   {
     "L1 Code": "01 00 00",
@@ -45,7 +48,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/01 Personal Admin",
-    "Concat (Path)": "01 01 00 Personal Admin"
+    "Concat (Path)": "01 01 00 Personal Admin",
+    "Drive Path": "01 00 00 Private/01 01 00 Personal Admin"
   },
   {
     "L1 Code": "01 00 00",
@@ -57,7 +61,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/02 Health",
-    "Concat (Path)": "01 02 00 Health"
+    "Concat (Path)": "01 02 00 Health",
+    "Drive Path": "01 00 00 Private/01 02 00 Health"
   },
   {
     "L1 Code": "01 00 00",
@@ -69,7 +74,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/03 Personal Growth",
-    "Concat (Path)": "01 03 00 Personal Growth"
+    "Concat (Path)": "01 03 00 Personal Growth",
+    "Drive Path": "01 00 00 Private/01 03 00 Personal Growth"
   },
   {
     "L1 Code": "01 00 00",
@@ -81,7 +87,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/04 Finances",
-    "Concat (Path)": "01 04 00 Finances"
+    "Concat (Path)": "01 04 00 Finances",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances"
   },
   {
     "L1 Code": "01 00 00",
@@ -93,7 +100,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/05 Other",
-    "Concat (Path)": "01 05 00 Other"
+    "Concat (Path)": "01 05 00 Other",
+    "Drive Path": "01 00 00 Private/01 05 00 Other"
   },
   {
     "L1 Code": "02 00 00",
@@ -105,7 +113,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "02 Work/01 Employment",
-    "Concat (Path)": "02 01 00 Employment"
+    "Concat (Path)": "02 01 00 Employment",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment"
   },
   {
     "L1 Code": "02 00 00",
@@ -117,7 +126,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "02 Work/02 Career Management",
-    "Concat (Path)": "02 02 00 Career Management"
+    "Concat (Path)": "02 02 00 Career Management",
+    "Drive Path": "02 00 00 Work/02 02 00 Career Management"
   },
   {
     "L1 Code": "02 00 00",
@@ -129,7 +139,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "02 Work/03 Collections",
-    "Concat (Path)": "02 03 00 Collections"
+    "Concat (Path)": "02 03 00 Collections",
+    "Drive Path": "02 00 00 Work/02 03 00 Collections"
   },
   {
     "L1 Code": "01 00 00",
@@ -141,7 +152,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/01 Personal Admin/01 Task Management",
-    "Concat (Path)": "01 01 01 Task Management"
+    "Concat (Path)": "01 01 01 Task Management",
+    "Drive Path": "01 00 00 Private/01 01 00 Personal Admin/01 01 01 Task Management"
   },
   {
     "L1 Code": "01 00 00",
@@ -153,7 +165,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/01 Personal Admin/02 Contracts",
-    "Concat (Path)": "01 01 02 Contracts"
+    "Concat (Path)": "01 01 02 Contracts",
+    "Drive Path": "01 00 00 Private/01 01 00 Personal Admin/01 01 02 Contracts"
   },
   {
     "L1 Code": "01 00 00",
@@ -165,7 +178,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/02 Health/01 Physical Health",
-    "Concat (Path)": "01 02 01 Physical Health"
+    "Concat (Path)": "01 02 01 Physical Health",
+    "Drive Path": "01 00 00 Private/01 02 00 Health/01 02 01 Physical Health"
   },
   {
     "L1 Code": "01 00 00",
@@ -177,7 +191,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/02 Health/02 Mental Health",
-    "Concat (Path)": "01 02 02 Mental Health"
+    "Concat (Path)": "01 02 02 Mental Health",
+    "Drive Path": "01 00 00 Private/01 02 00 Health/01 02 02 Mental Health"
   },
   {
     "L1 Code": "01 00 00",
@@ -189,7 +204,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/03 Personal Growth/01 Principles, Goals & Methods",
-    "Concat (Path)": "01 03 01 Principles, Goals & Methods"
+    "Concat (Path)": "01 03 01 Principles, Goals & Methods",
+    "Drive Path": "01 00 00 Private/01 03 00 Personal Growth/01 03 01 Principles, Goals & Methods"
   },
   {
     "L1 Code": "01 00 00",
@@ -201,7 +217,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/03 Personal Growth/02 Reflection",
-    "Concat (Path)": "01 03 02 Reflection"
+    "Concat (Path)": "01 03 02 Reflection",
+    "Drive Path": "01 00 00 Private/01 03 00 Personal Growth/01 03 02 Reflection"
   },
   {
     "L1 Code": "01 00 00",
@@ -213,7 +230,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/03 Personal Growth/03 Personal Growth Theory",
-    "Concat (Path)": "01 03 03 Personal Growth Theory"
+    "Concat (Path)": "01 03 03 Personal Growth Theory",
+    "Drive Path": "01 00 00 Private/01 03 00 Personal Growth/01 03 03 Personal Growth Theory"
   },
   {
     "L1 Code": "01 00 00",
@@ -225,7 +243,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/04 Finances/01 Purchase",
-    "Concat (Path)": "01 04 01 Purchase"
+    "Concat (Path)": "01 04 01 Purchase",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 01 Purchase"
   },
   {
     "L1 Code": "01 00 00",
@@ -237,7 +256,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/04 Finances/02 House",
-    "Concat (Path)": "01 04 02 House"
+    "Concat (Path)": "01 04 02 House",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 02 House"
   },
   {
     "L1 Code": "01 00 00",
@@ -249,7 +269,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/05 Other/01 Projects",
-    "Concat (Path)": "01 05 01 Projects"
+    "Concat (Path)": "01 05 01 Projects",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects"
   },
   {
     "L1 Code": "01 00 00",
@@ -261,7 +282,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/05 Other/02 Relationships",
-    "Concat (Path)": "01 05 02 Relationships"
+    "Concat (Path)": "01 05 02 Relationships",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 02 Relationships"
   },
   {
     "L1 Code": "01 00 00",
@@ -273,7 +295,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/05 Other/03 Collections",
-    "Concat (Path)": "01 05 03 Collections"
+    "Concat (Path)": "01 05 03 Collections",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 03 Collections"
   },
   {
     "L1 Code": "02 00 00",
@@ -285,7 +308,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "02 Work/01 Employment/01 Playmetech",
-    "Concat (Path)": "02 01 01 Playmetech"
+    "Concat (Path)": "02 01 01 Playmetech",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech"
   },
   {
     "L1 Code": "03 00 00",
@@ -297,7 +321,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "03 Studies/01 År 1 | (2009-2010)",
-    "Concat (Path)": "03 02 01 År 1 | (2009-2010)"
+    "Concat (Path)": "03 02 01 År 1 | (2009-2010)",
+    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 01 År 1 | (2009-2010)"
   },
   {
     "L1 Code": "03 00 00",
@@ -309,7 +334,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "03 Studies/02 År 2 | (2010-2011)",
-    "Concat (Path)": "03 02 02 År 2 | (2010-2011)"
+    "Concat (Path)": "03 02 02 År 2 | (2010-2011)",
+    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 02 År 2 | (2010-2011)"
   },
   {
     "L1 Code": "03 00 00",
@@ -321,7 +347,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "03 Studies/03 År 3 | (2011-2012)",
-    "Concat (Path)": "03 02 03 År 3 | (2011-2012)"
+    "Concat (Path)": "03 02 03 År 3 | (2011-2012)",
+    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 03 År 3 | (2011-2012)"
   },
   {
     "L1 Code": "03 00 00",
@@ -333,7 +360,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "03 Studies/04 År 4 | (2012, 2014)",
-    "Concat (Path)": "03 02 04 År 4 | (2012, 2014)"
+    "Concat (Path)": "03 02 04 År 4 | (2012, 2014)",
+    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 04 År 4 | (2012, 2014)"
   },
   {
     "L1 Code": "03 00 00",
@@ -345,7 +373,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "03 Studies/05 År 5 | (2014-2015)",
-    "Concat (Path)": "03 02 05 År 5 | (2014-2015)"
+    "Concat (Path)": "03 02 05 År 5 | (2014-2015)",
+    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 05 År 5 | (2014-2015)"
   },
   {
     "L1 Code": "01 00 00",
@@ -357,7 +386,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/01 Personal Admin/99 Archive",
-    "Concat (Path)": "01 01 99 Archive"
+    "Concat (Path)": "01 01 99 Archive",
+    "Drive Path": "01 00 00 Private/01 01 00 Personal Admin/01 01 99 Archive"
   },
   {
     "L1 Code": "01 00 00",
@@ -369,7 +399,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/02 Health/99 Archive",
-    "Concat (Path)": "01 02 99 Archive"
+    "Concat (Path)": "01 02 99 Archive",
+    "Drive Path": "01 00 00 Private/01 02 00 Health/01 02 99 Archive"
   },
   {
     "L1 Code": "01 00 00",
@@ -381,7 +412,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/03 Personal Growth/99 Archive",
-    "Concat (Path)": "01 03 99 Archive"
+    "Concat (Path)": "01 03 99 Archive",
+    "Drive Path": "01 00 00 Private/01 03 00 Personal Growth/01 03 99 Archive"
   },
   {
     "L1 Code": "01 00 00",
@@ -393,7 +425,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/04 Finances/99 Archive",
-    "Concat (Path)": "01 04 99 Archive"
+    "Concat (Path)": "01 04 99 Archive",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 99 Archive"
   },
   {
     "L1 Code": "01 00 00",
@@ -405,7 +438,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "01 Private/05 Other/99 Archive",
-    "Concat (Path)": "01 05 99 Archive"
+    "Concat (Path)": "01 05 99 Archive",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive"
   },
   {
     "L1 Code": "02 00 00",
@@ -417,7 +451,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "02 Work/01 Employment/99 Archive",
-    "Concat (Path)": "02 01 99 Archive"
+    "Concat (Path)": "02 01 99 Archive",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive"
   },
   {
     "L1 Code": "03 00 00",
@@ -429,7 +464,8 @@
     "L4 Name": "",
     "L4 Description": "",
     "Concat (Label)": "03 Studies/99 Studies Archive",
-    "Concat (Path)": "03 00 99 Studies Archive"
+    "Concat (Path)": "03 00 99 Studies Archive",
+    "Drive Path": "03 00 00 Studies/03 00 00 /03 00 99 Studies Archive"
   },
   {
     "L1 Code": "01 00 00",
@@ -441,7 +477,8 @@
     "L4 Name": "Productivity Frameworks",
     "L4 Description": "Methodologies, templates, and systems for task execution.",
     "Concat (Label)": "01 Private/01 Personal Admin/01 Task Management/Productivity Frameworks",
-    "Concat (Path)": "01 01 01 Task Management > Productivity Frameworks"
+    "Concat (Path)": "01 01 01 Task Management > Productivity Frameworks",
+    "Drive Path": "01 00 00 Private/01 01 00 Personal Admin/01 01 01 Task Management/Productivity Frameworks"
   },
   {
     "L1 Code": "01 00 00",
@@ -453,7 +490,8 @@
     "L4 Name": "The System (TS)",
     "L4 Description": "LOS maintenance, architecture, and prompt engineering.",
     "Concat (Label)": "01 Private/01 Personal Admin/01 Task Management/The System (TS)",
-    "Concat (Path)": "01 01 01 Task Management > The System (TS)"
+    "Concat (Path)": "01 01 01 Task Management > The System (TS)",
+    "Drive Path": "01 00 00 Private/01 01 00 Personal Admin/01 01 01 Task Management/The System (TS)"
   },
   {
     "L1 Code": "01 00 00",
@@ -465,7 +503,8 @@
     "L4 Name": "Signature",
     "L4 Description": "Active documents pending signature or recently executed.",
     "Concat (Label)": "01 Private/01 Personal Admin/02 Contracts/Signature",
-    "Concat (Path)": "01 01 02 Contracts > Signature"
+    "Concat (Path)": "01 01 02 Contracts > Signature",
+    "Drive Path": "01 00 00 Private/01 01 00 Personal Admin/01 01 02 Contracts/Signature"
   },
   {
     "L1 Code": "01 00 00",
@@ -477,7 +516,8 @@
     "L4 Name": "Medical Appointments & Tests",
     "L4 Description": "Ongoing medical appointments, blood tests (BT), and health tracking.",
     "Concat (Label)": "01 Private/02 Health/01 Physical Health/Medical Appointments & Tests",
-    "Concat (Path)": "01 02 01 Physical Health > Medical Appointments & Tests"
+    "Concat (Path)": "01 02 01 Physical Health > Medical Appointments & Tests",
+    "Drive Path": "01 00 00 Private/01 02 00 Health/01 02 01 Physical Health/Medical Appointments & Tests"
   },
   {
     "L1 Code": "01 00 00",
@@ -489,7 +529,8 @@
     "L4 Name": "2026 Pregnancy",
     "L4 Description": "Planning and tracking for the 2026 pregnancy.",
     "Concat (Label)": "01 Private/02 Health/01 Physical Health/2026 Pregnancy",
-    "Concat (Path)": "01 02 01 Physical Health > 2026 Pregnancy"
+    "Concat (Path)": "01 02 01 Physical Health > 2026 Pregnancy",
+    "Drive Path": "01 00 00 Private/01 02 00 Health/01 02 01 Physical Health/2026 Pregnancy"
   },
   {
     "L1 Code": "01 00 00",
@@ -501,7 +542,8 @@
     "L4 Name": "Banking",
     "L4 Description": "Standard accounts and bank statements.",
     "Concat (Label)": "01 Private/04 Finances/Banking",
-    "Concat (Path)": "01 04 00 Finances > Banking"
+    "Concat (Path)": "01 04 00 Finances > Banking",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Banking"
   },
   {
     "L1 Code": "01 00 00",
@@ -513,7 +555,8 @@
     "L4 Name": "Budgeting & Planning",
     "L4 Description": "Financial planning, budgets, and subscriptions.",
     "Concat (Label)": "01 Private/04 Finances/Budgeting & Planning",
-    "Concat (Path)": "01 04 00 Finances > Budgeting & Planning"
+    "Concat (Path)": "01 04 00 Finances > Budgeting & Planning",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Budgeting & Planning"
   },
   {
     "L1 Code": "01 00 00",
@@ -525,7 +568,8 @@
     "L4 Name": "Crypto",
     "L4 Description": "Cryptocurrency holdings.",
     "Concat (Label)": "01 Private/04 Finances/Crypto",
-    "Concat (Path)": "01 04 00 Finances > Crypto"
+    "Concat (Path)": "01 04 00 Finances > Crypto",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Crypto"
   },
   {
     "L1 Code": "01 00 00",
@@ -537,7 +581,8 @@
     "L4 Name": "Insurance",
     "L4 Description": "Policies and claims.",
     "Concat (Label)": "01 Private/04 Finances/Insurance",
-    "Concat (Path)": "01 04 00 Finances > Insurance"
+    "Concat (Path)": "01 04 00 Finances > Insurance",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Insurance"
   },
   {
     "L1 Code": "01 00 00",
@@ -549,7 +594,8 @@
     "L4 Name": "Investing",
     "L4 Description": "General investment documents (Broad context).",
     "Concat (Label)": "01 Private/04 Finances/Investing",
-    "Concat (Path)": "01 04 00 Finances > Investing"
+    "Concat (Path)": "01 04 00 Finances > Investing",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Investing"
   },
   {
     "L1 Code": "01 00 00",
@@ -561,7 +607,8 @@
     "L4 Name": "Payslips",
     "L4 Description": "Income records.",
     "Concat (Label)": "01 Private/04 Finances/Payslips",
-    "Concat (Path)": "01 04 00 Finances > Payslips"
+    "Concat (Path)": "01 04 00 Finances > Payslips",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Payslips"
   },
   {
     "L1 Code": "01 00 00",
@@ -573,7 +620,8 @@
     "L4 Name": "Pension",
     "L4 Description": "Long-term savings.",
     "Concat (Label)": "01 Private/04 Finances/Pension",
-    "Concat (Path)": "01 04 00 Finances > Pension"
+    "Concat (Path)": "01 04 00 Finances > Pension",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Pension"
   },
   {
     "L1 Code": "01 00 00",
@@ -585,7 +633,8 @@
     "L4 Name": "Revolut Equity",
     "L4 Description": "Revolut shareholdings.",
     "Concat (Label)": "01 Private/04 Finances/Revolut Equity",
-    "Concat (Path)": "01 04 00 Finances > Revolut Equity"
+    "Concat (Path)": "01 04 00 Finances > Revolut Equity",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Revolut Equity"
   },
   {
     "L1 Code": "01 00 00",
@@ -597,7 +646,8 @@
     "L4 Name": "Services & Subscriptions",
     "L4 Description": "Ongoing service contracts, SaaS, mobile, and broadband.",
     "Concat (Label)": "01 Private/04 Finances/Services & Subscriptions",
-    "Concat (Path)": "01 04 00 Finances > Services & Subscriptions"
+    "Concat (Path)": "01 04 00 Finances > Services & Subscriptions",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Services & Subscriptions"
   },
   {
     "L1 Code": "01 00 00",
@@ -609,7 +659,8 @@
     "L4 Name": "Tax",
     "L4 Description": "Returns and correspondence.",
     "Concat (Label)": "01 Private/04 Finances/Tax",
-    "Concat (Path)": "01 04 00 Finances > Tax"
+    "Concat (Path)": "01 04 00 Finances > Tax",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/Tax"
   },
   {
     "L1 Code": "01 00 00",
@@ -621,7 +672,8 @@
     "L4 Name": "Instructions",
     "L4 Description": "Manuals and user guides.",
     "Concat (Label)": "01 Private/04 Finances/01 Purchase/Instructions",
-    "Concat (Path)": "01 04 01 Purchase > Instructions"
+    "Concat (Path)": "01 04 01 Purchase > Instructions",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 01 Purchase/Instructions"
   },
   {
     "L1 Code": "01 00 00",
@@ -633,7 +685,8 @@
     "L4 Name": "Passes & Tickets",
     "L4 Description": "Active travel/event documents.",
     "Concat (Label)": "01 Private/04 Finances/01 Purchase/Passes & Tickets",
-    "Concat (Path)": "01 04 01 Purchase > Passes & Tickets"
+    "Concat (Path)": "01 04 01 Purchase > Passes & Tickets",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 01 Purchase/Passes & Tickets"
   },
   {
     "L1 Code": "01 00 00",
@@ -645,7 +698,8 @@
     "L4 Name": "Receipts",
     "L4 Description": "General purchase receipts.",
     "Concat (Label)": "01 Private/04 Finances/01 Purchase/Receipts",
-    "Concat (Path)": "01 04 01 Purchase > Receipts"
+    "Concat (Path)": "01 04 01 Purchase > Receipts",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 01 Purchase/Receipts"
   },
   {
     "L1 Code": "01 00 00",
@@ -657,7 +711,8 @@
     "L4 Name": "SW1V 4QE",
     "L4 Description": "Current residence (London).",
     "Concat (Label)": "01 Private/04 Finances/02 House/SW1V 4QE",
-    "Concat (Path)": "01 04 02 House > SW1V 4QE"
+    "Concat (Path)": "01 04 02 House > SW1V 4QE",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 02 House/SW1V 4QE"
   },
   {
     "L1 Code": "01 00 00",
@@ -669,7 +724,8 @@
     "L4 Name": "AI",
     "L4 Description": "Artificial Intelligence initiatives.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/AI",
-    "Concat (Path)": "01 05 01 Projects > AI"
+    "Concat (Path)": "01 05 01 Projects > AI",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/AI"
   },
   {
     "L1 Code": "01 00 00",
@@ -681,7 +737,8 @@
     "L4 Name": "20260509 LFC-CFC",
     "L4 Description": "**Project: Trip to Liverpool.** Liverpool FC vs Chelsea FC game.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/20260509 LFC-CFC",
-    "Concat (Path)": "01 05 01 Projects > 20260509 LFC-CFC"
+    "Concat (Path)": "01 05 01 Projects > 20260509 LFC-CFC",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/20260509 LFC-CFC"
   },
   {
     "L1 Code": "01 00 00",
@@ -693,7 +750,8 @@
     "L4 Name": "20260510-20260514 Lisbon",
     "L4 Description": "**Project: Trip to Lisbon.** May 10-14, 2026.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/20260510-20260514 Lisbon",
-    "Concat (Path)": "01 05 01 Projects > 20260510-20260514 Lisbon"
+    "Concat (Path)": "01 05 01 Projects > 20260510-20260514 Lisbon",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/20260510-20260514 Lisbon"
   },
   {
     "L1 Code": "01 00 00",
@@ -705,7 +763,8 @@
     "L4 Name": "202606 P&E",
     "L4 Description": "**Project: Wedding for Pontus & Emilia.** June 2026.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/202606 P&E",
-    "Concat (Path)": "01 05 01 Projects > 202606 P&E"
+    "Concat (Path)": "01 05 01 Projects > 202606 P&E",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/202606 P&E"
   },
   {
     "L1 Code": "01 00 00",
@@ -717,7 +776,8 @@
     "L4 Name": "202608 M&N",
     "L4 Description": "**Project: Wedding for Mimmi & Nils.** August 2026.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/202608 M&N",
-    "Concat (Path)": "01 05 01 Projects > 202608 M&N"
+    "Concat (Path)": "01 05 01 Projects > 202608 M&N",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/202608 M&N"
   },
   {
     "L1 Code": "01 00 00",
@@ -729,7 +789,8 @@
     "L4 Name": "202606 Passport",
     "L4 Description": "**Project: Swedish & British Passport Renewal & Name Change.**",
     "Concat (Label)": "01 Private/05 Other/01 Projects/202606 Passport",
-    "Concat (Path)": "01 05 01 Projects > 202606 Passport"
+    "Concat (Path)": "01 05 01 Projects > 202606 Passport",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/202606 Passport"
   },
   {
     "L1 Code": "01 00 00",
@@ -741,7 +802,8 @@
     "L4 Name": "Clothes",
     "L4 Description": "Wardrobe management.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/Clothes",
-    "Concat (Path)": "01 05 01 Projects > Clothes"
+    "Concat (Path)": "01 05 01 Projects > Clothes",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/Clothes"
   },
   {
     "L1 Code": "01 00 00",
@@ -753,7 +815,8 @@
     "L4 Name": "Cooking",
     "L4 Description": "Recipes and meal planning.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/Cooking",
-    "Concat (Path)": "01 05 01 Projects > Cooking"
+    "Concat (Path)": "01 05 01 Projects > Cooking",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/Cooking"
   },
   {
     "L1 Code": "01 00 00",
@@ -765,7 +828,8 @@
     "L4 Name": "Declutter",
     "L4 Description": "Physical/Digital cleanup.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/Declutter",
-    "Concat (Path)": "01 05 01 Projects > Declutter"
+    "Concat (Path)": "01 05 01 Projects > Declutter",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/Declutter"
   },
   {
     "L1 Code": "01 00 00",
@@ -777,7 +841,8 @@
     "L4 Name": "2027 Wedding",
     "L4 Description": "**Project: Wedding Celebration.** Wedding party/events (2027).",
     "Concat (Label)": "01 Private/05 Other/01 Projects/2027 Wedding",
-    "Concat (Path)": "01 05 01 Projects > 2027 Wedding"
+    "Concat (Path)": "01 05 01 Projects > 2027 Wedding",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/2027 Wedding"
   },
   {
     "L1 Code": "01 00 00",
@@ -789,7 +854,8 @@
     "L4 Name": "202604-202605 Staycation",
     "L4 Description": "Project: Staycation/spend quality time with Carry during my gardening leave",
     "Concat (Label)": "01 Private/05 Other/01 Projects/202604-202605 Staycation",
-    "Concat (Path)": "01 05 01 Projects > 202604-202605 Staycation"
+    "Concat (Path)": "01 05 01 Projects > 202604-202605 Staycation",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/202604-202605 Staycation"
   },
   {
     "L1 Code": "01 00 00",
@@ -801,7 +867,8 @@
     "L4 Name": "Upgrade Office",
     "L4 Description": "Project: Home office setup and improvements.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/Upgrade Office",
-    "Concat (Path)": "01 05 01 Projects > Upgrade Office"
+    "Concat (Path)": "01 05 01 Projects > Upgrade Office",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/Upgrade Office"
   },
   {
     "L1 Code": "01 00 00",
@@ -813,7 +880,8 @@
     "L4 Name": "Data Analysis & Software Development",
     "L4 Description": "Active coding, data analysis, and software development projects.",
     "Concat (Label)": "01 Private/05 Other/01 Projects/Data Analysis & Software Development",
-    "Concat (Path)": "01 05 01 Projects > Data Analysis & Software Development"
+    "Concat (Path)": "01 05 01 Projects > Data Analysis & Software Development",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 01 Projects/Data Analysis & Software Development"
   },
   {
     "L1 Code": "01 00 00",
@@ -825,7 +893,8 @@
     "L4 Name": "Alexander & Gabriel",
     "L4 Description": "Brothers (surname Adersteg). Do not use for other people named Alexander or Gabriel.",
     "Concat (Label)": "01 Private/05 Other/02 Relationships/Alexander & Gabriel",
-    "Concat (Path)": "01 05 02 Relationships > Alexander & Gabriel"
+    "Concat (Path)": "01 05 02 Relationships > Alexander & Gabriel",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 02 Relationships/Alexander & Gabriel"
   },
   {
     "L1 Code": "01 00 00",
@@ -834,10 +903,11 @@
     "L2 Name": "Other",
     "L3 Code": "01 05 02",
     "L3 Name": "Relationships",
-    "L4 Name": "CMA",
+    "L4 Name": "Carry Martens Adersteg",
     "L4 Description": "Carry Martens Adersteg.",
-    "Concat (Label)": "01 Private/05 Other/02 Relationships/CMA",
-    "Concat (Path)": "01 05 02 Relationships > CMA"
+    "Concat (Label)": "01 Private/05 Other/02 Relationships/Carry Martens Adersteg",
+    "Concat (Path)": "01 05 02 Relationships > Carry Martens Adersteg",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 02 Relationships/Carry Martens Adersteg"
   },
   {
     "L1 Code": "01 00 00",
@@ -849,7 +919,8 @@
     "L4 Name": "Jim Cargill",
     "L4 Description": "Friend / Father-in-law.",
     "Concat (Label)": "01 Private/05 Other/02 Relationships/Jim Cargill",
-    "Concat (Path)": "01 05 02 Relationships > Jim Cargill"
+    "Concat (Path)": "01 05 02 Relationships > Jim Cargill",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 02 Relationships/Jim Cargill"
   },
   {
     "L1 Code": "01 00 00",
@@ -861,7 +932,8 @@
     "L4 Name": "Mamma & Pappa",
     "L4 Description": "Parents.",
     "Concat (Label)": "01 Private/05 Other/02 Relationships/Mamma & Pappa",
-    "Concat (Path)": "01 05 02 Relationships > Mamma & Pappa"
+    "Concat (Path)": "01 05 02 Relationships > Mamma & Pappa",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 02 Relationships/Mamma & Pappa"
   },
   {
     "L1 Code": "01 00 00",
@@ -873,7 +945,8 @@
     "L4 Name": "Niklas Johansson",
     "L4 Description": "Friend.",
     "Concat (Label)": "01 Private/05 Other/02 Relationships/Niklas Johansson",
-    "Concat (Path)": "01 05 02 Relationships > Niklas Johansson"
+    "Concat (Path)": "01 05 02 Relationships > Niklas Johansson",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 02 Relationships/Niklas Johansson"
   },
   {
     "L1 Code": "01 00 00",
@@ -885,7 +958,8 @@
     "L4 Name": "Messages",
     "L4 Description": "[AGGREGATOR] All relationship messages.",
     "Concat (Label)": "01 Private/05 Other/02 Relationships/Messages",
-    "Concat (Path)": "01 05 02 Relationships > Messages"
+    "Concat (Path)": "01 05 02 Relationships > Messages",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 02 Relationships/Messages"
   },
   {
     "L1 Code": "01 00 00",
@@ -897,7 +971,8 @@
     "L4 Name": "Liverpool FC",
     "L4 Description": "Football/Interest.",
     "Concat (Label)": "01 Private/05 Other/03 Collections/Liverpool FC",
-    "Concat (Path)": "01 05 03 Collections > Liverpool FC"
+    "Concat (Path)": "01 05 03 Collections > Liverpool FC",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 03 Collections/Liverpool FC"
   },
   {
     "L1 Code": "01 00 00",
@@ -909,7 +984,8 @@
     "L4 Name": "Star Wars",
     "L4 Description": "Collection/Interest.",
     "Concat (Label)": "01 Private/05 Other/03 Collections/Star Wars",
-    "Concat (Path)": "01 05 03 Collections > Star Wars"
+    "Concat (Path)": "01 05 03 Collections > Star Wars",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 03 Collections/Star Wars"
   },
   {
     "L1 Code": "01 00 00",
@@ -921,7 +997,8 @@
     "L4 Name": "Useful/Helpful",
     "L4 Description": "Useful information, tools, software setups, tips and tricks",
     "Concat (Label)": "01 Private/05 Other/03 Collections/Useful/Helpful",
-    "Concat (Path)": "01 05 03 Collections > Useful/Helpful"
+    "Concat (Path)": "01 05 03 Collections > Useful/Helpful",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 03 Collections/Useful/Helpful"
   },
   {
     "L1 Code": "01 00 00",
@@ -933,7 +1010,8 @@
     "L4 Name": "Data",
     "L4 Description": "Data exports, backups, and dumps.",
     "Concat (Label)": "01 Private/05 Other/03 Collections/Data",
-    "Concat (Path)": "01 05 03 Collections > Data"
+    "Concat (Path)": "01 05 03 Collections > Data",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 03 Collections/Data"
   },
   {
     "L1 Code": "01 00 00",
@@ -945,7 +1023,8 @@
     "L4 Name": "Memories",
     "L4 Description": "Photos, keepsakes, and personal historical data.",
     "Concat (Label)": "01 Private/05 Other/03 Collections/Memories",
-    "Concat (Path)": "01 05 03 Collections > Memories"
+    "Concat (Path)": "01 05 03 Collections > Memories",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 03 Collections/Memories"
   },
   {
     "L1 Code": "01 00 00",
@@ -957,7 +1036,8 @@
     "L4 Name": "History",
     "L4 Description": "Actual world history, historical events, and general reference.",
     "Concat (Label)": "01 Private/05 Other/03 Collections/History",
-    "Concat (Path)": "01 05 03 Collections > History"
+    "Concat (Path)": "01 05 03 Collections > History",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 03 Collections/History"
   },
   {
     "L1 Code": "01 00 00",
@@ -969,7 +1049,8 @@
     "L4 Name": "Newsletters",
     "L4 Description": "Subscribed newsletters and general reading material.",
     "Concat (Label)": "01 Private/05 Other/03 Collections/Newsletters",
-    "Concat (Path)": "01 05 03 Collections > Newsletters"
+    "Concat (Path)": "01 05 03 Collections > Newsletters",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 03 Collections/Newsletters"
   },
   {
     "L1 Code": "02 00 00",
@@ -981,7 +1062,8 @@
     "L4 Name": "01 Professional Admin",
     "L4 Description": "Work-related admin, IT setup, policies. (Cross-links to Personal Admin).",
     "Concat (Label)": "02 Work/01 Employment/01 Playmetech/01 Professional Admin",
-    "Concat (Path)": "02 01 01 Playmetech > 01 Professional Admin"
+    "Concat (Path)": "02 01 01 Playmetech > 01 Professional Admin",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/01 Professional Admin"
   },
   {
     "L1 Code": "02 00 00",
@@ -993,7 +1075,8 @@
     "L4 Name": "02 Team & Operations",
     "L4 Description": "1-on-1s, team building, internal processes, and company culture.",
     "Concat (Label)": "02 Work/01 Employment/01 Playmetech/02 Team & Operations",
-    "Concat (Path)": "02 01 01 Playmetech > 02 Team & Operations"
+    "Concat (Path)": "02 01 01 Playmetech > 02 Team & Operations",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/02 Team & Operations"
   },
   {
     "L1 Code": "02 00 00",
@@ -1005,7 +1088,8 @@
     "L4 Name": "03 Professional Growth",
     "L4 Description": "Upskilling, training, and performance reviews relevant to Q21.",
     "Concat (Label)": "02 Work/01 Employment/01 Playmetech/03 Professional Growth",
-    "Concat (Path)": "02 01 01 Playmetech > 03 Professional Growth"
+    "Concat (Path)": "02 01 01 Playmetech > 03 Professional Growth",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/03 Professional Growth"
   },
   {
     "L1 Code": "02 00 00",
@@ -1017,7 +1101,8 @@
     "L4 Name": "04 Finances",
     "L4 Description": "Work-related expenses, benefits, and payslips. (Cross-links to Personal Finance).",
     "Concat (Label)": "02 Work/01 Employment/01 Playmetech/04 Finances",
-    "Concat (Path)": "02 01 01 Playmetech > 04 Finances"
+    "Concat (Path)": "02 01 01 Playmetech > 04 Finances",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/04 Finances"
   },
   {
     "L1 Code": "02 00 00",
@@ -1029,7 +1114,8 @@
     "L4 Name": "05 Projects",
     "L4 Description": "Active Q21 work projects (metadata, notes, non-confidential docs).",
     "Concat (Label)": "02 Work/01 Employment/01 Playmetech/05 Projects",
-    "Concat (Path)": "02 01 01 Playmetech > 05 Projects"
+    "Concat (Path)": "02 01 01 Playmetech > 05 Projects",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/05 Projects"
   },
   {
     "L1 Code": "02 00 00",
@@ -1041,7 +1127,8 @@
     "L4 Name": "CVs & Cover Letters",
     "L4 Description": "Active resumes and application templates.",
     "Concat (Label)": "02 Work/02 Career Management/CVs & Cover Letters",
-    "Concat (Path)": "02 02 00 Career Management > CVs & Cover Letters"
+    "Concat (Path)": "02 02 00 Career Management > CVs & Cover Letters",
+    "Drive Path": "02 00 00 Work/02 02 00 Career Management/CVs & Cover Letters"
   },
   {
     "L1 Code": "02 00 00",
@@ -1053,7 +1140,8 @@
     "L4 Name": "Grades & Certificates",
     "L4 Description": "Proof of employment, transcripts, and certifications.",
     "Concat (Label)": "02 Work/02 Career Management/Grades & Certificates",
-    "Concat (Path)": "02 02 00 Career Management > Grades & Certificates"
+    "Concat (Path)": "02 02 00 Career Management > Grades & Certificates",
+    "Drive Path": "02 00 00 Work/02 02 00 Career Management/Grades & Certificates"
   },
   {
     "L1 Code": "02 00 00",
@@ -1065,7 +1153,8 @@
     "L4 Name": "202603 Airwallex",
     "L4 Description": "**Active Application:** Job application and interview process.",
     "Concat (Label)": "02 Work/02 Career Management/202603 Airwallex",
-    "Concat (Path)": "02 02 00 Career Management > 202603 Airwallex"
+    "Concat (Path)": "02 02 00 Career Management > 202603 Airwallex",
+    "Drive Path": "02 00 00 Work/02 02 00 Career Management/202603 Airwallex"
   },
   {
     "L1 Code": "02 00 00",
@@ -1077,7 +1166,8 @@
     "L4 Name": "202604 Deel",
     "L4 Description": "**Active Application:** Job application and interview process.",
     "Concat (Label)": "02 Work/02 Career Management/202604 Deel",
-    "Concat (Path)": "02 02 00 Career Management > 202604 Deel"
+    "Concat (Path)": "02 02 00 Career Management > 202604 Deel",
+    "Drive Path": "02 00 00 Work/02 02 00 Career Management/202604 Deel"
   },
   {
     "L1 Code": "02 00 00",
@@ -1089,7 +1179,8 @@
     "L4 Name": "202603 OLIX",
     "L4 Description": "**Active Application:** Job application and interview process.",
     "Concat (Label)": "02 Work/02 Career Management/202603 OLIX",
-    "Concat (Path)": "02 02 00 Career Management > 202603 OLIX"
+    "Concat (Path)": "02 02 00 Career Management > 202603 OLIX",
+    "Drive Path": "02 00 00 Work/02 02 00 Career Management/202603 OLIX"
   },
   {
     "L1 Code": "02 00 00",
@@ -1101,7 +1192,8 @@
     "L4 Name": "Newsletters",
     "L4 Description": "Professional and work-related newsletters.",
     "Concat (Label)": "02 Work/03 Collections/Newsletters",
-    "Concat (Path)": "02 03 00 Collections > Newsletters"
+    "Concat (Path)": "02 03 00 Collections > Newsletters",
+    "Drive Path": "02 00 00 Work/02 03 00 Collections/Newsletters"
   },
   {
     "L1 Code": "01 00 00",
@@ -1113,7 +1205,8 @@
     "L4 Name": "75006",
     "L4 Description": "Residence (Paris).",
     "Concat (Label)": "01 Private/04 Finances/99 Archive/75006",
-    "Concat (Path)": "01 04 99 Archive > 75006"
+    "Concat (Path)": "01 04 99 Archive > 75006",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 99 Archive/75006"
   },
   {
     "L1 Code": "01 00 00",
@@ -1125,7 +1218,8 @@
     "L4 Name": "NCS",
     "L4 Description": "Nordea Close Services.",
     "Concat (Label)": "01 Private/04 Finances/99 Archive/NCS",
-    "Concat (Path)": "01 04 99 Archive > NCS"
+    "Concat (Path)": "01 04 99 Archive > NCS",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 99 Archive/NCS"
   },
   {
     "L1 Code": "01 00 00",
@@ -1137,7 +1231,8 @@
     "L4 Name": "202510 M",
     "L4 Description": "The Move (To Paris).",
     "Concat (Label)": "01 Private/04 Finances/99 Archive/202510 M",
-    "Concat (Path)": "01 04 99 Archive > 202510 M"
+    "Concat (Path)": "01 04 99 Archive > 202510 M",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 99 Archive/202510 M"
   },
   {
     "L1 Code": "01 00 00",
@@ -1149,7 +1244,8 @@
     "L4 Name": "W23DY",
     "L4 Description": "London Flat (Previous).",
     "Concat (Label)": "01 Private/04 Finances/99 Archive/W23DY",
-    "Concat (Path)": "01 04 99 Archive > W23DY"
+    "Concat (Path)": "01 04 99 Archive > W23DY",
+    "Drive Path": "01 00 00 Private/01 04 00 Finances/01 04 99 Archive/W23DY"
   },
   {
     "L1 Code": "01 00 00",
@@ -1161,7 +1257,8 @@
     "L4 Name": "2025 Wedding",
     "L4 Description": "Wedding & Engagement Dinners.",
     "Concat (Label)": "01 Private/05 Other/99 Archive/2025 Wedding",
-    "Concat (Path)": "01 05 99 Archive > 2025 Wedding"
+    "Concat (Path)": "01 05 99 Archive > 2025 Wedding",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/2025 Wedding"
   },
   {
     "L1 Code": "01 00 00",
@@ -1173,7 +1270,8 @@
     "L4 Name": "UKC",
     "L4 Description": "UK Citizenship/Visa.",
     "Concat (Label)": "01 Private/05 Other/99 Archive/UKC",
-    "Concat (Path)": "01 05 99 Archive > UKC"
+    "Concat (Path)": "01 05 99 Archive > UKC",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/UKC"
   },
   {
     "L1 Code": "01 00 00",
@@ -1185,7 +1283,8 @@
     "L4 Name": "Blackjack",
     "L4 Description": "Hobby/Skill development.",
     "Concat (Label)": "01 Private/05 Other/99 Archive/Blackjack",
-    "Concat (Path)": "01 05 99 Archive > Blackjack"
+    "Concat (Path)": "01 05 99 Archive > Blackjack",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/Blackjack"
   },
   {
     "L1 Code": "01 00 00",
@@ -1197,7 +1296,8 @@
     "L4 Name": "2025 09 Visa",
     "L4 Description": "Carry's Visa Application.",
     "Concat (Label)": "01 Private/05 Other/99 Archive/2025 09 Visa",
-    "Concat (Path)": "01 05 99 Archive > 2025 09 Visa"
+    "Concat (Path)": "01 05 99 Archive > 2025 09 Visa",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/2025 09 Visa"
   },
   {
     "L1 Code": "01 00 00",
@@ -1209,7 +1309,8 @@
     "L4 Name": "2025 Xmas",
     "L4 Description": "**Project: Christmas 2025.** Gifts, logistics, events, and food planning.",
     "Concat (Label)": "01 Private/05 Other/99 Archive/2025 Xmas",
-    "Concat (Path)": "01 05 99 Archive > 2025 Xmas"
+    "Concat (Path)": "01 05 99 Archive > 2025 Xmas",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/2025 Xmas"
   },
   {
     "L1 Code": "01 00 00",
@@ -1221,7 +1322,8 @@
     "L4 Name": "202601 M",
     "L4 Description": "The Move (Jan 2026 - Project view).",
     "Concat (Label)": "01 Private/05 Other/99 Archive/202601 M",
-    "Concat (Path)": "01 05 99 Archive > 202601 M"
+    "Concat (Path)": "01 05 99 Archive > 202601 M",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/202601 M"
   },
   {
     "L1 Code": "01 00 00",
@@ -1233,7 +1335,8 @@
     "L4 Name": "20260411 Housewarming C&D",
     "L4 Description": "Project: Housewarming event planning.",
     "Concat (Label)": "01 Private/05 Other/99 Archive/20260411 Housewarming C&D",
-    "Concat (Path)": "01 05 99 Archive > 20260411 Housewarming C&D"
+    "Concat (Path)": "01 05 99 Archive > 20260411 Housewarming C&D",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20260411 Housewarming C&D"
   },
   {
     "L1 Code": "02 00 00",
@@ -1245,7 +1348,8 @@
     "L4 Name": "201102 S&P",
     "L4 Description": "Historical Employment",
     "Concat (Label)": "02 Work/01 Employment/99 Archive/201102 S&P",
-    "Concat (Path)": "02 01 99 Archive > 201102 S&P"
+    "Concat (Path)": "02 01 99 Archive > 201102 S&P",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201102 S&P"
   },
   {
     "L1 Code": "02 00 00",
@@ -1257,7 +1361,8 @@
     "L4 Name": "201108 Sveriges Ingenjörer",
     "L4 Description": "Historical Employment",
     "Concat (Label)": "02 Work/01 Employment/99 Archive/201108 Sveriges Ingenjörer",
-    "Concat (Path)": "02 01 99 Archive > 201108 Sveriges Ingenjörer"
+    "Concat (Path)": "02 01 99 Archive > 201108 Sveriges Ingenjörer",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201108 Sveriges Ingenjörer"
   },
   {
     "L1 Code": "02 00 00",
@@ -1269,7 +1374,8 @@
     "L4 Name": "201312 Nova 100",
     "L4 Description": "Historical Employment",
     "Concat (Label)": "02 Work/01 Employment/99 Archive/201312 Nova 100",
-    "Concat (Path)": "02 01 99 Archive > 201312 Nova 100"
+    "Concat (Path)": "02 01 99 Archive > 201312 Nova 100",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201312 Nova 100"
   },
   {
     "L1 Code": "02 00 00",
@@ -1281,7 +1387,8 @@
     "L4 Name": "201406 Brooklyn OpCo",
     "L4 Description": "Historical Employment",
     "Concat (Label)": "02 Work/01 Employment/99 Archive/201406 Brooklyn OpCo",
-    "Concat (Path)": "02 01 99 Archive > 201406 Brooklyn OpCo"
+    "Concat (Path)": "02 01 99 Archive > 201406 Brooklyn OpCo",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201406 Brooklyn OpCo"
   },
   {
     "L1 Code": "03 00 00",
@@ -1293,7 +1400,8 @@
     "L4 Name": "Stockholms Nation",
     "L4 Description": "Historical Studies",
     "Concat (Label)": "03 Studies/99 Studies Archive/Stockholms Nation",
-    "Concat (Path)": "03 00 99 Studies Archive > Stockholms Nation"
+    "Concat (Path)": "03 00 99 Studies Archive > Stockholms Nation",
+    "Drive Path": "03 00 00 Studies/03 00 00 /03 00 99 Studies Archive"
   },
   {
     "L1 Code": "03 00 00",
@@ -1305,7 +1413,8 @@
     "L4 Name": "Uppsala University",
     "L4 Description": "Historical Studies",
     "Concat (Label)": "03 Studies/99 Studies Archive/Uppsala University",
-    "Concat (Path)": "03 00 99 Studies Archive > Uppsala University"
+    "Concat (Path)": "03 00 99 Studies Archive > Uppsala University",
+    "Drive Path": "03 00 00 Studies/03 00 00 /03 00 99 Studies Archive"
   },
   {
     "L1 Code": "02 00 00",
@@ -1317,7 +1426,8 @@
     "L4 Name": "201508 Deloitte",
     "L4 Description": "Historical Employment",
     "Concat (Label)": "02 Work/01 Employment/99 Archive/201508 Deloitte",
-    "Concat (Path)": "02 01 99 Archive > 201508 Deloitte"
+    "Concat (Path)": "02 01 99 Archive > 201508 Deloitte",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201508 Deloitte"
   },
   {
     "L1 Code": "02 00 00",
@@ -1329,7 +1439,8 @@
     "L4 Name": "201611 Efficio",
     "L4 Description": "Historical Employment",
     "Concat (Label)": "02 Work/01 Employment/99 Archive/201611 Efficio",
-    "Concat (Path)": "02 01 99 Archive > 201611 Efficio"
+    "Concat (Path)": "02 01 99 Archive > 201611 Efficio",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201611 Efficio"
   },
   {
     "L1 Code": "02 00 00",
@@ -1341,7 +1452,8 @@
     "L4 Name": "201908 Inverto",
     "L4 Description": "Historical Employment",
     "Concat (Label)": "02 Work/01 Employment/99 Archive/201908 Inverto",
-    "Concat (Path)": "02 01 99 Archive > 201908 Inverto"
+    "Concat (Path)": "02 01 99 Archive > 201908 Inverto",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201908 Inverto"
   },
   {
     "L1 Code": "02 00 00",
@@ -1353,7 +1465,8 @@
     "L4 Name": "201911 Revolut",
     "L4 Description": "Historical Employment",
     "Concat (Label)": "02 Work/01 Employment/99 Archive/201911 Revolut",
-    "Concat (Path)": "02 01 99 Archive > 201911 Revolut"
+    "Concat (Path)": "02 01 99 Archive > 201911 Revolut",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201911 Revolut"
   },
   {
     "L1 Code": "01 00 00",
@@ -1365,7 +1478,8 @@
     "L4 Name": "20200605-20200608 Lisbon",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/20200605-20200608 Lisbon",
-    "Concat (Path)": "01 05 99 Archive > 20200605-20200608 Lisbon"
+    "Concat (Path)": "01 05 99 Archive > 20200605-20200608 Lisbon",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20200605-20200608 Lisbon"
   },
   {
     "L1 Code": "01 00 00",
@@ -1377,7 +1491,8 @@
     "L4 Name": "20200611 Nice",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/20200611 Nice",
-    "Concat (Path)": "01 05 99 Archive > 20200611 Nice"
+    "Concat (Path)": "01 05 99 Archive > 20200611 Nice",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20200611 Nice"
   },
   {
     "L1 Code": "01 00 00",
@@ -1389,7 +1504,8 @@
     "L4 Name": "20200730-20200809 Tokyo",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/20200730-20200809 Tokyo",
-    "Concat (Path)": "01 05 99 Archive > 20200730-20200809 Tokyo"
+    "Concat (Path)": "01 05 99 Archive > 20200730-20200809 Tokyo",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20200730-20200809 Tokyo"
   },
   {
     "L1 Code": "01 00 00",
@@ -1401,7 +1517,8 @@
     "L4 Name": "20200812-20200816 - Stockholm",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/20200812-20200816 - Stockholm",
-    "Concat (Path)": "01 05 99 Archive > 20200812-20200816 - Stockholm"
+    "Concat (Path)": "01 05 99 Archive > 20200812-20200816 - Stockholm",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20200812-20200816 - Stockholm"
   },
   {
     "L1 Code": "01 00 00",
@@ -1413,7 +1530,8 @@
     "L4 Name": "20200829-20200902 Mykonos",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/20200829-20200902 Mykonos",
-    "Concat (Path)": "01 05 99 Archive > 20200829-20200902 Mykonos"
+    "Concat (Path)": "01 05 99 Archive > 20200829-20200902 Mykonos",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20200829-20200902 Mykonos"
   },
   {
     "L1 Code": "01 00 00",
@@ -1425,7 +1543,8 @@
     "L4 Name": "20200925-20200927 D&L 30th",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/20200925-20200927 D&L 30th",
-    "Concat (Path)": "01 05 99 Archive > 20200925-20200927 D&L 30th"
+    "Concat (Path)": "01 05 99 Archive > 20200925-20200927 D&L 30th",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20200925-20200927 D&L 30th"
   },
   {
     "L1 Code": "01 00 00",
@@ -1437,7 +1556,8 @@
     "L4 Name": "20210708 Bröllop",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/20210708 Bröllop",
-    "Concat (Path)": "01 05 99 Archive > 20210708 Bröllop"
+    "Concat (Path)": "01 05 99 Archive > 20210708 Bröllop",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20210708 Bröllop"
   },
   {
     "L1 Code": "01 00 00",
@@ -1449,7 +1569,8 @@
     "L4 Name": "20220610-20220610 R & H",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/20220610-20220610 R & H",
-    "Concat (Path)": "01 05 99 Archive > 20220610-20220610 R & H"
+    "Concat (Path)": "01 05 99 Archive > 20220610-20220610 R & H",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20220610-20220610 R & H"
   },
   {
     "L1 Code": "01 00 00",
@@ -1461,7 +1582,8 @@
     "L4 Name": "Alex",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/Alex",
-    "Concat (Path)": "01 05 99 Archive > Alex"
+    "Concat (Path)": "01 05 99 Archive > Alex",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/Alex"
   },
   {
     "L1 Code": "01 00 00",
@@ -1473,7 +1595,8 @@
     "L4 Name": "Amy",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/Amy",
-    "Concat (Path)": "01 05 99 Archive > Amy"
+    "Concat (Path)": "01 05 99 Archive > Amy",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/Amy"
   },
   {
     "L1 Code": "01 00 00",
@@ -1485,7 +1608,8 @@
     "L4 Name": "Daff",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/Daff",
-    "Concat (Path)": "01 05 99 Archive > Daff"
+    "Concat (Path)": "01 05 99 Archive > Daff",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/Daff"
   },
   {
     "L1 Code": "01 00 00",
@@ -1497,7 +1621,8 @@
     "L4 Name": "Körkort",
     "L4 Description": "Historical Project",
     "Concat (Label)": "01 Private/05 Other/99 Archive/Körkort",
-    "Concat (Path)": "01 05 99 Archive > Körkort"
+    "Concat (Path)": "01 05 99 Archive > Körkort",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/Körkort"
   },
   {
     "L1 Code": "00 00 00",
@@ -1509,7 +1634,8 @@
     "L4 Name": "00 Manual Review",
     "L4 Description": "Items that the automated pipelines could not confidently categorize and require human intervention.",
     "Concat (Label)": "00 Manual Review",
-    "Concat (Path)": "00 Manual Review"
+    "Concat (Path)": "00 Manual Review",
+    "Drive Path": "00 Manual Review"
   },
   {
     "L1 Code": "00 00 00",
@@ -1521,7 +1647,8 @@
     "L4 Name": "00 No Filter",
     "L4 Description": "Raw incoming items that intentionally bypass standard automated filtering rules.",
     "Concat (Label)": "00 No Filter",
-    "Concat (Path)": "00 No Filter"
+    "Concat (Path)": "00 No Filter",
+    "Drive Path": "00 No Filter"
   },
   {
     "L1 Code": "00 00 00",
@@ -1533,7 +1660,8 @@
     "L4 Name": "00 Test",
     "L4 Description": "Safe sandbox label used for testing automations, scripts, and Gem workflows without affecting real data.",
     "Concat (Label)": "00 Test",
-    "Concat (Path)": "00 Test"
+    "Concat (Path)": "00 Test",
+    "Drive Path": "00 Test"
   },
   {
     "L1 Code": "00 00 00",
@@ -1545,7 +1673,8 @@
     "L4 Name": "99 Google Comments",
     "L4 Description": "Automated notifications from Google Docs/Drive that require a quick read but no permanent storage.",
     "Concat (Label)": "99 Google Comments",
-    "Concat (Path)": "99 Google Comments"
+    "Concat (Path)": "99 Google Comments",
+    "Drive Path": "99 Google Comments"
   },
   {
     "L1 Code": "00 00 00",
@@ -1557,7 +1686,8 @@
     "L4 Name": "99 Label_Reviewed",
     "L4 Description": "A vital system flag applied by the Apps Scripts to indicate an item has been successfully processed and should not be analyzed again in the next batch.",
     "Concat (Label)": "99 Label_Reviewed",
-    "Concat (Path)": "99 Label_Reviewed"
+    "Concat (Path)": "99 Label_Reviewed",
+    "Drive Path": "99 Label_Reviewed"
   },
   {
     "L1 Code": "00 00 00",
@@ -1569,7 +1699,8 @@
     "L4 Name": "99 SMS",
     "L4 Description": "Funnel endpoint for incoming routed SMS messages awaiting processing or task extraction.",
     "Concat (Label)": "99 SMS",
-    "Concat (Path)": "99 SMS"
+    "Concat (Path)": "99 SMS",
+    "Drive Path": "99 SMS"
   },
   {
     "L1 Code": "00 00 00",
@@ -1581,7 +1712,8 @@
     "L4 Name": "99 Telegram",
     "L4 Description": "Funnel endpoint for incoming routed Telegram messages awaiting processing or task extraction.",
     "Concat (Label)": "99 Telegram",
-    "Concat (Path)": "99 Telegram"
+    "Concat (Path)": "99 Telegram",
+    "Drive Path": "99 Telegram"
   },
   {
     "L1 Code": "00 00 00",
@@ -1593,7 +1725,8 @@
     "L4 Name": "99 Messenger",
     "L4 Description": "Funnel endpoint for incoming routed Facebook Messenger messages awaiting processing or task extraction.",
     "Concat (Label)": "99 Messenger",
-    "Concat (Path)": "99 Messenger"
+    "Concat (Path)": "99 Messenger",
+    "Drive Path": "99 Messenger"
   },
   {
     "L1 Code": "00 00 00",
@@ -1605,7 +1738,8 @@
     "L4 Name": "99 WhatsApp",
     "L4 Description": "Funnel endpoint for incoming routed WhatsApp messages awaiting processing or task extraction.",
     "Concat (Label)": "99 WhatsApp",
-    "Concat (Path)": "99 WhatsApp"
+    "Concat (Path)": "99 WhatsApp",
+    "Drive Path": "99 WhatsApp"
   },
   {
     "L1 Code": "00 00 00",
@@ -1617,6 +1751,7 @@
     "L4 Name": "99 To be deleted",
     "L4 Description": "Temporary storage and the purge queue. Items that are needed briefly or marked for the next automated/manual trash cycle.",
     "Concat (Label)": "99 To be deleted",
-    "Concat (Path)": "99 To be deleted"
+    "Concat (Path)": "99 To be deleted",
+    "Drive Path": "99 To be deleted"
   }
 ]

@@ -317,14 +317,33 @@ function getActiveThreadTaskMap() {
  * @param {string} id - The ID of the Google Drive document.
  * @returns {string} The text content of the document.
  */
+let _cachedDocTexts = {};
+
+/**
+ * Safely fetches the text content of a Google Document or File by ID.
+ * Falls back to fetching the raw blob as string if DocumentApp fails.
+ * Memoizes results to prevent redundant document loads in a single run.
+ * @param {string} id - The ID of the Google Drive document.
+ * @returns {string} The text content of the document.
+ */
 function getSafeDocText(id) {
+  if (!id) return "";
+  if (_cachedDocTexts[id] !== undefined) {
+    return _cachedDocTexts[id];
+  }
   let text = "";
   try {
     text = DocumentApp.openById(id).getBody().getText();
   } catch (e) {
-    text = DriveApp.getFileById(id).getBlob().getDataAsString();
+    try {
+      text = DriveApp.getFileById(id).getBlob().getDataAsString();
+    } catch (err) {
+      console.error(`Failed to fetch file/doc ${id}: ${err.message}`);
+    }
   }
-  return processPromptText(text);
+  const processed = processPromptText(text);
+  _cachedDocTexts[id] = processed;
+  return processed;
 }
 
 /**
@@ -343,19 +362,28 @@ function getDrivePromptStr() {
   return getSafeDocText(SYSTEM_CONFIG.DOCS.CLERK_DRIVE_INSTRUCTIONS);
 }
 
+let _cachedIsWorkAccount = null;
+
 /**
  * Checks if the executing account is the Work account (daniel@playmetech.net).
+ * Memoized to prevent redundant PropertiesService and Session API calls.
  * @returns {boolean} True if Work account, false otherwise.
  */
 function isWorkAccount() {
+  if (_cachedIsWorkAccount !== null) {
+    return _cachedIsWorkAccount;
+  }
+  
   try {
     const props = typeof PropertiesService !== 'undefined' ? PropertiesService.getUserProperties() : null;
     if (props) {
       if (props.getProperty("IS_WORK_ACCOUNT") === "true") {
+        _cachedIsWorkAccount = true;
         return true;
       }
       const folderId = props.getProperty("WORKSPACE_FOLDER_ID");
       if (folderId === "1Jb5PhZnrqsP3uoUE20Lv75eO4zySPyTr" || folderId === "1W1VyU1ANNNgoq3KrIq1spT_DOpDFyq3A") {
+        _cachedIsWorkAccount = true;
         return true;
       }
     }
@@ -367,6 +395,7 @@ function isWorkAccount() {
     if (scriptProps) {
       const folderId = scriptProps.getProperty("WORKSPACE_FOLDER_ID");
       if (folderId === "1Jb5PhZnrqsP3uoUE20Lv75eO4zySPyTr" || folderId === "1W1VyU1ANNNgoq3KrIq1spT_DOpDFyq3A") {
+        _cachedIsWorkAccount = true;
         return true;
       }
     }
@@ -375,8 +404,11 @@ function isWorkAccount() {
   }
   try {
     var email = Session.getEffectiveUser().getEmail();
-    return email && (email.indexOf("playmetech.net") !== -1 || email.indexOf("playmetech.com") !== -1 || email.indexOf("work") !== -1);
+    const result = !!(email && (email.indexOf("playmetech.net") !== -1 || email.indexOf("playmetech.com") !== -1 || email.indexOf("work") !== -1));
+    _cachedIsWorkAccount = result;
+    return result;
   } catch(e) {
+    _cachedIsWorkAccount = false;
     return false;
   }
 }
