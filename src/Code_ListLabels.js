@@ -94,7 +94,7 @@ function cleanAndCreateGmailLabels() {
   });
   
   // 2. Fetch the taxonomy JSON dynamically
-  const taxonomyFilename = isWork ? "WoS_Taxonomy.json" : "LOS_Taxonomy.json";
+  const taxonomyFilename = isWork ? "PMTOS_Taxonomy.json" : "LOS_Taxonomy.json";
   const files = DriveApp.getFilesByName(taxonomyFilename);
   if (!files.hasNext()) {
     console.error(taxonomyFilename + " not found. Please run syncTaxonomyToSheet() first.");

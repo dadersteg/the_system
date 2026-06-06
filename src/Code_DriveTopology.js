@@ -152,7 +152,7 @@ function syncDriveFoldersFromTaxonomy() {
     }
 
     const isWork = isWorkAccount();
-    const taxonomyFilename = isWork ? "WoS_Taxonomy.json" : "LOS_Taxonomy.json";
+    const taxonomyFilename = isWork ? "PMTOS_Taxonomy.json" : "LOS_Taxonomy.json";
     const BATCH_SIZE = 10;
     const TARGET_DEPTH = 4;
 
@@ -400,7 +400,7 @@ function auditWorkspaceFolders() {
                  
     console.log(`Starting Drive Workspace Audit... Root Folder: ${root.getName()} (ID: ${root.getId()})`);
 
-    const taxonomyFilename = isWork ? "WoS_Taxonomy.json" : "LOS_Taxonomy.json";
+    const taxonomyFilename = isWork ? "PMTOS_Taxonomy.json" : "LOS_Taxonomy.json";
     const files = DriveApp.getFilesByName(taxonomyFilename);
     if (!files.hasNext()) {
       console.error(taxonomyFilename + " not found. Please run syncTaxonomyToSheet() first.");
