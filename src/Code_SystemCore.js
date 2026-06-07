@@ -71,7 +71,6 @@ function setupSystemTriggers() {
     // and bi-directional cross-LOS routing autonomously.
     // 
     // - extractTasksWithConversationDetails
-    // - syncRevisionsToTasks
     // - run1DayTaskMaintenance
     // - runTheClerkDriveRetro
 
