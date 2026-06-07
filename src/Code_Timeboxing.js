@@ -179,7 +179,7 @@ function scheduleTasksToCalendar(tasks) {
         const proposedStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startH, startM, 0);
         const proposedEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endH, endM, 0);
         
-        if (proposedStart > now) {
+        if (proposedEnd > now) {
            // --- COLLISION DETECTION ---
            let hasCollision = false;
            const response = Calendar.Events.list('primary', {
