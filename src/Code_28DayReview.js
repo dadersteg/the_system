@@ -161,8 +161,8 @@ function monthlyReviewTriggerWrapper() {
   const diffTime = nowUtc.getTime() - baseDate.getTime();
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
   
-  // Execute every 28 days (diffDays % 28 === 0) at 9:00, 13:00, and 18:00
-  if (diffDays >= 0 && diffDays % 28 === 0 && [9, 13, 18].includes(currentHour)) {
+  // Execute every 28 days (diffDays % 28 === 0) at 9:00
+  if (diffDays >= 0 && diffDays % 28 === 0 && [9].includes(currentHour)) {
     console.log("Executing 28-Day Strategic Review...");
     try {
       runTaskMasterEngine(); // Pre-clean

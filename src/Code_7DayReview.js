@@ -208,10 +208,10 @@ function write7DayRoadmap(markdownStr) {
 
 function weeklyReviewTriggerWrapper() {
   const currentDay = new Date().getDay(); // 0 is Sunday, 5 is Friday
-  // Execute only on Sunday at 9:00, 13:00, and 18:00
+  // Execute only on Sunday at 9:00
   const currentHour = new Date().getHours();
   
-  if (currentDay === 0 && [9, 13, 18].includes(currentHour)) {
+  if (currentDay === 0 && [9].includes(currentHour)) {
     console.log("Executing weekly 7-Day Review...");
     try {
       runTaskMasterEngine(); // Pre-clean

@@ -105,9 +105,7 @@ function doGet(e) {
       const data = sheet.getRange(startRow, 1, numRows, sheet.getLastColumn()).getValues();
       return ContentService.createTextOutput(JSON.stringify(data));
    }
-   if (e && e.parameter && e.parameter.getKey === "true") {
-     return ContentService.createTextOutput(PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY"));
-  }
+
   if (e && e.parameter && e.parameter.test === "true") {
      const result = testTaskMasterSimulation();
      return ContentService.createTextOutput(JSON.stringify(result));
@@ -1880,6 +1878,18 @@ function processHealthRequest(e) {
   if (e && e.parameter && e.parameter.action === "readFile" && e.parameter.fileId) {
     try {
       const file = DriveApp.getFileById(e.parameter.fileId);
+      const parents = file.getParents();
+      let isAllowed = false;
+      while (parents.hasNext()) {
+        const parent = parents.next();
+        if (parent.getId() === SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID) {
+           isAllowed = true;
+           break;
+        }
+      }
+      if (!isAllowed) {
+        return ContentService.createTextOutput("Error: Unauthorized. File must be within the Workspace Folder.");
+      }
       return ContentService.createTextOutput(file.getBlob().getDataAsString());
     } catch(err) { return ContentService.createTextOutput(err.toString()); }
   }

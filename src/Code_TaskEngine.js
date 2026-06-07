@@ -212,9 +212,26 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
   }
   
   if (aiResult.taskUpdates && aiResult.taskUpdates.length > 0) {
-     console.log(`Applying updates to ${aiResult.taskUpdates.length} tasks...`);
-     processTaskUpdates(aiResult.taskUpdates, taskIdMap, importerListId, todoListId);
-     console.log(`Successfully finished applying task updates.`);
+      console.log(`Executing Semantic Cross-Check for ${aiResult.taskUpdates.length} proposed updates...`);
+      const crossCheckPayload = {
+          instruction: "Perform a Semantic Cross-Check. Compare the proposed 'taskUpdates' against the 'allTasksContext'. If any proposed task is a semantic duplicate of an existing task, change its routingTarget to 'DELETE'. If a day or category is over-scheduled, adjust the 'recommendedDeadline'. Return the final corrected JSON object containing the 'taskUpdates' array.",
+          proposedUpdates: aiResult.taskUpdates,
+          allTasksContext: payload.allTasksContext
+      };
+      
+      const crossCheckPrompt = "You are a strict QA AI. Return a JSON object with a single 'taskUpdates' array containing the finalized task objects. Respond ONLY with valid JSON.";
+      const crossCheckResult = executeTaskMasterGemini(crossCheckPayload, crossCheckPrompt);
+      
+      if (crossCheckResult && crossCheckResult.taskUpdates) {
+          console.log("Semantic Cross-Check complete. Applying finalized updates.");
+          aiResult.taskUpdates = crossCheckResult.taskUpdates;
+      } else {
+          console.warn("Semantic Cross-Check failed or returned empty. Using original routing results.");
+      }
+      
+      console.log(`Applying updates to ${aiResult.taskUpdates.length} tasks...`);
+      processTaskUpdates(aiResult.taskUpdates, taskIdMap, importerListId, todoListId);
+      console.log(`Successfully finished applying task updates.`);
   } else {
      console.warn("No task updates returned from Gemini.");
   }

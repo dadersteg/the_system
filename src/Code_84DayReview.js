@@ -169,8 +169,8 @@ function quarterlyReviewTriggerWrapper() {
   const diffTime = nowUtc.getTime() - baseDate.getTime();
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
   
-  // Execute every 84 days (diffDays % 84 === 0) at 9:00, 13:00, and 18:00
-  if (diffDays >= 0 && diffDays % 84 === 0 && [9, 13, 18].includes(currentHour)) {
+  // Execute every 84 days (diffDays % 84 === 0) at 9:00
+  if (diffDays >= 0 && diffDays % 84 === 0 && [9].includes(currentHour)) {
     console.log("Executing 84-Day Strategic Review...");
     try {
       runTaskMasterEngine(); // Pre-clean

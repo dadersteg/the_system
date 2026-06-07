@@ -155,8 +155,14 @@ function executeEngine(mode, currentModel) {
 
         // Batching Logic
         let currentBatch = [];
+        let filesProcessedCount = 0;
         for (let f of allFiles) {
             if (Date.now() - sessionStart > DRIVE_MAX_EXECUTION_TIME_MS) break;
+            if (filesProcessedCount >= 15) {
+                console.log("Reached 15-file loop limit. Exiting cleanly.");
+                break;
+            }
+            filesProcessedCount++;
 
             const effectiveMime = f.targetMime || f.mime;
             const needsIsolation = effectiveMime.includes("image/") || effectiveMime === "application/pdf" || effectiveMime.includes("officedocument") || effectiveMime.includes("ms-");
@@ -576,6 +582,14 @@ function checkDeterministicRules(f, driveRules) {
      const { name } = fileObj;
      try {
          const file = DriveApp.getFileById(id);
+         if (mime === MimeType.GOOGLE_DOCS || mime === "application/vnd.google-apps.document") {
+             const txt = DocumentApp.openById(id).getBody().getText();
+             return { part: { text: `CONTENT:\n${txt.substring(0, 8000)}` } };
+         }
+         if (mime === MimeType.GOOGLE_SHEETS || mime === "application/vnd.google-apps.spreadsheet") {
+             const txt = SpreadsheetApp.openById(id).getSheets()[0].getDataRange().getValues().slice(0, 50).map(r => r.join(" | ")).join("\n");
+             return { part: { text: `CONTENT:\n${txt.substring(0, 8000)}` } };
+         }
         const blob = file.getBlob();
 
         // 1. Vision
