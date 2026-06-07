@@ -31,7 +31,15 @@ def fetch_active_tasks(service):
             if "deleted" in list_title.lower():
                 continue
             
-            tasks = service.tasks().list(tasklist=list_id, showCompleted=False).execute().get('items', [])
+            tasks = []
+            page_token = None
+            while True:
+                response = service.tasks().list(tasklist=list_id, showCompleted=False, maxResults=100, pageToken=page_token).execute()
+                tasks.extend(response.get('items', []))
+                page_token = response.get('nextPageToken')
+                if not page_token:
+                    break
+            
             if tasks:
                 tasks_by_list[list_title] = tasks
     except Exception as e:
