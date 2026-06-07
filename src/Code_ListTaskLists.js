@@ -31,3 +31,14 @@ function updateTaskList() {
     console.error("Failed to write JSON to Drive: " + e.message);
   }
 }
+
+function PRINT_MY_TASK_LISTS() {
+  const lists = Tasks.Tasklists.list().items;
+  if (!lists) {
+    console.log("No task lists found.");
+    return;
+  }
+  console.log("=== YOUR TASK LIST IDS ===");
+  lists.forEach(l => console.log(`Title: "${l.title}" --> ID: "${l.id}"`));
+  console.log("==========================");
+}
