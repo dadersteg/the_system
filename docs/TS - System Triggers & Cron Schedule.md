@@ -25,10 +25,6 @@ This document outlines the automated trigger schedule for the Life Organisation 
     *   **Schedule:** Every 15 Minutes
     *   **Purpose:** Reads Google Tasks, extracts metadata/AI summaries, and exports them to the Master Spreadsheet.
 
-*   **Task Revisions Sync (`syncRevisionsToTasks`)**
-    *   **Schedule:** Every 15 Minutes
-    *   **Purpose:** Pushes manual "Revised" edits made in the Master Spreadsheet back to Google Tasks.
-
 *   **Task Master Engine (Micro-Batch Polisher) (`runTaskMasterEngine`)**
     *   **Schedule:** Every 15 Minutes
     *   **Purpose:** Uses Delta-Sync to detect new/modified tasks. Routes them via Gemini for immediate categorization and deadline assignment.
@@ -75,6 +71,5 @@ This document outlines the automated trigger schedule for the Life Organisation 
 
 ## Manual Scripts (Run On-Demand)
 These scripts are computationally heavy or require human oversight and are executed manually:
-*   **`applyManualRevisionsEmail` & `applyManualRevisionsDrive`:** Re-labels or moves files based on manual spreadsheet corrections.
 *   **`syncDriveFoldersFromTaxonomy()`:** Run after updating the taxonomy to ensure Drive folders exist.
 *   **`runTheClerkRetro()` / `runTheClerkArchive()`:** Slow-burn historical backfills.
