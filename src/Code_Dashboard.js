@@ -12,9 +12,9 @@
 
 function debugGetHeaders() {
    const ss = getMasterSpreadsheet();
-   const notes = ss.getSheets().find(s => s.getSheetId().toString() === "967747913");
-   const emails = ss.getSheets().find(s => s.getSheetId().toString() === "2131515996");
-   const tasks = ss.getSheets().find(s => s.getSheetId().toString() === "1580572397");
+   const notes = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.NOTES_LOG);
+   const emails = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.EMAIL_LOG);
+   const tasks = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.TASK_REVIEW);
    return JSON.stringify({
      notes: notes ? notes.getRange(1, 1, 1, Math.max(1, notes.getLastColumn())).getValues()[0] : [],
      emails: emails ? emails.getRange(1, 1, 1, Math.max(1, emails.getLastColumn())).getValues()[0] : [],
@@ -98,7 +98,7 @@ function doGet(e) {
 
    if (e && e.parameter && e.parameter.debugEmails === "true") {
       const ss = getMasterSpreadsheet();
-      const sheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
+      const sheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.EMAIL_LOG);
       const lr = sheet.getLastRow();
       const startRow = Math.max(2, lr - 24);
       const numRows = Math.max(1, lr - startRow + 1);
@@ -258,10 +258,6 @@ function doGet(e) {
      }
      const values = sheet.getDataRange().getValues();
      return ContentService.createTextOutput(JSON.stringify(values)).setMimeType(ContentService.MimeType.JSON);
-  }
-  if (e && e.parameter && e.parameter.action === "createAxaContinuationTask") {
-     const result = createAxaContinuationTask();
-     return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
   }
   if (e && e.parameter && e.parameter.action === "createTask") {
      const title = e.parameter.title;
@@ -877,7 +873,7 @@ function getDashboardData() {
   try {
     // 5. Fetch 25 latest Clerk notes from Notes Log
     if (ss) {
-      const notesLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.NOTES_LOG);
+      const notesLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.NOTES_LOG);
       if (notesLogSheet) {
         const lastRow = notesLogSheet.getLastRow();
         if (lastRow > 1) {
@@ -899,7 +895,7 @@ function getDashboardData() {
   try {
     // 6. Fetch 25 latest Clerk emails from Email Log
     if (ss) {
-      const emailLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
+      const emailLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.EMAIL_LOG);
       if (emailLogSheet) {
         const lastRow = emailLogSheet.getLastRow();
         if (lastRow > 1) {
@@ -928,7 +924,7 @@ function getDashboardData() {
   try {
     // 6.5 Fetch 25 latest Clerk tasks from Task Review
     if (ss) {
-      const taskLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.TASK_REVIEW);
+      const taskLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.TASK_REVIEW);
       if (taskLogSheet) {
         const lastRow = taskLogSheet.getLastRow();
         if (lastRow > 1) {
@@ -1005,71 +1001,6 @@ function getDashboardData() {
   return data;
 }
 
-function createAxaContinuationTask() {
-  // 1. Complete the existing task "Evaluate AXA Policy Status"
-  const completionResult = completeTaskByTitle("Evaluate AXA Policy Status");
-  
-  // 2. Create the One Pager Google Doc
-  const folderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
-  const folder = DriveApp.getFolderById(folderId);
-  const doc = DocumentApp.create("One Pager - Call AXA to Transfer Group Policy");
-  const body = doc.getBody();
-  
-  body.appendParagraph("One Pager: AXA Health Policy Continuation").setHeading(DocumentApp.ParagraphHeading.HEADING1);
-  
-  body.appendParagraph("This note contains the necessary details to transfer Daniel Adersteg's corporate AXA Health insurance (provided by Revolut) to a personal policy while preserving Medical History Disregarded (MHD) terms.\n");
-  
-  const detailsSection = body.appendParagraph("Key Policy Details");
-  detailsSection.setHeading(DocumentApp.ParagraphHeading.HEADING2);
-  body.appendParagraph("• Lead Member: Daniel Erik Patrik Adersteg (DOB: 19-Sep-1990)");
-  body.appendParagraph("• Covered Partner: Carina Martens Adersteg (DOB: 06-Aug-1993, joined scheme on 08-Dec-2025)");
-  body.appendParagraph("• Former Employer: Revolut Ltd");
-  body.appendParagraph("• Group Policy Number: 96660");
-  body.appendParagraph("• Current Plan Tier: ADVANCE (Couple Cover)");
-  body.appendParagraph("• Date of Joining Group Scheme: 01-Apr-2020");
-  body.appendParagraph("• Underwriting Terms: Medical History Disregarded (MHD) - Covers pre-existing conditions.");
-  body.appendParagraph("• Offboarding / Last Day of Contract: 25 May 2026");
-  
-  const claimsSection = body.appendParagraph("Pending Claims & Shortfall");
-  claimsSection.setHeading(DocumentApp.ParagraphHeading.HEADING2);
-  body.appendParagraph("• Outpatient consultation & diagnostic tests with Prof. Ghassan Alusi occurred on 5 May 2026 (prior to offboarding date, so covered).");
-  body.appendParagraph("• Consultation total cost was £270.00. AXA paid £170.00.");
-  body.appendParagraph("• Action Required: Daniel owes a £100.00 excess shortfall to Alusi Ent Ltd (T/A G Alusi, Invoice Ref: GA97726344959Y). This is an outstanding personal liability to be settled directly with the clinic.");
-  body.appendParagraph("• Diagnostic tests total cost was £813.67, paid in full by AXA on 19 May 2026.");
-  
-  const transferSection = body.appendParagraph("How to Complete the Transfer");
-  transferSection.setHeading(DocumentApp.ParagraphHeading.HEADING2);
-  body.appendParagraph("• AXA Health Company Leavers Phone Number: 0800 028 2915 (Alternative: 0800 032 1965)");
-  body.appendParagraph("• What to request: 'Transfer from Revolut corporate scheme (Group 96660) to a personal plan under Continuous Personal Terms (CPT) to preserve our MHD (Medical History Disregarded) status.'");
-  body.appendParagraph("• Timeline: Must be completed within 30 days of leaving the scheme (by 24 June 2026) to guarantee MHD terms are transferred without new underwriting.");
-  body.appendParagraph("• Alternative: You can log into the member portal (axahealth.co.uk/claim) and initiate a request via Live Chat, though a phone call may still be required to set up payment details.");
-  
-  doc.saveAndClose();
-  
-  // Move file to Workspace folder
-  const file = DriveApp.getFileById(doc.getId());
-  folder.addFile(file);
-  DriveApp.getRootFolder().removeFile(file);
-  
-  const docUrl = doc.getUrl();
-  
-  // 3. Create the new task
-  const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
-  const taskResource = {
-    title: "Call AXA to transfer group policy to personal plan",
-    notes: "Review one pager and make the call to complete transfer: " + docUrl,
-    due: "2026-05-31T23:59:59.000Z"
-  };
-  const taskResult = Tasks.Tasks.insert(taskResource, todoListId);
-  
-  return {
-    success: true,
-    completionResult: completionResult,
-    docUrl: docUrl,
-    docName: doc.getName(),
-    newTaskId: taskResult.id
-  };
-}
 
 function completeTaskById(taskId) {
   try {
@@ -1102,7 +1033,7 @@ function logHabit(habitName) {
   try {
     const ssId = SYSTEM_CONFIG.ROOTS.HABITS_SHEET_ID;
     const ss = SpreadsheetApp.openById(ssId);
-    let sheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.HABITS_LOG);
+    let sheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.HABITS_LOG);
     if (!sheet) {
       sheet = ss.getSheets()[0];
     }
@@ -1119,7 +1050,7 @@ function getHabitStreak(habitName) {
   try {
     const ssId = SYSTEM_CONFIG.ROOTS.HABITS_SHEET_ID;
     const ss = SpreadsheetApp.openById(ssId);
-    const sheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.HABITS_LOG) || ss.getSheets()[0];
+    const sheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.HABITS_LOG) || ss.getSheets()[0];
     if (!sheet) return 0;
     
     const data = sheet.getDataRange().getValues();
@@ -1197,7 +1128,7 @@ function generateWifieMessage() {
   try {
     // 1. Fetch WhatsApp context from Email_Log
     const ss = getMasterSpreadsheet();
-    const logSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
+    const logSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.EMAIL_LOG);
     let whatsappContext = "No recent WhatsApp context found.";
     
     if (logSheet) {
@@ -1489,7 +1420,7 @@ function getDashboardClerkLogs() { const startT = Date.now();
       return new Date(0);
     };
     
-    let notesLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.NOTES_LOG);
+    let notesLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.NOTES_LOG);
     if (!notesLogSheet) notesLogSheet = allSheets.find(s => s.getName().toLowerCase().includes('notes log') || s.getName().toLowerCase().includes('notes_log') || s.getName().toLowerCase() === 'files');
     if (notesLogSheet) {
       const lastRow = notesLogSheet.getLastRow();
@@ -1505,7 +1436,7 @@ function getDashboardClerkLogs() { const startT = Date.now();
       }
     }
     
-    let emailLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
+    let emailLogSheet = allSheets.find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.EMAIL_LOG);
     if (!emailLogSheet) emailLogSheet = allSheets.find(s => s.getName().toLowerCase().includes('email log') || s.getName().toLowerCase().includes('email_log') || s.getName().toLowerCase() === 'emails');
     if (emailLogSheet) {
       const lastRow = emailLogSheet.getLastRow();

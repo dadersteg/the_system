@@ -8,7 +8,7 @@ function updateLabelList() {
 const ss = getMasterSpreadsheet();
   
   // Try to find the Label Management tab (GID from Clerk) or default to creating a new one
-  const targetGid = 1007497112; 
+  const targetGid = parseInt(SYSTEM_CONFIG.SHEETS.LABEL_MANAGEMENT, 10); 
   const sheets = ss.getSheets();
   
   // ES6 Refactoring: Use find instead of iterative loop
