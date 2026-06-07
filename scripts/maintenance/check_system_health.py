@@ -275,7 +275,7 @@ def main():
     check_clasprc()
     
     # Check the_system token.json
-    sys_token = check_token_file('token.json', "the_system/token.json")
+    sys_token = check_token_file('auth/token.json', "the_system/token.json")
     verify_google_apis(sys_token, "the_system/token.json")
     
     # Check agy_quantum21 tokens

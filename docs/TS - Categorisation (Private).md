@@ -275,7 +275,7 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 
 | Code | Description |
 | :--- | :--- |
-| **01 Professional Admin** | Work-related admin, IT setup, policies. (Cross-links to Personal Admin). |
+| **01 Playmetech Admin** | Work-related admin, IT setup, policies. (Cross-links to Personal Admin). |
 | **02 Team & Operations** | 1-on-1s, team building, internal processes, and company culture. |
 | **03 Professional Growth** | Upskilling, training, and performance reviews relevant to Q21. |
 | **04 Finances** | Work-related expenses, benefits, and payslips. (Cross-links to Personal Finance). |

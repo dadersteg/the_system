@@ -111,7 +111,7 @@ def check_and_route_tasks(private_service, work_service):
         for lst in private_lists:
             list_id = lst['id']
             list_title = lst['title']
-            if "deleted" in list_title.lower(): continue
+            if "deleted" in list_title.lower() or "recurring" in list_title.lower(): continue
             
             tasks = private_service.tasks().list(tasklist=list_id, showCompleted=False).execute().get('items', [])
             for task in tasks:
@@ -151,7 +151,7 @@ def check_and_route_tasks(private_service, work_service):
         for lst in work_lists:
             list_id = lst['id']
             list_title = lst['title']
-            if "deleted" in list_title.lower(): continue
+            if "deleted" in list_title.lower() or "recurring" in list_title.lower(): continue
             
             tasks = work_service.tasks().list(tasklist=list_id, showCompleted=False).execute().get('items', [])
             for task in tasks:
@@ -207,7 +207,7 @@ def fetch_tasks_from_service(service, label):
         print(f"Failed to fetch tasks for {label}: {e}")
     return all_tasks
 
-def write_combined_markdown(private_tasks, work_tasks, output_path):
+def write_combined_markdown(private_tasks, work_tasks, output_path, same_account=False):
     """Writes the combined tasks list into a beautiful Markdown file."""
     now_str = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S")
     
@@ -220,7 +220,11 @@ def write_combined_markdown(private_tasks, work_tasks, output_path):
         
         # --- WORK SECTOR ---
         f.write(f"## 💼 Work Tasks (Quantum 21 / Playmetech)\n\n")
-        if not work_tasks:
+        if same_account:
+            f.write("> [!WARNING]\n")
+            f.write("> Work OAuth token is currently authenticated to the same Google Account as Private Tasks.\n")
+            f.write("> Work tasks are hidden here to prevent duplicate listing. Please re-authenticate your Work account token.\n\n")
+        elif not work_tasks:
             f.write("*No active work tasks found.*\n\n")
         else:
             for list_title, tasks in work_tasks.items():
@@ -269,7 +273,7 @@ def write_combined_markdown(private_tasks, work_tasks, output_path):
 
     print(f"Combined Markdown generated successfully at: {output_path}")
 
-def write_individual_markdown(tasks_dict, output_path, title_header):
+def write_individual_markdown(tasks_dict, output_path, title_header, same_account=False):
     """Writes an individual tasks list into a beautiful Markdown file."""
     now_str = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S")
     
@@ -277,7 +281,11 @@ def write_individual_markdown(tasks_dict, output_path, title_header):
         f.write(f"# {title_header}\n\n")
         f.write(f"*Last Aggregated: {now_str}*\n")
         
-        if not tasks_dict:
+        if same_account:
+            f.write("> [!WARNING]\n")
+            f.write("> Work OAuth token is currently authenticated to the same Google Account as Private Tasks.\n")
+            f.write("> Work tasks are hidden here to prevent duplicate listing. Please re-authenticate your Work account token.\n\n")
+        elif not tasks_dict:
             f.write("*No active tasks found.*\n\n")
         else:
             for list_title, tasks in tasks_dict.items():
@@ -306,14 +314,18 @@ def main():
     print("====================================================")
 
     # 1. Setup paths
-    # Fallback to token.json / creds.json for backwards-compatibility
-    private_token = 'token_tasks_private.json' if os.path.exists('token_tasks_private.json') else 'token_tasks.json'
-    private_creds = 'creds_private.json' if os.path.exists('creds_private.json') else 'creds.json'
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    auth_dir = os.path.realpath(os.path.join(script_dir, '../../auth'))
+
+    private_token = os.path.join(auth_dir, 'token_tasks_private.json' if os.path.exists(os.path.join(auth_dir, 'token_tasks_private.json')) else 'token_tasks.json')
+    private_creds = os.path.join(auth_dir, 'creds_private.json' if os.path.exists(os.path.join(auth_dir, 'creds_private.json')) else 'creds.json')
     
-    work_token = 'token_tasks_work.json'
-    work_creds = 'creds_work.json'
+    work_token = os.path.join(auth_dir, 'token_tasks_work.json')
+    work_creds = os.path.join(auth_dir, 'creds_work.json')
     
-    output_md = 'Google Tasks (Combined).md'
+    output_md = os.path.join(auth_dir, 'Google Tasks (Combined).md')
+    output_private_md = os.path.join(auth_dir, 'Google Tasks (Private).md')
+    output_work_md = os.path.join(auth_dir, 'Google Tasks (Work).md')
 
     # 2. Get Private API Service
     print("\n[Auth] Fetching credentials for Private Account...")
@@ -335,9 +347,24 @@ def main():
     else:
         print("Warning: Work Tasks API could not be connected. Skipping work sync.")
 
-    # 4. Run Routing Gateway (Requires both services)
+    # Check for same account token collision
+    same_account = False
     if private_service and work_service:
-        check_and_route_tasks(private_service, work_service)
+        try:
+            lists_p = private_service.tasklists().list(maxResults=1).execute().get('items', [])
+            lists_w = work_service.tasklists().list(maxResults=1).execute().get('items', [])
+            if lists_p and lists_w and lists_p[0]['id'] == lists_w[0]['id']:
+                same_account = True
+                print("⚠️  WARNING: Both Private and Work OAuth tokens point to the same Google Account!")
+        except Exception as e:
+            print(f"Error checking accounts match: {e}")
+
+    # 4. Run Routing Gateway (Requires both services, only if they are different accounts)
+    if private_service and work_service:
+        if not same_account:
+            check_and_route_tasks(private_service, work_service)
+        else:
+            print("[Gateway] Bypassing bi-directional routing to prevent infinite loops (Account collision).")
 
     # 5. Fetch Tasks
     private_tasks = {}
@@ -347,22 +374,22 @@ def main():
         print("\n[Sync] Fetching private tasks...")
         private_tasks = fetch_tasks_from_service(private_service, "Private")
         
-    if work_service:
+    if work_service and not same_account:
         print("\n[Sync] Fetching work tasks...")
         work_tasks = fetch_tasks_from_service(work_service, "Work")
 
     # 6. Generate combined markdown
     if private_service or work_service:
         print("\n[Output] Generating combined Markdown...")
-        write_combined_markdown(private_tasks, work_tasks, output_md)
+        write_combined_markdown(private_tasks, work_tasks, output_md, same_account=same_account)
         
     if private_service:
         print("\n[Output] Generating private Markdown...")
-        write_individual_markdown(private_tasks, "Google Tasks (Private).md", "Google Tasks (Private)")
+        write_individual_markdown(private_tasks, output_private_md, "Google Tasks (Private)")
         
     if work_service:
         print("\n[Output] Generating work Markdown...")
-        write_individual_markdown(work_tasks, "Google Tasks (Work).md", "Google Tasks (Work)")
+        write_individual_markdown(work_tasks, output_work_md, "Google Tasks (Work)", same_account=same_account)
         
     print("\nExecution complete.")
 
