@@ -24,7 +24,7 @@ const CONFIG = {
   includeHidden: false,    
   charLimit: 2000,         
   spreadsheetId: SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID,
-  targetGid: SYSTEM_CONFIG.SHEET_GIDS.TASK_REVIEW,
+  targetGid: SYSTEM_CONFIG.SHEETS.TASK_REVIEW,
   geminiBatchSize: 40      // Max tasks per Gemini prompt to avoid timeouts
 };
 
@@ -756,7 +756,7 @@ function loadExistingTaskMap(sheet, headers) {
  */
 function syncCompletedTasksLog() {
   const ss = getMasterSpreadsheet();
-  const COMPLETED_LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.COMPLETED_TASKS_LOG;
+  const COMPLETED_LOG_GID = SYSTEM_CONFIG.SHEETS.COMPLETED_TASKS_LOG;
   
   let completedSheet = ss.getSheets().find(s => s.getSheetId().toString() === COMPLETED_LOG_GID);
   if (!completedSheet) {

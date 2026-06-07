@@ -4,7 +4,7 @@
  */
 function updateModelList() {
   const ss = getMasterSpreadsheet();
-  const targetGid = 1704335578;
+  const targetGid = parseInt(SYSTEM_CONFIG.SHEETS.GEMINI_MODELS, 10);
   const sheets = ss.getSheets();
   
   const sheet = sheets.find(s => s.getSheetId() === targetGid);
