@@ -860,15 +860,7 @@ function writeOnePager(markdownStr, isDailyPlan) {
            file = DriveApp.getFileById(fileId);
            file.setContent(markdownStr);
         } else {
-           const files = folder.getFilesByName(fileName);
-           if (files.hasNext()) {
-              file = files.next();
-              file.setContent(markdownStr);
-           } else {
-              file = folder.createFile(fileName, markdownStr, MimeType.PLAIN_TEXT);
-           }
-           // Save the newly created or found file ID to UserProperties
-           PropertiesService.getUserProperties().setProperty("EXECUTION_PLAN_ID", file.getId());
+           console.error("Failed to resolve 1 Day Execution Plan ID from SYSTEM_CONFIG.");
         }
      } else {
         const files = folder.getFilesByName(fileName);
