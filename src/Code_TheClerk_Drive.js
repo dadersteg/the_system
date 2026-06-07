@@ -16,12 +16,12 @@ const DRIVE_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
 const DRIVE_MODEL_NAME = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE;
 
 const DRIVE_MASTER_SHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
-const DRIVE_LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_LOG;
-const DRIVE_SESSION_LOG_GID = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_SESSION_LOG;
+const DRIVE_LOG_GID = SYSTEM_CONFIG.SHEETS.DRIVE_LOG;
+const DRIVE_SESSION_LOG_GID = SYSTEM_CONFIG.SHEETS.DRIVE_SESSION_LOG;
 const DRIVE_RULES_SHEET_ID = SYSTEM_CONFIG.ROOTS.DRIVE_RULES_SHEET_ID;
 
-const DRIVE_FILENAME_RULES_GID = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_FILENAME_RULES; // Filename Rules Tab
-const DRIVE_FOLDER_RULES_GID = SYSTEM_CONFIG.SHEET_GIDS.DRIVE_FOLDER_RULES;   // Folder Rules Tab
+const DRIVE_FILENAME_RULES_GID = SYSTEM_CONFIG.SHEETS.DRIVE_FILENAME_RULES; // Filename Rules Tab
+const DRIVE_FOLDER_RULES_GID = SYSTEM_CONFIG.SHEETS.DRIVE_FOLDER_RULES;   // Folder Rules Tab
 
 /**
  * @constant {number} DRIVE_MAX_BATCH_SIZE
@@ -879,7 +879,7 @@ function fetchRecentContext(ss) {
     let contextStr = "--- RECENT CONTEXT (EMAILS & TASKS) ---\nUse this context to understand current ongoing activities and avoid duplicating tasks. If the file being processed relates to these, determine nuanced actions that move the work forward.\n\n";
     try {
         // Fetch Emails
-        const emailLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.EMAIL_LOG);
+        const emailLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.EMAIL_LOG);
         if (emailLogSheet) {
             const lastRow = emailLogSheet.getLastRow();
             if (lastRow > 1) {
@@ -895,7 +895,7 @@ function fetchRecentContext(ss) {
         }
         
         // Fetch Tasks
-        const taskLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEET_GIDS.TASK_REVIEW);
+        const taskLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.TASK_REVIEW);
         if (taskLogSheet) {
             const lastRow = taskLogSheet.getLastRow();
             if (lastRow > 2) {
