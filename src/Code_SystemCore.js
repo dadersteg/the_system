@@ -435,35 +435,9 @@ function processPromptText(textStr) {
 
 /**
  * Resolves the Google Drive File ID for the 1 Day Execution Plan.
- * Dynamically queries and saves the ID to UserProperties if not set.
  * @returns {string} The Google Drive File ID.
  */
 function getExecutionPlanId() {
-  try {
-    const props = PropertiesService.getUserProperties();
-    let id = props.getProperty("EXECUTION_PLAN_ID");
-    if (id && id.trim() !== "") {
-      return id;
-    }
-    
-    // Auto-discover the ID in the workspace folder
-    const folderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
-    if (!folderId) return null;
-    
-    const folder = DriveApp.getFolderById(folderId);
-    const suffix = isWorkAccount() ? " (Work)" : " (Private)";
-    const fileName = "TS - Task Master > 1 Day Execution Plan" + suffix + ".md";
-    const files = folder.getFilesByName(fileName);
-    if (files.hasNext()) {
-      const file = files.next();
-      id = file.getId();
-      props.setProperty("EXECUTION_PLAN_ID", id);
-      console.log(`Saved EXECUTION_PLAN_ID to UserProperties: ${id}`);
-      return id;
-    }
-  } catch (e) {
-    console.error("Error in getExecutionPlanId:", e.message);
-  }
-  return null;
+  return SYSTEM_CONFIG.GENERATED_OUTPUTS.DAY_1_EXECUTION_PLAN;
 }
 
