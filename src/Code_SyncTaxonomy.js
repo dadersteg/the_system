@@ -5,7 +5,7 @@
 
 function syncTaxonomyToSheet() {
   const sheetId = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
-  const targetGid = 1287896098;
+  const targetGid = SYSTEM_CONFIG.SHEETS.LOS_TAXONOMY;
 
   const fileId = SYSTEM_CONFIG.DOCS.TAXONOMY_DOC_ID;
   if (!fileId) throw new Error("TAXONOMY_DOC_ID is not configured in Script Properties or Code_Config.js.");
@@ -91,8 +91,12 @@ function syncTaxonomyToSheet() {
         }
       }
       
+      let m1 = line.match(l1Regex);
+      if (m1) {
+        currentSection = 'core';
+      }
+
       if (currentSection === 'core') {
-        let m1 = line.match(l1Regex);
         if (m1) {
           currentL1Code = m1[1].trim();
           currentL1Name = m1[2].trim();
@@ -423,18 +427,8 @@ function syncTaxonomyToSheet() {
     row.push(driveParts.join("/"));
   }
 
-  // Adjust labels for Work account context (remove redundant Playmetech nested path prefix)
-  if (isWork) {
-    const workPrefix = "02 Work/01 Employment/01 Playmetech/";
-    for (let i = 1; i < data.length; i++) {
-      let label = data[i][8];
-      if (label && label.indexOf(workPrefix) === 0) {
-        data[i][8] = label.substring(workPrefix.length);
-      } else if (label === "02 Work/01 Employment/01 Playmetech") {
-        data[i][8] = "Playmetech";
-      }
-    }
-  }
+  // Adjust labels for Work account context 
+  // (Obsolete logic for stripping '02 Work/01 Employment/01 Playmetech/' removed as PMT is now flat)
 
   // Dump to sheet
   const ss = SpreadsheetApp.openById(sheetId);
