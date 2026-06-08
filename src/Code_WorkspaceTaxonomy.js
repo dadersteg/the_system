@@ -14,22 +14,7 @@ function syncTaxonomyToSheet() {
   
   const isWork = isWorkAccount();
 
-  // 1. Add Niklas Johansson if not present (Private/LOS only)
-  if (!isWork && !text.includes("Niklas Johansson")) {
-    text = text.replace(
-      "| **Mamma & Pappa** | Parents. |",
-      "| **Mamma & Pappa** | Parents. |\n\n| **Niklas Johansson** | Friend. |"
-    );
-  }
 
-  // 2. Update 98 to 99 for SMS, Telegram, WhatsApp (Private/LOS only)
-  if (!isWork) {
-    text = text.replace(/\* \*\*98 SMS:\*\*/g, "* **99 SMS:**");
-    text = text.replace(/\* \*\*98 Telegram:\*\*/g, "* **99 Telegram:**");
-    text = text.replace(/\* \*\*98 WhatsApp:\*\*/g, "* **99 WhatsApp:**");
-    // Save the updated text back to Google Drive
-    file.setContent(text);
-  }
 
   const lines = text.split("\n");
   const data = [];
