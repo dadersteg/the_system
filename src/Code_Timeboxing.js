@@ -171,10 +171,14 @@ function scheduleTasksToCalendar(tasks) {
       const endParts = task.endTime.split(':');
       
       if (startParts.length === 2 && endParts.length === 2) {
-        const startH = parseInt(startParts[0], 10);
+        let startH = parseInt(startParts[0], 10);
         const startM = parseInt(startParts[1], 10);
-        const endH = parseInt(endParts[0], 10);
+        let endH = parseInt(endParts[0], 10);
         const endM = parseInt(endParts[1], 10);
+        
+        // Auto-correct 12-hour format mistakes (1 AM - 6 AM -> 1 PM - 6 PM)
+        if (startH >= 1 && startH <= 6) startH += 12;
+        if (endH >= 1 && endH <= 7) endH += 12;
         
         const proposedStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startH, startM, 0);
         const proposedEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endH, endM, 0);
