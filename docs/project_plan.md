@@ -29,10 +29,10 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 ### Phase B: Google Tasks Reconciliation MVP (Parallel Workstream) [✅ COMPLETED]
 *Frontloading the ability to review, edit, and categorize existing tasks while the rest of the system is built.*
 *   **[x] Task B.1:** Refactor `Code_Tasks.js` into production-ready code (clean architecture, strict commenting, error handling).
-*   **[x] Task B.2:** Build a bi-directional spreadsheet sync (Export Google Tasks to Sheets, and Ingest manual Sheet edits back into Google Tasks).
+*   **[x] Task B.2:** Build a bi-directional spreadsheet sync (Export Google Tasks to Sheets, and Ingest manual Sheet edits back into Google Tasks). *Note: The spreadsheet edit synchronization has been retired to simplify the architecture.*
 *   **[x] Task B.3:** Integrate the Gemini API to automatically summarize any emails linked to the tasks.
 *   **[x] Task B.4:** Integrate the Gemini API to autonomously categorize the tasks within the spreadsheet.
-*   **[ ] Task B.5:** Timeboxing MVP: Add functionality to the sync that allows assigning an "Estimated Duration" to a task in the spreadsheet and automatically creating a corresponding Calendar Event block.
+*   **[x] Task B.5:** Timeboxing MVP: Add functionality to the sync that allows assigning an "Estimated Duration" to a task in the spreadsheet and automatically creating a corresponding Calendar Event block.
 
 ### Phase C: Set Up the Funnel (Data Ingestion) [✅ COMPLETED]
 *Ensuring all incoming data ends up in one place.*
@@ -81,6 +81,7 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *   **[ ] Task E.8:** Semi-automate reflection: Semi-automate the reflection process using Atlas to cross-reference the Audit Table with your subjective journaling to ensure alignment with your goals.
 *   **[x] Task E.9:** Dashboard Design Polish: Polish interactive buttons, navigation items, and dropdown menus with custom transition animations and direct state binding fixes.
 *   **[x] Task E.10:** Taxonomy Omni-Sync: Bidirectional Maintenance: Categorization processes are established. Financial taxonomy and recurring service utilities have been synchronized across the LOS documentation and Google Drive infrastructure.
+*   **[x] Task E.11:** Antigravity Skills: Define and verify native Antigravity skills for Socratic planning (/planning_review) and reflection (/reflection_review) reviews.
 
 ### Phase F: Conversational Personas (Gemini Gems Setup) [✅ COMPLETED]
 *Bringing the static personas to life as interactive consultants.*

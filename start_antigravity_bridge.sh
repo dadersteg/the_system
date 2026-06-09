@@ -6,7 +6,7 @@
 
 # 1. Environment variables for the Telegram Bot
 # Replace these with your actual Token and Telegram User ID before running
-export TELEGRAM_BOT_TOKEN="8624910336:AAEaK9eyryEMrZ8QzhD7sj_h1QDfNpZMl08"
+export TELEGRAM_BOT_TOKEN="8624910336:AAHT1MszcupFu5wcwdeRv7wxMsmYjLhwwvI"
 export TELEGRAM_USER_ID="5379934761"
 
 echo "========================================="
