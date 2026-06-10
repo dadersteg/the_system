@@ -518,7 +518,7 @@ function syncCompletedTasksLog() {
                   if (match) link = match[0];
                 }
                 
-                rowsToAdd.push([task.id, task.title, task.notes || "", link, task.completed || task.updated]);
+                rowsToAdd.push([task.id, task.title, task.notes || "", link, task.completed || task.updated, "Completed"]);
                 existingIds.add(task.id);
                 addedCount++;
               }
@@ -560,6 +560,22 @@ function purgeToBeDeletedTasks() {
     return;
   }
   
+  const ss = getMasterSpreadsheet();
+  const COMPLETED_LOG_GID = SYSTEM_CONFIG.SHEETS.COMPLETED_TASKS_LOG;
+  let completedSheet = ss.getSheets().find(s => s.getSheetId().toString() === COMPLETED_LOG_GID);
+  
+  let existingIds = new Set();
+  if (completedSheet) {
+    try {
+      const existingData = completedSheet.getDataRange().getValues();
+      for (let i = 1; i < existingData.length; i++) {
+        existingIds.add(existingData[i][0]);
+      }
+    } catch (e) {
+      console.warn("Could not read existing data from completed log: " + e.message);
+    }
+  }
+  
   let pageToken;
   let deletedCount = 0;
   
@@ -573,14 +589,40 @@ function purgeToBeDeletedTasks() {
       }));
       
       const items = response.items || [];
+      const rowsToAdd = [];
+      
       for (const t of items) {
          try {
+           if (completedSheet && !existingIds.has(t.id)) {
+              let link = "";
+              if (t.links) {
+                const emailLinkObj = t.links.find(l => l.type === "email");
+                if (emailLinkObj) link = emailLinkObj.link;
+              } else if (t.notes) {
+                const match = t.notes.match(/https?:\/\/[^\s]+/);
+                if (match) link = match[0];
+              }
+              rowsToAdd.push([t.id, t.title, t.notes || "", link, t.updated || new Date().toISOString(), "Deleted"]);
+              existingIds.add(t.id);
+           }
+           
            executeWithRetry(() => Tasks.Tasks.remove(deleteListId, t.id));
            deletedCount++;
+           Utilities.sleep(500); // Rate-limit protection to avoid hitting quota
          } catch (e) {
            console.error(`Failed to delete task ${t.id}: ${e.message}`);
          }
       }
+      
+      if (completedSheet && rowsToAdd.length > 0) {
+         const lastRow = completedSheet.getLastRow();
+         if (lastRow === 0) {
+            completedSheet.getRange(1, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
+         } else {
+            completedSheet.getRange(lastRow + 1, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
+         }
+      }
+      
       pageToken = response.nextPageToken;
     } catch (e) {
       console.error(`Failed to fetch tasks from To Be Deleted list: ${e.message}`);
