@@ -107,6 +107,15 @@ module.exports = {
       autorestart: false,
       out_file: "logs/github_sync_out.log",
       error_file: "logs/github_sync_err.log"
+    },
+    {
+      name: "trigger-jules-daily",
+      script: "scripts/maintenance/trigger_jules.js",
+      cwd: "/Users/daniel/Documents/AGY/the_system",
+      cron_restart: "0 4 * * *", // Runs daily at 4:00 AM
+      autorestart: false,
+      out_file: "logs/trigger_jules_out.log",
+      error_file: "logs/trigger_jules_err.log"
     }
   ]
 };
