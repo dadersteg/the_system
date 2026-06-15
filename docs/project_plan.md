@@ -126,3 +126,9 @@ The end goal is a **Fully Unified, Semi-Autonomous "AI Executive Suite."**
 *Integrating Google Chat as a consolidated messaging workspace.*
 *   **[ ] Task L.1:** Set up one-way ingestion routing from WhatsApp/Telegram/Messenger bridges to dedicated Google Chat spaces (utilizing webhook endpoints on a Business Standard Google Workspace account).
 *   **[ ] Task L.2:** Build a bidirectional sync daemon that polls the Apps Script outbound queue and dispatches replies written inside Google Chat back to the messaging bridges.
+
+### Phase M: Drive Knowledge Management (Projects Integration)
+*Integrating Google Workspace "Projects" to provide dynamic AI grounding without disrupting existing shortcut-based workflows.*
+*   **[ ] Task M.1 (Rollout Dependent):** AI Projects Setup. Once Google Workspace "Projects" is generally available for our account tier, create dedicated Project containers for major personas (e.g., The Clerk, System Architect, Vantage).
+*   **[ ] Task M.2:** Link canonical files into these Projects as reference materials to establish bounded contexts for Gemini `/grill-me` sessions.
+*   **[ ] Task M.3:** Maintain existing `.shortcut` architecture. Shortcuts will continue to serve as quick manual navigational aids for the Ministry of Workflows, while Projects will handle AI-driven synthesis.

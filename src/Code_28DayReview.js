@@ -133,7 +133,7 @@ function write28DayReport(markdownStr) {
   const fileId = SYSTEM_CONFIG.GENERATED_OUTPUTS.DAY_28_STRATEGIC;
   if (!fileId) {
      console.error("Missing ID for DAY_28_STRATEGIC. Creating file...");
-     const suffix = IS_WORK_ENV ? " (Work)" : " (Private)";
+     const suffix = IS_PMT_ENV ? " (PMT)" : " (Private)";
      const fileName = `TS - Task Master > 28 Day Strategic Pruning${suffix}.md`;
      const file = DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID).createFile(fileName, markdownStr, MimeType.PLAIN_TEXT);
      console.warn(`CREATED NEW FILE! Update config: ${file.getId()}`);

@@ -7,7 +7,7 @@ This document outlines the strict boolean logic and prioritization algorithms th
 Before a task is routed, it must pass the Goal Alignment test.
 *   **Condition:** Does this task demonstrably advance a core Personal or Work Goal?
 *   **Action (True):** Proceed to Eisenhower routing.
-*   **Action (False):** Is it a mandatory administrative chore (e.g., paying taxes)? If yes, route to Backlog or This Week. If no, **PROPOSE_DELETE**. Do not allow noise to consume bandwidth.
+*   **Action (False):** Is it a mandatory administrative chore (e.g., paying taxes)? If yes, route to Backlog or This Week. If no, **DELETE**. Do not allow noise to consume bandwidth.
 
 ## 2. The Eisenhower Algorithm (Urgency vs Importance)
 All tasks must be mapped to a quadrant.
@@ -21,10 +21,10 @@ All tasks must be mapped to a quadrant.
     *   *Rule:* Assign a firm `recommendedDeadline` to force execution.
 *   **Q3: Delegate/Automate (Not Important & Urgent)**
     *   *Definition:* Interruptions, administrative noise, favors for others that do not advance core goals.
-    *   *Routing:* `BACKLOG` (to strip urgency) or `PROPOSE_DELETE`. 
+    *   *Routing:* `BACKLOG` (to strip urgency) or `DELETE`. 
 *   **Q4: Delete (Not Important & Not Urgent)**
     *   *Definition:* Distractions, vague ideas, obsolete notes.
-    *   *Routing:* `PROPOSE_DELETE`.
+    *   *Routing:* `DELETE`.
 
 ## 3. "Eat the Frog" (The 1 Day Apex)
 When synthesizing the `TODAY'S FOCUS` list for the Priority One-Pager, you must identify the single most critical task.

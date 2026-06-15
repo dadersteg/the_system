@@ -12,7 +12,7 @@ function syncTaxonomyToSheet() {
   const file = DriveApp.getFileById(fileId);
   let text = file.getBlob().getDataAsString();
   
-  const isWork = isWorkAccount();
+  const isPmt = isPmtAccount();
 
 
 
@@ -22,7 +22,7 @@ function syncTaxonomyToSheet() {
 
   const clean = (name) => name ? name.replace("(Standing Contexts)", "").replace("(Active)", "").replace("(Passive)", "").replace(/\[AGGREGATOR\]/gi, "").trim() : "";
 
-  if (isWork) {
+  if (isPmt) {
     // Parse using PMT flat taxonomy logic
     let currentSection = null; // 'core', 'strategies', 'goals'
     let currentL1Code = "";
@@ -118,7 +118,8 @@ function syncTaxonomyToSheet() {
             currentL1Code, currentL1Name,
             "", "", "", "",
             labelCode, desc,
-            labelCode, labelCode
+            `${currentL1Name}/${labelCode}`,
+            `${currentL1Name} > ${labelCode}`
           ]);
         }
       }
@@ -412,7 +413,7 @@ function syncTaxonomyToSheet() {
     row.push(driveParts.join("/"));
   }
 
-  // Adjust labels for Work account context 
+  // Adjust labels for PMT account context 
   // (Obsolete logic for stripping '02 Work/01 Employment/01 Playmetech/' removed as PMT is now flat)
 
   // Dump to sheet
@@ -446,14 +447,14 @@ function syncTaxonomyToSheet() {
      for(let j=0; j<data[0].length; j++) {
         obj[data[0][j]] = row[j];
      }
-     if (isWork && row[6]) {
+     if (isPmt && row[6]) {
         obj["L4 Code"] = row[6];
      }
      jsonOutput.push(obj);
      csvRows.push(row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","));
   }
 
-  const taxPrefix = isWork ? "PMTOS_Taxonomy" : "LOS_Taxonomy";
+  const taxPrefix = isPmt ? "PMTOS_Taxonomy" : "LOS_Taxonomy";
 
   const jsonBlob = Utilities.newBlob(JSON.stringify(jsonOutput, null, 2), "application/json", taxPrefix + ".json");
   const csvBlob = Utilities.newBlob(csvRows.join("\n"), "text/csv", taxPrefix + ".csv");
@@ -624,7 +625,7 @@ function syncDriveFoldersFromTaxonomy() {
       return;
     }
 
-    const isWork = isWorkAccount();
+    const isPmt = isPmtAccount();
     const BATCH_SIZE = 10;
     const TARGET_DEPTH = 4;
 
@@ -702,7 +703,7 @@ function syncDriveFoldersFromTaxonomy() {
       endIndex = i;
       const item = taxonomy[i];
 
-      if (isWork && !item["L4 Code"]) {
+      if (isPmt && !item["L4 Code"]) {
         continue;
       }
 
@@ -822,7 +823,7 @@ function resolveFolderFromTaxonomy(concatPath, taxonomy) {
   const folderNames = item["Drive Path"] ? item["Drive Path"].split("/").map(s => s.trim()) : [];
   if (folderNames.length === 0) return null;
 
-  const isWork = isWorkAccount();
+  const isPmt = isPmtAccount();
 
   // Traverse down from the root / workspace root
   let currentFolder = DriveApp.getRootFolder();

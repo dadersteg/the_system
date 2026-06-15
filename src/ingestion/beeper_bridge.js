@@ -82,7 +82,10 @@ try {
     console.log("No blocked_threads.json found or invalid format.");
 }
 
-// --- CHAT CACHE & RESOLUTION ---
+// --- DEDUPLICATION CACHE ---
+const processedMessageIds = new Set();
+const processedMessageTimes = [];
+
 const chatCache = {};
 
 async function getChatDetails(chatID) {
@@ -247,6 +250,23 @@ async function sendToGmail(compiledText, network, chatTitle, attachments = [], c
 // Helper function to process messages
 async function processMessage(msg) {
     try {
+        const msgId = msg.id;
+        if (msgId) {
+            if (processedMessageIds.has(msgId)) {
+                console.log(`Ignoring duplicate event for message ID: ${msgId}`);
+                return;
+            }
+            processedMessageIds.add(msgId);
+            processedMessageTimes.push({ id: msgId, timestamp: Date.now() });
+
+            // Clean up cache of IDs older than 24 hours
+            const expiryTime = Date.now() - 24 * 60 * 60 * 1000;
+            while (processedMessageTimes.length > 0 && processedMessageTimes[0].timestamp < expiryTime) {
+                const expired = processedMessageTimes.shift();
+                processedMessageIds.delete(expired.id);
+            }
+        }
+
         const chatID = msg.chatID;
         const chatDetails = await getChatDetails(chatID);
         const network = chatDetails.network;
@@ -357,7 +377,7 @@ function connectBeeperWS() {
                 console.log("DUMPING MESSAGE EVENT:", JSON.stringify(event, null, 2));
                 if (event.entries && Array.isArray(event.entries)) {
                     for (let entry of event.entries) {
-                        entry.chatID = event.chatID;
+                        entry.chatID = entry.chatID || event.chatID;
                         await processMessage(entry);
                     }
                 } else {

@@ -19,7 +19,14 @@ let _cachedMasterSheet = null;
  */
 function getMasterSpreadsheet() {
   if (!_cachedMasterSheet) {
-    _cachedMasterSheet = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    try {
+      _cachedMasterSheet = SpreadsheetApp.getActiveSpreadsheet();
+    } catch (e) {
+      // Standalone script context throws exception for getActiveSpreadsheet
+    }
+    if (!_cachedMasterSheet) {
+      _cachedMasterSheet = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+    }
   }
   return _cachedMasterSheet;
 }
@@ -33,7 +40,7 @@ function setupSystemTriggers() {
   try {
     const triggers = ScriptApp.getProjectTriggers();
 
-    console.log(`[INIT] Found ${triggers.length} existing triggers. Wiping slate clean for ${IS_WORK_ENV ? 'WORK' : 'PRIVATE'} environment...`);
+    console.log(`[INIT] Found ${triggers.length} existing triggers. Wiping slate clean for ${IS_PMT_ENV ? 'PMT' : 'PRIVATE'} environment...`);
     for (let i = 0; i < triggers.length; i++) {
       ScriptApp.deleteTrigger(triggers[i]);
     }
@@ -44,6 +51,7 @@ function setupSystemTriggers() {
     ScriptApp.newTrigger("runTheClerkEmailOngoing").timeBased().everyMinutes(10).create();
     ScriptApp.newTrigger("runTheClerkDriveOngoing").timeBased().everyMinutes(1).create();
     ScriptApp.newTrigger("runTheClerkNotes").timeBased().everyMinutes(15).create();
+    ScriptApp.newTrigger("runDriveArchaeologist").timeBased().everyDays(1).atHour(2).create();
 
     // ========================================================
     // 2. TASK ENGINE & REVIEWS (AI Analysis and Gating)
@@ -62,6 +70,7 @@ function setupSystemTriggers() {
     ScriptApp.newTrigger("updateTaskList").timeBased().everyDays(1).atHour(2).create();
     ScriptApp.newTrigger("syncTaxonomyToSheet").timeBased().everyHours(1).create();
     ScriptApp.newTrigger("exportTriageTasksToDrive").timeBased().everyDays(1).atHour(2).create();
+    ScriptApp.newTrigger("exportTrackers").timeBased().everyHours(1).create();
 
     // ========================================================
     // 4. EXCLUDED PIPELINES (Managed by Python / User)
@@ -74,7 +83,7 @@ function setupSystemTriggers() {
     // - run1DayTaskMaintenance
     // - runTheClerkDriveRetro
 
-    console.log(`[SUCCESS] All valid system triggers have been provisioned for the ${IS_WORK_ENV ? 'WORK' : 'PRIVATE'} environment.`);
+    console.log(`[SUCCESS] All valid system triggers have been provisioned for the ${IS_PMT_ENV ? 'PMT' : 'PRIVATE'} environment.`);
   } catch (e) {
     console.error(`setupSystemTriggers failed: ${e.message}`);
   }
@@ -364,11 +373,11 @@ function getDrivePromptStr() {
 let _cachedIsWorkAccount = null;
 
 /**
- * Checks if the executing account is the Work account (daniel@playmetech.net).
+ * Checks if the executing account is the PMT account (daniel@playmetech.net).
  * Memoized to prevent redundant PropertiesService and Session API calls.
- * @returns {boolean} True if Work account, false otherwise.
+ * @returns {boolean} True if PMT account, false otherwise.
  */
-function isWorkAccount() {
+function isPmtAccount() {
   if (_cachedIsWorkAccount !== null) {
     return _cachedIsWorkAccount;
   }
@@ -413,21 +422,21 @@ function isWorkAccount() {
 }
 
 /**
- * Dynamically translates LOS references to WoS references when running on the Work account.
+ * Dynamically translates LOS references to PMTOS references when running on the PMT account.
  * 
  * @param {string} textStr The prompt template text.
  * @returns {string} The translated prompt template text.
  */
 function processPromptText(textStr) {
   if (!textStr) return "";
-  if (typeof isWorkAccount === 'function' && isWorkAccount()) {
+  if (typeof isPmtAccount === 'function' && isPmtAccount()) {
     return textStr
-      .replace(/\bLife Organisation System \(LOS\)/g, "Work Organisation System (WoS)")
-      .replace(/\bLife Organisation System\b/g, "Work Organisation System")
+      .replace(/\bLife Organisation System \(LOS\)/g, "Playmetech Organisation System (PMTOS)")
+      .replace(/\bLife Organisation System\b/g, "Playmetech Organisation System")
       .replace(/\bLOS_Taxonomy\b/g, "PMTOS_Taxonomy")
-      .replace(/\bLOS taxonomy\b/g, "WoS taxonomy")
-      .replace(/\bLOS Taxonomy\b/g, "WoS Taxonomy")
-      .replace(/\bLOS\b/g, "WoS")
+      .replace(/\bLOS taxonomy\b/g, "PMTOS taxonomy")
+      .replace(/\bLOS Taxonomy\b/g, "PMTOS Taxonomy")
+      .replace(/\bLOS\b/g, "PMTOS")
       .replace(/\blos\b/g, "wos");
   }
   return textStr;

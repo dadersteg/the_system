@@ -98,3 +98,24 @@ function getAllTaskListsFromCLI() {
     return JSON.stringify({ error: e.message });
   }
 }
+
+function dumpRecentEmailTasks() {
+  const ss = getMasterSpreadsheet();
+  const LOG_GID = IS_PMT_ENV ? "2131515996" : "967747913";
+  const sheet = ss.getSheets().find(s => s.getSheetId().toString() === LOG_GID);
+  if (!sheet) {
+    console.log("Sheet not found");
+    return;
+  }
+  const data = sheet.getDataRange().getValues();
+  const recent = data.slice(-20);
+  recent.forEach(row => {
+    const ts = row[0];
+    const subject = row[3];
+    const actions = row[13];
+    const synced = row[14];
+    if (actions && actions.trim() !== "") {
+      console.log(`[${ts}] Subject: ${subject} | Actions: ${actions} | Synced: ${synced}`);
+    }
+  });
+}

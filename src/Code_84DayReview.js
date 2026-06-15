@@ -141,7 +141,7 @@ function write84DayReport(markdownStr) {
   const fileId = SYSTEM_CONFIG.GENERATED_OUTPUTS.DAY_84_STRATEGIC;
   if (!fileId) {
      console.error("Missing ID for DAY_84_STRATEGIC. Creating file...");
-     const suffix = IS_WORK_ENV ? " (Work)" : " (Private)";
+     const suffix = IS_PMT_ENV ? " (PMT)" : " (Private)";
      const fileName = `TS - Task Master > 84 Day Strategic Reflection${suffix}.md`;
      const file = DriveApp.getFolderById(SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID).createFile(fileName, markdownStr, MimeType.PLAIN_TEXT);
      console.warn(`CREATED NEW FILE! Update config: ${file.getId()}`);
