@@ -152,34 +152,9 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
     }
     
     // ATTACHMENT EXTRACTION (MULTIMODAL SUPPORT FOR RECEIPTS, FLYERS, PDFs)
-    let inlineImages = [];
-    try {
-      const attachments = lastMsg.getAttachments();
-      for (let att of attachments) {
-        const mime = att.getContentType();
-        const size = att.getSize();
-        
-        // Conditions for valid multimodal attachments:
-        // 1. Image: Ignore tiny signatures (< 10KB)
-        // 2. PDF: Restrict size to < 4MB to prevent Google Apps Script memory crashes
-        const isImage = mime.startsWith('image/') && size > 10240;
-        const isSmallPdf = mime === 'application/pdf' && size < 4 * 1024 * 1024;
-        const isHugePdf = mime === 'application/pdf' && size >= 4 * 1024 * 1024;
-        
-        if (isImage || isSmallPdf) {
-          inlineImages.push({
-            mimeType: mime,
-            data: Utilities.base64Encode(att.getBytes())
-          });
-          if (inlineImages.length >= 2) break; // Cap at 2 attachments per run to prevent payload bloat
-        } else if (isHugePdf) {
-          // If the PDF is too large, pass a system note explicitly OUTSIDE the body
-          systemNotes += `\n- This email contains a large PDF attachment ("${att.getName()}", ${(size / (1024 * 1024)).toFixed(2)} MB) which exceeds the automated processing limit. You MUST extract an action item to "Manually review large PDF attachment: ${att.getName()}".`;
-        }
-      }
-    } catch (e) {
-      console.warn(`Failed to extract images for thread ${threadId}: ${e.message}`);
-    }
+    const attachmentData = _extractMultimodalAttachments(lastMsg);
+    let inlineImages = attachmentData.inlineImages;
+    systemNotes += attachmentData.systemNotes;
     const threadUrl = `https://mail.google.com/mail/u/0/#all/${threadId}`;
     
     const firstMsgDate = Utilities.formatDate(firstMsg.getDate(), "GMT", "yyyy-MM-dd HH:mm:ss");
@@ -196,47 +171,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
       .filter(n => n !== PROCESSED_FLAG);
     
     // 3. Spreadsheet Logic (Deterministic Override)
-    let tempLabels = [];
-    let keepInInboxVals = [];
-    let markAsReadVals = [];
-    let skipAIVals = [];
-    
-    // Evaluate combined deterministic rules
-    const lowerSender = sender.toLowerCase();
-    const lowerSubject = subject.toLowerCase();
-    const lowerBody = body.toLowerCase();
-    
-    deterministicRules.forEach(rule => {
-      let isMatch = true;
-      
-      // Check each non-null condition using AND logic
-      if (rule.sender && !lowerSender.includes(rule.sender)) {
-        isMatch = false;
-      }
-      if (rule.subject && !lowerSubject.includes(rule.subject)) {
-        isMatch = false;
-      }
-      if (rule.emailContains && !lowerBody.includes(rule.emailContains)) {
-        isMatch = false;
-      }
-      
-      if (isMatch) {
-        if (rule.labels && rule.labels.length > 0) tempLabels.push(...rule.labels);
-        keepInInboxVals.push(rule.keepInInbox);
-        markAsReadVals.push(rule.markAsRead);
-        skipAIVals.push(rule.skipAI);
-      }
-    });
-    
-    let ssMatch = null;
-    if (tempLabels.length > 0 || keepInInboxVals.length > 0 || skipAIVals.length > 0) {
-       ssMatch = {
-         labels: [...new Set(tempLabels)],
-         keepInInbox: keepInInboxVals.length > 0 ? keepInInboxVals.some(v => v === true) : true,
-         markAsRead: markAsReadVals.some(v => v === true),
-         skipAI: skipAIVals.some(v => v === true)
-       };
-    }
+    let ssMatch = _evaluateDeterministicRules(sender, subject, body, deterministicRules);
     const ssLabels = ssMatch ? ssMatch.labels : [];
 
     // 4. AI Inference
@@ -514,15 +449,21 @@ function writeBatchLogEntries(batchLogsArray, isRetro) {
 
   const rowsToWrite = [];
 
+  const headerMap = new Map();
+  headers.forEach((h, i) => {
+    headerMap.set(h.toString().trim().toLowerCase(), i);
+  });
+
   batchLogsArray.forEach(rowObj => {
     const newRow = new Array(headers.length).fill("");
     Object.keys(rowObj).forEach(key => {
-      let idx = headers.findIndex(h => h.toString().trim().toLowerCase() === key.toLowerCase());
-      if (idx !== -1) {
-        newRow[idx] = rowObj[key];
+      const lowerKey = key.toLowerCase();
+      if (headerMap.has(lowerKey)) {
+        newRow[headerMap.get(lowerKey)] = rowObj[key];
       } else {
         headers.push(key);
         newRow.push(rowObj[key]);
+        headerMap.set(lowerKey, headers.length - 1);
         sheet.getRange(headerRowIdx + 1, headers.length).setValue(key);
       }
     });
@@ -535,6 +476,83 @@ function writeBatchLogEntries(batchLogsArray, isRetro) {
 }
 
 // --- CORE UTILITIES ---
+
+/**
+ * Extracts valid multimodal attachments (images, small PDFs) and builds system notes for huge PDFs.
+ * @param {GoogleAppsScript.Gmail.GmailMessage} lastMsg
+ * @returns {Object} { inlineImages: Array, systemNotes: string }
+ */
+function _extractMultimodalAttachments(lastMsg) {
+  let inlineImages = [];
+  let systemNotes = "";
+  try {
+    const attachments = lastMsg.getAttachments();
+    for (let att of attachments) {
+      const mime = att.getContentType();
+      const size = att.getSize();
+
+      const isImage = mime.startsWith('image/') && size > 10240;
+      const isSmallPdf = mime === 'application/pdf' && size < 4 * 1024 * 1024;
+      const isHugePdf = mime === 'application/pdf' && size >= 4 * 1024 * 1024;
+
+      if (isImage || isSmallPdf) {
+        inlineImages.push({
+          mimeType: mime,
+          data: Utilities.base64Encode(att.getBytes())
+        });
+        if (inlineImages.length >= 2) break;
+      } else if (isHugePdf) {
+        systemNotes += `\n- This email contains a large PDF attachment ("${att.getName()}", ${(size / (1024 * 1024)).toFixed(2)} MB) which exceeds the automated processing limit. You MUST extract an action item to "Manually review large PDF attachment: ${att.getName()}".`;
+      }
+    }
+  } catch (e) {
+    console.warn(`Failed to extract images: ${e.message}`);
+  }
+  return { inlineImages: inlineImages, systemNotes: systemNotes };
+}
+
+/**
+ * Evaluates sender, subject, and body against deterministic rules from the spreadsheet.
+ * @param {string} sender
+ * @param {string} subject
+ * @param {string} body
+ * @param {Array} deterministicRules
+ * @returns {Object|null}
+ */
+function _evaluateDeterministicRules(sender, subject, body, deterministicRules) {
+  let tempLabels = [];
+  let keepInInboxVals = [];
+  let markAsReadVals = [];
+  let skipAIVals = [];
+
+  const lowerSender = sender.toLowerCase();
+  const lowerSubject = subject.toLowerCase();
+  const lowerBody = body.toLowerCase();
+
+  deterministicRules.forEach(rule => {
+    let isMatch = true;
+    if (rule.sender && !lowerSender.includes(rule.sender)) isMatch = false;
+    if (rule.subject && !lowerSubject.includes(rule.subject)) isMatch = false;
+    if (rule.emailContains && !lowerBody.includes(rule.emailContains)) isMatch = false;
+
+    if (isMatch) {
+      if (rule.labels && rule.labels.length > 0) tempLabels.push(...rule.labels);
+      keepInInboxVals.push(rule.keepInInbox);
+      markAsReadVals.push(rule.markAsRead);
+      skipAIVals.push(rule.skipAI);
+    }
+  });
+
+  if (tempLabels.length > 0 || keepInInboxVals.length > 0 || skipAIVals.length > 0) {
+     return {
+       labels: [...new Set(tempLabels)],
+       keepInInbox: keepInInboxVals.length > 0 ? keepInInboxVals.some(v => v === true) : true,
+       markAsRead: markAsReadVals.some(v => v === true),
+       skipAI: skipAIVals.some(v => v === true)
+     };
+  }
+  return null;
+}
 
 function callLLMWithSourceContext(subject, from, body, docInstructions, taxonomyJson, existing, ss, isRetro, modelName, inlineImages, systemNotes, personalGoalsStr, workGoalsStr, openTasksStr) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`;
