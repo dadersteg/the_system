@@ -109,13 +109,34 @@ module.exports = {
       error_file: "logs/github_sync_err.log"
     },
     {
-      name: "trigger-jules-daily",
+      name: "trigger-jules-minor",
       script: "scripts/maintenance/trigger_jules.js",
+      args: "--minor",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "0 4 * * *", // Runs daily at 4:00 AM
+      cron_restart: "0 4,16 * * *", // Twice a day: 4 AM and 4 PM
       autorestart: false,
-      out_file: "logs/trigger_jules_out.log",
-      error_file: "logs/trigger_jules_err.log"
+      out_file: "logs/trigger_jules_minor_out.log",
+      error_file: "logs/trigger_jules_minor_err.log"
+    },
+    {
+      name: "trigger-jules-ui",
+      script: "scripts/maintenance/trigger_jules.js",
+      args: "--ui",
+      cwd: "/Users/daniel/Documents/AGY/the_system",
+      cron_restart: "0 5,17 * * *", // Twice a day: 5 AM and 5 PM
+      autorestart: false,
+      out_file: "logs/trigger_jules_ui_out.log",
+      error_file: "logs/trigger_jules_ui_err.log"
+    },
+    {
+      name: "trigger-jules-major",
+      script: "scripts/maintenance/trigger_jules.js",
+      args: "--major",
+      cwd: "/Users/daniel/Documents/AGY/the_system",
+      cron_restart: "0 6 * * 0,3", // Twice a week: Sunday and Wednesday at 6 AM
+      autorestart: false,
+      out_file: "logs/trigger_jules_major_out.log",
+      error_file: "logs/trigger_jules_major_err.log"
     }
   ]
 };

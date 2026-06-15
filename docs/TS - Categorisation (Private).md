@@ -88,11 +88,11 @@ The immutable skeleton of the system.
 
 ## 03 XX 00 Institutions
 
-- 03 01 00 Östra Real
+* **03 01 00 Östra Real**
 
-- 03 02 00 Uppsala University
+* **03 02 00 Uppsala University**
 
-- 03 03 00 Stockholms Nation
+* **03 03 00 Stockholms Nation**
 
 
 ## 03 02 00 Uppsala University Years

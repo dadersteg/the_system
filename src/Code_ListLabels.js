@@ -81,17 +81,7 @@ function cleanAndCreateGmailLabels() {
   const labels = GmailApp.getUserLabels();
   
   // 1. Delete legacy/messed up labels
-  labels.forEach(l => {
-    const name = l.getName();
-    if (name === "02 Work" || name.indexOf("02 Work/") === 0) {
-      console.log(`[ACTION] Deleting legacy label: ${name}`);
-      try {
-        l.deleteLabel();
-      } catch(e) {
-        console.error(`Failed to delete label ${name}: ${e.message}`);
-      }
-    }
-  });
+  // Removed legacy hardcoded deletion of '02 Work' labels to prevent deleting active labels.
   
   // 2. Fetch the taxonomy JSON dynamically
   const taxonomyFilename = isPmt ? "PMTOS_Taxonomy.json" : "LOS_Taxonomy.json";
@@ -112,8 +102,8 @@ function cleanAndCreateGmailLabels() {
   const validLabels = new Set();
   
   taxonomy.forEach(item => {
-    if (item && item["Drive Path"]) {
-      const parts = item["Drive Path"].split("/").map(s => s.trim()).filter(Boolean);
+    if (item && item["Concat (Label)"]) {
+      const parts = item["Concat (Label)"].split("/").map(s => s.trim()).filter(Boolean);
       const firstPart = parts[0] || "";
       
       // Ignore system triage (00), system operational (99) tags, and cross-dimensional (goals/strategies)
@@ -145,4 +135,33 @@ function cleanAndCreateGmailLabels() {
   
   console.log("Gmail labels cleanup and alignment complete.");
 }
+
+/**
+ * Safely removes duplicate Gmail labels (those with a 6-digit prefix structure,
+ * e.g., starting with "01 00 00 Private" or matching the general "\d{2} \d{2} \d{2}" prefix pattern)
+ * and keeps the primary/simplified Concat (Label) (2-digit) labels intact.
+ * Logs each deleted label clearly so that the logs can be audited.
+ */
+function cleanupDuplicateGmailLabels() {
+  console.log("Starting cleanup of duplicate 6-digit Gmail labels...");
+  const labels = GmailApp.getUserLabels();
+  let deletedCount = 0;
+  
+  labels.forEach(label => {
+    const name = label.getName();
+    // Match the general \d{2} \d{2} \d{2} prefix pattern at the start of the label name
+    if (/^\d{2} \d{2} \d{2}/.test(name)) {
+      console.log(`[AUDIT] Deleting duplicate label: ${name}`);
+      try {
+        label.deleteLabel();
+        deletedCount++;
+      } catch (e) {
+        console.error(`Failed to delete label ${name}: ${e.message}`);
+      }
+    }
+  });
+  
+  console.log(`Duplicate Gmail labels cleanup complete. Total deleted: ${deletedCount}`);
+}
+
 
