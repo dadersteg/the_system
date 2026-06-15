@@ -113,7 +113,7 @@ module.exports = {
       script: "scripts/maintenance/trigger_jules.js",
       args: "--minor",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "0 4,16 * * *", // Twice a day: 4 AM and 4 PM
+      cron_restart: "0 2,14 * * *", // 2 AM and 2 PM
       autorestart: false,
       out_file: "logs/trigger_jules_minor_out.log",
       error_file: "logs/trigger_jules_minor_err.log"
@@ -123,7 +123,7 @@ module.exports = {
       script: "scripts/maintenance/trigger_jules.js",
       args: "--ui",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "0 5,17 * * *", // Twice a day: 5 AM and 5 PM
+      cron_restart: "0 3,15 * * *", // 3 AM and 3 PM
       autorestart: false,
       out_file: "logs/trigger_jules_ui_out.log",
       error_file: "logs/trigger_jules_ui_err.log"
@@ -133,7 +133,7 @@ module.exports = {
       script: "scripts/maintenance/trigger_jules.js",
       args: "--major",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "0 6 * * 0,3", // Twice a week: Sunday and Wednesday at 6 AM
+      cron_restart: "0 4 * * 0,5", // Friday and Sunday at 4 AM
       autorestart: false,
       out_file: "logs/trigger_jules_major_out.log",
       error_file: "logs/trigger_jules_major_err.log"
