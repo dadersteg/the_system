@@ -12,7 +12,7 @@ const WEBAPP_URL = process.env.WEBAPP_URL;
 const BEEPER_ACCESS_TOKEN = process.env.BEEPER_ACCESS_TOKEN;
 const BEEPER_API_URL = process.env.BEEPER_API_URL || 'http://localhost:23373';
 
-const TIME_LIMIT = new Date(Date.now() - 2 * 60 * 60 * 1000);
+const TIME_LIMIT = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000);
 
 let cachedGoogleToken = null;
 let googleTokenExpiry = 0;

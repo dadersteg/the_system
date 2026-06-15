@@ -52,3 +52,8 @@ The Personas draw their intelligence and context from a centralized, living Know
 *   **Master Asset Naming Protocol:** The definitive rules for file naming and retention.
 *   **Memo:** Dynamic logistical context, relationships, and operational cheat sheets.
 *   **Goals, Methods and Habits:** The highly personal, dynamic goal architecture for The System.
+
+---
+
+## 5. Future Project Roadmap
+*   **Workspace Studios Integration:** Investigate deprecating paid custom API scripts for email/calendar routing and migrating "The Clerk" and "Relational Tally" engines entirely into Google Workspace Studios. This leverages native event-driven triggers and conserves API quota.
