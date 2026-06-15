@@ -109,31 +109,41 @@ module.exports = {
       error_file: "logs/github_sync_err.log"
     },
     {
-      name: "trigger-jules-minor",
+      name: "trigger-jules-backend",
       script: "scripts/maintenance/trigger_jules.js",
-      args: "--minor",
+      args: "--micro-backend",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "0 2,14 * * *", // 2 AM and 2 PM
+      cron_restart: "0 2 * * *", // 2:00 AM Daily
       autorestart: false,
-      out_file: "logs/trigger_jules_minor_out.log",
-      error_file: "logs/trigger_jules_minor_err.log"
+      out_file: "logs/trigger_jules_backend_out.log",
+      error_file: "logs/trigger_jules_backend_err.log"
     },
     {
       name: "trigger-jules-ui",
       script: "scripts/maintenance/trigger_jules.js",
-      args: "--ui",
+      args: "--micro-ui",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "0 3,15 * * *", // 3 AM and 3 PM
+      cron_restart: "0 3 * * *", // 3:00 AM Daily
       autorestart: false,
       out_file: "logs/trigger_jules_ui_out.log",
       error_file: "logs/trigger_jules_ui_err.log"
+    },
+    {
+      name: "trigger-jules-cleanup",
+      script: "scripts/maintenance/trigger_jules.js",
+      args: "--micro-cleanup",
+      cwd: "/Users/daniel/Documents/AGY/the_system",
+      cron_restart: "0 4 * * *", // 4:00 AM Daily
+      autorestart: false,
+      out_file: "logs/trigger_jules_cleanup_out.log",
+      error_file: "logs/trigger_jules_cleanup_err.log"
     },
     {
       name: "trigger-jules-major",
       script: "scripts/maintenance/trigger_jules.js",
       args: "--major",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "0 4 * * 0,5", // Friday and Sunday at 4 AM
+      cron_restart: "0 5 * * 0,3", // 5:00 AM Wednesday & Sunday
       autorestart: false,
       out_file: "logs/trigger_jules_major_out.log",
       error_file: "logs/trigger_jules_major_err.log"
