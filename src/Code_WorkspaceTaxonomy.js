@@ -402,9 +402,9 @@ function syncTaxonomyToSheet() {
     let driveParts = [];
     let prefixCount = 0;
     
-    if (l1Code) { driveParts.push(`${l1Code} ${l1Name}`); prefixCount++; }
-    if (l2Code) { driveParts.push(`${l2Code} ${l2Name}`); prefixCount++; }
-    if (l3Code) { driveParts.push(`${l3Code} ${l3Name}`); prefixCount++; }
+    if (l1Code && l1Name) { driveParts.push(`${l1Code} ${l1Name}`.trim()); prefixCount++; }
+    if (l2Code && l2Name) { driveParts.push(`${l2Code} ${l2Name}`.trim()); prefixCount++; }
+    if (l3Code && l3Name) { driveParts.push(`${l3Code} ${l3Name}`.trim()); prefixCount++; }
     
     for (let j = prefixCount; j < parts.length; j++) {
        driveParts.push(parts[j]);
