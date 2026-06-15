@@ -142,8 +142,45 @@ function sendRawMimeEmail(to, subjectB64, bodyB64, nameB64, references, attachme
   var boundary = "boundary_" + Math.random().toString(36).substr(2);
   var messageId = "<" + Math.random().toString(36).substr(2) + "@ingestion.bridge>";
 
+  // Decode subject to plain text
+  var bodyText = Utilities.newBlob(Utilities.base64Decode(bodyB64)).getDataAsString('UTF-8');
+
   // Look up existing thread to chain into
   var existingThreadId = findExistingThread(subjectB64);
+
+  if (existingThreadId) {
+    try {
+      var thread = GmailApp.getThreadById(existingThreadId);
+      var existingMessages = thread.getMessages();
+      var normalizedThreadText = "";
+      for (var i = 0; i < existingMessages.length; i++) {
+        normalizedThreadText += normalizeText(existingMessages[i].getPlainBody());
+      }
+
+      var snippets = bodyText.split(/[\r\n]*---[\r\n]*/);
+      var filteredSnippets = [];
+      for (var j = 0; j < snippets.length; j++) {
+        var snippet = snippets[j].trim();
+        if (!snippet) continue;
+        var normalizedSnippet = normalizeText(snippet);
+        if (normalizedThreadText.indexOf(normalizedSnippet) === -1) {
+          filteredSnippets.push(snippet);
+        } else {
+          Logger.log("Filtered out duplicate snippet: " + snippet.substring(0, 50) + "...");
+        }
+      }
+
+      if (filteredSnippets.length === 0 && (!attachments || attachments.length === 0)) {
+        Logger.log("Skipping email send as all snippets are duplicates.");
+        return null;
+      }
+
+      bodyText = filteredSnippets.join("\n\n---\n\n");
+      bodyB64 = Utilities.base64Encode(bodyText, Utilities.Charset.UTF_8);
+    } catch (e) {
+      Logger.log("Deduplication error: " + e.message);
+    }
+  }
 
   // Build MIME headers - subject and name use RFC 2047 base64 encoding
   var mimeLines = [
@@ -219,4 +256,15 @@ function authorizeGmailSend() {
     []
   );
   Logger.log("Authorization + test email sent successfully!");
+}
+
+/**
+ * Normalizes text to make snippet-based duplicate checking robust against spacing,
+ * line endings, and casing.
+ * @param {string} txt - The text to normalize.
+ * @returns {string} The normalized alphanumeric text.
+ */
+function normalizeText(txt) {
+  if (!txt) return "";
+  return txt.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
 }
