@@ -2,40 +2,43 @@ const { spawn } = require('child_process');
 
 // Parse CLI arguments to determine task type
 const args = process.argv.slice(2);
-const taskType = args[0] || '--minor';
+const taskType = args[0] || '--micro-backend';
 
 let promptPayload = "";
-let automationMode = "NONE";
+let automationMode = "AUTO_CREATE_PR";
 let title = "";
 
-if (taskType === '--ui') {
+if (taskType === '--micro-ui') {
   title = "Premium Micro-Design Polish (UI)";
-  automationMode = "NONE";
-  promptPayload = `**TASK: Premium Micro-Design Polish & Autonomous Deploy**
+  promptPayload = `**TASK: Premium Micro-Design Polish**
 1. Select exactly ONE specific UI element in WebApp_Dashboard.html (e.g., a button's hover state, a card's padding/shadow, a navigation link's active state, or a tab's transition animation).
 2. Modernize the selected element using custom desaturated colors, refined typography (Google Fonts), and smooth micro-animations/transitions (using cubic-bezier easing). Avoid plain default colors.
-3. Ensure the polished element has a touch target of at least 44px on mobile viewports and scales fluidly.
-4. **CRITICAL CONSTRAINT:** Do NOT make sweeping layout changes, restructure the DOM, or modify unrelated CSS rules. Surgical precision only.`;
+3. Ensure the polished element has a touch target of at least 44px on mobile viewports and scales fluidly.`;
+
+} else if (taskType === '--micro-cleanup') {
+  title = "Codebase Cleanup & Documentation";
+  promptPayload = `**TASK: Codebase Cleanup & Documentation**
+1. Select exactly ONE recently modified script or logic block.
+2. Inject comprehensive JSDoc/Google-style docstrings for the functions. Ensure compliance with jules.md.
+3. Scan for and strictly remove unused variables, orphaned imports, or commented-out legacy code blocks.
+4. Standardize variable naming (camelCase for JS, snake_case for Python).`;
 
 } else if (taskType === '--major') {
   title = "Systematic Architectural Refactoring (Major)";
-  automationMode = "AUTO_CREATE_PR";
   promptPayload = `**TASK: Systematic Architectural Refactoring**
-1. Identify high-debt scripts within the repository (prioritizing those handling heavy data parsing or API fetching) or legacy monolithic functions exceeding 100 lines.
+1. Identify high-debt scripts within the repository or legacy monolithic functions exceeding 100 lines (including core logic like executeTriageEngine).
 2. **Performance:** Convert nested O(n^2) loops into O(n) hash maps where applicable. Batch external API/Apps Script calls to prevent rate limits.
-3. **Resilience & Readability:** Standardize variable naming (camelCase for JS, snake_case for Python). Break monolithic functions into smaller, single-responsibility helpers. Add try/catch bounds to external data fetches.
-4. **Documentation:** Inject comprehensive JSDoc/Google-style docstrings for EVERY function modified, detailing inputs, outputs, and edge cases. Ensure compliance with jules.md header requirements.
-5. Summarize the technical debt cleared and the architectural gains clearly in the resulting Pull Request description.`;
+3. **Resilience & Readability:** Standardize variable naming. Break monolithic functions into smaller helpers. Add try/catch bounds.
+4. **CRITICAL SAFETY & DATA PARITY:** When refactoring core logic or photo syncs, you MUST NOT drop data columns or ignore payload fields. Ensure 100% data parity before and after optimization.
+5. **OPT OUT CAUSE:** If the codebase is already highly optimized and you cannot find any legitimate, meaningful architectural improvements to make, you must explicitly opt out. Do not invent problems to solve. If you opt out, make zero changes and state 'No major refactoring needed at this time.'
+6. Summarize the technical debt cleared and the architectural gains clearly in the resulting Pull Request description.`;
 
-} else { // --minor
+} else { // --micro-backend
   title = "Daily Micro-Stability Check (Backend/Logic)";
-  automationMode = "NONE";
   promptPayload = `**TASK: Daily Micro-Stability & Health Check**
 1. Select exactly ONE recently modified script or specific logic block.
-2. Perform a safe, micro-stability check. Improve its error handling (e.g., adding try/catch bounds), clean up any messy logic, or optimize a single performance bottleneck.
-3. Ensure the file contains the strict @file, @version, and @changelog headers mandated by jules.md.
-4. Scan for unused variables or commented-out legacy code blocks and remove them.
-5. **CRITICAL CONSTRAINT:** Do NOT make sweeping architectural changes or break any existing functionality. Surgical precision only.`;
+2. Perform a safe, micro-stability check. Improve its error handling, clean up messy logic, or optimize a single performance bottleneck.
+3. Do NOT make sweeping architectural changes or break any existing functionality. Surgical precision only.`;
 }
 
 const JULES_API_KEY = "***REMOVED***";
@@ -51,7 +54,7 @@ const payload = {
       title: title,
       prompt: promptPayload,
       startingBranch: "main",
-      ...(automationMode !== "NONE" && { automationMode: automationMode }),
+      automationMode: automationMode,
       requirePlanApproval: false
     }
   }
