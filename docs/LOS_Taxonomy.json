@@ -504,7 +504,7 @@
     "L4 Description": "",
     "Concat (Label)": "03 Studies/99 Studies Archive",
     "Concat (Path)": "03 00 99 Studies Archive",
-    "Drive Path": "03 00 00 Studies/03 00 99 Studies Archive"
+    "Drive Path": "03 00 00 Studies/03 00 00 /03 00 99 Studies Archive"
   },
   {
     "L1 Code": "01 00 00",
@@ -1440,7 +1440,7 @@
     "L4 Description": "Historical Studies",
     "Concat (Label)": "03 Studies/99 Studies Archive/Stockholms Nation",
     "Concat (Path)": "03 00 99 Studies Archive > Stockholms Nation",
-    "Drive Path": "03 00 00 Studies/03 00 99 Studies Archive/Stockholms Nation"
+    "Drive Path": "03 00 00 Studies/03 00 00 /03 00 99 Studies Archive"
   },
   {
     "L1 Code": "03 00 00",
@@ -1453,7 +1453,7 @@
     "L4 Description": "Historical Studies",
     "Concat (Label)": "03 Studies/99 Studies Archive/Uppsala University",
     "Concat (Path)": "03 00 99 Studies Archive > Uppsala University",
-    "Drive Path": "03 00 00 Studies/03 00 99 Studies Archive/Uppsala University"
+    "Drive Path": "03 00 00 Studies/03 00 00 /03 00 99 Studies Archive"
   },
   {
     "L1 Code": "02 00 00",
