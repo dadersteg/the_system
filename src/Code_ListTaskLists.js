@@ -1,8 +1,22 @@
 /**
- * THE SYSTEM: GOOGLE TASK LIST EXPORTER
- * Fetches all Google Task lists and exports a JSON file to the main Drive workspace for agent context.
+ * @file src/Code_ListTaskLists.js
+ * @description Fetches all Google Task lists and exports a JSON file to the main Drive workspace for agent context. Includes a utility to print lists to the console.
+ *
+ * @version 1.0.1
+ * @last_modified 2026-06-15
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.1: Added standardized JSDoc headers, fixed variable casing (camelCase), and removed legacy/unneeded code.
+ * - 1.0.0: Initial creation.
  */
 
+/**
+ * Fetches all Google Task lists and exports them as a JSON file to the configured workspace root folder.
+ * This file acts as agent context for mapping list titles to IDs.
+ *
+ * @returns {void}
+ */
 function updateTaskList() {
   const lists = Tasks.Tasklists.list().items;
   if (!lists) return;
@@ -13,11 +27,11 @@ function updateTaskList() {
     updated: l.updated
   }));
 
-  const TARGET_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
+  const targetFolderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
   const fileName = "Actual_Google_Task_Lists.json";
   
   try {
-    const targetFolder = DriveApp.getFolderById(TARGET_FOLDER_ID);
+    const targetFolder = DriveApp.getFolderById(targetFolderId);
     const jsonBlob = Utilities.newBlob(JSON.stringify(jsonOutput, null, 2), "application/json", fileName);
     
     const existingFiles = targetFolder.getFilesByName(fileName);
@@ -32,7 +46,13 @@ function updateTaskList() {
   }
 }
 
-function PRINT_MY_TASK_LISTS() {
+/**
+ * Utility function to print all available task lists and their respective IDs to the Apps Script execution log.
+ * Useful for manual inspection and debugging.
+ *
+ * @returns {void}
+ */
+function printMyTaskLists() {
   const lists = Tasks.Tasklists.list().items;
   if (!lists) {
     console.log("No task lists found.");
