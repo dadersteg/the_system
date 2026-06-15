@@ -47,11 +47,11 @@ const payload = {
   params: {
     name: "jules_create_session",
     arguments: {
-      source: "github/dadersteg/the_system",
+      source: "sources/github/dadersteg/the_system",
       title: title,
       prompt: promptPayload,
       startingBranch: "main",
-      automationMode: automationMode,
+      ...(automationMode !== "NONE" && { automationMode: automationMode }),
       requirePlanApproval: false
     }
   }
