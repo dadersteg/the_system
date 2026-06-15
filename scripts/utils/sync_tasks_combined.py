@@ -120,19 +120,35 @@ def check_and_route_tasks(private_service, work_service):
                 category_path = get_los_code_from_metadata(notes)
                 
                 is_work = False
-                if notes:
-                    match = re.search(r'Context:\s*(\d{2}\s\d{2}\s\d{2})', notes)
-                    if match:
-                        code = match.group(1).strip()
-                        if code.startswith("02") and "02 01 99" not in code:
+                if "[ROUTED_TO_PRIVATE]" in notes:
+                    is_work = False # Prevent bouncing back to Work
+                else:
+                    if notes:
+                        match = re.search(r'Context:\s*(\d{2}\s\d{2}\s\d{2})', notes)
+                        if match:
+                            code = match.group(1).strip()
+                            if code.startswith("02") and "02 01 99" not in code:
+                                is_work = True
+                    if not is_work and category_path:
+                        if "02 01 01" in category_path and "02 01 99" not in category_path:
                             is_work = True
-                if not is_work and category_path:
-                    if "02 01 01" in category_path and "02 01 99" not in category_path:
-                        is_work = True
                         
                 if is_work:
                     print(f"[Gateway] Found Work task in private list '{list_title}': '{title}'")
                     try:
+                        # Inject anti-bounce tag and AI constraint
+                        if "[ROUTED_TO_WORK]" not in notes:
+                            if "---SYSTEM_METADATA---" in notes:
+                                notes = notes.replace("---SYSTEM_METADATA---", "[ROUTED_TO_WORK]\n---SYSTEM_METADATA---")
+                            else:
+                                notes += "\n[ROUTED_TO_WORK]"
+                            
+                        constraint = "Must classify as Work/PMTOS. Do not use 01 or 02 01 99."
+                        if "DA:" in notes:
+                            notes = re.sub(r'DA:(.*)$', lambda m: f"DA: {m.group(1).strip()} | {constraint}" if m.group(1).strip() else f"DA: {constraint}", notes, flags=re.MULTILINE)
+                        else:
+                            notes = notes.replace("---SYSTEM_METADATA---", f"DA: {constraint}\n---SYSTEM_METADATA---")
+
                         work_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}
                         inserted = work_service.tasks().insert(tasklist=WORK_TASKS_DEST, body=work_task_body).execute()
                         print(f"[Gateway] Pushed task to Work default list. (ID: {inserted['id']})")
@@ -160,19 +176,35 @@ def check_and_route_tasks(private_service, work_service):
                 category_path = get_los_code_from_metadata(notes)
                 
                 is_private = False
-                if notes:
-                    match = re.search(r'Context:\s*(\d{2}\s\d{2}\s\d{2})', notes)
-                    if match:
-                        code = match.group(1).strip()
-                        if code.startswith("01") or "02 01 99" in code:
+                if "[ROUTED_TO_WORK]" in notes:
+                    is_private = False # Prevent bouncing back to Private
+                else:
+                    if notes:
+                        match = re.search(r'Context:\s*(\d{2}\s\d{2}\s\d{2})', notes)
+                        if match:
+                            code = match.group(1).strip()
+                            if code.startswith("01") or "02 01 99" in code:
+                                is_private = True
+                    if not is_private and category_path:
+                        if re.match(r'^01\s\d{2}\s\d{2}', category_path.strip()) or "02 01 99" in category_path:
                             is_private = True
-                if not is_private and category_path:
-                    if re.match(r'^01\s\d{2}\s\d{2}', category_path.strip()) or "02 01 99" in category_path:
-                        is_private = True
                         
                 if is_private:
                     print(f"[Gateway] Found Personal task in work list '{list_title}': '{title}'")
                     try:
+                        # Inject anti-bounce tag and AI constraint
+                        if "[ROUTED_TO_PRIVATE]" not in notes:
+                            if "---SYSTEM_METADATA---" in notes:
+                                notes = notes.replace("---SYSTEM_METADATA---", "[ROUTED_TO_PRIVATE]\n---SYSTEM_METADATA---")
+                            else:
+                                notes += "\n[ROUTED_TO_PRIVATE]"
+                                
+                        constraint = "Must classify as Personal/LOS. Do not use 02."
+                        if "DA:" in notes:
+                            notes = re.sub(r'DA:(.*)$', lambda m: f"DA: {m.group(1).strip()} | {constraint}" if m.group(1).strip() else f"DA: {constraint}", notes, flags=re.MULTILINE)
+                        else:
+                            notes = notes.replace("---SYSTEM_METADATA---", f"DA: {constraint}\n---SYSTEM_METADATA---")
+
                         private_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}
                         inserted = private_service.tasks().insert(tasklist=PRIVATE_TASKS_DEST, body=private_task_body).execute()
                         print(f"[Gateway] Pushed task to Private default list. (ID: {inserted['id']})")
