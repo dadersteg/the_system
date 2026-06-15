@@ -1,3 +1,18 @@
+const fs = require('fs');
+const path = require('path');
+let localEnv = {};
+try {
+  const envContent = fs.readFileSync(path.join(__dirname, '.env'), 'utf-8');
+  envContent.split('\n').forEach(line => {
+    const match = line.match(/^([^=]+)=(.*)$/);
+    if (match) {
+      localEnv[match[1]] = match[2].replace(/^["'](.*)["']$/, '$1');
+    }
+  });
+} catch(e) {
+  console.warn("No .env file found or unable to parse.");
+}
+
 module.exports = {
   apps: [
     // ==========================================
@@ -8,7 +23,10 @@ module.exports = {
       script: "src/telegram_antigravity_bridge.py",
       interpreter: "/Users/daniel/Developer/AGY_caches/the_system/my_venv/bin/python3",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      env_file: ".env",
+      env: {
+        TELEGRAM_BOT_TOKEN: localEnv.TELEGRAM_BOT_TOKEN || "",
+        TELEGRAM_USER_ID: localEnv.TELEGRAM_USER_ID || ""
+      },
       autorestart: true,
       restart_delay: 5000
     },
@@ -17,6 +35,10 @@ module.exports = {
       script: "src/ingestion/telegram_bridge.py",
       interpreter: "/Users/daniel/Developer/AGY_caches/the_system/my_venv/bin/python3",
       cwd: "/Users/daniel/Documents/AGY/the_system",
+      env: {
+        TELEGRAM_BOT_TOKEN: localEnv.TELEGRAM_BOT_TOKEN || "",
+        TELEGRAM_USER_ID: localEnv.TELEGRAM_USER_ID || ""
+      },
       autorestart: true,
       restart_delay: 5000
     },
