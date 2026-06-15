@@ -105,11 +105,34 @@ def main():
             body['completed'] = None  # Google API sets this automatically or we omit it
     if args.due:
         body['due'] = f"{args.due}T00:00:00.000Z"
-    if args.notes is not None:
-        body['notes'] = args.notes
-    elif args.append_notes:
-        existing = task.get('notes', '')
-        body['notes'] = f"{existing}\n\n{args.append_notes}".strip() if existing else args.append_notes
+    if args.notes is not None or args.append_notes is not None:
+        existing = task.get('notes')
+        if existing is None:
+            existing = ''
+            
+        meta_delimiter = '---SYSTEM_METADATA---'
+        
+        if meta_delimiter in existing:
+            parts = existing.split(meta_delimiter, 1)
+            user_content = parts[0].rstrip()
+            sys_metadata = f"\n\n{meta_delimiter}{parts[1]}"
+        else:
+            user_content = existing.rstrip()
+            sys_metadata = ""
+
+        incoming = args.notes if args.notes is not None else args.append_notes
+        if meta_delimiter in incoming:
+            incoming = incoming.split(meta_delimiter, 1)[0].rstrip()
+
+        if args.notes is not None:
+            new_content = incoming
+        else:
+            new_content = f"{user_content}\n\n{incoming}".rstrip() if user_content else incoming
+
+        if not new_content:
+            sys_metadata = sys_metadata.lstrip()
+            
+        body['notes'] = f"{new_content}{sys_metadata}"
 
     if not body:
         print("No changes specified to update.")

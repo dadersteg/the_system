@@ -187,7 +187,7 @@ function getCalendarCapacity7Days() {
 
 function write7DayRoadmap(markdownStr) {
   const folderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
-  const suffix = isWorkAccount() ? " (Work)" : " (Private)";
+  const suffix = isPmtAccount() ? " (PMT)" : " (Private)";
   const fileName = `TS - Task Master > 7 Day Roadmap${suffix}.md`;
   try {
      const folder = DriveApp.getFolderById(folderId);

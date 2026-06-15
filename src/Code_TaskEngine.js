@@ -132,16 +132,26 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
               cleanNotes = metaSplit[0];
               if (metaSplit.length > 1) metadataStr = metaSplit[1].trim();
               
-              cleanNotes = cleanNotes.replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
-              cleanNotes = cleanNotes.replace(/\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
+              cleanNotes = cleanNotes.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
               cleanNotes = cleanNotes.trim();
             }
             
-            const taskContentForHash = (t.title || "") + "|" + cleanNotes + "|" + (t.due || "") + "|" + (t.status || "");
+            const normFinalTitle = (t.title || "").replace(/\s+/g, " ").trim();
+            const normFinalNotes = cleanNotes.replace(/\s+/g, " ").trim();
+            const normFinalDue = (t.due || "").replace(/\s+/g, " ").trim();
+            const normFinalStatus = (t.status || "").replace(/\s+/g, " ").trim();
+            
+            const taskContentForHash = normFinalTitle + "|" + normFinalNotes + "|" + normFinalDue + "|" + normFinalStatus;
             const currentHash = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, taskContentForHash));
             
             let userConstraint = "";
-            if (metadataStr) {
+            
+            const isAssignedTask = !!(t.assignmentInfo || (t.webViewLink && (t.webViewLink.includes("docs.google.com") || t.webViewLink.includes("chat.google.com"))));
+            if (isAssignedTask) {
+                if (PropertiesService.getScriptProperties().getProperty("ai_hash_" + t.id) === currentHash) {
+                    aiHashMatch = true;
+                }
+            } else if (metadataStr) {
                try {
                  const existingMetadata = JSON.parse(metadataStr);
                  if (existingMetadata.user_constraint) {
@@ -157,7 +167,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
                cleanNotes += `\n[SYSTEM DIRECTIVE - STRICT USER CONSTRAINT: ${userConstraint}]`;
             }
             
-            const needsReview = (listId === importerListId) ? true : !aiHashMatch;
+            const needsReview = !aiHashMatch;
             
             rawTasks.push({
                id: t.id,
@@ -213,22 +223,39 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
   
   if (aiResult.taskUpdates && aiResult.taskUpdates.length > 0) {
       console.log(`Executing Semantic Cross-Check for ${aiResult.taskUpdates.length} proposed updates...`);
+
+      // Extract IDs defensively
+      const proposedIds = aiResult.taskUpdates
+          .map(u => u ? u.taskId : null)
+          .filter(id => id != null);
+
       const crossCheckPayload = {
-          instruction: "Perform a Semantic Cross-Check. Compare the proposed 'taskUpdates' against the 'allTasksContext'. If any proposed task is a semantic duplicate of an existing task, change its routingTarget to 'DELETE'. If a day or category is over-scheduled, adjust the 'recommendedDeadline'. Return the final corrected JSON object containing the 'taskUpdates' array.",
+          instruction: "Perform a Semantic Cross-Check. Compare the proposed 'taskUpdates' against the 'allTasksContext'. If any proposed task is a semantic duplicate of an existing task, change its routingTarget to 'DELETE'. If a day or category is over-scheduled, adjust the 'recommendedDeadline'. Return the final corrected JSON object containing the 'taskUpdates' array. You MUST return the entire taskUpdates array, including ALL original tasks from proposedUpdates, even if you did not modify them. Do not omit any tasks.",
           proposedUpdates: aiResult.taskUpdates,
-          allTasksContext: payload.allTasksContext
+          // Explicitly exclude the tasks being evaluated
+          allTasksContext: payload.allTasksContext.filter(t => !proposedIds.includes(t.id))
       };
       
-      const crossCheckPrompt = "You are a strict QA AI. Return a JSON object with a single 'taskUpdates' array containing the finalized task objects. Respond ONLY with valid JSON.";
+      const crossCheckPrompt = "You are a strict QA AI. Return a JSON object with a single 'taskUpdates' array containing the finalized task objects. You MUST return ALL original tasks from proposedUpdates, even if unmodified. Do not omit any tasks. Respond ONLY with valid JSON.";
       const crossCheckResult = executeTaskMasterGemini(crossCheckPayload, crossCheckPrompt);
       
       if (crossCheckResult && crossCheckResult.taskUpdates) {
           console.log("Semantic Cross-Check complete. Applying finalized updates.");
-          aiResult.taskUpdates = crossCheckResult.taskUpdates;
+          const crossCheckMap = {};
+          crossCheckResult.taskUpdates.forEach(u => {
+              if (u && u.taskId) crossCheckMap[u.taskId] = u;
+          });
+          aiResult.taskUpdates = aiResult.taskUpdates.map(u => {
+              if (u && u.taskId && crossCheckMap[u.taskId]) {
+                  return { ...u, ...crossCheckMap[u.taskId] };
+              }
+              return u;
+          });
       } else {
           console.warn("Semantic Cross-Check failed or returned empty. Using original routing results.");
       }
       
+      aiResult.taskUpdates = aiResult.taskUpdates.filter(u => u && typeof u === 'object' && u.taskId);
       console.log(`Applying updates to ${aiResult.taskUpdates.length} tasks...`);
       processTaskUpdates(aiResult.taskUpdates, taskIdMap, importerListId, todoListId);
       console.log(`Successfully finished applying task updates.`);
@@ -316,6 +343,24 @@ function runHourlyReview() {
   }
   systemPrompt = processPromptText(systemPrompt);
   
+  let configOverrides = { "temperature": 0.2 };
+  const configMatch = systemPrompt.match(/^\s*```(?:json)?\s*([\s\S]*?)\s*```/i);
+  
+  if (configMatch) {
+    // Strip the JSON block from the systemInstruction string regardless of parsing success
+    systemPrompt = systemPrompt.substring(configMatch[0].length).trim();
+    try {
+      const parsedConfig = JSON.parse(configMatch[1].trim());
+      if (parsedConfig !== null && typeof parsedConfig === 'object' && !Array.isArray(parsedConfig)) {
+        configOverrides = Object.assign(configOverrides, parsedConfig);
+      } else {
+        console.warn("Parsed generationConfig is not a valid object, ignoring.");
+      }
+    } catch (e) {
+      console.warn("Failed to parse generationConfig JSON from system prompt, falling back to default.", e);
+    }
+  }
+  
   const payloadStr = JSON.stringify(payload);
   // Use the smartest model available for full-context reasoning, with fallback to 2M context if needed
   const MODEL_NAME = selectModelForPayload(payloadStr, SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_PRO);
@@ -324,7 +369,7 @@ function runHourlyReview() {
   const requestPayload = {
     "systemInstruction": { "parts": [{ "text": systemPrompt }] },
     "contents": [{ "role": "user", "parts": [{ "text": payloadStr }] }],
-    "generationConfig": { "temperature": 0.2 }
+    "generationConfig": configOverrides
   };
   
   const options = {
@@ -399,7 +444,8 @@ function runHourlyReview() {
  * strictly at 6:00, 8:00, 12:00, 16:00, and 20:00.
  */
 function hourlyReviewTriggerWrapper() {
-  const currentHour = new Date().getHours(); 
+  const currentHourStr = Utilities.formatDate(new Date(), "Europe/London", "H");
+  const currentHour = parseInt(currentHourStr, 10); 
   
   // Only execute during these specific hours
   if ([6, 8, 12, 16, 20].includes(currentHour)) {
@@ -442,12 +488,12 @@ function executeTaskMasterGemini(payloadObj, systemInstruction) {
           "type": "OBJECT",
           "properties": {
             "taskId": { "type": "STRING" },
-            "routingTarget": { "type": "STRING", "description": "SCHEDULE, BACKLOG, DELETE, COMPLETE, RETAIN_IMPORTER" },
+            "routingTarget": { "type": "STRING", "description": "SCHEDULE, BACKLOG, DELETE, COMPLETE, RETAIN_IMPORTER, REVIEW" },
             "recommendedDeadline": { "type": "STRING", "description": "YYYY-MM-DD format. Required if SCHEDULE." },
             "estimatedDuration": { "type": "STRING", "description": "e.g. 15m, 1h, 2h" },
             "alignedGoal": { "type": "STRING", "description": "The URN (e.g. 2026-MD-NEW-045) of the System Goal this task serves. You must find this URN in the provided goals tables. If the task is a mandatory administrative chore that does not advance a specific strategic goal, output 'Maintenance'." },
             "category_path": { "type": "STRING", "description": "The EXACT value from the 'Concat (Path)' field of the provided Taxonomy JSON. You MUST use the full path format (e.g. '01 05 01 Projects > AI'). Do NOT use the Label format or hallucinate paths." },
-            "recommendedTitle": { "type": "STRING", "description": "The polished title for the task, following the guidelines in the prompt." },
+            "recommendedTitle": { "type": "STRING", "description": "Keep concise, action-oriented. CRITICAL: NEVER remove people's names, Case Refs, or unique identifiers from the title. Preserve all vital context." },
             "systemComment": { "type": "STRING", "description": "AI questions or feedback to the user." },
             "clearUserComment": { "type": "BOOLEAN", "description": "Set to true if you have processed the user's DA: instruction." }
           },
@@ -512,13 +558,19 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       
       // Let's determine final title (clean metadata from title)
       let finalTitle = u.recommendedTitle || task.title || "";
-      finalTitle = finalTitle.replace(/\s*\[.*\]$/, "").trim(); // strip old trailing brackets
+      finalTitle = finalTitle.trim(); // strip old trailing brackets
       
       let targetListId = listId;
       if (u.routingTarget === "DELETE") {
           targetListId = SYSTEM_CONFIG.TASKS.TO_BE_DELETED_LIST_ID;
+      } else if (u.routingTarget === "REVIEW") {
+          targetListId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID;
       } else if (listId === importerListId && u.routingTarget !== "RETAIN_IMPORTER") {
           targetListId = todoListId;
+      }
+      
+      if (isAssignedTask) {
+          targetListId = listId;
       }
       
       let daComment = "DA:";
@@ -537,10 +589,28 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       }
       
       const isValidWebView = task.webViewLink && !task.webViewLink.toLowerCase().includes("tasks.google.com") && !task.webViewLink.toLowerCase().includes("/tasks") && !task.webViewLink.toLowerCase().includes("googleapis.com/tasks");
-      const topLink = (isValidWebView ? task.webViewLink : "") || (task.links && task.links.length > 0 && task.links.find(l => {
+      let topLink = (isValidWebView ? task.webViewLink : "") || (task.links && task.links.length > 0 && task.links.find(l => {
          const url = (l.link || "").toLowerCase();
          return url && !url.includes("tasks.google.com") && !url.includes("/tasks") && !url.includes("googleapis.com/tasks");
       })?.link) || "";
+
+      if (!topLink && rawNotes) {
+         const linkMatches = rawNotes.match(/https?:\/\/[^\s]+/g);
+         if (linkMatches) {
+            for (let url of linkMatches) {
+               while (/[.,;:!]$/.test(url) || 
+                      (url.endsWith(')') && (url.match(/\(/g) || []).length < (url.match(/\)/g) || []).length) || 
+                      (url.endsWith(']') && (url.match(/\[/g) || []).length < (url.match(/\]/g) || []).length)) {
+                  url = url.slice(0, -1);
+               }
+               const urlLower = url.toLowerCase();
+               if (!urlLower.includes("tasks.google.com") && !urlLower.includes("/tasks") && !urlLower.includes("googleapis.com/tasks")) {
+                  topLink = url;
+                  break;
+               }
+            }
+         }
+      }
       
       const lines = textBlock.split('\n');
       lines.forEach(line => {
@@ -586,10 +656,9 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       const originalDate = task.due;
       let isFutureDate = false;
       if (originalDate && !originalDate.includes("2099-12-31")) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const taskDate = new Date(originalDate);
-        if (taskDate >= today) {
+        const todayStr = Utilities.formatDate(new Date(), "Europe/London", "yyyy-MM-dd");
+        const taskDateStr = Utilities.formatDate(new Date(originalDate), "Europe/London", "yyyy-MM-dd");
+        if (taskDateStr >= todayStr) {
           isFutureDate = true;
         }
       }
@@ -661,11 +730,15 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       const rawNotesStr = finalNotes.join('\n');
       const metaSplitForHash = rawNotesStr.split('---SYSTEM_METADATA---');
       let baseNotesForHash = metaSplitForHash[0];
-      baseNotesForHash = baseNotesForHash.replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
-      baseNotesForHash = baseNotesForHash.replace(/\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
+      baseNotesForHash = baseNotesForHash.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
       baseNotesForHash = baseNotesForHash.trim();
       
-      const finalContentForHash = finalTitle + "|" + baseNotesForHash + "|" + (finalDue || "") + "|" + (u.routingTarget === "COMPLETE" ? "completed" : "needsAction");
+      const normFinalTitle = finalTitle.replace(/\s+/g, " ").trim();
+      const normFinalNotes = baseNotesForHash.replace(/\s+/g, " ").trim();
+      const normFinalDue = (finalDue || "").replace(/\s+/g, " ").trim();
+      const normFinalStatus = (u.routingTarget === "COMPLETE" ? "completed" : "needsAction").replace(/\s+/g, " ").trim();
+      
+      const finalContentForHash = normFinalTitle + "|" + normFinalNotes + "|" + normFinalDue + "|" + normFinalStatus;
       const currentHash = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, finalContentForHash));
       existingMetadata.ai_hash = currentHash;
       
@@ -692,11 +765,14 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
             due: finalDue,
             status: u.routingTarget === "COMPLETE" ? "completed" : "needsAction"
           };
-          Tasks.Tasks.insert(newTask, targetListId);
+          
+          const createdTask = Tasks.Tasks.insert(newTask, targetListId);
           
           if (isAssignedTask) {
              console.log(`Assigned task identified. Marking original task ${u.taskId} as completed.`);
              Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
+             PropertiesService.getScriptProperties().deleteProperty("ai_hash_" + u.taskId);
+             PropertiesService.getScriptProperties().setProperty("ai_hash_" + createdTask.id, currentHash);
           } else {
              console.log(`Standard task identified. Removing original task ${u.taskId}.`);
              try {
@@ -708,13 +784,21 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
           }
       } else {
           if (isAssignedTask) {
-             // Notes are read-only for assigned tasks, do not try to patch them
-             const patchObj = {
-               title: finalTitle,
-               status: finalStatus
-             };
+             const patchObj = { status: finalStatus };
              console.log(`Patching assigned task in place: ${JSON.stringify(patchObj)}`);
              Tasks.Tasks.patch(patchObj, listId, u.taskId);
+             
+             if (finalStatus === "completed") {
+                PropertiesService.getScriptProperties().deleteProperty("ai_hash_" + u.taskId);
+             } else {
+                let cNotes = task.notes || "";
+                cNotes = cNotes.split('---SYSTEM_METADATA---')[0].replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "").replace(/\s+/g, " ").trim();
+                const nTitle = (task.title || "").replace(/\s+/g, " ").trim();
+                const nDue = (task.due || "").replace(/\s+/g, " ").trim();
+                const nStatus = finalStatus.replace(/\s+/g, " ").trim();
+                const assignedHash = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, nTitle + "|" + cNotes + "|" + nDue + "|" + nStatus));
+                PropertiesService.getScriptProperties().setProperty("ai_hash_" + u.taskId, assignedHash);
+             }
           } else {
              const patchObj = {
                notes: newNotesStr,
@@ -766,8 +850,21 @@ function getCalendarCapacity() {
  */
 function getTodayCalendarEvents() {
   const now = new Date();
-  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+  const yyyy = Utilities.formatDate(now, "Europe/London", "yyyy");
+  const MM = Utilities.formatDate(now, "Europe/London", "MM");
+  const dd = Utilities.formatDate(now, "Europe/London", "dd");
+
+  const approxStart = new Date(`${yyyy}-${MM}-${dd}T00:00:00Z`);
+  const approxEnd = new Date(`${yyyy}-${MM}-${dd}T23:59:59Z`);
+
+  const startOffset = Utilities.formatDate(approxStart, "Europe/London", "XXX");
+  const endOffset = Utilities.formatDate(approxEnd, "Europe/London", "XXX");
+
+  const startStr = `${yyyy}-${MM}-${dd}T00:00:00${startOffset}`;
+  const endStr = `${yyyy}-${MM}-${dd}T23:59:59${endOffset}`;
+
+  const startOfDay = new Date(startStr);
+  const endOfDay = new Date(endStr);
   try {
     const events = CalendarApp.getDefaultCalendar().getEvents(startOfDay, endOfDay);
     return events.map(e => ({
@@ -782,7 +879,7 @@ function getTodayCalendarEvents() {
 }
 
 /**
- * Downloads personal and work strategic goal tables from Google Drive, with script caching.
+ * Downloads personal and PMT strategic goal tables from Google Drive, with script caching.
  * 
  * @returns {string} Goals data text block.
  */
@@ -797,7 +894,7 @@ function getSystemGoals() {
     
     let goalsText = "=== PERSONAL GOALS ===\n";
     goalsText += DriveApp.getFileById(personalId).getBlob().getDataAsString();
-    goalsText += "\n\n=== WORK GOALS ===\n";
+    goalsText += "\n\n=== PMT GOALS ===\n";
     goalsText += DriveApp.getFileById(workId).getBlob().getDataAsString();
     
     cache.put("SYSTEM_GOALS_V2", goalsText.substring(0, 100000), 21600); // Cache for 6 hours
@@ -849,7 +946,7 @@ function writeOnePager(markdownStr, isDailyPlan) {
      const folderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
      const folder = DriveApp.getFolderById(folderId);
      
-     const suffix = isWorkAccount() ? " (Work)" : " (Private)";
+     const suffix = isPmtAccount() ? " (PMT)" : " (Private)";
      const baseName = isDailyPlan ? "TS - Task Master > 1 Day Execution Plan" : "TS - Task Master > Global Priority Review";
      const fileName = baseName + suffix + ".md";
      

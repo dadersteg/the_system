@@ -75,9 +75,9 @@ const ss = getMasterSpreadsheet();
  * creates the correct flat WOS Gmail labels if missing.
  */
 function cleanAndCreateGmailLabels() {
-  const isWork = isWorkAccount();
+  const isPmt = isPmtAccount();
   
-  console.log(`Starting Gmail Labels cleanup and alignment for ${isWork ? "Work" : "Private"} profile...`);
+  console.log(`Starting Gmail Labels cleanup and alignment for ${isPmt ? "PMT" : "Private"} profile...`);
   const labels = GmailApp.getUserLabels();
   
   // 1. Delete legacy/messed up labels
@@ -94,7 +94,7 @@ function cleanAndCreateGmailLabels() {
   });
   
   // 2. Fetch the taxonomy JSON dynamically
-  const taxonomyFilename = isWork ? "PMTOS_Taxonomy.json" : "LOS_Taxonomy.json";
+  const taxonomyFilename = isPmt ? "PMTOS_Taxonomy.json" : "LOS_Taxonomy.json";
   const files = DriveApp.getFilesByName(taxonomyFilename);
   if (!files.hasNext()) {
     console.error(taxonomyFilename + " not found. Please run syncTaxonomyToSheet() first.");
@@ -116,8 +116,8 @@ function cleanAndCreateGmailLabels() {
       const parts = item["Drive Path"].split("/").map(s => s.trim()).filter(Boolean);
       const firstPart = parts[0] || "";
       
-      // Ignore system triage (00) and system operational (99) tags
-      if (firstPart.indexOf("00 ") === 0 || firstPart.indexOf("99 ") === 0 || item["L1 Code"] === "00 00 00" || item["L1 Name"] === "System") {
+      // Ignore system triage (00), system operational (99) tags, and cross-dimensional (goals/strategies)
+      if (firstPart.indexOf("00 ") === 0 || firstPart.indexOf("99 ") === 0 || item["L1 Code"] === "00 00 00" || item["L1 Name"] === "System" || item["L1 Code"] === "Cross-Dimensional") {
         return;
       }
       

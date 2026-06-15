@@ -342,8 +342,8 @@ function checkEverything() {
 }
 
 /**
- * Helper to update the WORKSPACE_FOLDER_ID UserProperty for the Work profile.
- * Run this function once from the dropdown in your Work Google Apps Script editor.
+ * Helper to update the WORKSPACE_FOLDER_ID UserProperty for the PMT profile.
+ * Run this function once from the dropdown in your PMT Google Apps Script editor.
  */
 function setWorkWorkspaceFolderProperty() {
   const workWorkspaceFolderId = "1Jb5PhZnrqsP3uoUE20Lv75eO4zySPyTr";
@@ -362,8 +362,8 @@ function setWorkWorkspaceFolderProperty() {
 }
 
 /**
- * Configures the Google Apps Script user properties for The Clerk Notes on the Work account.
- * Run this function once from the dropdown in your Work Google Apps Script editor.
+ * Configures the Google Apps Script user properties for The Clerk Notes on the PMT account.
+ * Run this function once from the dropdown in your PMT Google Apps Script editor.
  */
 function setWorkClerkNotesProperties() {
   const properties = {
@@ -376,17 +376,17 @@ function setWorkClerkNotesProperties() {
     const props = PropertiesService.getUserProperties();
     props.setProperties(properties);
     console.log("======================================================================");
-    console.log("SUCCESS: Work Clerk Notes User Properties configured successfully!");
+    console.log("SUCCESS: PMT Clerk Notes User Properties configured successfully!");
     console.log(JSON.stringify(properties, null, 2));
     console.log("======================================================================");
   } catch (e) {
-    console.error("Failed to set Work Clerk Notes properties: " + e.message);
+    console.error("Failed to set PMT Clerk Notes properties: " + e.message);
   }
 }
 
 /**
- * Prepends the standard instruction header to the Work Running Notes Google Doc.
- * Run this function once from the dropdown in your Work Google Apps Script editor.
+ * Prepends the standard instruction header to the PMT Running Notes Google Doc.
+ * Run this function once from the dropdown in your PMT Google Apps Script editor.
  */
 function setupWorkClerkRunningNotesDoc() {
   const docId = "1Q-ADivuGgaknMWbEFe-1QnS2v9c5K9FHdnPDifo0JDI";
@@ -395,12 +395,12 @@ function setupWorkClerkRunningNotesDoc() {
     const body = doc.getBody();
     const text = body.getText();
     
-    if (!text.includes("WORK RUNNING NOTES")) {
+    if (!text.includes("PMT RUNNING NOTES")) {
       const instructions = 
-        "# WORK RUNNING NOTES\n" +
+        "# PMT RUNNING NOTES\n" +
         "Instructions: Append new meeting notes or scratchpad items at the very bottom of this document. " +
         "The Clerk will automatically sweep the document, clean your notes into structured markdown, " +
-        "extract actionable tasks to your Work tasks backlog, and append a new '--- PROCESSED [Timestamp] ---' " +
+        "extract actionable tasks to your PMT tasks backlog, and append a new '--- PROCESSED [Timestamp] ---' " +
         "divider. Do not modify text above the latest processed divider.\n\n" +
         "--- PROCESSED Initialized ---\n\n";
         
@@ -417,8 +417,8 @@ function setupWorkClerkRunningNotesDoc() {
 }
 
 /**
- * Automates the insertion of the new Work Profile API Key into Script Properties.
- * Run this function once from the dropdown in your Work Google Apps Script editor.
+ * Automates the insertion of the new PMT Profile API Key into Script Properties.
+ * Run this function once from the dropdown in your PMT Google Apps Script editor.
  */
 function setWorkGeminiAPIKey() {
   // ⚠️ SECURITY WARNING: Never hardcode API keys. 
@@ -428,7 +428,7 @@ function setWorkGeminiAPIKey() {
     const props = PropertiesService.getScriptProperties();
     props.setProperty("GEMINI_API_KEY", newApiKey);
     console.log("======================================================================");
-    console.log("SUCCESS: Work Profile GEMINI_API_KEY configured securely in the cloud!");
+    console.log("SUCCESS: PMT Profile GEMINI_API_KEY configured securely in the cloud!");
     console.log("======================================================================");
   } catch (e) {
     console.error("Failed to set GEMINI_API_KEY: " + e.message);

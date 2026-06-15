@@ -1,6 +1,6 @@
 function printTrueIds() {
-  const isWork = isWorkAccount();
-  const profileName = isWork ? "WORK" : "PRIVATE";
+  const isPmt = isPmtAccount();
+  const profileName = isPmt ? "PMT" : "PRIVATE";
   
   const trueConfig = {
     PROFILE: profileName,

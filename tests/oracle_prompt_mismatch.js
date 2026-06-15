@@ -4,7 +4,8 @@ const vm = require('vm');
 
 let tasksDb = {
   'importer-list': [],
-  'todo-list': []
+  'todo-list': [],
+  'to-be-deleted-list': []
 };
 
 const Tasks = {
@@ -46,7 +47,7 @@ const callGeminiMock = (payloadStr, modelName, systemInstruction, schema) => {
     taskUpdates: [
       {
         taskId: "task-1",
-        routingTarget: "PROPOSE_DELETE", // as instructed by Task_Master_Prompt.md
+        routingTarget: "DELETE", // as instructed by Task_Master_Prompt.md
         estimatedDuration: "0m",
         alignedGoal: "Maintenance",
         category_path: "N/A",
@@ -58,7 +59,7 @@ const callGeminiMock = (payloadStr, modelName, systemInstruction, schema) => {
 
 const sandbox = {
   SYSTEM_CONFIG: {
-    TASKS: { IMPORTER_LIST_ID: 'importer-list', TODO_LIST_ID: 'todo-list' },
+    TASKS: { IMPORTER_LIST_ID: 'importer-list', TODO_LIST_ID: 'todo-list', TO_BE_DELETED_LIST_ID: 'to-be-deleted-list' },
     DOCS: { TASK_MASTER_PROMPT_ID: '1', TAXONOMY_JSON_ID: '1', PERSONAL_GOALS_FILE_ID: '1', WORK_GOALS_FILE_ID: '1' },
     ROOTS: {}, SECRETS: {}
   },
@@ -84,16 +85,20 @@ function runOracle() {
     { id: 'task-1', title: 'Junk Task', notes: '', status: 'needsAction' }
   ];
   tasksDb['todo-list'] = [];
+  tasksDb['to-be-deleted-list'] = [];
   
   sandbox.runTaskMasterEngine();
   
-  const task1 = tasksDb['todo-list'].find(t => t.title.includes('Junk')) || tasksDb['importer-list'].find(t => t.title.includes('Junk'));
+  const task1 = tasksDb['to-be-deleted-list'].find(t => t.title.includes('Junk')) ||
+                tasksDb['todo-list'].find(t => t.title.includes('Junk')) ||
+                tasksDb['importer-list'].find(t => t.title.includes('Junk'));
   
-  if (task1.title.includes("99 To be deleted")) {
+  if (task1 && task1.title.includes("99 To be deleted")) {
     console.log("PASS: Task was correctly marked for deletion.");
   } else {
-    console.log(`FAIL: Task title is '${task1.title}'. It was NOT marked for deletion.`);
-    console.log(`Task is currently in ${tasksDb['todo-list'].length > 0 ? 'todo-list' : 'importer-list'}.`);
+    const title = task1 ? task1.title : 'undefined';
+    console.log(`FAIL: Task title is '${title}'. It was NOT marked for deletion.`);
+    console.log(`Task is currently in ${tasksDb['to-be-deleted-list'].length > 0 ? 'to-be-deleted-list' : (tasksDb['todo-list'].length > 0 ? 'todo-list' : 'importer-list')}.`);
     process.exit(1);
   }
 }

@@ -26,6 +26,28 @@ function doGet(e) {
   const healthRes = processHealthRequest(e);
   if (healthRes) return healthRes;
 
+  if (e && e.parameter && e.parameter.action === "readDocBypass") {
+     return readDocBypass(e.parameter.fileId);
+  }
+  
+  if (e && e.parameter && e.parameter.action === "updateCloudDoc") {
+     try {
+       updateCloudDoc();
+       return ContentService.createTextOutput("OK - Cloud doc forced to update.");
+     } catch(err) {
+       return ContentService.createTextOutput("Error: " + err.message);
+     }
+  }
+
+  if (e && e.parameter && e.parameter.action === "runDriveArchaeologist") {
+     try {
+       runDriveArchaeologist();
+       return ContentService.createTextOutput("OK - runDriveArchaeologist executed successfully.");
+     } catch(err) {
+       return ContentService.createTextOutput("Error: " + err.message);
+     }
+  }
+
   if (e && e.parameter && e.parameter.action === "createManifestSpreadsheet") {
      try {
        const url = createManifestSpreadsheet();
@@ -100,8 +122,11 @@ function doGet(e) {
       const ss = getMasterSpreadsheet();
       const sheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.EMAIL_LOG);
       const lr = sheet.getLastRow();
+      if (lr <= 1) {
+         return ContentService.createTextOutput(JSON.stringify([]));
+      }
       const startRow = Math.max(2, lr - 24);
-      const numRows = Math.max(1, lr - startRow + 1);
+      const numRows = lr - startRow + 1;
       const data = sheet.getRange(startRow, 1, numRows, sheet.getLastColumn()).getValues();
       return ContentService.createTextOutput(JSON.stringify(data));
    }
@@ -114,10 +139,9 @@ function doGet(e) {
      const result = generateWifieMessage();
      return ContentService.createTextOutput(JSON.stringify(result, null, 2)).setMimeType(ContentService.MimeType.JSON);
   }
-  if (e && e.parameter && e.parameter.recurring === "true") {
-     createRecurringCarryTasks();
-     return ContentService.createTextOutput("Successfully created recurring tasks.");
-  }
+   if (e && e.parameter && e.parameter.recurring === "true") {
+      return ContentService.createTextOutput("Recurring task generation via Apps Script has been retired. Please use rebuild_recurring_tasks.py instead.");
+   }
   if (e && e.parameter && e.parameter.checkPrompt === "true") {
      const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
      const content = DriveApp.getFileById(promptId).getBlob().getDataAsString();
@@ -930,19 +954,20 @@ function getDashboardData() {
         if (lastRow > 1) {
           const startRow = Math.max(2, lastRow - 24);
           const numRows = lastRow - startRow + 1;
-          const logData = taskLogSheet.getRange(startRow, 1, numRows, 8).getValues();
+          const logData = taskLogSheet.getRange(startRow, 1, numRows, 17).getValues();
           data.clerkTasks = logData.reverse().map(row => {
             let parsedDate = "";
-            try { parsedDate = row[0] ? new Date(row[0]).toISOString() : new Date().toISOString(); } catch(e) {}
+            try { parsedDate = row[7] ? new Date(row[7]).toISOString() : new Date().toISOString(); } catch(e) {}
             return {
               date: parsedDate,
-              originalTitle: row[1] || "Untitled",
-              due: row[2] || "",
-              targetList: row[3] || "",
-              cleanedTitle: row[4] || "",
-              notes: row[5] || "",
-              status: row[6] || "",
-              taskId: row[7] || ""
+              originalTitle: row[4] || "Untitled", // Task Title
+              due: row[7] || "",                  // Due Date
+              targetList: row[1] || "",           // Task List
+              cleanedTitle: row[4] || "",         // Cleaned Title
+              category: row[3] ? (row[2] + " > " + row[3]) : (row[2] || "N/A"), // Combined Category
+              notes: row[5] || "",                // Notes
+              status: row[6] || "",               // Status
+              taskId: row[14] || ""               // Task ID
             };
           });
         }
@@ -1133,7 +1158,11 @@ function generateWifieMessage() {
     
     if (logSheet) {
       const data = logSheet.getDataRange().getValues();
-      const headers = data[0].map(h => h.toString().toLowerCase().trim());
+      let headerRowIdx = 0;
+      if (data.length > 1 && data[0].findIndex(h => h.toString().trim().toLowerCase() === "link") === -1) {
+        headerRowIdx = 1;
+      }
+      const headers = data[headerRowIdx].map(h => h.toString().toLowerCase().trim());
       const subjectIdx = headers.indexOf('subject');
       const senderIdx = headers.indexOf('sender');
       const summaryIdx = headers.indexOf('ai summary');
@@ -1141,7 +1170,7 @@ function generateWifieMessage() {
       
       const recentWifieChats = [];
       
-      for (let i = data.length - 1; i >= Math.max(1, data.length - 100); i--) {
+      for (let i = data.length - 1; i >= Math.max(headerRowIdx + 1, data.length - 100); i--) {
         const row = data[i];
         const subject = (row[subjectIdx] || "").toString().toLowerCase();
         const sender = (row[senderIdx] || "").toString().toLowerCase();
@@ -1546,14 +1575,14 @@ function getDashboardClerkLogs() { const startT = Date.now();
   console.log("Clerk logs load time: " + (Date.now() - startT) + "ms"); return res; }
 
 function parseExecutionPlan(md) {
-  const data = { bluf: "", frogs: { work: [], personal: [] }, top3: { work: [], personal: [] }, rest: { work: [], personal: [] }, alerts: [], triage: "" };
+  const data = { bluf: "", frogs: { pmt: [], personal: [] }, top3: { pmt: [], personal: [] }, rest: { pmt: [], personal: [] }, alerts: [], triage: "" };
   if (typeof md !== "string") {
     console.warn("parseExecutionPlan received non-string input:", md);
     return data;
   }
   
   let currentSection = "";
-  let currentCategory = ""; // "work" or "personal"
+  let currentCategory = ""; // "pmt" or "personal"
   
   try {
     const lines = md.split('\n');
@@ -1574,8 +1603,8 @@ function parseExecutionPlan(md) {
       }
       
       // Support emojis or bold
-      if (line.match(/^\*\*Work:\*\*/i) || line.match(/^\*\*💼 Work:\*\*/i)) {
-        currentCategory = "work";
+      if (line.match(/^\*\*PMT:\*\*/i) || line.match(/^\*\*🎯 PMT:\*\*/i)) {
+        currentCategory = "pmt";
         continue;
       }
       if (line.match(/^\*\*Personal:\*\*/i) || line.match(/^\*\*🏠 Personal:\*\*/i)) {

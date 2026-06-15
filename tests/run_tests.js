@@ -141,7 +141,8 @@ const sandbox = {
   console: consoleMock,
   callGemini: callGeminiMock,
   selectModelForPayload: () => 'gemini-1.5-pro',
-  executeTimeboxing: () => {}
+  executeTimeboxing: () => {},
+  processPromptText: (text) => text || ""
 };
 
 vm.createContext(sandbox);

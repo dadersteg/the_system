@@ -59,6 +59,14 @@ function runTheClerkEmailOngoing() {
 
   // Run the batch (Limit 15 to prevent timeout)
   executeTriageEngine(newEmailQuery, 15, false, configPayload);
+  
+  // THE PHOTO EXTRACTOR: Process any new Telegram/Messenger backup photos
+  try {
+    processGmailPhotos();
+  } catch(e) {
+    console.warn("processGmailPhotos failed: " + e.message);
+  }
+  
   return "Successfully swept inbox and executed triage engine.";
 }
 
@@ -545,7 +553,7 @@ function callLLMWithSourceContext(subject, from, body, docInstructions, taxonomy
   }
 
   // 3. Append JSON context and Goal Lists
-  finalPrompt += `\n\n--- OPEN TASKS ---\n${openTasksStr}\n\n--- VALID TAXONOMY CATEGORIES (Use 'Concat' logic or textual names) ---\n${taxonomyJson}\n\n--- MASTER GOAL LISTS ---\n**PERSONAL GOALS:**\n${personalGoalsStr}\n\n**WORK GOALS:**\n${workGoalsStr}\n\n--- CONTEXT: PRE-EXISTING LABELS --- [ ${existing.join(', ') || "None"} ]\n--- CONTEXT: SPREADSHEET RULES --- [ ${ss.join(', ') || "None"} ]\n--- SYSTEM DIRECTIVES ---\n${systemNotes || "None"}\n--- EMAIL DATA ---\nFROM: ${from} | SUBJECT: ${subject} | BODY: ${body}\nJSON:`;
+  finalPrompt += `\n\n--- OPEN TASKS ---\n${openTasksStr}\n\n--- VALID TAXONOMY CATEGORIES (Use 'Concat' logic or textual names) ---\n${taxonomyJson}\n\n--- MASTER GOAL LISTS ---\n**PERSONAL GOALS:**\n${personalGoalsStr}\n\n**PMT GOALS:**\n${workGoalsStr}\n\n--- CONTEXT: PRE-EXISTING LABELS --- [ ${existing.join(', ') || "None"} ]\n--- CONTEXT: SPREADSHEET RULES --- [ ${ss.join(', ') || "None"} ]\n--- SYSTEM DIRECTIVES ---\n${systemNotes || "None"}\n--- EMAIL DATA ---\nFROM: ${from} | SUBJECT: ${subject} | BODY: ${body}\nJSON:`;
   
   const parts = [{ "text": finalPrompt }];
   if (inlineImages && inlineImages.length > 0) {

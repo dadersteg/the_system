@@ -75,6 +75,10 @@ try:
 except Exception as e:
     print("No blocked_threads.json found or invalid format.")
 
+# --- DEDUPLICATION CACHE (for SMS relay) ---
+# Stores MD5 hashes of raw message text with their processing timestamps
+processed_sms_hashes = {}
+
 # --- BUFFERING LOGIC ---
 message_buffer = {}
 BUFFER_DELAY_SECONDS = 5 * 60
@@ -190,6 +194,21 @@ async def handler(event):
             first_line = raw.split('\n')[0]
             phone = first_line.replace('📱 [SMS]', '').replace('[SMS]', '').strip()
             thread_name = f"SMS: {phone}" if phone else "SMS Inbox"
+        
+    # Deduplicate raw text of SMS messages to prevent double-sends from MacroDroid retries
+    if is_sms_relay and event.raw_text:
+        global processed_sms_hashes
+        text_hash = hashlib.md5(event.raw_text.encode('utf-8')).hexdigest()
+        now = time.time()
+        
+        # Clean up hashes older than 10 minutes
+        expiry = now - 10 * 60
+        processed_sms_hashes = {h: t for h, t in processed_sms_hashes.items() if t > expiry}
+        
+        if text_hash in processed_sms_hashes:
+            print(f"Ignoring duplicate SMS message with hash: {text_hash}")
+            return
+        processed_sms_hashes[text_hash] = now
         
     # Check if thread is blocked
     if thread_name.lower() in BLOCKED_THREADS:

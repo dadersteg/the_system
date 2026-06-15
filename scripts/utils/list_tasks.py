@@ -49,10 +49,14 @@ def fetch_active_tasks(service):
 def parse_args():
     parser = argparse.ArgumentParser(description="List active Google Tasks")
     parser.add_argument("--json", action="store_true", help="Output raw JSON instead of formatted text")
+    parser.add_argument("--profile", choices=["private", "work"], help="Filter tasks by profile (private or work)")
     return parser.parse_args()
 
 def main():
     args = parse_args()
+    
+    load_private = args.profile in [None, "private"]
+    load_work = args.profile in [None, "work"]
     
     script_dir = os.path.dirname(os.path.realpath(__file__))
     auth_dir = os.path.realpath(os.path.join(script_dir, '../../auth'))
@@ -60,8 +64,8 @@ def main():
     private_token = os.path.join(auth_dir, 'token_tasks.json')
     work_token = os.path.join(auth_dir, 'token_tasks_work.json')
     
-    service_p = get_service(private_token)
-    service_w = get_service(work_token)
+    service_p = get_service(private_token) if load_private else None
+    service_w = get_service(work_token) if load_work else None
     
     same_account = False
     if service_p and service_w:
@@ -106,11 +110,15 @@ def main():
                 due_str = f" [Due: {due.split('T')[0]}]" if due else ""
                 print(f"    - [ ] {title}{due_str}")
 
-    print_sector("Private Tasks", tasks_p)
-    if not same_account:
-        print_sector("Work Tasks", tasks_w)
-    else:
-        print("\n💼 Work Tasks: (Hidden to prevent duplicates; please resolve account token collision)")
+    if load_private:
+        print_sector("Private Tasks", tasks_p)
+    
+    if load_work:
+        if not same_account:
+            print_sector("Work Tasks", tasks_w)
+        else:
+            print("\n💼 Work Tasks: (Hidden to prevent duplicates; please resolve account token collision)")
+            
     print("\n====================================================")
 
 if __name__ == '__main__':
