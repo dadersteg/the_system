@@ -143,6 +143,45 @@
     "Drive Path": "02 00 00 Work/02 03 00 Collections"
   },
   {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "03 01 00",
+    "L2 Name": "Östra Real",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies/01 Östra Real",
+    "Concat (Path)": "03 01 00 Östra Real",
+    "Drive Path": "03 00 00 Studies/03 01 00 Östra Real"
+  },
+  {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "03 02 00",
+    "L2 Name": "Uppsala University",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies/02 Uppsala University",
+    "Concat (Path)": "03 02 00 Uppsala University",
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University"
+  },
+  {
+    "L1 Code": "03 00 00",
+    "L1 Name": "Studies",
+    "L2 Code": "03 03 00",
+    "L2 Name": "Stockholms Nation",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "",
+    "L4 Description": "",
+    "Concat (Label)": "03 Studies/03 Stockholms Nation",
+    "Concat (Path)": "03 03 00 Stockholms Nation",
+    "Drive Path": "03 00 00 Studies/03 03 00 Stockholms Nation"
+  },
+  {
     "L1 Code": "01 00 00",
     "L1 Name": "Private",
     "L2 Code": "01 01 00",
@@ -315,66 +354,66 @@
     "L1 Code": "03 00 00",
     "L1 Name": "Studies",
     "L2 Code": "03 02 00",
-    "L2 Name": "",
+    "L2 Name": "Uppsala University",
     "L3 Code": "03 02 01",
     "L3 Name": "År 1 | (2009-2010)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/01 År 1 | (2009-2010)",
+    "Concat (Label)": "03 Studies/02 Uppsala University/01 År 1 | (2009-2010)",
     "Concat (Path)": "03 02 01 År 1 | (2009-2010)",
-    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 01 År 1 | (2009-2010)"
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 01 År 1 | (2009-2010)"
   },
   {
     "L1 Code": "03 00 00",
     "L1 Name": "Studies",
     "L2 Code": "03 02 00",
-    "L2 Name": "",
+    "L2 Name": "Uppsala University",
     "L3 Code": "03 02 02",
     "L3 Name": "År 2 | (2010-2011)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/02 År 2 | (2010-2011)",
+    "Concat (Label)": "03 Studies/02 Uppsala University/02 År 2 | (2010-2011)",
     "Concat (Path)": "03 02 02 År 2 | (2010-2011)",
-    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 02 År 2 | (2010-2011)"
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 02 År 2 | (2010-2011)"
   },
   {
     "L1 Code": "03 00 00",
     "L1 Name": "Studies",
     "L2 Code": "03 02 00",
-    "L2 Name": "",
+    "L2 Name": "Uppsala University",
     "L3 Code": "03 02 03",
     "L3 Name": "År 3 | (2011-2012)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/03 År 3 | (2011-2012)",
+    "Concat (Label)": "03 Studies/02 Uppsala University/03 År 3 | (2011-2012)",
     "Concat (Path)": "03 02 03 År 3 | (2011-2012)",
-    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 03 År 3 | (2011-2012)"
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 03 År 3 | (2011-2012)"
   },
   {
     "L1 Code": "03 00 00",
     "L1 Name": "Studies",
     "L2 Code": "03 02 00",
-    "L2 Name": "",
+    "L2 Name": "Uppsala University",
     "L3 Code": "03 02 04",
     "L3 Name": "År 4 | (2012, 2014)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/04 År 4 | (2012, 2014)",
+    "Concat (Label)": "03 Studies/02 Uppsala University/04 År 4 | (2012, 2014)",
     "Concat (Path)": "03 02 04 År 4 | (2012, 2014)",
-    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 04 År 4 | (2012, 2014)"
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 04 År 4 | (2012, 2014)"
   },
   {
     "L1 Code": "03 00 00",
     "L1 Name": "Studies",
     "L2 Code": "03 02 00",
-    "L2 Name": "",
+    "L2 Name": "Uppsala University",
     "L3 Code": "03 02 05",
     "L3 Name": "År 5 | (2014-2015)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/05 År 5 | (2014-2015)",
+    "Concat (Label)": "03 Studies/02 Uppsala University/05 År 5 | (2014-2015)",
     "Concat (Path)": "03 02 05 År 5 | (2014-2015)",
-    "Drive Path": "03 00 00 Studies/03 02 00 /03 02 05 År 5 | (2014-2015)"
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 05 År 5 | (2014-2015)"
   },
   {
     "L1 Code": "01 00 00",
@@ -465,7 +504,7 @@
     "L4 Description": "",
     "Concat (Label)": "03 Studies/99 Studies Archive",
     "Concat (Path)": "03 00 99 Studies Archive",
-    "Drive Path": "03 00 00 Studies/03 00 00 /03 00 99 Studies Archive"
+    "Drive Path": "03 00 00 Studies/03 00 99 Studies Archive"
   },
   {
     "L1 Code": "01 00 00",
@@ -1401,7 +1440,7 @@
     "L4 Description": "Historical Studies",
     "Concat (Label)": "03 Studies/99 Studies Archive/Stockholms Nation",
     "Concat (Path)": "03 00 99 Studies Archive > Stockholms Nation",
-    "Drive Path": "03 00 00 Studies/03 00 00 /03 00 99 Studies Archive"
+    "Drive Path": "03 00 00 Studies/03 00 99 Studies Archive/Stockholms Nation"
   },
   {
     "L1 Code": "03 00 00",
@@ -1414,7 +1453,7 @@
     "L4 Description": "Historical Studies",
     "Concat (Label)": "03 Studies/99 Studies Archive/Uppsala University",
     "Concat (Path)": "03 00 99 Studies Archive > Uppsala University",
-    "Drive Path": "03 00 00 Studies/03 00 00 /03 00 99 Studies Archive"
+    "Drive Path": "03 00 00 Studies/03 00 99 Studies Archive/Uppsala University"
   },
   {
     "L1 Code": "02 00 00",
