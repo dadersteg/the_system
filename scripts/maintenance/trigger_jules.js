@@ -41,7 +41,7 @@ if (taskType === '--micro-ui') {
 3. Do NOT make sweeping architectural changes or break any existing functionality. Surgical precision only.`;
 }
 
-const JULES_API_KEY = "***REMOVED***";
+const JULES_API_KEY = process.env.JULES_API_KEY || "REPLACE_WITH_YOUR_KEY";
 
 const payload = {
   jsonrpc: "2.0",
