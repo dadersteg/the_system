@@ -147,14 +147,15 @@ const SYSTEM_CONFIG = {
                      "1FTMPS0DidTf0-JH1QQN_qZ5qB_eTnXoo", // Saved from Chrome (Carina)
                      "17uUH01ihipNeRfTQQcD61zzjORpWFCRY"  // Saved from Chrome (Daniel)
                    ]),
-    OUT_OF_SCOPE: (IS_PMT_ENV ? [
+    OUT_OF_SCOPE: [
+                     // PMT Local Folders
                      "1iuy0Ewq-m-ZDgUOkzQt6juDeqK9QaW5W", // 00 Inbox (PMT)
                      "1VnfJ8SJkwpmQB6ASImsk_-czonEC2RCl", // MacMini Desktop (PMT)
                      "1W3hfHcmIa3jXsY4Mv2q2WnHsoYt1IlkH", // MacMini Downloads (PMT)
                      "1kNQj91SMLlAUsOzAiBBmsjLoQXunRANG", // MBA Desktop (PMT)
                      "15RKY62cIZp0MYGPCtkaZ7Z4_Pn8bsPeB", // MBA Downloads (PMT)
-                     "1UclbKZ_K7gwwgZN3UynHqb3yvOte2V1-"  // MBA Documents (PMT)
-                   ] : [
+                     "1UclbKZ_K7gwwgZN3UynHqb3yvOte2V1-", // MBA Documents (PMT)
+                     // Private Local Folders
                      "1XossC1cdOZE82efew3qH48LJnhl6ng4i", // 00 Inbox
                      "1twdnJDVS3br2F_vcNW7nXAAUeLu2H5sh", // MacMini Desktop
                      "1UOv58dSn1uL3GJVJ1rP3xvpve4LVqNhv", // MacMini Downloads
@@ -164,7 +165,7 @@ const SYSTEM_CONFIG = {
                      "1-ADyfSnqq1Yk31Hd0upzWumJuZM77k0Q", // MBA Documents
                      "1FTMPS0DidTf0-JH1QQN_qZ5qB_eTnXoo", // Saved from Chrome (Carina)
                      "17uUH01ihipNeRfTQQcD61zzjORpWFCRY"  // Saved from Chrome (Daniel)
-                   ]).join(","),
+                   ].join(","),
     STND_DEST: getEnvProp("DRIVE_STND_DEST") || (IS_PMT_ENV ? "1wAWcN2BA2xA8nMiKUad7UQP0H-scg_WR" : "1lQlTLOL3e-FTIDZ8hOXP6oi3aTMG6Ezb"), // Destination TBC
     REVIEW: getEnvProp("DRIVE_REVIEW") || (IS_PMT_ENV ? "1XhG9y__HT3x4QXmFKr9cBCRThSijHt9H" : "1FBBm4sFSFKf53T3n9sqoKhm1R8d6EDoY") // Manual Review
   },
