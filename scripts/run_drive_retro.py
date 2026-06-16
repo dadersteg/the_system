@@ -2,6 +2,7 @@ import os
 import json
 import time
 import socket
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Set a global timeout of 60 seconds for all network connections
@@ -13,6 +14,9 @@ from google.genai import Client
 from google.genai import types
 
 def load_env():
+    """
+    Loads environment variables from the local .env file.
+    """
     if os.path.exists('.env'):
         with open('.env', 'r') as f:
             for line in f:
@@ -40,33 +44,74 @@ DRIVE_RETRO_LOG_GID = "1325920151"
 
 # Load state
 STATE_FILE = 'drive_retro_state.json'
+
 def load_state():
+    """
+    Loads processing offset and page token state from the local state JSON file.
+    
+    Outputs:
+        dict: Loaded state with keys 'page_token' and 'processed_count'.
+    """
     if os.path.exists(STATE_FILE):
         with open(STATE_FILE, 'r') as f:
             return json.load(f)
     return {"page_token": None, "processed_count": 0}
 
 def save_state(state):
+    """
+    Saves the progress/offset state to a local state JSON file.
+    
+    Inputs:
+        state (dict): State dictionary containing page_token and processed_count.
+    """
     with open(STATE_FILE, 'w') as f:
         json.dump(state, f)
 
-# Folder cache for ancestor checking
+# Locks and caches for thread-safe operations
 ancestor_cache = {}
-def check_ancestor(file_id, bad_folder='10OWXo6W88eB3P-yP_zq67vrEPHqtbuc1'):
-    if file_id in ancestor_cache: return ancestor_cache[file_id]
-    try:
-        f = drive_service.files().get(fileId=file_id, fields='parents').execute()
-        parents = f.get('parents', [])
-        if bad_folder in parents:
+ancestor_cache_lock = threading.Lock()
+
+def check_ancestor(file_id, parents=None, bad_folder='10OWXo6W88eB3P-yP_zq67vrEPHqtbuc1'):
+    """
+    Checks recursively if a file or folder is a descendant of a specific bad folder.
+    Uses pre-fetched parent metadata and a thread-safe cache to avoid redundant API requests.
+    
+    Inputs:
+        file_id (str): The ID of the file or folder to check.
+        parents (list, optional): Pre-fetched parents from search results to save an API call.
+        bad_folder (str): The ID of the parent folder to flag as bad/invalid.
+        
+    Outputs:
+        bool: True if the file is a descendant of the bad folder, False otherwise.
+    """
+    if file_id == bad_folder:
+        return True
+        
+    with ancestor_cache_lock:
+        if file_id in ancestor_cache:
+            return ancestor_cache[file_id]
+            
+    if parents is None:
+        try:
+            f = drive_service.files().get(fileId=file_id, fields='parents').execute()
+            parents = f.get('parents', [])
+        except Exception as e:
+            print(f"Error fetching parents for {file_id}: {e}")
+            parents = []
+            
+    if bad_folder in parents:
+        with ancestor_cache_lock:
             ancestor_cache[file_id] = True
-            return True
-        for p in parents:
-            if check_ancestor(p, bad_folder):
+        return True
+        
+    for p in parents:
+        if check_ancestor(p, None, bad_folder):
+            with ancestor_cache_lock:
                 ancestor_cache[file_id] = True
-                return True
-    except:
-        pass
-    ancestor_cache[file_id] = False
+            return True
+            
+    with ancestor_cache_lock:
+        ancestor_cache[file_id] = False
     return False
 
 # Load Rules and TOMS
@@ -83,6 +128,16 @@ system_prompt = f"{instructions}\n\nTAXONOMY:\n{taxonomy}\n\nTARGET OPERATING MO
 CACHE_NAME = None
 
 def process_file(item):
+    """
+    Extracts a text snippet from a Google Drive file, calls Gemini API using a cached context
+    to retrieve structured renaming and path recommendations, and returns the result.
+    
+    Inputs:
+        item (dict): The file metadata dictionary containing id, name, mimeType, and modifiedTime.
+        
+    Outputs:
+        dict: A results dictionary detailing proposed names, paths, summaries, and success status.
+    """
     file_id = item['id']
     name = item['name']
     mime = item['mimeType']
@@ -108,6 +163,7 @@ def process_file(item):
         else:
             content_part += "[Content extraction skipped for binary]"
     except Exception as e:
+        print(f"Warning: Failed to extract content for '{name}' ({file_id}): {e}")
         content_part += f"[Error extracting: {e}]"
         
     try:
@@ -130,9 +186,16 @@ def process_file(item):
             "reasoning": data.get('reasoning', '')
         }
     except Exception as e:
+        print(f"Error calling Gemini for '{name}': {e}")
         return {"success": False, "item": item, "error": str(e)}
 
 def write_logs(results):
+    """
+    Appends processed metadata proposals to the master tracking spreadsheet.
+    
+    Inputs:
+        results (list): List of results dictionaries from process_file.
+    """
     sheet_name = "Drive 05 Retro Log"
     rows = []
     for res in results:
@@ -148,100 +211,163 @@ def write_logs(results):
     if not rows: return
     
     body = {"values": rows}
-    sheets_service.spreadsheets().values().append(
-        spreadsheetId=MASTER_SHEET_ID,
-        range=f"{sheet_name}!A:R",
-        valueInputOption="USER_ENTERED",
-        body=body
-    ).execute()
+    try:
+        sheets_service.spreadsheets().values().append(
+            spreadsheetId=MASTER_SHEET_ID,
+            range=f"{sheet_name}!A:R",
+            valueInputOption="USER_ENTERED",
+            body=body
+        ).execute()
+        print(f"Logged {len(rows)} entries to Google Sheet.")
+    except Exception as e:
+        print(f"Error appending log rows to Google Sheets: {e}")
 
 # Global cache for resolved paths to speed up lookups
 resolved_path_cache = {}
+folder_resolve_lock = threading.Lock()
 
 def resolve_folder_path(proposed_path):
+    """
+    Checks if a nested folder path exists in Google Drive. If not, it creates the folders.
+    Employs an in-memory thread-safe cache and pre-mapped root directory IDs to minimize queries.
+    
+    Inputs:
+        proposed_path (str): The concatenated path string separated by '>', e.g. "01 Private > 05 Other".
+        
+    Outputs:
+        str: The Google Drive ID of the resolved destination folder, or None if path is invalid.
+    """
     if not proposed_path or proposed_path.lower() == 'unknown':
         return None
         
-    if proposed_path in resolved_path_cache:
-        return resolved_path_cache[proposed_path]
-        
-    segments = [s.strip() for s in proposed_path.split('>')]
-    if not segments:
-        return None
-        
-    # Start by finding the first segment globally
-    first_seg = segments[0]
-    query = f"mimeType = 'application/vnd.google-apps.folder' and name contains '{first_seg}' and trashed = false"
-    res = drive_service.files().list(q=query, fields="files(id, name)").execute()
-    files = res.get('files', [])
-    
-    if files:
-        current_parent = files[0]['id']
-        matched_name = files[0]['name']
-        start_idx = 1
-        # If the next segment is already part of the matched folder name, skip it
-        if len(segments) > 1 and segments[1].lower() in matched_name.lower():
-            start_idx = 2
-    else:
-        current_parent = 'root'
-        start_idx = 0
-        
-    # Traverse/create subsequent segments
-    for i in range(start_idx, len(segments)):
-        segment = segments[i]
-        query = f"mimeType = 'application/vnd.google-apps.folder' and '{current_parent}' in parents and name = '{segment}' and trashed = false"
-        res = drive_service.files().list(q=query, fields="files(id)").execute()
-        subfiles = res.get('files', [])
-        
-        if subfiles:
-            current_parent = subfiles[0]['id']
-        else:
-            print(f"Creating folder '{segment}' under parent '{current_parent}'...")
-            file_metadata = {
-                'name': segment,
-                'mimeType': 'application/vnd.google-apps.folder',
-                'parents': [current_parent]
-            }
-            folder = drive_service.files().create(body=file_metadata, fields='id').execute()
-            current_parent = folder.get('id')
+    with folder_resolve_lock:
+        if proposed_path in resolved_path_cache:
+            return resolved_path_cache[proposed_path]
             
-    resolved_path_cache[proposed_path] = current_parent
-    return current_parent
+        segments = [s.strip() for s in proposed_path.split('>')]
+        if not segments:
+            return None
+            
+        # Start by finding the first segment globally
+        first_seg = segments[0]
+        
+        # Hardcoded map of core taxonomy roots to save API calls
+        known_roots = {
+            '01 private': '0B85__gYrQ-2Ud3JDY004TE4xYW8',
+            '01 00 00 private': '0B85__gYrQ-2Ud3JDY004TE4xYW8',
+            '02 work': '0B85__gYrQ-2USXRlV3RQSUd6RUk',
+            '02 00 00 work': '0B85__gYrQ-2USXRlV3RQSUd6RUk',
+            '03 studies': '0B85__gYrQ-2UcE5oeFhDRWg1YVE',
+            '03 00 00 studies': '0B85__gYrQ-2UcE5oeFhDRWg1YVE',
+            '99 archive': '1nJFVZbiAWArdP6pU-RBdLrKkD0rlelwY',
+            '99 00 00 archive': '1nJFVZbiAWArdP6pU-RBdLrKkD0rlelwY'
+        }
+        
+        clean_first_seg = first_seg.strip().lower()
+        if clean_first_seg in known_roots:
+            current_parent = known_roots[clean_first_seg]
+            start_idx = 1
+        else:
+            query = f"mimeType = 'application/vnd.google-apps.folder' and name contains '{first_seg}' and trashed = false"
+            res = drive_service.files().list(q=query, fields="files(id, name)").execute()
+            files = res.get('files', [])
+            
+            if files:
+                current_parent = files[0]['id']
+                matched_name = files[0]['name']
+                start_idx = 1
+                # If the next segment is already part of the matched folder name, skip it
+                if len(segments) > 1 and segments[1].lower() in matched_name.lower():
+                    start_idx = 2
+            else:
+                current_parent = 'root'
+                start_idx = 0
+                
+        # Traverse/create subsequent segments
+        for i in range(start_idx, len(segments)):
+            segment = segments[i]
+            query = f"mimeType = 'application/vnd.google-apps.folder' and '{current_parent}' in parents and name = '{segment}' and trashed = false"
+            res = drive_service.files().list(q=query, fields="files(id)").execute()
+            subfiles = res.get('files', [])
+            
+            if subfiles:
+                current_parent = subfiles[0]['id']
+            else:
+                print(f"Creating folder '{segment}' under parent '{current_parent}'...")
+                file_metadata = {
+                    'name': segment,
+                    'mimeType': 'application/vnd.google-apps.folder',
+                    'parents': [current_parent]
+                }
+                folder = drive_service.files().create(body=file_metadata, fields='id').execute()
+                current_parent = folder.get('id')
+                
+        resolved_path_cache[proposed_path] = current_parent
+        return current_parent
+
+def update_file_metadata_and_move(res):
+    """
+    Updates metadata for a single Google Drive file and moves it to the target directory.
+    
+    Inputs:
+        res (dict): The result dictionary containing the proposed name, path, and file details.
+    """
+    if not res['success']:
+        return
+    item = res['item']
+    new_desc = f"[CLERK PROCESSED]\nTaxonomy: {res['proposed_path']}\nSummary: {res['summary']}"
+    
+    try:
+        # 1. Update metadata (name and description)
+        drive_service.files().update(
+            fileId=item['id'],
+            body={
+                "name": res['proposed_name'],
+                "description": new_desc
+            }
+        ).execute()
+        print(f"Updated metadata: {item['name']} -> {res['proposed_name']}")
+        
+        # 2. Resolve target folder path and move the file
+        target_folder_id = resolve_folder_path(res['proposed_path'])
+        if target_folder_id:
+            # Retrieve actual parents to verify if move is necessary
+            f_info = drive_service.files().get(fileId=item['id'], fields='parents').execute()
+            previous_parents = f_info.get('parents', [])
+            if target_folder_id not in previous_parents:
+                previous_parents_str = ",".join(previous_parents)
+                drive_service.files().update(
+                    fileId=item['id'],
+                    addParents=target_folder_id,
+                    removeParents=previous_parents_str,
+                    fields='id, parents'
+                ).execute()
+                print(f"Moved file '{res['proposed_name']}' to: {res['proposed_path']}")
+    except Exception as e:
+        print(f"Failed to update/move '{item['name']}' ({item['id']}): {e}")
 
 def update_drive(results):
-    for res in results:
-        if not res['success']: continue
-        item = res['item']
-        new_desc = f"[CLERK PROCESSED]\nTaxonomy: {res['proposed_path']}\nSummary: {res['summary']}"
+    """
+    Updates Google Drive metadata and structures files into correct folders in parallel.
+    
+    Inputs:
+        results (list): List of results dictionaries from process_file.
+    """
+    valid_results = [res for res in results if res['success']]
+    if not valid_results:
+        return
         
-        try:
-            # 1. Update metadata
-            drive_service.files().update(
-                fileId=item['id'],
-                body={
-                    "name": res['proposed_name'],
-                    "description": new_desc
-                }
-            ).execute()
-            print(f"Updated metadata: {item['name']} -> {res['proposed_name']}")
-            
-            # 2. Resolve and move
-            target_folder_id = resolve_folder_path(res['proposed_path'])
-            if target_folder_id:
-                f_info = drive_service.files().get(fileId=item['id'], fields='parents').execute()
-                previous_parents = ",".join(f_info.get('parents', []))
-                if target_folder_id not in previous_parents:
-                    drive_service.files().update(
-                        fileId=item['id'],
-                        addParents=target_folder_id,
-                        removeParents=previous_parents,
-                        fields='id, parents'
-                    ).execute()
-                    print(f"Moved file to: {res['proposed_path']}")
-        except Exception as e:
-            print(f"Failed to update/move {item['name']}: {e}")
+    print(f"Updating Drive metadata and folder paths for {len(valid_results)} files in parallel...")
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        # Run updates in parallel to eliminate sequential API request bottlenecks
+        executor.map(update_file_metadata_and_move, valid_results)
 
 def run():
+    """
+    Executes the main Drive Retro Engine loop.
+    Batches historical files, filters by ancestor/processed flags, calls Gemini model using 
+    cached context in a ThreadPoolExecutor, and performs parallel updates on Google Drive.
+    """
     global CACHE_NAME
     state = load_state()
     page_token = state['page_token']
@@ -265,12 +391,13 @@ def run():
     try:
         while True:
             print(f"Fetching batch (pageToken: {page_token})...")
+            # Fetch parents in the list call to optimize ancestor check
             results = drive_service.files().list(
                 q=query, 
                 orderBy="modifiedTime desc", 
                 pageSize=50, 
                 pageToken=page_token,
-                fields="nextPageToken, files(id, name, mimeType, modifiedTime, description)"
+                fields="nextPageToken, files(id, name, mimeType, modifiedTime, description, parents)"
             ).execute()
             
             items = results.get('files', [])
@@ -287,7 +414,8 @@ def run():
                 desc = item.get('description', '')
                 if '[CLERK PROCESSED]' in desc:
                     continue
-                if check_ancestor(item['id']):
+                # Use pre-fetched parents to perform ancestor checking with 0 initial API requests
+                if check_ancestor(item['id'], item.get('parents')):
                     continue
                 valid_items.append(item)
                 
@@ -320,8 +448,9 @@ def run():
         # Cleanup cache on exit
         try:
             print("Cleaning up Context Cache...")
-            gemini_client.caches.delete(name=CACHE_NAME)
-            print("Cleanup complete.")
+            if CACHE_NAME:
+                gemini_client.caches.delete(name=CACHE_NAME)
+                print("Cleanup complete.")
         except Exception as e:
             print(f"Failed to delete cache: {e}")
 
