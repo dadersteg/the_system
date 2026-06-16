@@ -133,47 +133,47 @@
       font-size: 15px;
       background: transparent;
       border: 1px solid transparent;
-      letter-spacing: -0.2px;
+      letter-spacing: -0.1px;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       -webkit-font-smoothing: antialiased;
-      transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                  background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                  border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .nav-item span {
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       display: inline-block;
     }
 
     .nav-item::before {
       content: '';
       position: absolute;
-      left: 10px; /* Floating capsule spacing */
+      left: 12px; /* Floating capsule spacing aligned */
       top: 50%;
-      transform: translateY(-50%) scaleY(0.2);
-      width: 4px;
+      transform: translateY(-50%) scaleY(0.1);
+      width: 3px;
       height: 16px;
       background: linear-gradient(180deg, var(--color-accent), #a5b4fc);
       border-radius: 99px; /* Rounded pill shape */
       opacity: 0;
-      box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                  opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                  height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+                  opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @media (prefers-color-scheme: dark) {
       .nav-item::before {
         background: linear-gradient(180deg, var(--color-accent), #c7d2fe);
-        box-shadow: 0 0 16px rgba(129, 140, 248, 0.8);
+        box-shadow: 0 0 12px rgba(129, 140, 248, 0.6);
       }
     }
     
     .nav-item:hover { 
-      background: rgba(99, 102, 241, 0.04); 
+      background: rgba(99, 102, 241, 0.05); 
       border-color: rgba(99, 102, 241, 0.12);
       color: var(--color-text);
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.02);
@@ -181,15 +181,15 @@
 
     @media (prefers-color-scheme: dark) {
       .nav-item:hover {
-        background: rgba(129, 140, 248, 0.06);
-        border-color: rgba(129, 140, 248, 0.15);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        background: rgba(129, 140, 248, 0.08);
+        border-color: rgba(129, 140, 248, 0.18);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       }
     }
 
     .nav-item:hover::before {
-      opacity: 0.6;
-      transform: translateY(-50%) scaleY(1);
+      opacity: 0.7;
+      transform: translateY(-50%) scaleY(1.0);
       height: 18px;
     }
 
@@ -198,8 +198,8 @@
     }
 
     .nav-item:active {
-      background: rgba(99, 102, 241, 0.06);
-      border-color: rgba(99, 102, 241, 0.18);
+      background: rgba(99, 102, 241, 0.08);
+      border-color: rgba(99, 102, 241, 0.2);
     }
 
     .nav-item:active span {
@@ -208,16 +208,17 @@
 
     @media (prefers-color-scheme: dark) {
       .nav-item:active {
-        background: rgba(129, 140, 248, 0.08);
-        border-color: rgba(129, 140, 248, 0.22);
+        background: rgba(129, 140, 248, 0.12);
+        border-color: rgba(129, 140, 248, 0.25);
       }
     }
 
     .nav-item.active { 
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.02) 100%);
-      border-color: rgba(99, 102, 241, 0.25);
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.06) 0%, rgba(99, 102, 241, 0.01) 100%);
+      border-color: rgba(99, 102, 241, 0.2);
       color: var(--color-accent); 
-      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      text-shadow: 0 0 8px rgba(99, 102, 241, 0.12);
       font-weight: 600;
     }
 
@@ -227,35 +228,36 @@
 
     @media (prefers-color-scheme: dark) {
       .nav-item.active {
-        background: linear-gradient(135deg, rgba(129, 140, 248, 0.1) 0%, rgba(129, 140, 248, 0.03) 100%);
-        border-color: rgba(129, 140, 248, 0.3);
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        background: linear-gradient(90deg, rgba(129, 140, 248, 0.1) 0%, rgba(129, 140, 248, 0.02) 100%);
+        border-color: rgba(129, 140, 248, 0.25);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        text-shadow: 0 0 12px rgba(129, 140, 248, 0.2);
       }
     }
 
     .nav-item.active::before {
-      transform: translateY(-50%) scaleY(1);
+      transform: translateY(-50%) scaleY(1.0);
       opacity: 1;
       height: 22px;
     }
     
     .nav-item.active:hover {
-      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.03) 100%);
-      border-color: rgba(99, 102, 241, 0.35);
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.02) 100%);
+      border-color: rgba(99, 102, 241, 0.3);
     }
 
     @media (prefers-color-scheme: dark) {
       .nav-item.active:hover {
-        box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-        background: linear-gradient(135deg, rgba(129, 140, 248, 0.14) 0%, rgba(129, 140, 248, 0.04) 100%);
-        border-color: rgba(129, 140, 248, 0.4);
+        box-shadow: 0 6px 28px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        background: linear-gradient(90deg, rgba(129, 140, 248, 0.14) 0%, rgba(129, 140, 248, 0.04) 100%);
+        border-color: rgba(129, 140, 248, 0.35);
       }
     }
 
     .nav-item.active:hover::before {
       opacity: 1;
-      transform: translateY(-50%) scaleY(1);
+      transform: translateY(-50%) scaleY(1.0);
       height: 24px;
     }
 
@@ -264,7 +266,7 @@
     }
 
     .nav-item.active:active {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0.04) 100%);
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.03) 100%);
     }
 
     .nav-item.active:active span {
@@ -273,7 +275,7 @@
 
     @media (prefers-color-scheme: dark) {
       .nav-item.active:active {
-        background: linear-gradient(135deg, rgba(129, 140, 248, 0.16) 0%, rgba(129, 140, 248, 0.05) 100%);
+        background: linear-gradient(90deg, rgba(129, 140, 248, 0.15) 0%, rgba(129, 140, 248, 0.05) 100%);
       }
     }
 
@@ -2441,42 +2443,59 @@
       }
       
       const el = document.getElementById('breathe-streak');
-      el.innerText = parseInt(el.innerText) + 1 + ' (Syncing...)';
-      
       const habitName = breatheMode === '478' ? '4-7-8 Breathing' : 'Box Breathing';
+      
+      // Determine baseline streak safely from state
+      let baseStreak = 0;
       if (state.data) {
-          if (breatheMode === '478') state.data.breatheStreak = (state.data.breatheStreak || 0) + 1;
-          else state.data.boxBreatheStreak = (state.data.boxBreatheStreak || 0) + 1;
+        if (breatheMode === '478') {
+          state.data.breatheStreak = (state.data.breatheStreak || 0) + 1;
+          baseStreak = state.data.breatheStreak;
+        } else {
+          state.data.boxBreatheStreak = (state.data.boxBreatheStreak || 0) + 1;
+          baseStreak = state.data.boxBreatheStreak;
+        }
+      } else {
+        // Fallback to DOM if state is not available
+        baseStreak = (parseInt(el.innerText, 10) || 0) + 1;
       }
+      
+      el.innerText = baseStreak + ' (Syncing...)';
       renderLotus();
       
       google.script.run
         .withSuccessHandler(function(res) {
-           el.innerText = parseInt(el.innerText) + ' (Logged)';
+          el.innerText = baseStreak + ' (Logged)';
+          log(`Successfully logged habit: ${habitName}`, 'success');
         })
         .withFailureHandler(function(err) {
-           console.error('Failed to log habit:', err);
-           el.innerText = parseInt(el.innerText) + ' (Error)';
+          console.error('Failed to log habit:', err);
+          el.innerText = baseStreak + ' (Error)';
+          log(`Failed to log habit: ${habitName}. Error: ${err.message || err}`, 'error');
         })
         .withUserObject({})
         .logHabit(habitName);
       
       let breathingTaskId = null;
-      if (state.data && state.data.tasks) {
+      if (state.data && Array.isArray(state.data.tasks)) {
         for (let t of state.data.tasks) {
-           if (t.title && t.title.toLowerCase().includes(habitName.toLowerCase())) {
-               breathingTaskId = t.id;
-               break;
-           }
+          if (t && t.title && t.title.toLowerCase().includes(habitName.toLowerCase())) {
+            breathingTaskId = t.id;
+            break;
+          }
         }
       }
       
       if (breathingTaskId) {
-         google.script.run
-           .withFailureHandler(function(err) {
-             console.error('Failed to complete breathing task:', err);
-           })
-           .completeTaskById(breathingTaskId);
+        google.script.run
+          .withSuccessHandler(function() {
+            log(`Successfully completed breathing task in Google Tasks.`, 'success');
+          })
+          .withFailureHandler(function(err) {
+            console.error('Failed to complete breathing task:', err);
+            log(`Failed to complete breathing task: ${err.message || err}`, 'error');
+          })
+          .completeTaskById(breathingTaskId);
       }
     }
 
