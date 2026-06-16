@@ -459,14 +459,52 @@
     }
     
     .dash-card-header a {
+      font-family: 'Google Sans', sans-serif;
       font-size: 13px;
-      color: var(--color-primary);
-      text-decoration: none;
       font-weight: 600;
-      transition: var(--transition);
-      opacity: 0.8;
+      color: var(--color-accent);
+      text-decoration: none;
+      background: rgba(99, 102, 241, 0.05); /* Desaturated indigo */
+      border: 1px solid rgba(99, 102, 241, 0.1);
+      border-radius: 8px;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
-    .dash-card-header a:hover { opacity: 1; }
+    @media (prefers-color-scheme: dark) {
+      .dash-card-header a {
+        background: rgba(129, 140, 248, 0.08);
+        border-color: rgba(129, 140, 248, 0.15);
+      }
+    }
+    .dash-card-header a:hover {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: rgba(99, 102, 241, 0.25);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    @media (prefers-color-scheme: dark) {
+      .dash-card-header a:hover {
+        background: rgba(129, 140, 248, 0.15);
+        border-color: rgba(129, 140, 248, 0.3);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+    }
+    .dash-card-header a:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
     .dash-card-body {
       padding: 16px;
@@ -1209,7 +1247,7 @@
         <div class="dash-card">
           <div class="dash-card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2>Today's Calendar</h2>
-            <a href="https://calendar.google.com/" target="_blank" style="font-size: 14px; color: var(--color-primary); text-decoration: none; font-weight: 500;">Open Calendar ↗</a>
+            <a href="https://calendar.google.com/" target="_blank">Open Calendar ↗</a>
           </div>
           <div class="dash-card-body" id="calendar-container">
             <!-- skeletons -->
@@ -1228,7 +1266,7 @@
         <div class="dash-card">
           <div class="dash-card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2>Open Tasks</h2>
-            <a href="https://calendar.google.com/calendar/u/0/r/tasks" target="_blank" style="font-size: 14px; color: var(--color-primary); text-decoration: none; font-weight: 500;">Open Google Tasks ↗</a>
+            <a href="https://calendar.google.com/calendar/u/0/r/tasks" target="_blank">Open Google Tasks ↗</a>
           </div>
           <div class="dash-card-body" id="tasks-container">
              <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton" style="border-radius: 4px;"></div><div class="sk-sub skeleton" style="border-radius: 4px;"></div></div></div>
@@ -1246,7 +1284,7 @@
         <div class="dash-card">
           <div class="dash-card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2>Inbox</h2>
-            <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank" style="font-size: 14px; color: var(--color-primary); text-decoration: none; font-weight: 500;">Open Inbox ↗</a>
+            <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank">Open Inbox ↗</a>
           </div>
           <div class="dash-card-body" id="emails-container">
             <!-- skeletons -->
