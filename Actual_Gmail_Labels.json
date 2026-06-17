@@ -682,12 +682,12 @@
   {
     "name": "01 Private/04 Finances/Tax",
     "leaf": "Tax",
-    "unread_count": 1
+    "unread_count": 2
   },
   {
     "name": "01 Private/05 Other",
     "leaf": "05 Other",
-    "unread_count": 0
+    "unread_count": 1
   },
   {
     "name": "01 Private/05 Other/01 Projects",
@@ -737,7 +737,7 @@
   {
     "name": "01 Private/05 Other/01 Projects/AI",
     "leaf": "AI",
-    "unread_count": 9
+    "unread_count": 10
   },
   {
     "name": "01 Private/05 Other/01 Projects/Clothes",
@@ -782,7 +782,7 @@
   {
     "name": "01 Private/05 Other/02 Relationships/Carry Martens Adersteg",
     "leaf": "Carry Martens Adersteg",
-    "unread_count": 0
+    "unread_count": 1
   },
   {
     "name": "01 Private/05 Other/02 Relationships/CMA",
@@ -837,7 +837,7 @@
   {
     "name": "01 Private/05 Other/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 14
+    "unread_count": 16
   },
   {
     "name": "01 Private/05 Other/03 Collections/Newsletters, 01 Private/05 Other/01 Projects/AI",
@@ -1212,7 +1212,7 @@
   {
     "name": "02 Work/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 0
+    "unread_count": 2
   },
   {
     "name": "03 00 00 Studies",
@@ -1382,7 +1382,7 @@
   {
     "name": "99 Label_Reviewed",
     "leaf": "99 Label_Reviewed",
-    "unread_count": 25
+    "unread_count": 32
   },
   {
     "name": "99 Messenger",
@@ -1402,7 +1402,7 @@
   {
     "name": "99 To be deleted",
     "leaf": "99 To be deleted",
-    "unread_count": 0
+    "unread_count": 2
   },
   {
     "name": "99 WhatsApp",
@@ -1442,6 +1442,6 @@
   {
     "name": "Photo_Extracted",
     "leaf": "Photo_Extracted",
-    "unread_count": 0
+    "unread_count": 1
   }
 ]
