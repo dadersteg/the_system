@@ -2,11 +2,12 @@
  * @file src/Code_SystemCore.js
  * @description System core utilities providing centralized AI functions, system triggers, and testing functions.
  *
- * @version 1.0.0
- * @last_modified 2026-05-04
+ * @version 1.0.1
+ * @last_modified 2026-06-05
  * @modified_by Jules
  *
  * @changelog
+ * - 1.0.1: Improved error handling by replacing empty catch blocks with explicit console logging in getMasterSpreadsheet and isPmtAccount.
  * - 1.0.0: Initial creation from split of Code_Utilities.js. Added standardized documentation header, JSDoc descriptions for all functions, aggressive type checking, and error boundaries.
  */
 
@@ -22,7 +23,7 @@ function getMasterSpreadsheet() {
     try {
       _cachedMasterSheet = SpreadsheetApp.getActiveSpreadsheet();
     } catch (e) {
-      // Standalone script context throws exception for getActiveSpreadsheet
+      console.error(`getMasterSpreadsheet: getActiveSpreadsheet failed (expected in standalone context) - ${e.message}`);
     }
     if (!_cachedMasterSheet) {
       _cachedMasterSheet = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
@@ -396,7 +397,7 @@ function isPmtAccount() {
       }
     }
   } catch(e) {
-    // Ignore
+    console.warn(`isPmtAccount: Failed to fetch user properties - ${e.message}`);
   }
   try {
     const scriptProps = typeof PropertiesService !== 'undefined' ? PropertiesService.getScriptProperties() : null;
@@ -408,7 +409,7 @@ function isPmtAccount() {
       }
     }
   } catch(e) {
-    // Ignore
+    console.warn(`isPmtAccount: Failed to fetch script properties - ${e.message}`);
   }
   try {
     var email = Session.getEffectiveUser().getEmail();
