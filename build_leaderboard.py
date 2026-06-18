@@ -29,27 +29,41 @@ for dir_name, status in dirs.items():
             content = file.read()
             
             # Extract BLUF (Concept)
-            concept_m = re.search(r'\*\*Concept:\*\*\s*(.*?)(?=\n\n|\n\*\*|\Z)', content, re.DOTALL)
+            concept_m = re.search(r'\*\*Concept:\*\*\n(.*?)(?=\n\*|\n\n|\Z)', content, re.DOTALL)
             if concept_m:
-                words = concept_m.group(1).split()
-                bluf = " ".join(words[:12]) + "..." if len(words) > 12 else " ".join(words)
-                bluf = bluf.replace("\n", " ")
+                bluf_raw = concept_m.group(1).strip().replace("\n", " ")
+                # Truncate slightly if it's monstrously long, but keep the core sentence
+                if len(bluf_raw) > 250:
+                    bluf = bluf_raw[:247] + "..."
+                else:
+                    bluf = bluf_raw
             
+            # Extract scores (including upfront ones for Feasibility/Practicality)
+            feas_m = re.search(r'\*\*Feasibility:\*\*\s*(\d+)/10', content)
+            if feas_m: feas = feas_m.group(1)
+            
+            prac_m = re.search(r'\*\*Practicality:\*\*\s*(\d+)/10', content)
+            if prac_m: prac = prac_m.group(1)
+
             if status == "Graduated":
                 roi_m = re.search(r'ROI:\s*([0-9.%+-]+)', content)
-                if roi_m: roi = roi_m.group(1)
+                if roi_m: 
+                    roi_val = roi_m.group(1)
+                    # Convert 1746.27% to 17.4x
+                    if "%" in roi_val:
+                        try:
+                            num = float(roi_val.replace("%", "").replace(",", ""))
+                            roi = f"{num/100:.1f}x"
+                        except:
+                            roi = roi_val
+                    else:
+                        roi = roi_val
                 
                 clv_m = re.search(r'CLV Beat Rate:\s*([0-9.%]+)', content)
                 if clv_m: clv = clv_m.group(1)
                 
                 win_m = re.search(r'Win Rate:\s*([0-9.%]+)', content)
                 if win_m: win = win_m.group(1)
-                
-                feas_m = re.search(r'\*\*Feasibility:\*\*\s*(\d+)/10', content)
-                if feas_m: feas = feas_m.group(1)
-                
-                prac_m = re.search(r'\*\*Practicality:\*\*\s*(\d+)/10', content)
-                if prac_m: prac = prac_m.group(1)
                 
                 comp_m = re.search(r'\*\*Composite Score:\*\*\s*(\d+)/100', content)
                 if comp_m: comp = comp_m.group(1)
@@ -94,15 +108,17 @@ for m in models:
 with open(leaderboard_path, 'w') as f:
     f.write("# Quant Portfolio Leaderboard\n\n")
     f.write("*This leaderboard tracks the entire lifecycle of all automated strategies across the PMT framework. It is autonomously maintained by the Quant-Prime and Quant-Validator agents.*\n\n")
-    f.write("| Rank/ID | Model Name | Status | BLUF | ROI | CLV Beat | Comp. Score |\n")
-    f.write("| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n")
+    f.write("| Rank | Model ID | Status | BLUF | ROI | CLV Beat | Win Rate | Feas. | Prac. | Comp. Score |\n")
+    f.write("| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n")
     
     for idx, m in enumerate(unique_models):
-        rank = str(idx + 1) if m['status'] == 'Graduated' else f"#{m['id']}"
-        # Removed Win Rate, Feasibility, Practicality, and Data Fidelity from main view to save space for BLUF
-        f.write(f"| {rank} | {m['name']} | {m['status']} | {m['bluf']} | {m['roi']} | {m['clv']} | {m['comp']} |\n")
+        rank = str(idx + 1) if m['status'] == 'Graduated' else "-"
+        # Format ID nicely
+        model_id = f"M-{m['id']:03d}"
+        
+        f.write(f"| {rank} | {model_id} | {m['status']} | {m['bluf']} | {m['roi']} | {m['clv']} | {m['win']} | {m['feas']} | {m['prac']} | {m['comp']} |\n")
 
     f.write("\n---\n")
     f.write("*(Updated dynamically by PMT Agents)*\n")
 
-print("Leaderboard with BLUF generated.")
+print("Leaderboard generation complete.")
