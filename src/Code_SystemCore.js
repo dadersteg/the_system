@@ -2,11 +2,12 @@
  * @file src/Code_SystemCore.js
  * @description System core utilities providing centralized AI functions, system triggers, and testing functions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  * @last_modified 2026-06-05
  * @modified_by Jules
  *
  * @changelog
+ * - 1.0.2: Wrapped JSON.parse(resultText) in callGemini with a try/catch block to prevent uncaught exceptions. Removed duplicated JSDoc header above _cachedDocTexts.
  * - 1.0.1: Improved error handling by replacing empty catch blocks with explicit console logging in getMasterSpreadsheet and isPmtAccount.
  * - 1.0.0: Initial creation from split of Code_Utilities.js. Added standardized documentation header, JSDoc descriptions for all functions, aggressive type checking, and error boundaries.
  */
@@ -172,7 +173,12 @@ function callGemini(promptText, modelName, systemInstruction, schema) {
         const json = JSON.parse(response.getContentText());
         if (json.candidates && json.candidates.length > 0 && json.candidates[0].content && json.candidates[0].content.parts && json.candidates[0].content.parts.length > 0) {
           const resultText = json.candidates[0].content.parts[0].text;
-          return JSON.parse(resultText);
+          try {
+            return JSON.parse(resultText);
+          } catch (parseErr) {
+            console.error(`callGemini failed to parse JSON response: ${parseErr.message}`);
+            return { error: `callGemini failed to parse JSON response: ${parseErr.message}` };
+          }
         } else {
           return { error: "callGemini response payload is missing candidate parts." };
         }
@@ -320,12 +326,6 @@ function getActiveThreadTaskMap() {
   return map;
 }
 
-/**
- * Safely fetches the text content of a Google Document or File by ID.
- * Falls back to fetching the raw blob as string if DocumentApp fails.
- * @param {string} id - The ID of the Google Drive document.
- * @returns {string} The text content of the document.
- */
 let _cachedDocTexts = {};
 
 /**
