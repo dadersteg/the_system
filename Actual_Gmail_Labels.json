@@ -737,7 +737,7 @@
   {
     "name": "01 Private/05 Other/01 Projects/AI",
     "leaf": "AI",
-    "unread_count": 10
+    "unread_count": 11
   },
   {
     "name": "01 Private/05 Other/01 Projects/Clothes",
@@ -782,7 +782,7 @@
   {
     "name": "01 Private/05 Other/02 Relationships/Carry Martens Adersteg",
     "leaf": "Carry Martens Adersteg",
-    "unread_count": 1
+    "unread_count": 0
   },
   {
     "name": "01 Private/05 Other/02 Relationships/CMA",
@@ -837,7 +837,7 @@
   {
     "name": "01 Private/05 Other/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 16
+    "unread_count": 17
   },
   {
     "name": "01 Private/05 Other/03 Collections/Newsletters, 01 Private/05 Other/01 Projects/AI",
@@ -1130,6 +1130,11 @@
     "unread_count": 0
   },
   {
+    "name": "02 Work/01 Employment/01 Quantum 21",
+    "leaf": "01 Quantum 21",
+    "unread_count": 0
+  },
+  {
     "name": "02 Work/01 Employment/99 Archive",
     "leaf": "99 Archive",
     "unread_count": 0
@@ -1212,7 +1217,7 @@
   {
     "name": "02 Work/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 2
+    "unread_count": 4
   },
   {
     "name": "03 00 00 Studies",
@@ -1382,7 +1387,7 @@
   {
     "name": "99 Label_Reviewed",
     "leaf": "99 Label_Reviewed",
-    "unread_count": 32
+    "unread_count": 34
   },
   {
     "name": "99 Messenger",
@@ -1442,6 +1447,6 @@
   {
     "name": "Photo_Extracted",
     "leaf": "Photo_Extracted",
-    "unread_count": 1
+    "unread_count": 0
   }
 ]
