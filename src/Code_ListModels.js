@@ -1,6 +1,21 @@
 /**
- * THE SYSTEM: GEMINI MODEL EXPORTER
- * Fetches available Gemini models from the API and populates the dedicated sheet tab.
+ * @file src/Code_ListModels.js
+ * @description THE SYSTEM: GEMINI MODEL EXPORTER. Fetches available Gemini models from the API, populates the dedicated sheet tab, and exports to Google Drive as JSON.
+ * @version 1.0.1
+ * @last_modified 2026-06-19
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.1: Injected comprehensive JSDoc docstrings, standardized variable casing, and verified syntax.
+ * - 1.0.0: Initial version.
+ */
+
+/**
+ * Fetches available Gemini models from the generative language API, writes the results
+ * into the configured Gemini Models spreadsheet, and exports a JSON backup to Google Drive.
+ *
+ * @returns {void}
+ * @throws {Error} If the target sheet cannot be found or the API request fails.
  */
 function updateModelList() {
   const ss = getMasterSpreadsheet();
@@ -28,7 +43,7 @@ function updateModelList() {
 
   // Map JSON to Rows and Data
   const jsonOutput = models.map(model => {
-    let modelId = model.name.replace("models/", "");
+    const modelId = model.name.replace("models/", "");
     
     tableData.push([
       modelId, 
@@ -64,11 +79,11 @@ function updateModelList() {
   sheet.autoResizeColumns(1, tableData[0].length);
   
   // Export to Google Drive as JSON
-  const TARGET_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
+  const targetFolderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
   const fileName = "Actual_Gemini_Models.json";
   
   try {
-    const targetFolder = DriveApp.getFolderById(TARGET_FOLDER_ID);
+    const targetFolder = DriveApp.getFolderById(targetFolderId);
     const jsonBlob = Utilities.newBlob(JSON.stringify(jsonOutput, null, 2), "application/json", fileName);
     
     const existingFiles = targetFolder.getFilesByName(fileName);
@@ -83,6 +98,11 @@ function updateModelList() {
   }
 }
 
+/**
+ * Fetches available Gemini models from the generative language API for CLI usage.
+ *
+ * @returns {Array<string>|string} An array of model names on success, or an error message string on failure.
+ */
 function getModelsForCLI() {
   const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
   const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
