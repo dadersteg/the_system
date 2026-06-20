@@ -150,6 +150,99 @@ async function checkBridges() {
         }
     }
 
+    // Check Cron Scripts based on output files
+    const cronChecks = [
+        { name: 'task-sync', file: path.join(__dirname, '../../auth/Google Tasks (Combined).md'), maxAgeMs: 30 * 60 * 1000 },
+        { name: 'github-sync', file: '/Users/daniel/Documents/AGY/the_system/logs/github_sync_out.log', maxAgeMs: 24 * 60 * 60 * 1000 },
+        { name: 'sheet-sync-maintenance', file: '/Users/daniel/Documents/AGY/the_system/logs/sheet_sync_maintenance_out.log', maxAgeMs: 2 * 60 * 60 * 1000 },
+        { name: 'check-bridges-daily', file: '/Users/daniel/Documents/AGY/the_system/logs/check_bridges_daily_out.log', maxAgeMs: 25 * 60 * 60 * 1000 },
+        { name: 'trigger-jules-backend', file: '/Users/daniel/Documents/AGY/the_system/logs/trigger_jules_backend_out.log', maxAgeMs: 25 * 60 * 60 * 1000 },
+        { name: 'trigger-jules-ui', file: '/Users/daniel/Documents/AGY/the_system/logs/trigger_jules_ui_out.log', maxAgeMs: 25 * 60 * 60 * 1000 },
+        { name: 'trigger-jules-cleanup', file: '/Users/daniel/Documents/AGY/the_system/logs/trigger_jules_cleanup_out.log', maxAgeMs: 25 * 60 * 60 * 1000 }
+    ];
+
+    for (const check of cronChecks) {
+        try {
+            const stats = fs.statSync(check.file);
+            const ageMs = Date.now() - stats.mtimeMs;
+            const previousStatus = state[check.name] || 'online';
+
+            if (ageMs > check.maxAgeMs) {
+                if (previousStatus === 'online') {
+                    state[check.name] = 'offline';
+                    stateChanged = true;
+                    await sendAlertEmail(
+                        `⚠️ [System Monitor] Cron Stalled: ${check.name}`,
+                        `The cron job "${check.name}" appears to be stalled.\n` +
+                        `Its output file (${check.file}) has not been updated in ${Math.round(ageMs / 60000)} minutes.`
+                    );
+                }
+            } else if (previousStatus === 'offline') {
+                state[check.name] = 'online';
+                stateChanged = true;
+                await sendAlertEmail(
+                    `✅ [System Monitor] Cron Recovered: ${check.name}`,
+                    `The cron job "${check.name}" is successfully running again.`
+                );
+            }
+        } catch (err) {
+            console.error(`Failed to stat ${check.file}: ${err.message}`);
+        }
+    }
+
+    // Check Apps Script Heartbeats via Google Sheets
+    try {
+        const { getPrivateAccessToken } = require('./google_auth');
+        const token = await getPrivateAccessToken();
+        const sheetIds = [
+            { env: 'Private', id: '13bU68Lg4l0qV6-iSoZRrwSgHHS6jfA7yrrx9YLuXNNY' },
+            { env: 'PMT', id: '1FO-iNKasPpen9MpG2Urt7IFFgw4psrm6sArxjuAWDxY' }
+        ];
+
+        for (const sheet of sheetIds) {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheet.id}/values/5 Import - Session Stats Log!A:C?access_token=${token}`;
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                const rows = data.values || [];
+                // Look for TaskMasterEngine
+                const tmRows = rows.filter(r => r[1] === 'TaskMasterEngine' && r[2] === 'SUCCESS');
+                if (tmRows.length > 0) {
+                    const lastRow = tmRows[tmRows.length - 1];
+                    const lastTime = new Date(lastRow[0]).getTime();
+                    const ageMs = Date.now() - lastTime;
+                    
+                    const stateKey = `TaskMasterEngine-${sheet.env}`;
+                    const previousStatus = state[stateKey] || 'online';
+
+                    // TaskMasterEngine runs every 15 mins. Give it a 35 min buffer.
+                    if (ageMs > 35 * 60 * 1000) {
+                        if (previousStatus === 'online') {
+                            state[stateKey] = 'offline';
+                            stateChanged = true;
+                            await sendAlertEmail(
+                                `⚠️ [System Monitor] Apps Script Stalled: TaskMasterEngine (${sheet.env})`,
+                                `The TaskMasterEngine pipeline in the ${sheet.env} environment appears to have stalled or timed out.\n` +
+                                `No successful heartbeat logged in the last ${Math.round(ageMs / 60000)} minutes.`
+                            );
+                        }
+                    } else if (previousStatus === 'offline') {
+                        state[stateKey] = 'online';
+                        stateChanged = true;
+                        await sendAlertEmail(
+                            `✅ [System Monitor] Apps Script Recovered: TaskMasterEngine (${sheet.env})`,
+                            `The TaskMasterEngine pipeline in the ${sheet.env} environment is successfully running again.`
+                        );
+                    }
+                }
+            } else {
+                console.error(`Failed to fetch heartbeat for ${sheet.env}: ${res.statusText}`);
+            }
+        }
+    } catch (err) {
+        console.error(`Error checking Apps Script heartbeats: ${err.message}`);
+    }
+
     if (stateChanged) {
         saveState(state);
     }

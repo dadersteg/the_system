@@ -92,6 +92,25 @@ function setupSystemTriggers() {
 }
 
 /**
+ * Logs a system heartbeat to the Session Stats Log to monitor pipeline health.
+ * @param {string} scriptName - The name of the script or pipeline.
+ * @param {string} status - The status, typically 'SUCCESS'.
+ */
+function logSystemHeartbeat(scriptName, status) {
+  try {
+    const ss = getMasterSpreadsheet();
+    const sheet = ss.getSheetByName("5 Import - Session Stats Log");
+    if (sheet) {
+      sheet.appendRow([new Date(), scriptName, status]);
+    } else {
+      console.warn(`logSystemHeartbeat: Could not find '5 Import - Session Stats Log' tab.`);
+    }
+  } catch (e) {
+    console.error(`logSystemHeartbeat failed: ${e.message}`);
+  }
+}
+
+/**
  * Determines the best Gemini model to use based on the estimated token count of the payload.
  * Provides a fallback to the 2M context model (1.5 Pro) if the 1M reasoning flagship (3.1 Pro) is insufficient.
  * @param {string} payloadStr - The stringified payload to analyze.
