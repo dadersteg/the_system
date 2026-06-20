@@ -601,6 +601,36 @@ function renameTab(oldName, newName) {
 }
 
 // ----------------------------------------------------
+// VANTAGE REPORT TRIGGERS
+// ----------------------------------------------------
+
+function _triggerReflectionAPI(actionName) {
+  try {
+    const url = SYSTEM_CONFIG.API.REFLECTION_WEBHOOK;
+    const secret = SYSTEM_CONFIG.API.REFLECTION_SECRET;
+    if (!url || !secret) return "Configuration Error: Webhook URL or Secret missing.";
+    
+    const fetchUrl = url + "?action=" + encodeURIComponent(actionName) + "&secret=" + encodeURIComponent(secret);
+    const response = UrlFetchApp.fetch(fetchUrl);
+    return "API Response: " + response.getContentText();
+  } catch (e) {
+    return "Trigger Error: " + e.message;
+  }
+}
+
+function triggerVantage2Day() {
+  return _triggerReflectionAPI("run2DayRawLog");
+}
+
+function triggerVantage14Day() {
+  return _triggerReflectionAPI("run14DayRawLog");
+}
+
+function triggerVantage14DayAudit() {
+  return _triggerReflectionAPI("run14DayAudit");
+}
+
+// ----------------------------------------------------
 // EXTENDED ALIGNMENT CAPABILITIES
 // ----------------------------------------------------
 

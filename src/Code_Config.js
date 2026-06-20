@@ -58,8 +58,16 @@ const SYSTEM_CONFIG = {
     WORKSPACE_FOLDER_ID: IS_PMT_ENV ? "1MuDEjRgrh6l2wvtpdoi3Tiq_oRUjzBwx" : "13Nvsav_Gt1zTXjPH0crBMdERN9HkN2pc",
     DRIVE_RULES_SHEET_ID: IS_PMT_ENV ? "1FO-iNKasPpen9MpG2Urt7IFFgw4psrm6sArxjuAWDxY" : "13bU68Lg4l0qV6-iSoZRrwSgHHS6jfA7yrrx9YLuXNNY",
     HABITS_SHEET_ID: IS_PMT_ENV ? "1V-w6QtL9e16nnWdi5m58U0iPxfuIVfmyMrHrfZk9iI8" : "1avNkROuThqd4wgzFjPKinxR9y7RYJmPCR-HASbfWUUo",
-    DRIVE_RETRO_ROOT_ID: IS_PMT_ENV ? "" : "",
   },
+  
+  API: {
+    REFLECTION_WEBHOOK: IS_PMT_ENV 
+      ? "https://script.google.com/macros/s/AKfycbzpnXdu6dXin-iGsGJrQxL8-Hy3OEdtfN78TpM6TcFG2Rb8lQ_WBTXx02uDKlXMI7JZKQ/exec" 
+      : "https://script.google.com/macros/s/AKfycbzJnRuZRGRJYYTJpnKL3qxiBIDuSb_zKee1GIneGclittUF7nor-xyXKvM2BwJ7Y3yK/exec",
+    REFLECTION_SECRET: "REFLECTION_SECURE_TRIGGER_123"
+  },
+  
+  DRIVE_RETRO_ROOT_ID: IS_PMT_ENV ? "" : "",
   
   DOCS: {
     TASK_MASTER_PROMPT_ID: "11Q8GQQ33KroFw8SNTQ6ioyDvnNq4j6ar",
@@ -96,7 +104,7 @@ const SYSTEM_CONFIG = {
     IMPORTER_LIST_ID: IS_PMT_ENV ? "MDYyMjMzMTg0OTMyNDE4MjM4MDk6MDow" : "MDI4NDE2MzU3Nzc0OTkzOTU4NzQ6MDow",
     AI_REVIEW_LIST_ID: IS_PMT_ENV ? "WDVGU1pHd25FTnJuLXJ6dg" : "ZzZ0aHpMNDJzNEJmMnJhUw",
     TODO_LIST_ID: IS_PMT_ENV ? "M05Gb0c1dG91bXlkQUJpVQ" : "RWNzLU50Qmp1QUZpalhqSg",
-    TO_BE_DELETED_LIST_ID: IS_PMT_ENV ? "MVlRNkVjUlJwMWpaenVTYQ" : "QWkyNE1sdlVXMzMwbjhFQw",
+    TO_BE_DELETED_LIST_ID: IS_PMT_ENV ? "TjZGa1JZbUwxclVTYmpBUg" : "QWkyNE1sdlVXMzMwbjhFQw",
     RECURRING_LIST_ID: IS_PMT_ENV ? "N01qSEtvZ2ZWLWVMYW1KWQ" : "TnZtbVFtT1FJbktKeWtkUw",
     TASK_MASTER_INDEX: getEnvProp("TASK_MASTER_INDEX") || "0"
   },
@@ -138,6 +146,7 @@ const SYSTEM_CONFIG = {
                      "1W3hfHcmIa3jXsY4Mv2q2WnHsoYt1IlkH", // MacMini Downloads (PMT)
                      "1kNQj91SMLlAUsOzAiBBmsjLoQXunRANG", // MBA Desktop (PMT)
                      "15RKY62cIZp0MYGPCtkaZ7Z4_Pn8bsPeB", // MBA Downloads (PMT)
+                     "1yr9bPJcprkfYSbDnAD0z4TDJLgR8D5wt", // Gemini Meeting Notes (PMT)
                    ] : [
                      "1XossC1cdOZE82efew3qH48LJnhl6ng4i", // 00 Inbox
                      "1twdnJDVS3br2F_vcNW7nXAAUeLu2H5sh", // MacMini Desktop
@@ -145,7 +154,8 @@ const SYSTEM_CONFIG = {
                      "1-BzlJdISmsLgE8eYsCDFEpQav310Fw-9", // MBA Private Desktop 
                      "1-DVksigswUn1Hvdi_X2I5uFKqOSr35si", // MBA Private Downloads
                      "1FTMPS0DidTf0-JH1QQN_qZ5qB_eTnXoo", // Saved from Chrome (Carina)
-                     "17uUH01ihipNeRfTQQcD61zzjORpWFCRY"  // Saved from Chrome (Daniel)
+                     "17uUH01ihipNeRfTQQcD61zzjORpWFCRY", // Saved from Chrome (Daniel)
+                     "1yr9bPJcprkfYSbDnAD0z4TDJLgR8D5wt"  // Gemini Meeting Notes
                    ]),
     OUT_OF_SCOPE: [
                      // PMT Local Folders

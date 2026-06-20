@@ -454,7 +454,7 @@ function syncCompletedTasksLog() {
                 }
 
                 const compDate = new Date(task.completed || task.updated || new Date().toISOString());
-                const compTimeStr = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd'T'HH:mm:ssXXX");
+                const compTimeStr = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd HH:mm:ss");
                 const cleanCompTime = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd");
                 const urn = `urn:task:completed-${task.id}`;
 
@@ -624,7 +624,7 @@ function purgeToBeDeletedTasks() {
               let computedTitle = resolved.title;
 
               const compDate = new Date(t.completed || t.updated || new Date().toISOString());
-              const compTimeStr = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd'T'HH:mm:ssXXX");
+              const compTimeStr = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd HH:mm:ss");
               const cleanCompTime = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd");
               const urn = `urn:task:completed-${t.id}`;
 
