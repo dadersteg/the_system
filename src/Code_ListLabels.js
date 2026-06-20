@@ -133,35 +133,77 @@ function cleanAndCreateGmailLabels() {
     }
   });
   
+  // 4. Safely migrate any duplicate label paths that might have been hallucinated by LLM
+  migrateDuplicateGmailLabels();
+  
   console.log("Gmail labels cleanup and alignment complete.");
 }
 
 /**
- * Safely removes duplicate Gmail labels (those with a 6-digit prefix structure,
- * e.g., starting with "01 00 00 Private" or matching the general "\d{2} \d{2} \d{2}" prefix pattern)
- * and keeps the primary/simplified Concat (Label) (2-digit) labels intact.
- * Logs each deleted label clearly so that the logs can be audited.
+ * Safely migrates threads from duplicate Gmail labels (those with a 6-digit prefix structure,
+ * e.g., starting with "01 00 00 Private" matching the Concat Path) to the correct 2-digit label 
+ * (e.g., "01 Private" matching the Concat Label), and then deletes the duplicate label.
  */
-function cleanupDuplicateGmailLabels() {
-  console.log("Starting cleanup of duplicate 6-digit Gmail labels...");
+function migrateDuplicateGmailLabels() {
+  const isPmt = typeof isPmtAccount === 'function' ? isPmtAccount() : false;
+  console.log(`Starting migration of duplicate Gmail labels for ${isPmt ? "PMT" : "Private"} profile...`);
+  
+  const taxonomyFilename = isPmt ? "PMTOS_Taxonomy.json" : "LOS_Taxonomy.json";
+  const files = DriveApp.getFilesByName(taxonomyFilename);
+  if (!files.hasNext()) {
+    console.error(taxonomyFilename + " not found. Cannot migrate duplicate labels.");
+    return;
+  }
+  
+  let taxonomy;
+  try {
+    taxonomy = JSON.parse(files.next().getBlob().getDataAsString());
+  } catch (e) {
+    console.error(`Failed to parse ${taxonomyFilename}: ${e.message}`);
+    return;
+  }
+  
+  // Build translation map from Concat (Path) -> Concat (Label)
+  const pathToLabelMap = {};
+  taxonomy.forEach(item => {
+    if (item["Concat (Path)"] && item["Concat (Label)"]) {
+      pathToLabelMap[item["Concat (Path)"]] = item["Concat (Label)"];
+    }
+  });
+
   const labels = GmailApp.getUserLabels();
-  let deletedCount = 0;
+  let migratedCount = 0;
   
   labels.forEach(label => {
     const name = label.getName();
-    // Match the general \d{2} \d{2} \d{2} prefix pattern at the start of the label name
-    if (/^\d{2} \d{2} \d{2}/.test(name)) {
-      console.log(`[AUDIT] Deleting duplicate label: ${name}`);
+    
+    // Check if this label name exists as a Concat (Path) and has a distinct Concat (Label)
+    if (pathToLabelMap[name] && pathToLabelMap[name] !== name) {
+      const correctName = pathToLabelMap[name];
+      console.log(`[ACTION] Migrating duplicate label: '${name}' -> '${correctName}'`);
+      
       try {
+        let correctLabel = GmailApp.getUserLabelByName(correctName);
+        if (!correctLabel) {
+          correctLabel = GmailApp.createLabel(correctName);
+        }
+        
+        // Migrate threads
+        const threads = label.getThreads();
+        for (let i = 0; i < threads.length; i++) {
+          threads[i].addLabel(correctLabel);
+          threads[i].removeLabel(label);
+        }
+        
         label.deleteLabel();
-        deletedCount++;
+        migratedCount++;
       } catch (e) {
-        console.error(`Failed to delete label ${name}: ${e.message}`);
+        console.error(`Failed to migrate label ${name}: ${e.message}`);
       }
     }
   });
   
-  console.log(`Duplicate Gmail labels cleanup complete. Total deleted: ${deletedCount}`);
+  console.log(`Duplicate Gmail labels migration complete. Total migrated: ${migratedCount}`);
 }
 
 
