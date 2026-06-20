@@ -1,3 +1,20 @@
+/**
+ * @file src/Code_ApplyGoal5.js
+ * @description Updates the System Architecture Overview document to include the fifth strategic goal (Tech Cost Efficiency).
+ *
+ * @version 1.0.0
+ * @last_modified 2024-07-28
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.0: Initial JSDoc implementation and standardized variable names.
+ */
+
+/**
+ * Applies the Goal 5 updates to the specified document.
+ *
+ * @returns {GoogleAppsScript.Content.TextOutput} JSON response indicating success or failure.
+ */
 function applyGoal5Update() {
   try {
     const docId = '1N44t8vrm6QsCEg1h0TKGHviUyFNhGOvxE9Tjvi_w6zA';
