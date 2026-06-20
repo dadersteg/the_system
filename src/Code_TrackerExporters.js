@@ -40,7 +40,7 @@ function _exportLogData(sheet, typeName, folderId) {
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) return;
 
-  const headerRowIdx = data[0].findIndex(h => h && h.toString().toLowerCase().includes('link') || h.toString().toLowerCase().includes('original name')) === -1 && data.length > 1 ? 1 : 0;
+  const headerRowIdx = data[0].findIndex(h => h && (h.toString().toLowerCase().includes('link') || h.toString().toLowerCase().includes('original name'))) === -1 && data.length > 1 ? 1 : 0;
   const headers = data[headerRowIdx].map(h => h.toString().trim().toLowerCase());
   
   const colMap = typeName === "Email" ? {
