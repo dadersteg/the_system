@@ -93,6 +93,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
   const personalGoalsStr = configPayload ? configPayload.personalGoalsStr : getSafeDocText(SYSTEM_CONFIG.DOCS.PERSONAL_GOALS_FILE_ID);
   const workGoalsStr = configPayload ? configPayload.workGoalsStr : getSafeDocText(SYSTEM_CONFIG.DOCS.WORK_GOALS_FILE_ID);
   
+  let safeTaxonomyJsonStr = taxonomyJsonStr;
   const labelToPathMap = {};
   try {
     const parsedTaxonomy = JSON.parse(taxonomyJsonStr);
@@ -100,7 +101,10 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
       if (item["Concat (Label)"] && item["Concat (Path)"]) {
         labelToPathMap[item["Concat (Label)"]] = item["Concat (Path)"];
       }
+      // Strip Concat (Path) to prevent LLM from hallucinating Drive folders as Gmail labels
+      delete item["Concat (Path)"];
     });
+    safeTaxonomyJsonStr = JSON.stringify(parsedTaxonomy);
   } catch(e) {
     console.error("Failed to parse taxonomy: " + e.message);
   }
@@ -188,7 +192,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
         };
     } else {
         const openTasksStr = activeTaskMap.openTasksForAI.join('\n');
-        aiMatch = callLLMWithSourceContext(subject, sender, body, fullDocPrompt, taxonomyJsonStr, existingLabels, ssLabels, isRetro, currentModel, inlineImages, systemNotes, personalGoalsStr, workGoalsStr, openTasksStr);
+        aiMatch = callLLMWithSourceContext(subject, sender, body, fullDocPrompt, safeTaxonomyJsonStr, existingLabels, ssLabels, isRetro, currentModel, inlineImages, systemNotes, personalGoalsStr, workGoalsStr, openTasksStr);
     }
     
     if (!aiMatch) {
