@@ -77,6 +77,7 @@ function runTaskMasterEngine() {
   const prompt = getTaskMasterSystemPrompt();
   const res = _executeTaskMasterPipeline(prompt, false);
   try { if (typeof purgeToBeDeletedTasks === "function") purgeToBeDeletedTasks(); } catch(e) { console.error(e); }
+  logSystemHeartbeat("TaskMasterEngine", "SUCCESS");
   return res;
 }
 
@@ -230,13 +231,27 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
           .filter(id => id != null);
 
       const crossCheckPayload = {
-          instruction: "Perform a Semantic Cross-Check. Compare the proposed 'taskUpdates' against the 'allTasksContext'. If any proposed task is a semantic duplicate of an existing task, change its routingTarget to 'DELETE'. If a day or category is over-scheduled, adjust the 'recommendedDeadline'. Return the final corrected JSON object containing the 'taskUpdates' array. You MUST return the entire taskUpdates array, including ALL original tasks from proposedUpdates, even if you did not modify them. Do not omit any tasks.",
+          instruction: "Perform a Semantic Cross-Check. Compare the proposed 'taskUpdates' against the 'allTasksContext' to identify duplicate tasks or scheduling conflicts.\n\n" +
+                       "--- DEDUPLICATION RULES ---\n" +
+                       "1. A proposed task is a 'semantic duplicate' of an existing task ONLY if they represent the exact same work item with the exact same objective and details (including different phrasing or formatting representing the same item, e.g. a raw URL vs. a polished title).\n" +
+                       "2. Tasks are NOT duplicates if they target different people, clients, projects, case references, ticket IDs, email addresses, or specific dates/subjects, even if the action verb (e.g., 'Draft email', 'Call', 'Review', 'Send') is identical.\n" +
+                       "3. Do not mark a task as DELETE unless you are absolutely certain it is a 100% redundant duplicate of an existing active task in 'allTasksContext'. When in doubt, err on the side of safety and do NOT delete the task.\n" +
+                       "4. If two tasks have generic titles (e.g., 'Draft email', 'Follow up') without specific context, and you cannot confirm they represent the same work item, you MUST treat them as distinct tasks and RETAIN them.\n" +
+                       "5. If a proposed task already has a routingTarget of 'DELETE' or 'COMPLETE' in 'proposedUpdates', you MUST NOT modify its routingTarget.\n\n" +
+                       "--- OVER-SCHEDULING RULES ---\n" +
+                       "6. If a day or category is over-scheduled, adjust the 'recommendedDeadline' to spread out the work. Adjust deadlines ONLY when a single day has an extreme density of tasks (> 5 tasks). Prefer pushing to future weekdays (for work tasks) or weekends (for personal tasks) with low density in 'allTasksContext'. Do not override user-specified deadlines.\n\n" +
+                       "--- OUTPUT RULES ---\n" +
+                       "7. Return the final corrected JSON object containing the 'taskUpdates' array. You MUST return the entire taskUpdates array, including ALL original tasks from proposedUpdates.\n" +
+                       "8. For all fields other than 'routingTarget' (modified only for duplicates) and 'recommendedDeadline' (modified only for over-scheduling), you MUST preserve their original values from proposedUpdates exactly. Do not modify, nullify, or omit them.",
           proposedUpdates: aiResult.taskUpdates,
-          // Explicitly exclude the tasks being evaluated
           allTasksContext: payload.allTasksContext.filter(t => !proposedIds.includes(t.id))
       };
       
-      const crossCheckPrompt = "You are a strict QA AI. Return a JSON object with a single 'taskUpdates' array containing the finalized task objects. You MUST return ALL original tasks from proposedUpdates, even if unmodified. Do not omit any tasks. Respond ONLY with valid JSON.";
+      const crossCheckPrompt = "You are a strict QA AI. Return a JSON object with a single 'taskUpdates' array containing the finalized task objects. " +
+                               "Your primary responsibility is to ensure that tasks are not incorrectly deleted, and that existing routing targets (DELETE/COMPLETE) and metadata fields (estimatedDuration, alignedGoal) are preserved unmodified. " +
+                               "Verify that similar-looking tasks are only marked as duplicates (routingTarget = 'DELETE') if they represent the exact same work item. " +
+                               "CRITICAL: Tasks targeting different people, clients, projects, case references, or generic titles (e.g. 'Draft email' vs 'Draft email' without context) are NOT duplicates. " +
+                               "You MUST return ALL original tasks from proposedUpdates, even if unmodified. Do not omit any tasks. Respond ONLY with valid JSON.";
       const crossCheckResult = executeTaskMasterGemini(crossCheckPayload, crossCheckPrompt);
       
       if (crossCheckResult && crossCheckResult.taskUpdates) {

@@ -8,9 +8,10 @@ const mockFiles = fs.readdirSync(mockTasksDir).filter(f => f.endsWith('.json'));
 
 const SYSTEM_CONFIG = {
   TASKS: { IMPORTER_LIST_ID: 'importer-list', TODO_LIST_ID: 'todo-list', RECURRING_LIST_ID: 'recurring-list' },
-  DOCS: { TASK_MASTER_PROMPT_ID: 'doc-1', TASK_MASTER_DAILY_PROMPT_ID: 'doc-2', PERSONAL_GOALS_FILE_ID: 'doc-3', WORK_GOALS_FILE_ID: 'doc-4', TAXONOMY_JSON_ID: 'doc-5' },
-  ROOTS: { WORKSPACE_FOLDER_ID: 'folder-1' },
-  SECRETS: { GEMINI_MODEL_FLASH: 'gemini-1.5-flash', GEMINI_MODEL_PRO: 'gemini-1.5-pro', GEMINI_API_KEY: 'test-key' }
+  DOCS: { TASK_MASTER_PROMPT_ID: 'doc-1', TASK_MASTER_DAILY_PROMPT_ID: 'doc-2', PERSONAL_GOALS_FILE_ID: 'doc-3', WORK_GOALS_FILE_ID: 'doc-4', TAXONOMY_JSON_ID: 'doc-5', CLERK_DRIVE_INSTRUCTIONS: 'doc-7' },
+  ROOTS: { WORKSPACE_FOLDER_ID: 'folder-1', MASTER_SHEET_ID: 'sheet-1' },
+  SECRETS: { GEMINI_MODEL_FLASH: 'gemini-1.5-flash', GEMINI_MODEL_PRO: 'gemini-1.5-pro', GEMINI_MODEL_2M_RETRO: 'gemini-1.5-pro', GEMINI_API_KEY: 'test-key' },
+  GENERATED_OUTPUTS: { DAY_1_EXECUTION_PLAN: 'doc-6' }
 };
 
 let tasksDb = {
@@ -128,6 +129,28 @@ const consoleMock = {
 
 const MimeType = { PLAIN_TEXT: 'text/plain' };
 
+const SpreadsheetApp = {
+  getActiveSpreadsheet: () => ({
+    getSheetByName: (name) => ({
+      appendRow: () => {}
+    })
+  }),
+  openById: () => ({
+    getSheetByName: (name) => ({
+      appendRow: () => {}
+    })
+  })
+};
+
+const PropertiesService = {
+  getUserProperties: () => ({
+    getProperty: () => null
+  }),
+  getScriptProperties: () => ({
+    getProperty: () => null
+  })
+};
+
 // Setup Context
 const sandbox = {
   SYSTEM_CONFIG,
@@ -138,6 +161,8 @@ const sandbox = {
   CacheService,
   UrlFetchApp,
   MimeType,
+  SpreadsheetApp,
+  PropertiesService,
   console: consoleMock,
   callGemini: callGeminiMock,
   selectModelForPayload: () => 'gemini-1.5-pro',
@@ -146,6 +171,12 @@ const sandbox = {
 };
 
 vm.createContext(sandbox);
+
+const codeSystemCore = fs.readFileSync(path.join(__dirname, '../src/Code_SystemCore.js'), 'utf8');
+vm.runInContext(codeSystemCore, sandbox);
+
+// Re-assign mocked callGemini back to sandbox so that the test harness's mock is used instead of the real one
+sandbox.callGemini = callGeminiMock;
 
 const codeTaskEngine = fs.readFileSync(path.join(__dirname, '../src/Code_TaskEngine.js'), 'utf8');
 vm.runInContext(codeTaskEngine, sandbox);

@@ -3,5 +3,8 @@
   "telegram-bridge": "online",
   "messenger-bridge": "online",
   "antigravity-bridge": "online",
-  "beeper-bridge": "online"
+  "beeper-bridge": "online",
+  "task-sync": "online",
+  "sheet-sync-maintenance": "online",
+  "github-sync": "online"
 }

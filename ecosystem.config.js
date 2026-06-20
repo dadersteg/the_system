@@ -113,6 +113,9 @@ module.exports = {
       script: "scripts/maintenance/trigger_jules.js",
       args: "--micro-backend",
       cwd: "/Users/daniel/Documents/AGY/the_system",
+      env: {
+        JULES_API_KEY: localEnv.JULES_API_KEY || ""
+      },
       cron_restart: "0 2 * * *", // 2:00 AM Daily
       autorestart: false,
       out_file: "logs/trigger_jules_backend_out.log",
@@ -123,6 +126,9 @@ module.exports = {
       script: "scripts/maintenance/trigger_jules.js",
       args: "--micro-ui",
       cwd: "/Users/daniel/Documents/AGY/the_system",
+      env: {
+        JULES_API_KEY: localEnv.JULES_API_KEY || ""
+      },
       cron_restart: "0 3 * * *", // 3:00 AM Daily
       autorestart: false,
       out_file: "logs/trigger_jules_ui_out.log",
@@ -133,6 +139,9 @@ module.exports = {
       script: "scripts/maintenance/trigger_jules.js",
       args: "--micro-cleanup",
       cwd: "/Users/daniel/Documents/AGY/the_system",
+      env: {
+        JULES_API_KEY: localEnv.JULES_API_KEY || ""
+      },
       cron_restart: "0 4 * * *", // 4:00 AM Daily
       autorestart: false,
       out_file: "logs/trigger_jules_cleanup_out.log",
@@ -143,6 +152,9 @@ module.exports = {
       script: "scripts/maintenance/trigger_jules.js",
       args: "--major",
       cwd: "/Users/daniel/Documents/AGY/the_system",
+      env: {
+        JULES_API_KEY: localEnv.JULES_API_KEY || ""
+      },
       cron_restart: "0 5 * * 0,3", // 5:00 AM Wednesday & Sunday
       autorestart: false,
       out_file: "logs/trigger_jules_major_out.log",
