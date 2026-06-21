@@ -13,6 +13,10 @@ This master protocol governs the naming of all digital assets within the Life Or
 - **Google Photos & Gemini (Containers):** MUST use the Greater Than ` > ` separator.
   - *Reason:* It creates a clear visual hierarchy for flat lists and aligns with the Task Syntax.
 
+### 1.1 Platform Metadata Constraints (Drive vs. Gmail)
+- **Google Drive Metadata:** MUST use the full 6-digit `Concat (Path)` structure for categorization codes (e.g., `01 00 00 Private`). 
+- **Gmail Labels:** MUST strictly use the 2-digit `Concat (Label)` structure to preserve readability (e.g., `01 Private`). The 6-digit format is explicitly banned in Gmail.
+
 ---
 
 ## Part A: Google Drive Files (The Hyphen Protocol)
