@@ -34,17 +34,20 @@ function processGmailPhotos() {
       const msg = messages[j];
       const attachments = msg.getAttachments();
       const date = msg.getDate();
+      const subject = msg.getSubject();
+      const sender = msg.getFrom();
+      const body = msg.getPlainBody();
       
       for (let k = 0; k < attachments.length; k++) {
         const att = attachments[k];
         if (att.getContentType().indexOf("image/") !== -1) {
           
           // 1. Upload to Google Photos
-          const photoUrl = uploadToGooglePhotosNative(att);
+          const photoUrl = uploadToGooglePhotosNative(att, { subject: subject, sender: sender, date: date, body: body });
           if (!photoUrl) continue;
           
           // 2. Analyze with Gemini Vision
-          const analysis = analyzePhotoWithGemini(att);
+          const analysis = analyzePhotoWithGemini(att, { subject: subject, sender: sender, date: date, body: body });
           
           // 3. Append to Photo Register
           sheet.appendRow([
@@ -73,7 +76,7 @@ function processGmailPhotos() {
 /**
  * Uploads an Apps Script Blob to Google Photos
  */
-function uploadToGooglePhotosNative(blob) {
+function uploadToGooglePhotosNative(blob, msgContext) {
   const token = ScriptApp.getOAuthToken();
   
   // Step 1: Upload bytes
@@ -97,7 +100,12 @@ function uploadToGooglePhotosNative(blob) {
     return null;
   }
   
-  // Step 2: Create Media Item
+  let photoDescription = blob.getName();
+  if (msgContext) {
+    let cleanBody = msgContext.body ? msgContext.body.substring(0, 500).trim() : "";
+    photoDescription = cleanBody ? `${msgContext.subject}\n\n${cleanBody}` : msgContext.subject;
+  }
+
   const createOptions = {
     method: "post",
     headers: {
@@ -106,7 +114,7 @@ function uploadToGooglePhotosNative(blob) {
     },
     payload: JSON.stringify({
       newMediaItems: [{
-        description: blob.getName(),
+        description: photoDescription,
         simpleMediaItem: { uploadToken: uploadToken }
       }]
     })
@@ -127,7 +135,7 @@ function uploadToGooglePhotosNative(blob) {
 /**
  * Passes the image to Gemini 1.5 Flash
  */
-function analyzePhotoWithGemini(blob) {
+function analyzePhotoWithGemini(blob, msgContext) {
   const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + GEMINI_API_KEY;
   
   const base64Image = Utilities.base64Encode(blob.getBytes());
@@ -135,7 +143,7 @@ function analyzePhotoWithGemini(blob) {
   const payload = {
     contents: [{
       parts: [
-        { text: "Analyze this image and return a JSON object with: category, purpose, activities (array), entities (array), text_found (array), vibe, is_milestone (boolean)." },
+        { text: "Analyze this image and return a JSON object with: category, purpose, activities (array), entities (array), text_found (array), vibe, is_milestone (boolean)." + (msgContext ? `\n\nOriginal Message Context:\n- Subject: ${msgContext.subject}\n- Sender: ${msgContext.sender}\n- Date: ${msgContext.date}\n- Body: ${msgContext.body ? msgContext.body.substring(0, 500) : ''}` : "") },
         { inlineData: { mimeType: blob.getContentType(), data: base64Image } }
       ]
     }],

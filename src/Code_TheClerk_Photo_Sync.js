@@ -41,6 +41,9 @@ function processGmailPhotos() {
       const msg = messages[j];
       const attachments = msg.getAttachments();
       const date = msg.getDate();
+      const subject = msg.getSubject();
+      const sender = msg.getFrom();
+      const body = msg.getPlainBody();
       
       for (let k = 0; k < attachments.length; k++) {
         const att = attachments[k];
@@ -51,10 +54,13 @@ function processGmailPhotos() {
           if (!uploadToken) continue;
           
           // 2. Analyze with Gemini
-          const analysis = _analyzePhotoWithGemini(att);
+          const analysis = _analyzePhotoWithGemini(att, { subject: subject, sender: sender, date: date, body: body });
           
+          let cleanBody = body ? body.substring(0, 500).trim() : "";
+          let photoDescription = cleanBody ? `${subject}\n\n${cleanBody}` : subject;
+
           mediaItemsToCreate.push({
-            description: att.getName(),
+            description: photoDescription,
             simpleMediaItem: { uploadToken: uploadToken }
           });
           
@@ -169,7 +175,7 @@ function _batchCreateMediaItems(mediaItems) {
   return urls;
 }
 
-function _analyzePhotoWithGemini(blob) {
+function _analyzePhotoWithGemini(blob, msgContext) {
   const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
   if (!apiKey) return {};
 
@@ -179,7 +185,7 @@ function _analyzePhotoWithGemini(blob) {
   const payload = {
     contents: [{
       parts: [
-        { text: "Analyze this image and return a JSON object with: category (from TS taxonomy), purpose, activities (array), entities (array), text_found (array), vibe, is_milestone (boolean)." },
+        { text: "Analyze this image and return a JSON object with: category (from TS taxonomy), purpose, activities (array), entities (array), text_found (array), vibe, is_milestone (boolean)." + (msgContext ? `\n\nOriginal Message Context:\n- Subject: ${msgContext.subject}\n- Sender: ${msgContext.sender}\n- Date: ${msgContext.date}\n- Body: ${msgContext.body ? msgContext.body.substring(0, 500) : ''}` : "") },
         { inlineData: { mimeType: blob.getContentType(), data: base64Image } }
       ]
     }],
