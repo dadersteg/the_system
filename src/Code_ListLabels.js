@@ -181,11 +181,14 @@ function migrateDuplicateGmailLabels() {
             correctLabel = GmailApp.createLabel(correctName);
           }
           
-          // Migrate threads
-          const threads = label.getThreads();
-          for (let i = 0; i < threads.length; i++) {
-            threads[i].addLabel(correctLabel);
-            threads[i].removeLabel(label);
+          // Migrate threads safely in batches (getThreads has a 500 limit)
+          let threads = label.getThreads();
+          while (threads.length > 0) {
+            for (let i = 0; i < threads.length; i++) {
+              threads[i].addLabel(correctLabel);
+              threads[i].removeLabel(label);
+            }
+            threads = label.getThreads(); // Fetch next batch of threads still attached to this label
           }
           
           label.deleteLabel();
@@ -200,4 +203,97 @@ function migrateDuplicateGmailLabels() {
   console.log(`Duplicate Gmail labels migration complete. Total migrated: ${migratedCount}`);
 }
 
+/**
+ * Emergency Recovery Script: Restores lost Gmail labels caused by the migration pagination bug.
+ * Reads the historical 'Execution Log' to find the original labels assigned to each thread,
+ * and re-applies them without using any LLM tokens.
+ */
+function recoverLostLabelsFromLog() {
+  console.log("Starting Emergency Label Recovery from Execution Log...");
+  
+  // Connect to the master spreadsheet and get the Execution Log
+  const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+  // Search through all sheets to find the one matching LOG_GID
+  const isPmt = typeof isPmtAccount === 'function' ? isPmtAccount() : false;
+  const logGid = isPmt ? "2131515996" : "967747913"; // Hardcoded from system config for safety
+  
+  let sheet = ss.getSheets().find(s => s.getSheetId().toString() === logGid);
+  if (!sheet) {
+    sheet = ss.getSheetByName("Execution Log");
+  }
+  
+  if (!sheet) {
+    console.error("Could not find Execution Log sheet!");
+    return;
+  }
+  
+  const data = sheet.getDataRange().getValues();
+  // Remove header
+  data.shift();
+  
+  let recoveredCount = 0;
+  
+  // Helper to ensure we only apply the 2-digit format
+  function toTwoDigitFormat(labelPath) {
+    return labelPath.split('/').map(segment => {
+      let match;
+      if ((match = segment.match(/^(\d{2}) 00 00 (.+)$/))) {
+        return `${match[1]} ${match[2].trim()}`;
+      } else if ((match = segment.match(/^\d{2} (\d{2}) 00 (.+)$/))) {
+        return `${match[1]} ${match[2].trim()}`;
+      } else if ((match = segment.match(/^\d{2} \d{2} (\d{2}) (.+)$/))) {
+        return `${match[1]} ${match[2].trim()}`;
+      }
+      return segment.trim();
+    }).join('/');
+  }
 
+  // Iterate backwards (newest first)
+  for (let i = data.length - 1; i >= 0; i--) {
+    const row = data[i];
+    const finalLabelsStr = row[7]; // Final Label Set
+    const linkStr = row[8]; // Link
+    
+    if (!linkStr || !finalLabelsStr) continue;
+    
+    // Extract thread ID from the link: https://mail.google.com/mail/u/0/#all/[THREAD_ID]
+    const match = linkStr.match(/#all\/([^&]+)/);
+    if (!match) continue;
+    
+    const threadId = match[1];
+    
+    try {
+      const thread = GmailApp.getThreadById(threadId);
+      if (!thread) continue;
+      
+      const currentLabels = thread.getLabels().map(l => l.getName());
+      
+      // If thread has 99 Label_Reviewed but is missing its target categories
+      const targetLabels = finalLabelsStr.split(',').map(l => toTwoDigitFormat(l.trim())).filter(l => l);
+      
+      let needsRecovery = false;
+      for (const target of targetLabels) {
+        if (!currentLabels.includes(target) && target !== "99 Label_Reviewed" && target !== "99 To be deleted" && target !== "00 Manual Review") {
+          needsRecovery = true;
+          
+          let gLabel = GmailApp.getUserLabelByName(target);
+          if (!gLabel) {
+            gLabel = GmailApp.createLabel(target);
+          }
+          thread.addLabel(gLabel);
+          console.log(`[RECOVERED] Thread ${threadId} restored label: ${target}`);
+        }
+      }
+      
+      if (needsRecovery) {
+        recoveredCount++;
+      }
+      
+    } catch (e) {
+      // Ignore threads that might have been permanently deleted
+      console.warn(`Could not process thread ${threadId}: ${e.message}`);
+    }
+  }
+  
+  console.log(`Recovery complete. Total threads successfully restored: ${recoveredCount}`);
+}
