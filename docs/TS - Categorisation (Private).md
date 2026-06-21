@@ -26,6 +26,11 @@ Because Google Drive enforces a single-parent hierarchy, the LOS utilizes **Shor
 *   **Primary Context (Physical Storage):** A file physically lives in the folder where it is most contextually relevant for active work (e.g., a signed lease lives in `01 05 01 Projects / The Move`).
 *   **Aggregation Views [AGGREGATOR]:** Folders tagged as `[AGGREGATOR]` are used for cross-cutting master lists (e.g., all contracts across all projects). The Drive Clerk will place a Google Drive *Shortcut* in these folders, pointing to the original file.
 
+### 1.3. Platform Application Rules (Drive vs. Gmail)
+To preserve usability across different interfaces, the taxonomy is applied differently depending on the platform:
+*   **Google Drive Folders (The 6-Digit Rule):** All folders must use the full 6-digit `Concat (Path)` format (e.g., `01 00 00 Private/01 04 00 Finances/01 04 01 Purchase`).
+*   **Gmail Labels (The 2-Digit Rule):** Because Gmail concatenates nested labels, using 6 digits makes labels unreadable. Gmail labels MUST strip trailing zeros and use the active 2-digit `Concat (Label)` identifier for their level (e.g., `01 Private/04 Finances/01 Purchase`). The 6-digit format is explicitly banned in Gmail.
+
 ---
 
 
