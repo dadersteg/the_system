@@ -297,3 +297,68 @@ function recoverLostLabelsFromLog() {
   
   console.log(`Recovery complete. Total threads successfully restored: ${recoveredCount}`);
 }
+
+/**
+ * Utility Script: Cleans the Execution Log by translating any 6-digit hallucinated labels 
+ * into the correct 2-digit Gmail labels. This allows the user to visually review the 
+ * corrected labels in the spreadsheet before running the recovery script.
+ */
+function cleanExecutionLogLabels() {
+  console.log("Starting Execution Log cleanup...");
+  
+  const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
+  const isPmt = typeof isPmtAccount === 'function' ? isPmtAccount() : false;
+  const logGid = isPmt ? "2131515996" : "967747913"; 
+  
+  let sheet = ss.getSheets().find(s => s.getSheetId().toString() === logGid);
+  if (!sheet) sheet = ss.getSheetByName("Execution Log");
+  
+  if (!sheet) {
+    console.error("Could not find Execution Log sheet!");
+    return;
+  }
+  
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return;
+  
+  function toTwoDigitFormat(labelPath) {
+    return labelPath.split('/').map(segment => {
+      let match;
+      if ((match = segment.match(/^(\d{2}) 00 00 (.+)$/))) {
+        return `${match[1]} ${match[2].trim()}`;
+      } else if ((match = segment.match(/^\d{2} (\d{2}) 00 (.+)$/))) {
+        return `${match[1]} ${match[2].trim()}`;
+      } else if ((match = segment.match(/^\d{2} \d{2} (\d{2}) (.+)$/))) {
+        return `${match[1]} ${match[2].trim()}`;
+      }
+      return segment.trim();
+    }).join('/');
+  }
+
+  let updateCount = 0;
+  // Start from row 2 (index 1) to skip header
+  for (let i = 1; i < data.length; i++) {
+    const aiCategories = data[i][4]; // Column E
+    const finalLabels = data[i][7]; // Column H
+    
+    let updatedAiCategories = aiCategories;
+    let updatedFinalLabels = finalLabels;
+    
+    if (typeof aiCategories === 'string' && aiCategories) {
+      updatedAiCategories = aiCategories.split(',').map(l => toTwoDigitFormat(l.trim())).join(', ');
+    }
+    
+    if (typeof finalLabels === 'string' && finalLabels) {
+      updatedFinalLabels = finalLabels.split(',').map(l => toTwoDigitFormat(l.trim())).join(', ');
+    }
+    
+    if (updatedAiCategories !== aiCategories || updatedFinalLabels !== finalLabels) {
+      // +1 for 1-based indexing in sheets
+      if (updatedAiCategories !== aiCategories) sheet.getRange(i + 1, 5).setValue(updatedAiCategories);
+      if (updatedFinalLabels !== finalLabels) sheet.getRange(i + 1, 8).setValue(updatedFinalLabels);
+      updateCount++;
+    }
+  }
+  
+  console.log(`Execution Log cleanup complete. Cleaned ${updateCount} rows.`);
+}
