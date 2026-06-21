@@ -93,21 +93,9 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
   const personalGoalsStr = configPayload ? configPayload.personalGoalsStr : getSafeDocText(SYSTEM_CONFIG.DOCS.PERSONAL_GOALS_FILE_ID);
   const workGoalsStr = configPayload ? configPayload.workGoalsStr : getSafeDocText(SYSTEM_CONFIG.DOCS.WORK_GOALS_FILE_ID);
   
-  let safeTaxonomyJsonStr = taxonomyJsonStr;
-  const labelToPathMap = {};
-  try {
-    const parsedTaxonomy = JSON.parse(taxonomyJsonStr);
-    parsedTaxonomy.forEach(item => {
-      if (item["Concat (Label)"] && item["Concat (Path)"]) {
-        labelToPathMap[item["Concat (Label)"]] = item["Concat (Path)"];
-      }
-      // Strip Concat (Path) to prevent LLM from hallucinating Drive folders as Gmail labels
-      delete item["Concat (Path)"];
-    });
-    safeTaxonomyJsonStr = JSON.stringify(parsedTaxonomy);
-  } catch(e) {
-    console.error("Failed to parse taxonomy: " + e.message);
-  }
+  const taxonomyMaps = _buildTaxonomyMaps(taxonomyJsonStr);
+  const safeTaxonomyJsonStr = taxonomyMaps.safeTaxonomyJsonStr;
+  const labelToPathMap = taxonomyMaps.labelToPathMap;
   const activeTaskMap = getActiveThreadTaskMap();
 
   let processedCount = 0;
@@ -233,7 +221,7 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
       console.log(` > Flagged for deletion: ${subject}`);
     }
     
-    cleanupBuffer.push({ thread: thread, config: finalConfig });
+    cleanupBuffer.push({ thread: thread, config: finalConfig, existingLabels: existingLabels });
 
     // 7. Granular Log Entry & Task Push
     const summaryLog = aiMatch.summary || "";
@@ -252,71 +240,10 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
 
     if (validActions.length > 0) {
       actionItemsLog = validActions.map(a => a.title).join('; ');
-      
       const primaryCategoryLabel = (aiMatch.categories && aiMatch.categories.length > 0) ? aiMatch.categories[0] : "00 Manual Review";
-      const categoryPath = labelToPathMap[primaryCategoryLabel] || primaryCategoryLabel;
-      
       const importerListId = SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
       
-      validActions.forEach(actionObj => {
-         const actionTitle = actionObj.title;
-         const cleanTitle = actionTitle.split(' - ')[0] || actionTitle;
-         const lookupTitle = cleanTitle.toLowerCase().trim();
-         
-         let existingRef = activeTaskMap.byThread[threadId] || activeTaskMap.byTitle[lookupTitle] || (actionObj.mapped_task_id && actionObj.mapped_task_id !== "None" ? activeTaskMap.byId[actionObj.mapped_task_id] : null);
-         
-         if (existingRef) {
-             console.log(` > Task already exists or was mapped by AI. Appending action item.`);
-             try {
-                 let existingTask = existingRef.taskObj;
-                 existingTask.notes = (existingTask.notes || "") + `\n\n[UPDATE]: ${actionTitle}\nLink: ${threadUrl}`;
-                 
-                 if (actionObj.mark_completed_reason && actionObj.mark_completed_reason !== "None") {
-                    if (!existingTask.title.startsWith("99 Done ")) {
-                       existingTask.title = "99 Done - " + existingTask.title;
-                    }
-                    existingTask.notes += `\n\nSYS: To be marked as Done because: ${actionObj.mark_completed_reason}`;
-                 }
-                 
-                 Tasks.Tasks.patch({ notes: existingTask.notes, title: existingTask.title }, existingRef.listId, existingTask.id);
-                 console.log(` > Successfully appended to existing task.`);
-             } catch (e) {
-                 console.error(`Failed to append to existing task: ${e.message}`);
-             }
-         } else {
-             const aiCategory = actionObj.category_path || primaryCategoryLabel;
-             const finalCategoryPath = labelToPathMap[aiCategory] || aiCategory;
-             
-             let deadlineVal = actionObj.deadline && actionObj.deadline !== "None" ? actionObj.deadline : "None";
-             
-             const metadata = {
-                duration: "15m",
-                goal: actionObj.goal_urn && actionObj.goal_urn.startsWith("2026-") ? actionObj.goal_urn : "Maintenance",
-                category_path: finalCategoryPath,
-                created_at: new Date().toISOString()
-             };
-             if (deadlineVal !== "None") {
-                 metadata.deadline = deadlineVal;
-             }
-             
-             const notes = `${threadUrl}\nContext: ${finalCategoryPath}\n\n${actionTitle}\n\nSYS: Pending initial review.\nDA:\n\n---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
-             
-             try {
-                const taskPayload = {
-                   title: cleanTitle,
-                   notes: notes
-                };
-                if (deadlineVal !== "None") {
-                   taskPayload.due = deadlineVal + "T00:00:00.000Z";
-                }
-                const created = Tasks.Tasks.insert(taskPayload, importerListId);
-                syncedTaskIds.push(created.id);
-                console.log(` > Pushed task to Importer: ${cleanTitle}`);
-             } catch(e) {
-                console.error("Failed to push task to Importer: " + e.message);
-             }
-         }
-      });
+      syncedTaskIds.push(..._syncTasksForThread(validActions, primaryCategoryLabel, labelToPathMap, activeTaskMap, threadId, threadUrl, importerListId));
     }
 
     batchLogs.push({
@@ -350,9 +277,107 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
 
   if (cleanupBuffer.length > 0) {
     cleanupBuffer.forEach(item => {
-      executeAtomicCleanup(item.thread, item.config);
+      executeAtomicCleanup(item.thread, item.config, item.existingLabels);
     });
   }
+}
+
+/**
+ * Extracts taxonomy parsing into a helper to keep triage engine clean.
+ * @param {string} taxonomyJsonStr
+ * @returns {Object} Contains safeTaxonomyJsonStr and labelToPathMap
+ */
+function _buildTaxonomyMaps(taxonomyJsonStr) {
+  let safeTaxonomyJsonStr = taxonomyJsonStr;
+  const labelToPathMap = {};
+  try {
+    const parsedTaxonomy = JSON.parse(taxonomyJsonStr);
+    parsedTaxonomy.forEach(item => {
+      if (item["Concat (Label)"] && item["Concat (Path)"]) {
+        labelToPathMap[item["Concat (Label)"]] = item["Concat (Path)"];
+      }
+      delete item["Concat (Path)"];
+    });
+    safeTaxonomyJsonStr = JSON.stringify(parsedTaxonomy);
+  } catch (e) {
+    console.error("Failed to parse taxonomy: " + e.message);
+  }
+  return { safeTaxonomyJsonStr, labelToPathMap };
+}
+
+/**
+ * Pushes or appends action items as Tasks to the Importer list.
+ * @param {Array} validActions
+ * @param {string} primaryCategoryLabel
+ * @param {Object} labelToPathMap
+ * @param {Object} activeTaskMap
+ * @param {string} threadId
+ * @param {string} threadUrl
+ * @param {string} importerListId
+ * @returns {Array} Array of created task IDs.
+ */
+function _syncTasksForThread(validActions, primaryCategoryLabel, labelToPathMap, activeTaskMap, threadId, threadUrl, importerListId) {
+  const syncedTaskIds = [];
+  validActions.forEach(actionObj => {
+    const actionTitle = actionObj.title;
+    const cleanTitle = actionTitle.split(' - ')[0] || actionTitle;
+    const lookupTitle = cleanTitle.toLowerCase().trim();
+
+    let existingRef = activeTaskMap.byThread[threadId] || activeTaskMap.byTitle[lookupTitle] || (actionObj.mapped_task_id && actionObj.mapped_task_id !== "None" ? activeTaskMap.byId[actionObj.mapped_task_id] : null);
+
+    if (existingRef) {
+        console.log(` > Task already exists or was mapped by AI. Appending action item.`);
+        try {
+            let existingTask = existingRef.taskObj;
+            existingTask.notes = (existingTask.notes || "") + `\n\n[UPDATE]: ${actionTitle}\nLink: ${threadUrl}`;
+
+            if (actionObj.mark_completed_reason && actionObj.mark_completed_reason !== "None") {
+               if (!existingTask.title.startsWith("99 Done ")) {
+                  existingTask.title = "99 Done - " + existingTask.title;
+               }
+               existingTask.notes += `\n\nSYS: To be marked as Done because: ${actionObj.mark_completed_reason}`;
+            }
+
+            Tasks.Tasks.patch({ notes: existingTask.notes, title: existingTask.title }, existingRef.listId, existingTask.id);
+            console.log(` > Successfully appended to existing task.`);
+        } catch (e) {
+            console.error(`Failed to append to existing task: ${e.message}`);
+        }
+    } else {
+        const aiCategory = actionObj.category_path || primaryCategoryLabel;
+        const finalCategoryPath = labelToPathMap[aiCategory] || aiCategory;
+
+        let deadlineVal = actionObj.deadline && actionObj.deadline !== "None" ? actionObj.deadline : "None";
+
+        const metadata = {
+           duration: "15m",
+           goal: actionObj.goal_urn && actionObj.goal_urn.startsWith("2026-") ? actionObj.goal_urn : "Maintenance",
+           category_path: finalCategoryPath,
+           created_at: new Date().toISOString()
+        };
+        if (deadlineVal !== "None") {
+            metadata.deadline = deadlineVal;
+        }
+
+        const notes = `${threadUrl}\nContext: ${finalCategoryPath}\n\n${actionTitle}\n\nSYS: Pending initial review.\nDA:\n\n---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+
+        try {
+           const taskPayload = {
+              title: cleanTitle,
+              notes: notes
+           };
+           if (deadlineVal !== "None") {
+              taskPayload.due = deadlineVal + "T00:00:00.000Z";
+           }
+           const created = Tasks.Tasks.insert(taskPayload, importerListId);
+           syncedTaskIds.push(created.id);
+           console.log(` > Pushed task to Importer: ${cleanTitle}`);
+        } catch(e) {
+           console.error("Failed to push task to Importer: " + e.message);
+        }
+    }
+  });
+  return syncedTaskIds;
 }
 
 /**
@@ -458,6 +483,8 @@ function writeBatchLogEntries(batchLogsArray, isRetro) {
     headerMap.set(h.toString().trim().toLowerCase(), i);
   });
 
+  let newHeadersAdded = false;
+
   batchLogsArray.forEach(rowObj => {
     const newRow = new Array(headers.length).fill("");
     Object.keys(rowObj).forEach(key => {
@@ -468,14 +495,30 @@ function writeBatchLogEntries(batchLogsArray, isRetro) {
         headers.push(key);
         newRow.push(rowObj[key]);
         headerMap.set(lowerKey, headers.length - 1);
-        sheet.getRange(headerRowIdx + 1, headers.length).setValue(key);
+        newHeadersAdded = true;
+
+        // Pad all previously processed rows in rowsToWrite to match the new header count
+        rowsToWrite.forEach(row => {
+          while (row.length < headers.length) {
+            row.push("");
+          }
+        });
       }
     });
+
+    // Pad newRow so all inserted rows have uniform columns
+    while (newRow.length < headers.length) {
+      newRow.push("");
+    }
     rowsToWrite.push(newRow);
   });
 
+  if (newHeadersAdded) {
+    sheet.getRange(headerRowIdx + 1, 1, 1, headers.length).setValues([headers]);
+  }
+
   if (rowsToWrite.length > 0) {
-    sheet.getRange(sheet.getLastRow() + 1, 1, rowsToWrite.length, rowsToWrite[0].length).setValues(rowsToWrite);
+    sheet.getRange(sheet.getLastRow() + 1, 1, rowsToWrite.length, headers.length).setValues(rowsToWrite);
   }
 }
 
@@ -683,7 +726,7 @@ function callLLMWithSourceContext(subject, from, body, docInstructions, taxonomy
   return null;
 }
 
-function executeAtomicCleanup(thread, config) {
+function executeAtomicCleanup(thread, config, existingLabels) {
   try {
     const threadId = thread.getId();
     const addIds = [];
@@ -695,13 +738,23 @@ function executeAtomicCleanup(thread, config) {
     });
     addIds.push(getLabelIdByName(PROCESSED_FLAG));
 
-    thread.getLabels().forEach(l => {
-      const n = l.getName();
-      if (!config.labels.includes(n) && n !== PROCESSED_FLAG) {
-        const rid = getLabelIdByName(n);
-        if (rid) removeIds.push(rid);
-      }
-    });
+    if (existingLabels && Array.isArray(existingLabels)) {
+      existingLabels.forEach(n => {
+        if (!config.labels.includes(n) && n !== PROCESSED_FLAG) {
+          const rid = getLabelIdByName(n);
+          if (rid) removeIds.push(rid);
+        }
+      });
+    } else {
+       // Fallback just in case
+       thread.getLabels().forEach(l => {
+         const n = l.getName();
+         if (!config.labels.includes(n) && n !== PROCESSED_FLAG) {
+           const rid = getLabelIdByName(n);
+           if (rid) removeIds.push(rid);
+         }
+       });
+    }
 
     if (!config.keepInInbox) removeIds.push('INBOX');
     if (config.markAsRead) removeIds.push('UNREAD');
