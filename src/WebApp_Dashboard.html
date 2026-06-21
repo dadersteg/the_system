@@ -3,14 +3,15 @@
  * @file WebApp_Dashboard.html
  * @description Premium web dashboard UI providing a central hub for tasks, health, and system management.
  * 
- * @version 1.1.2
- * @last_modified 2026-06-19
+ * @version 1.1.3
+ * @last_modified 2026-06-21
  * @modified_by Jules
  * 
  * @changelog
  * - 1.1.0: Premium UI/UX refactoring, glassmorphism design, and layout enhancements.
  * - 1.1.1: Polished .log-clear UI element with premium micro-design properties.
  * - 1.1.2: Modernized #breathe-mode-select with premium micro-design properties and 44px touch target.
+ * - 1.1.3: Modernized intel cards in Reflection section with premium micro-design properties and 44px touch target.
  */
 -->
 <!DOCTYPE html>
@@ -1270,6 +1271,55 @@
       box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
     }
     
+    .intel-card-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: 24px;
+      border-radius: 12px;
+      color: var(--color-text);
+      text-decoration: none;
+      transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+      min-height: 44px;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    .intel-card-link:hover {
+      background: rgba(99, 102, 241, 0.04);
+      border-color: rgba(99, 102, 241, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .intel-card-link {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      .intel-card-link:hover {
+        background: rgba(129, 140, 248, 0.08);
+        border-color: rgba(129, 140, 248, 0.25);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    .intel-card-link:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .intel-card-link:focus-visible {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+    }
+
     .article-container {
       max-width: 850px;
       margin: 0 auto;
@@ -1568,18 +1618,18 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 24px; max-width: 600px; margin: 0 auto;">
-        <a href="https://gemini.google.com/gem/atlas" target="_blank" style="display: flex; align-items: center; justify-content: space-between; background: var(--color-surface); border: 1px solid var(--color-border); padding: 24px; border-radius: 12px; color: var(--color-text); text-decoration: none; transition: background 0.2s, border-color 0.2s;" onmouseover="this.style.background='var(--color-hover)'; this.style.borderColor='var(--color-primary)';" onmouseout="this.style.background='var(--color-surface)'; this.style.borderColor='var(--color-border)';">
+        <a href="https://gemini.google.com/gem/atlas" target="_blank" class="intel-card-link">
           <div style="display: flex; align-items: center; gap: 20px;">
             <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--color-icon-bg); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">A</div>
             <div>
               <div style="font-weight: 500; font-size: 18px;">Atlas</div>
-              <div style="font-size: 14px; color: var(--color-text-muted); margin-top: 4px;">Reflective AI Partner</div>
+              <div style="font-size: 14px; color: var(--color-text-muted); margin-top: 4px; font-family: 'Inter', sans-serif;">Reflective AI Partner</div>
             </div>
           </div>
           <div style="color: var(--color-text-muted); font-size: 24px;">→</div>
         </a>
 
-        <a href="https://docs.google.com/spreadsheets/d/1pchhGyniJKiWRm6zNXy834SSeITh3BW4ogVJGImfvFM/edit?gid=0#gid=0" target="_blank" style="display: flex; align-items: center; justify-content: space-between; background: var(--color-surface); border: 1px solid var(--color-border); padding: 24px; border-radius: 12px; color: var(--color-text); text-decoration: none; transition: background 0.2s, border-color 0.2s;" onmouseover="this.style.background='var(--color-hover)'; this.style.borderColor='var(--color-primary)';" onmouseout="this.style.background='var(--color-surface)'; this.style.borderColor='var(--color-border)';">
+        <a href="https://docs.google.com/spreadsheets/d/1pchhGyniJKiWRm6zNXy834SSeITh3BW4ogVJGImfvFM/edit?gid=0#gid=0" target="_blank" class="intel-card-link">
           <div style="display: flex; align-items: center; gap: 20px;">
             <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--color-icon-bg); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">J</div>
             <div>
