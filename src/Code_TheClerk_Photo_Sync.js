@@ -49,7 +49,9 @@ function processGmailPhotos() {
         const att = attachments[k];
         if (att.getContentType().indexOf("image/") !== -1) {
           
-          let safeFilename = subject.replace(/[^a-zA-Z0-9_\-\s]/g, "") + ".jpg";
+          // Remove brackets and make it a clean sentence
+          let cleanSubject = subject.replace(/\[|\]/g, "").replace(/\s+/g, " ").trim();
+          let safeFilename = cleanSubject.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_") + ".jpg";
           
           // 1. Upload bytes (get token)
           const uploadToken = _uploadBytesToPhotos(att, safeFilename);
@@ -58,8 +60,9 @@ function processGmailPhotos() {
           // 2. Analyze with Gemini
           const analysis = _analyzePhotoWithGemini(att, { subject: subject, sender: sender, date: date, body: body });
           
-          let cleanBody = body ? body.substring(0, 500).trim() : "";
-          let photoDescription = cleanBody ? `${subject}\n\n${cleanBody}` : subject;
+          // Strip URLs and programmatic brackets to prevent Google Photos from silently dropping the metadata as 'spam'
+          let cleanBody = body ? body.replace(/https?:\/\/[^\s]+/g, "[Link removed]").substring(0, 400).trim() : "";
+          let photoDescription = `Source: ${cleanSubject}\nDate: ${date}\nMessage: ${cleanBody}`;
 
           mediaItemsToCreate.push({
             description: photoDescription,
