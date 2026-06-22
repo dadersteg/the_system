@@ -37,6 +37,7 @@ Upon reviewing an input (Email, Message, Thought), apply the Eisenhower Matrix:
   * Role: The "Glue." It links the Requirement (the task) to the Resource (the doc/email/note).
   * Active List: The single view for what must be done.
   * Backlog: Holding pen for future actions.
+    * **Architectural Standard (The 2099 Rule):** We do *not* use a dedicated Backlog list. Instead, Backlog tasks remain in the main ToDo list but are assigned a `2099-12-31` due date to sink them to the bottom. This prevents the ID regeneration that occurs when the Tasks API destroys and recreates tasks moving across lists, thus preserving native UI links (Gmail badges) and persistent logging history.
 * Temporary Context (Google Keep):
   * Role: The "Scratchpad." Use for transient info (grocery lists, quick thoughts, phone numbers).
   * The Workflow: Capture in Keep -> Add Reminder (pushes to Tasks) -> Complete Task -> Archive Keep Note.
