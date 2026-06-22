@@ -49,8 +49,10 @@ function processGmailPhotos() {
         const att = attachments[k];
         if (att.getContentType().indexOf("image/") !== -1) {
           
+          let safeFilename = subject.replace(/[^a-zA-Z0-9_\-\s]/g, "") + ".jpg";
+          
           // 1. Upload bytes (get token)
-          const uploadToken = _uploadBytesToPhotos(att);
+          const uploadToken = _uploadBytesToPhotos(att, safeFilename);
           if (!uploadToken) continue;
           
           // 2. Analyze with Gemini
@@ -61,11 +63,14 @@ function processGmailPhotos() {
 
           mediaItemsToCreate.push({
             description: photoDescription,
-            simpleMediaItem: { uploadToken: uploadToken }
+            simpleMediaItem: { 
+              uploadToken: uploadToken,
+              fileName: safeFilename 
+            }
           });
           
           processedImages.push({
-            name: att.getName(),
+            name: safeFilename,
             date: date,
             analysis: analysis
           });
@@ -114,7 +119,7 @@ function processGmailPhotos() {
   }
 }
 
-function _uploadBytesToPhotos(blob) {
+function _uploadBytesToPhotos(blob, filename) {
   const token = ScriptApp.getOAuthToken();
   const uploadOptions = {
     method: "post",
@@ -122,7 +127,8 @@ function _uploadBytesToPhotos(blob) {
       "Authorization": "Bearer " + token,
       "Content-type": "application/octet-stream",
       "X-Goog-Upload-Content-Type": blob.getContentType(),
-      "X-Goog-Upload-Protocol": "raw"
+      "X-Goog-Upload-Protocol": "raw",
+      "X-Goog-Upload-File-Name": filename || blob.getName()
     },
     payload: blob.getBytes(),
     muteHttpExceptions: true
