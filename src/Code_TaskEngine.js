@@ -248,7 +248,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
       };
       
       const crossCheckPrompt = "You are a strict QA AI. Return a JSON object with a single 'taskUpdates' array containing the finalized task objects. " +
-                               "Your primary responsibility is to ensure that tasks are not incorrectly deleted, and that existing routing targets (DELETE/COMPLETE) and metadata fields (estimatedDuration, alignedGoal) are preserved unmodified. " +
+                               "Your primary responsibility is to ensure that tasks are not incorrectly deleted, and that existing routing targets (DELETE/COMPLETE/SPLIT) and metadata fields (estimatedDuration, alignedGoal, newSubTasks) are preserved unmodified. " +
                                "Verify that similar-looking tasks are only marked as duplicates (routingTarget = 'DELETE') if they represent the exact same work item. " +
                                "CRITICAL: Tasks targeting different people, clients, projects, case references, or generic titles (e.g. 'Draft email' vs 'Draft email' without context) are NOT duplicates. " +
                                "You MUST return ALL original tasks from proposedUpdates, even if unmodified. Do not omit any tasks. Respond ONLY with valid JSON.";
@@ -503,14 +503,26 @@ function executeTaskMasterGemini(payloadObj, systemInstruction) {
           "type": "OBJECT",
           "properties": {
             "taskId": { "type": "STRING" },
-            "routingTarget": { "type": "STRING", "description": "SCHEDULE, BACKLOG, DELETE, COMPLETE, RETAIN_IMPORTER, REVIEW" },
+            "routingTarget": { "type": "STRING", "description": "SCHEDULE, BACKLOG, DELETE, COMPLETE, RETAIN_IMPORTER, SPLIT" },
             "recommendedDeadline": { "type": "STRING", "description": "YYYY-MM-DD format. Required if SCHEDULE." },
-            "estimatedDuration": { "type": "STRING", "description": "e.g. 15m, 1h, 2h" },
+            "estimatedDuration": { "type": "STRING", "description": "e.g. 5m, 15m, 1h, 2h. MAX limit is 2h. Default to 5m for quick tasks." },
             "alignedGoal": { "type": "STRING", "description": "The URN (e.g. 2026-MD-NEW-045) of the System Goal this task serves. You must find this URN in the provided goals tables. If the task is a mandatory administrative chore that does not advance a specific strategic goal, output 'Maintenance'." },
             "category_path": { "type": "STRING", "description": "The EXACT value from the 'Concat (Path)' field of the provided Taxonomy JSON. You MUST use the full path format (e.g. '01 05 01 Projects > AI'). Do NOT use the Label format or hallucinate paths." },
             "recommendedTitle": { "type": "STRING", "description": "Keep concise, action-oriented. CRITICAL: NEVER remove people's names, Case Refs, or unique identifiers from the title. Preserve all vital context." },
             "systemComment": { "type": "STRING", "description": "AI questions or feedback to the user." },
-            "clearUserComment": { "type": "BOOLEAN", "description": "Set to true if you have processed the user's DA: instruction." }
+            "clearUserComment": { "type": "BOOLEAN", "description": "Set to true if you have processed the user's DA: instruction." },
+            "newSubTasks": {
+              "type": "ARRAY",
+              "description": "REQUIRED if routingTarget is SPLIT. The sub-tasks to create. Maximum duration per sub-task is 2h.",
+              "items": {
+                "type": "OBJECT",
+                "properties": {
+                  "title": { "type": "STRING", "description": "Sub-task title (e.g. 'Draft report pt.1')" },
+                  "estimatedDuration": { "type": "STRING", "description": "Max 2h" }
+                },
+                "required": ["title", "estimatedDuration"]
+              }
+            }
           },
           "required": ["taskId", "routingTarget", "estimatedDuration", "alignedGoal", "category_path", "recommendedTitle"]
         }
@@ -570,6 +582,57 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       if (!task) return;
       
       const isAssignedTask = !!(task.assignmentInfo || (task.webViewLink && (task.webViewLink.includes("docs.google.com") || task.webViewLink.includes("chat.google.com"))));
+
+      if (u.routingTarget === "SPLIT" && u.newSubTasks && u.newSubTasks.length > 0) {
+         console.log(`Executing automated task split for task ${u.taskId}`);
+         let allInsertsSucceeded = true;
+         
+         const baseMetadata = {
+           goal: u.alignedGoal || "TBD",
+           category_path: u.category_path || "N/A",
+           created_at: new Date().toISOString()
+         };
+         
+         const newTasksCreated = [];
+         
+         for (const sub of u.newSubTasks) {
+             try {
+                const subMeta = Object.assign({}, baseMetadata);
+                subMeta.duration = sub.estimatedDuration || "N/A";
+                
+                const subNotes = "---SYSTEM_METADATA---\n" + JSON.stringify(subMeta) + "\n\n--- ORIGINAL TASK DATA ---\n" + (task.notes || "");
+                
+                const subTaskResource = {
+                  title: sub.title,
+                  notes: subNotes,
+                  due: task.due, 
+                  status: "needsAction"
+                };
+                
+                const created = Tasks.Tasks.insert(subTaskResource, todoListId);
+                newTasksCreated.push(created);
+             } catch (e) {
+                console.error(`Failed to insert sub-task ${sub.title}: ${e.message}`);
+                allInsertsSucceeded = false;
+             }
+         }
+         
+         if (allInsertsSucceeded && newTasksCreated.length > 0) {
+             console.log(`Successfully split ${u.taskId}. Deleting original parent task.`);
+             try {
+                if (isAssignedTask) {
+                   Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
+                } else {
+                   Tasks.Tasks.remove(listId, u.taskId);
+                }
+             } catch (e) {
+                console.warn(`Could not completely delete parent task ${u.taskId}: ${e.message}`);
+             }
+         } else {
+             console.log(`Split inserts partially failed for ${u.taskId}. Parent task is retained.`);
+         }
+         return; 
+      }
       
       // Let's determine final title (clean metadata from title)
       let finalTitle = u.recommendedTitle || task.title || "";

@@ -48,6 +48,15 @@ function doGet(e) {
      }
   }
 
+  if (e && e.parameter && e.parameter.action === "testPhotos") {
+     try {
+       processGmailPhotos();
+       return ContentService.createTextOutput("OK - processGmailPhotos executed successfully.");
+     } catch(err) {
+       return ContentService.createTextOutput("Error: " + err.message);
+     }
+  }
+
   if (e && e.parameter && e.parameter.action === "createManifestSpreadsheet") {
      try {
        const url = createManifestSpreadsheet();

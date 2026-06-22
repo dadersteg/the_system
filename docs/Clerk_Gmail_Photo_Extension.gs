@@ -43,7 +43,8 @@ function processGmailPhotos() {
         if (att.getContentType().indexOf("image/") !== -1) {
           
           // 1. Upload to Google Photos
-          const photoUrl = uploadToGooglePhotosNative(att, { subject: subject, sender: sender, date: date, body: body });
+          let safeFilename = subject.replace(/[^a-zA-Z0-9_\-\s]/g, "") + ".jpg";
+          const photoUrl = uploadToGooglePhotosNative(att, { subject: subject, sender: sender, date: date, body: body }, safeFilename);
           if (!photoUrl) continue;
           
           // 2. Analyze with Gemini Vision
@@ -76,7 +77,7 @@ function processGmailPhotos() {
 /**
  * Uploads an Apps Script Blob to Google Photos
  */
-function uploadToGooglePhotosNative(blob, msgContext) {
+function uploadToGooglePhotosNative(blob, msgContext, filename) {
   const token = ScriptApp.getOAuthToken();
   
   // Step 1: Upload bytes
@@ -86,7 +87,8 @@ function uploadToGooglePhotosNative(blob, msgContext) {
       "Authorization": "Bearer " + token,
       "Content-type": "application/octet-stream",
       "X-Goog-Upload-Content-Type": blob.getContentType(),
-      "X-Goog-Upload-Protocol": "raw"
+      "X-Goog-Upload-Protocol": "raw",
+      "X-Goog-Upload-File-Name": filename || blob.getName()
     },
     payload: blob.getBytes()
   };
@@ -115,7 +117,10 @@ function uploadToGooglePhotosNative(blob, msgContext) {
     payload: JSON.stringify({
       newMediaItems: [{
         description: photoDescription,
-        simpleMediaItem: { uploadToken: uploadToken }
+        simpleMediaItem: { 
+          uploadToken: uploadToken,
+          fileName: filename
+        }
       }]
     })
   };
