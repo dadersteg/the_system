@@ -34,7 +34,7 @@ Local integration scripts (e.g., Python sync scripts) rely on client credentials
 2. **System Health Check CLI:**
    - Run the health checker from the root of `the_system/` workspace to verify python dependencies, clasp connection, and token validity:
      ```bash
-     ./check_system_health.py
+     ./scripts/maintenance/check_system_health.py
      ```
 
 ---
@@ -59,3 +59,11 @@ To prevent directory clutter, all agents must adhere to the following file place
 4. **Logs & Output:** Output logs, tree dumps, and process tracking files MUST be placed in `logs/`.
 5. **Assets:** PDFs, images, and non-text artifacts MUST be placed in `assets/`.
 6. **Configuration & Credentials:** Only core system configurations (e.g., `.env`, `fca-config.json`, `rules.agy`, `.clasp.json`) and credentials (`token.json`, `client_secret.json`) are permitted in the root directory.
+
+---
+
+## 7. Dual-Environment Clasp Deployment Protocol
+* **No Direct Configuration Edits:** AI agents are strictly forbidden from editing `.clasp.json` directly.
+* **No Direct Clasp Push:** AI agents are strictly forbidden from running `clasp push` directly.
+* **Mandated Deployment Script:** AI agents must always use `./deploy.sh private` or `./deploy.sh work` to deploy code to Google Apps Script.
+* **Environment Parity:** AI agents must ensure environment parity by syncing changes to both the private and work environments (i.e. deploying to both targets when making changes).

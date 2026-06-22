@@ -4,20 +4,27 @@
 # regardless of where the user invoked it from.
 cd "$(dirname "$0")" || exit 1
 
-# Check if target environment is provided
-if [ -z "$1" ]; then
-  echo "Error: Please specify target environment."
+# Verify that exactly one argument is passed
+if [ "$#" -ne 1 ]; then
+  echo "Error: Exactly one argument is required."
   echo "Usage: ./deploy.sh [private|work]"
   exit 1
 fi
 
-ENV=$(echo "$1" | tr '[:upper:]' '[:lower:]')
-
-if [ "$ENV" != "private" ] && [ "$ENV" != "work" ]; then
-  echo "Error: Invalid environment. Must be 'private' or 'work'."
-  echo "Usage: ./deploy.sh [private|work]"
-  exit 1
-fi
+# Case-insensitive validation and normalization
+case "$1" in
+  [Pp][Rr][Ii][Vv][Aa][Tt][Ee])
+    ENV="private"
+    ;;
+  [Ww][Oo][Rr][Kk])
+    ENV="work"
+    ;;
+  *)
+    echo "Error: Invalid environment '$1'. Must be 'private' or 'work'."
+    echo "Usage: ./deploy.sh [private|work]"
+    exit 1
+    ;;
+esac
 
 # Locate clasp files
 CONFIG_SOURCE=".clasp-$ENV.json"
@@ -29,7 +36,7 @@ if [ ! -f "$CONFIG_SOURCE" ]; then
 fi
 
 # Copy the file
-cp "$CONFIG_SOURCE" "$CONFIG_DEST"
+cp "$CONFIG_SOURCE" "$CONFIG_DEST" || { echo "Error: Failed to copy config file."; exit 1; }
 echo "Active clasp configuration set to: $CONFIG_SOURCE"
 
 # Perform push
