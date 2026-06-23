@@ -1,3 +1,21 @@
+/**
+ * @file src/Code_ArchitectureDump.js
+ * @description Logs the current system configuration IDs (PMT vs. PRIVATE) to the console for debugging purposes.
+ *
+ * @version 1.0.0
+ * @last_modified 2024-07-28
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.0: Initial creation. Added JSDoc header and function documentation.
+ */
+
+/**
+ * Determines the current execution profile (PMT or PRIVATE) and logs
+ * the exact configuration IDs in use to the console.
+ *
+ * @returns {void}
+ */
 function printTrueIds() {
   const isPmt = isPmtAccount();
   const profileName = isPmt ? "PMT" : "PRIVATE";
