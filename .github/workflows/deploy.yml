@@ -24,5 +24,12 @@ jobs:
       - name: Authenticate with Clasp
         run: echo '${{ secrets.CLASPRC_JSON }}' > ~/.clasprc.json
 
-      - name: Deploy with Clasp
-        run: clasp push --force
+      - name: Deploy to Private Project
+        run: |
+          cp .clasp-private.json .clasp.json
+          clasp push --force
+
+      - name: Deploy to Work/PMT Project
+        run: |
+          cp .clasp-work.json .clasp.json
+          clasp push --force
