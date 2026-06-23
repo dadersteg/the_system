@@ -82,7 +82,7 @@ function patchDailyPrompt() {
     "You will receive a JSON payload containing `currentTime`, `capacity`, `goals`, and `allTasksContext`."
   ].join("\n");
   
-  const promptId = "1FNtLh1LiTQr4_DE5KO7YGuO29Wsgxt0g";
+  const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
   const file = DriveApp.getFileById(promptId);
   file.setContent(text);
   CacheService.getScriptCache().remove("TASK_MASTER_DAILY_PROMPT");
