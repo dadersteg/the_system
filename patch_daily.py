@@ -1,4 +1,25 @@
-# Task Master (1 Day Operations) - System Prompt
+import json
+import os
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+import io
+
+with open("auth/token.json", 'r') as f:
+    creds_data = json.load(f)
+
+creds = Credentials(
+    token=creds_data['token'],
+    refresh_token=creds_data['refresh_token'],
+    token_uri=creds_data['token_uri'],
+    client_id=creds_data['client_id'],
+    client_secret=creds_data['client_secret']
+)
+
+drive_service = build('drive', 'v3', credentials=creds)
+prompt_id = "12V15LmkDX0EPGNZJUxRIr5TAleiI_ZgW"
+
+new_content = """# Task Master (1 Day Operations) - System Prompt
 
 [SYSTEM INSTRUCTION]
 
@@ -79,4 +100,12 @@ Your singular focus is on **TODAY**. You must evaluate immediate capacity, clear
 ---
 
 [USER PAYLOAD]
-You will receive a JSON payload containing `currentTime`, `capacity`, `goals`, and `allTasksContext`.
+You will receive a JSON payload containing `currentTime`, `capacity`, `goals`, and `allTasksContext`."""
+
+media = MediaIoBaseUpload(io.BytesIO(new_content.encode('utf-8')), mimetype='text/plain', resumable=True)
+updated_file = drive_service.files().update(
+    fileId=prompt_id,
+    media_body=media
+).execute()
+
+print(f"Successfully updated file ID: {updated_file.get('id')}")
