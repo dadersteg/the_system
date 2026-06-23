@@ -1,7 +1,13 @@
 /**
- *  bridges send subject/body/name as base64 (b64 flag), and this script
- * embeds them directly into the raw MIME using Content-Transfer-Encoding: base64,
- * so the emoji bytes never touch an Apps Script string→email conversion.
+ * @file src/Code_IngestionBridge.js
+ * @description Bridges send subject/body/name as base64 (b64 flag), and this script embeds them directly into the raw MIME using Content-Transfer-Encoding: base64, so the emoji bytes never touch an Apps Script string→email conversion.
+ *
+ * @version 1.0.0
+ * @last_modified 2026-06-05
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.0: Added standardized documentation header and improved error logging for empty catch blocks.
  */
 
 const BRIDGE_SECRET = "MOW_BRIDGE_SECRET_2026";
@@ -24,7 +30,9 @@ function doPost(e) {
       if (payload && payload.action) {
         return doGet(e);
       }
-    } catch (_) {}
+    } catch (err) {
+      console.error("Failed to parse POST payload: " + err.message);
+    }
   }
   return processWebhook(e);
 }
@@ -49,7 +57,8 @@ function processWebhook(e) {
     else if (e.postData && e.postData.contents) {
       try {
         payload = JSON.parse(e.postData.contents);
-      } catch (_) {
+      } catch (err) {
+        console.error("Failed to parse form-urlencoded POST payload fallback: " + err.message);
         payload = e.parameter || {};
       }
     }
