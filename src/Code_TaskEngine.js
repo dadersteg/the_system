@@ -248,7 +248,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
       };
       
       const crossCheckPrompt = "You are a strict QA AI. Return a JSON object with a single 'taskUpdates' array containing the finalized task objects. " +
-                               "Your primary responsibility is to ensure that tasks are not incorrectly deleted, and that existing routing targets (DELETE/COMPLETE/SPLIT) and metadata fields (estimatedDuration, alignedGoal, newSubTasks) are preserved unmodified. " +
+                               "Your primary responsibility is to ensure that tasks are not incorrectly deleted, and that existing routing targets (DELETE/COMPLETE/SPLIT) and metadata fields (estimatedDuration, alignedGoal, newSubTasks, systemComment) are preserved unmodified. " +
                                "Verify that similar-looking tasks are only marked as duplicates (routingTarget = 'DELETE') if they represent the exact same work item. " +
                                "CRITICAL: Tasks targeting different people, clients, projects, case references, or generic titles (e.g. 'Draft email' vs 'Draft email' without context) are NOT duplicates. " +
                                "You MUST return ALL original tasks from proposedUpdates, even if unmodified. Do not omit any tasks. Respond ONLY with valid JSON.";
@@ -509,7 +509,7 @@ function executeTaskMasterGemini(payloadObj, systemInstruction) {
             "alignedGoal": { "type": "STRING", "description": "The URN (e.g. 2026-MD-NEW-045) of the System Goal this task serves. You must find this URN in the provided goals tables. If the task is a mandatory administrative chore that does not advance a specific strategic goal, output 'Maintenance'." },
             "category_path": { "type": "STRING", "description": "The EXACT value from the 'Concat (Path)' field of the provided Taxonomy JSON. You MUST use the full path format (e.g. '01 05 01 Projects > AI'). Do NOT use the Label format or hallucinate paths." },
             "recommendedTitle": { "type": "STRING", "description": "Keep concise, action-oriented. CRITICAL: NEVER remove people's names, Case Refs, or unique identifiers from the title. Preserve all vital context." },
-            "systemComment": { "type": "STRING", "description": "AI questions or feedback to the user." },
+            "systemComment": { "type": "STRING", "description": "AI questions or feedback to the user. CRITICAL: If routingTarget is 'DELETE' or 'COMPLETE', you MUST provide a detailed rationale here explaining why this task was deleted or marked completed." },
             "clearUserComment": { "type": "BOOLEAN", "description": "Set to true if you have processed the user's DA: instruction." },
             "newSubTasks": {
               "type": "ARRAY",

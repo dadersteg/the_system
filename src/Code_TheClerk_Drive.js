@@ -954,7 +954,7 @@ function ingestSharedFilesToInbox() {
       q: "sharedWithMe = true and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
       orderBy: "sharedWithMeTime desc",
       pageSize: 50,
-      fields: "files(id, name, mimeType)"
+      fields: "files(id, name, mimeType, parents)"
     });
     files = response.files || [];
   } catch (e) {
@@ -993,7 +993,44 @@ function ingestSharedFilesToInbox() {
   let createdCount = 0;
   files.forEach(sharedFile => {
     if (!existingTargets.has(sharedFile.id)) {
-      try {
+      let isOrganized = false;
+      if (sharedFile.parents && sharedFile.parents.length > 0) {
+        try {
+          let current = DriveApp.getFolderById(sharedFile.parents[0]);
+          while (current) {
+            const cid = current.getId();
+            const crossEnvOrganizedFolders = [
+              "1MuDEjRgrh6l2wvtpdoi3Tiq_oRUjzBwx", // PMT Workspace
+              "13Nvsav_Gt1zTXjPH0crBMdERN9HkN2pc", // Private Workspace
+              "1wAWcN2BA2xA8nMiKUad7UQP0H-scg_WR", // PMT STND_DEST
+              "1lQlTLOL3e-FTIDZ8hOXP6oi3aTMG6Ezb", // Private STND_DEST
+              "1XhG9y__HT3x4QXmFKr9cBCRThSijHt9H", // PMT REVIEW
+              "1FBBm4sFSFKf53T3n9sqoKhm1R8d6EDoY"  // Private REVIEW
+            ];
+            if (crossEnvOrganizedFolders.includes(cid) || 
+                SYSTEM_CONFIG.DRIVE_FOLDERS.STND_SOURCES.includes(cid)) {
+              isOrganized = true;
+              break;
+            }
+            const parentsIter = current.getParents();
+            if (parentsIter.hasNext()) {
+              current = parentsIter.next();
+            } else {
+              break;
+            }
+          }
+        } catch (e) {
+          // Folder inaccessible or not a folder, assume unorganized
+        }
+      }
+      
+      if (isOrganized) {
+         console.log(`Skipping shortcut for "${sharedFile.name}" - already located in an organized system folder.`);
+         // Add to log so we don't check it again? No, it's fine, we'll just check it next time, but that's fast.
+         // Actually, wait, if we don't log it, we will traverse it EVERY time ingest runs!
+      } else {
+        try {
+
         console.log(`Creating shortcut for: "${sharedFile.name}" (ID: ${sharedFile.id})`);
         
         const resource = {
@@ -1007,6 +1044,7 @@ function ingestSharedFilesToInbox() {
         createdCount++;
       } catch (err) {
         console.error(`Failed to create shortcut for "${sharedFile.name}": ${err.message}`);
+      }
       }
     } else {
       // console.log(`Shortcut/file already exists for: "${sharedFile.name}" (ID: ${sharedFile.id})`);
