@@ -119,156 +119,21 @@ function executeTriageEngine(searchQuery, searchLimit, isRetro, configPayload) {
     }
     
     const thread = threads[index];
-    const threadId = thread.getId();
+    const logData = _processSingleEmailThread(
+      thread, index, threads.length, runTimestamp, deterministicRules, allowedAliases,
+      fullDocPrompt, safeTaxonomyJsonStr, labelToPathMap, activeTaskMap,
+      isRetro, currentModel, personalGoalsStr, workGoalsStr
+    );
     
-    const messages = thread.getMessages();
-    const firstMsg = messages[0];
-    const lastMsg = messages[messages.length - 1];
-    
-    const lastMsgId = lastMsg.getId();
-    
-    // Stateful Memory Check (Removed as per user request to simplify)
-    
-    const subject = firstMsg.getSubject();
-    const sender = firstMsg.getFrom().toLowerCase();
-    
-    let body = "";
-    let systemNotes = "";
-    if (messages.length === 1) {
-      body = messages[0].getPlainBody().substring(0, 3000);
-    } else {
-      // Feed the last 3 messages to ensure multiple rapid-fire requests are caught
-      const recentMessages = messages.slice(-3);
-      const bodies = recentMessages.map((m, i) => `--- MSG ${i+1} (FROM: ${m.getFrom()}) ---\n${m.getPlainBody().substring(0, 1500)}`);
-      body = bodies.join('\n\n');
+    if (logData && logData.shouldSkip) {
+      continue;
     }
     
-    // ATTACHMENT EXTRACTION (MULTIMODAL SUPPORT FOR RECEIPTS, FLYERS, PDFs)
-    const attachmentData = _extractMultimodalAttachments(lastMsg);
-    let inlineImages = attachmentData.inlineImages;
-    systemNotes += attachmentData.systemNotes;
-    const threadUrl = `https://mail.google.com/mail/u/0/#all/${threadId}`;
-    
-    const firstMsgDate = Utilities.formatDate(firstMsg.getDate(), "GMT", "yyyy-MM-dd HH:mm:ss");
-    const lastMsgDate = Utilities.formatDate(lastMsg.getDate(), "GMT", "yyyy-MM-dd HH:mm:ss");
-    
-    console.log(`[${index + 1}/${threads.length}] Analyzing: ${subject}`);
-    
-    // 1. Alias Detection
-    const targetAliases = getWhitelistedAliases(firstMsg, allowedAliases);
-
-    // 2. Legacy Context
-    const existingLabels = thread.getLabels()
-      .map(l => l.getName())
-      .filter(n => n !== PROCESSED_FLAG);
-    
-    // 3. Spreadsheet Logic (Deterministic Override)
-    let ssMatch = _evaluateDeterministicRules(sender, subject, body, deterministicRules);
-    const ssLabels = ssMatch ? ssMatch.labels : [];
-
-    // 4. AI Inference
-    let aiMatch = null;
-    if (ssMatch && ssMatch.skipAI) {
-        console.log(` > Skipping AI Inference due to Spreadsheet Rule (Skip AI = TRUE)`);
-        aiMatch = {
-            categories: [],
-            keepInInbox: ssMatch.keepInInbox,
-            markAsRead: ssMatch.markAsRead,
-            deleteEmail: ssMatch.labels.includes('99 To be deleted'),
-            summary: "Auto-categorized via Spreadsheet Rule (AI Bypassed)",
-            actionItems: []
-        };
-    } else {
-        const openTasksStr = activeTaskMap.openTasksForAI.join('\n');
-        aiMatch = callLLMWithSourceContext(subject, sender, body, fullDocPrompt, safeTaxonomyJsonStr, existingLabels, ssLabels, isRetro, currentModel, inlineImages, systemNotes, personalGoalsStr, workGoalsStr, openTasksStr);
+    if (logData) {
+       cleanupBuffer.push(logData.cleanupItem);
+       batchLogs.push(logData.logItem);
+       processedCount++;
     }
-    
-    if (!aiMatch) {
-       console.log(` > Skipping thread due to AI failure. Flagging for Manual Review to prevent queue blockage.`);
-       
-       const manualLabel = GmailApp.getUserLabelByName("00 Manual Review");
-       const processedLabel = GmailApp.getUserLabelByName("99 Label_Reviewed");
-       
-       if (manualLabel) thread.addLabel(manualLabel);
-       if (processedLabel) thread.addLabel(processedLabel);
-       
-       continue; 
-    }
-    Utilities.sleep(1500); // Increased Rate Limit Protection
-
-    // 5. Logical Merge (Spreadsheet Deterministic Override)
-    const finalConfig = mergeConfigs(ssMatch, aiMatch);
-    
-    // Add aliases to labels
-    targetAliases.forEach(alias => {
-      if (!finalConfig.labels.includes(alias)) finalConfig.labels.push(alias);
-    });
-
-    // Handle Fallback
-    const isManual = finalConfig.labels.length === 0 && !finalConfig.deleteEmail;
-    if (isManual) {
-      finalConfig.labels = [MANUAL_REVIEW_LABEL];
-      finalConfig.keepInInbox = true;
-      finalConfig.markAsRead = false;
-    }
-
-    // 6. Execution (Temp Delete or Labeling)
-    if (finalConfig.deleteEmail) {
-      if (!finalConfig.labels.includes(TEMP_DELETE_LABEL)) {
-        finalConfig.labels.push(TEMP_DELETE_LABEL);
-      }
-      finalConfig.keepInInbox = false; // Automatically archive items marked for temp deletion
-      console.log(` > Flagged for deletion: ${subject}`);
-    }
-    
-    cleanupBuffer.push({ thread: thread, config: finalConfig, existingLabels: existingLabels });
-
-    // 7. Granular Log Entry & Task Push
-    const summaryLog = aiMatch.summary || "";
-    let actionItemsLog = "";
-    let syncedTaskIds = [];
-
-    // Filter out hallucinations like ["None"], ["N/A"]
-    let validActions = [];
-    if (aiMatch.actionItems && Array.isArray(aiMatch.actionItems)) {
-       validActions = aiMatch.actionItems.filter(a => {
-          if (typeof a !== 'object') return false;
-          const str = (a.title || "").toLowerCase().trim();
-          return str !== "" && str !== "none" && str !== "n/a" && str !== "null";
-       });
-    }
-
-    if (validActions.length > 0) {
-      actionItemsLog = validActions.map(a => a.title).join('; ');
-      const primaryCategoryLabel = (aiMatch.categories && aiMatch.categories.length > 0) ? aiMatch.categories[0] : "00 Manual Review";
-      const importerListId = SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
-      
-      syncedTaskIds.push(..._syncTasksForThread(validActions, primaryCategoryLabel, labelToPathMap, activeTaskMap, threadId, threadUrl, importerListId));
-    }
-
-    batchLogs.push({
-      "Timestamp": runTimestamp, 
-      "Received First Message": firstMsgDate,
-      "Received Last Message": lastMsgDate,
-      "Subject": subject, 
-      "AI Categories": aiMatch.categories.join(', '), 
-      "SS Labels": ssLabels.join(', '),           
-      "Alias Labels": targetAliases.join(', '),      
-      "Final Label Set": finalConfig.labels.join(', '), 
-      "Link": threadUrl, 
-      "Inbox Status": finalConfig.deleteEmail ? "TEMP_DELETE" : (finalConfig.keepInInbox ? "INBOX" : "ARCHIVED"), 
-      "Read State": finalConfig.markAsRead ? "READ" : "UNREAD",
-      "Sender": sender,
-      "AI Summary": summaryLog,
-      "AI Action Items": actionItemsLog,
-      "Task Synced": syncedTaskIds.join(', '),
-      "Revised Labels (Override)": "",
-      "Override Status": ""
-    });
-    
-    // Stateful Cache Save (Removed as per user request to simplify)
-    
-    processedCount++;
   } // End of for-loop
 
   if (batchLogs.length > 0) {
@@ -878,3 +743,140 @@ function exportGmailLabelsToSheet() {
 // =============================================================================
 
 
+
+/**
+ * Processes a single email thread to extract logic and generate configuration.
+ * Extracted from executeTriageEngine for readability and testability.
+ */
+function _processSingleEmailThread(thread, index, totalThreads, runTimestamp, deterministicRules, allowedAliases, fullDocPrompt, safeTaxonomyJsonStr, labelToPathMap, activeTaskMap, isRetro, currentModel, personalGoalsStr, workGoalsStr) {
+  const threadId = thread.getId();
+
+  const messages = thread.getMessages();
+  const firstMsg = messages[0];
+  const lastMsg = messages[messages.length - 1];
+
+  const subject = firstMsg.getSubject();
+  const sender = firstMsg.getFrom().toLowerCase();
+
+  let body = "";
+  let systemNotes = "";
+  if (messages.length === 1) {
+    body = messages[0].getPlainBody().substring(0, 3000);
+  } else {
+    const recentMessages = messages.slice(-3);
+    const bodies = recentMessages.map((m, i) => `--- MSG ${i+1} (FROM: ${m.getFrom()}) ---
+${m.getPlainBody().substring(0, 1500)}`);
+    body = bodies.join('\n\n');
+  }
+
+  const attachmentData = _extractMultimodalAttachments(lastMsg);
+  let inlineImages = attachmentData.inlineImages;
+  systemNotes += attachmentData.systemNotes;
+  const threadUrl = `https://mail.google.com/mail/u/0/#all/${threadId}`;
+
+  const firstMsgDate = Utilities.formatDate(firstMsg.getDate(), "GMT", "yyyy-MM-dd HH:mm:ss");
+  const lastMsgDate = Utilities.formatDate(lastMsg.getDate(), "GMT", "yyyy-MM-dd HH:mm:ss");
+
+  console.log(`[${index + 1}/${totalThreads}] Analyzing: ${subject}`);
+
+  const targetAliases = getWhitelistedAliases(firstMsg, allowedAliases);
+
+  const existingLabels = thread.getLabels()
+    .map(l => l.getName())
+    .filter(n => n !== PROCESSED_FLAG);
+
+  let ssMatch = _evaluateDeterministicRules(sender, subject, body, deterministicRules);
+  const ssLabels = ssMatch ? ssMatch.labels : [];
+
+  let aiMatch = null;
+  if (ssMatch && ssMatch.skipAI) {
+      console.log(` > Skipping AI Inference due to Spreadsheet Rule (Skip AI = TRUE)`);
+      aiMatch = {
+          categories: [],
+          keepInInbox: ssMatch.keepInInbox,
+          markAsRead: ssMatch.markAsRead,
+          deleteEmail: ssMatch.labels.includes('99 To be deleted'),
+          summary: "Auto-categorized via Spreadsheet Rule (AI Bypassed)",
+          actionItems: []
+      };
+  } else {
+      const openTasksStr = activeTaskMap.openTasksForAI.join('\n');
+      aiMatch = callLLMWithSourceContext(subject, sender, body, fullDocPrompt, safeTaxonomyJsonStr, existingLabels, ssLabels, isRetro, currentModel, inlineImages, systemNotes, personalGoalsStr, workGoalsStr, openTasksStr);
+  }
+
+  if (!aiMatch) {
+     console.log(` > Skipping thread due to AI failure. Flagging for Manual Review to prevent queue blockage.`);
+     const manualLabel = GmailApp.getUserLabelByName("00 Manual Review");
+     const processedLabel = GmailApp.getUserLabelByName("99 Label_Reviewed");
+
+     if (manualLabel) thread.addLabel(manualLabel);
+     if (processedLabel) thread.addLabel(processedLabel);
+     return { shouldSkip: true };
+  }
+  Utilities.sleep(1500);
+
+  const finalConfig = mergeConfigs(ssMatch, aiMatch);
+
+  targetAliases.forEach(alias => {
+    if (!finalConfig.labels.includes(alias)) finalConfig.labels.push(alias);
+  });
+
+  const isManual = finalConfig.labels.length === 0 && !finalConfig.deleteEmail;
+  if (isManual) {
+    finalConfig.labels = [MANUAL_REVIEW_LABEL];
+    finalConfig.keepInInbox = true;
+    finalConfig.markAsRead = false;
+  }
+
+  if (finalConfig.deleteEmail) {
+    if (!finalConfig.labels.includes(TEMP_DELETE_LABEL)) {
+      finalConfig.labels.push(TEMP_DELETE_LABEL);
+    }
+    finalConfig.keepInInbox = false;
+    console.log(` > Flagged for deletion: ${subject}`);
+  }
+
+  const summaryLog = aiMatch.summary || "";
+  let actionItemsLog = "";
+  let syncedTaskIds = [];
+
+  let validActions = [];
+  if (aiMatch.actionItems && Array.isArray(aiMatch.actionItems)) {
+     validActions = aiMatch.actionItems.filter(a => {
+        if (typeof a !== 'object') return false;
+        const str = (a.title || "").toLowerCase().trim();
+        return str !== "" && str !== "none" && str !== "n/a" && str !== "null";
+     });
+  }
+
+  if (validActions.length > 0) {
+    actionItemsLog = validActions.map(a => a.title).join('; ');
+    const primaryCategoryLabel = (aiMatch.categories && aiMatch.categories.length > 0) ? aiMatch.categories[0] : "00 Manual Review";
+    const importerListId = SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
+
+    syncedTaskIds.push(..._syncTasksForThread(validActions, primaryCategoryLabel, labelToPathMap, activeTaskMap, threadId, threadUrl, importerListId));
+  }
+
+  return {
+    cleanupItem: { thread: thread, config: finalConfig, existingLabels: existingLabels },
+    logItem: {
+      "Timestamp": runTimestamp,
+      "Received First Message": firstMsgDate,
+      "Received Last Message": lastMsgDate,
+      "Subject": subject,
+      "AI Categories": aiMatch.categories.join(', '),
+      "SS Labels": ssLabels.join(', '),
+      "Alias Labels": targetAliases.join(', '),
+      "Final Label Set": finalConfig.labels.join(', '),
+      "Link": threadUrl,
+      "Inbox Status": finalConfig.deleteEmail ? "TEMP_DELETE" : (finalConfig.keepInInbox ? "INBOX" : "ARCHIVED"),
+      "Read State": finalConfig.markAsRead ? "READ" : "UNREAD",
+      "Sender": sender,
+      "AI Summary": summaryLog,
+      "AI Action Items": actionItemsLog,
+      "Task Synced": syncedTaskIds.join(', '),
+      "Revised Labels (Override)": "",
+      "Override Status": ""
+    }
+  };
+}
