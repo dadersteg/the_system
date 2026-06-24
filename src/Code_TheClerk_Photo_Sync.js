@@ -34,67 +34,22 @@ function processGmailPhotos() {
     const thread = threads[i];
     const messages = thread.getMessages();
     
-    let processedImages = [];
-    let mediaItemsToCreate = [];
-    
-    for (let j = 0; j < messages.length; j++) {
-      const msg = messages[j];
-      const attachments = msg.getAttachments();
-      const date = msg.getDate();
-      const subject = msg.getSubject();
-      const sender = msg.getFrom();
-      const body = msg.getPlainBody();
-      
-      for (let k = 0; k < attachments.length; k++) {
-        const att = attachments[k];
-        if (att.getContentType().indexOf("image/") !== -1) {
-          
-          // Remove brackets and make it a clean sentence
-          let cleanSubject = subject.replace(/\[|\]/g, "").replace(/\s+/g, " ").trim();
-          let safeFilename = cleanSubject.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_") + ".jpg";
-          
-          // 1. Upload bytes (get token)
-          const uploadToken = _uploadBytesToPhotos(att, safeFilename);
-          if (!uploadToken) continue;
-          
-          // 2. Analyze with Gemini
-          const analysis = _analyzePhotoWithGemini(att, { subject: subject, sender: sender, date: date, body: body });
-          
-          // Strip URLs and programmatic brackets to prevent Google Photos from silently dropping the metadata as 'spam'
-          let cleanBody = body ? body.replace(/https?:\/\/[^\s]+/g, "[Link removed]").substring(0, 400).trim() : "";
-          let photoDescription = `Source: ${cleanSubject}\nDate: ${date}\nMessage: ${cleanBody}`;
-
-          mediaItemsToCreate.push({
-            description: photoDescription,
-            simpleMediaItem: { 
-              uploadToken: uploadToken,
-              fileName: safeFilename 
-            }
-          });
-          
-          processedImages.push({
-            name: safeFilename,
-            date: date,
-            analysis: analysis
-          });
-          
-          // Small delay to avoid hammering the upload API
-          Utilities.sleep(500);
-        }
-      }
-    }
+    const uploadResults = _processAndUploadAttachments(messages);
+    const mediaItemsToCreate = uploadResults.mediaItemsToCreate;
+    const processedImages = uploadResults.processedImages;
     
     // 3. Batch Create Media Items
     if (mediaItemsToCreate.length > 0) {
       const urls = _batchCreateMediaItems(mediaItemsToCreate);
       
-      // 4. Append to Photo Register
+      // 4. Append to Photo Register (Batched)
       if (sheet) {
+        let rowsToWrite = [];
         for (let m = 0; m < processedImages.length; m++) {
           const img = processedImages[m];
           const photoUrl = urls[m] || ""; // Match by index
           
-          sheet.appendRow([
+          rowsToWrite.push([
             img.name,
             "Gmail_Import",
             img.date,
@@ -109,6 +64,10 @@ function processGmailPhotos() {
             img.analysis.vibe || "",
             img.analysis.is_milestone || false
           ]);
+        }
+
+        if (rowsToWrite.length > 0) {
+           sheet.getRange(sheet.getLastRow() + 1, 1, rowsToWrite.length, rowsToWrite[0].length).setValues(rowsToWrite);
         }
       } else {
         console.log(`Processed ${processedImages.length} photos, but no sheet to log.`);
@@ -222,4 +181,68 @@ function _analyzePhotoWithGemini(blob, msgContext) {
     console.error("Gemini analysis failed: " + e.message);
   }
   return {};
+}
+
+
+/**
+ * Processes messages to extract image attachments, uploads them, and performs AI analysis.
+ * Extracted from processGmailPhotos to improve error handling and readability.
+ * @param {GoogleAppsScript.Gmail.GmailMessage[]} messages
+ * @returns {Object} { processedImages, mediaItemsToCreate }
+ */
+function _processAndUploadAttachments(messages) {
+  let processedImages = [];
+  let mediaItemsToCreate = [];
+
+  for (let j = 0; j < messages.length; j++) {
+    const msg = messages[j];
+    const attachments = msg.getAttachments();
+    const date = msg.getDate();
+    const subject = msg.getSubject();
+    const sender = msg.getFrom();
+    const body = msg.getPlainBody();
+
+    for (let k = 0; k < attachments.length; k++) {
+      const att = attachments[k];
+      if (att.getContentType().indexOf("image/") !== -1) {
+        try {
+          // Remove brackets and make it a clean sentence
+          let cleanSubject = subject.replace(/\[|\]/g, "").replace(/\s+/g, " ").trim();
+          let safeFilename = cleanSubject.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_") + ".jpg";
+
+          // 1. Upload bytes (get token)
+          const uploadToken = _uploadBytesToPhotos(att, safeFilename);
+          if (!uploadToken) continue;
+
+          // 2. Analyze with Gemini
+          const analysis = _analyzePhotoWithGemini(att, { subject: subject, sender: sender, date: date, body: body });
+
+          // Strip URLs and programmatic brackets to prevent Google Photos from silently dropping the metadata as 'spam'
+          let cleanBody = body ? body.replace(/https?:\/\/[^\s]+/g, "[Link removed]").substring(0, 400).trim() : "";
+          let photoDescription = `Source: ${cleanSubject}\nDate: ${date}\nMessage: ${cleanBody}`;
+
+          mediaItemsToCreate.push({
+            description: photoDescription,
+            simpleMediaItem: {
+              uploadToken: uploadToken,
+              fileName: safeFilename
+            }
+          });
+
+          processedImages.push({
+            name: safeFilename,
+            date: date,
+            analysis: analysis
+          });
+
+          // Small delay to avoid hammering the upload API
+          Utilities.sleep(500);
+        } catch (e) {
+          console.warn(`Failed processing attachment in message ${subject}: ${e.message}`);
+        }
+      }
+    }
+  }
+
+  return { processedImages, mediaItemsToCreate };
 }
