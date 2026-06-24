@@ -100,49 +100,38 @@ function parseTasksForTimeboxing(markdown) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     
-    if (line.includes("## ⚡ \"EAT THE FROG\"") || line.includes("## 🎯 TODAY'S TOP 3") || line.includes("## ⚙️ ROUTINES & MAINTENANCE") || line.includes("## 📌 THE REST OF TODAY")) {
+    const upperLine = line.toUpperCase();
+    if (upperLine.includes("EAT THE FROG") || upperLine.includes("TODAY'S TOP 3") || upperLine.includes("ROUTINES") || upperLine.includes("THE REST OF TODAY")) {
       inTargetSection = true;
       continue;
     }
     
-    if (line.startsWith("## ⚠️") || line.startsWith("## 🗑️")) {
+    if (upperLine.includes("THIS WEEK") || upperLine.includes("THIS MONTH") || upperLine.includes("BOTTLENECKS") || upperLine.includes("QUARANTINE")) {
       inTargetSection = false;
     }
     
-    if (inTargetSection && line.startsWith("- [ ] [")) {
-      // Regex matches: "- [ ] [08:00 - 09:00] [Q2] Task Name {ID: xxxxx} (Duration/Cat)"
-      const matchWithTimeAndId = line.match(/- \[ \] \[(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})\] \[Q\d\] (.*?)\s*\{ID:\s*(.*?)\}\s*\((.*?)\)/);
-      const matchWithId = line.match(/- \[ \] \[Q\d\] (.*?)\s*\{ID:\s*(.*?)\}\s*\((.*?)\)/);
-      const matchWithoutId = line.match(/- \[ \] \[Q\d\] (.*?)\s*\((.*?)\)/);
+    if (inTargetSection && line.startsWith("- [ ]")) {
+      const regex = /- \[ \]\s*(?:\[(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})\]\s*)?(?:(?:🐸|\\ud83d\\udc38)\s*)?(?:\[THE FROG\]\s*)?\[Q[1-4]\]\s*(.*?)(?:\s*\{ID:\s*(.*?)\})?(?:\s*\((.*?)\))?$/i;
+      const match = line.match(regex);
       
-      let title, id, startTime, endTime;
-      
-      if (matchWithTimeAndId) {
-         startTime = matchWithTimeAndId[1];
-         endTime = matchWithTimeAndId[2];
-         title = matchWithTimeAndId[3].trim();
-         id = matchWithTimeAndId[4].trim();
-      } else if (matchWithId) {
-         title = matchWithId[1].trim();
-         id = matchWithId[2].trim();
-      } else if (matchWithoutId) {
-         title = matchWithoutId[1].trim();
-         id = null;
-      } else {
-         continue;
-      }
-      
-      // Remove markdown artifacts like trailing hyphens if the AI appended notes
-      if (title.endsWith(" -")) title = title.slice(0, -2);
-      
-      if (!tasks.find(t => (t.id && t.id === id) || (!t.id && t.title === title))) {
-         tasks.push({
-            id: id,
-            title: title,
-            startTime: startTime,
-            endTime: endTime,
-            rawLine: line
-         });
+      if (match) {
+        const startTime = match[1];
+        const endTime = match[2];
+        let title = match[3] ? match[3].trim() : "";
+        const id = match[4] ? match[4].trim() : null;
+        
+        // Remove markdown artifacts like trailing hyphens if the AI appended notes
+        if (title.endsWith(" -")) title = title.slice(0, -2).trim();
+        
+        if (title && !tasks.find(t => (t.id && t.id === id) || (!t.id && t.title === title))) {
+           tasks.push({
+              id: id,
+              title: title,
+              startTime: startTime,
+              endTime: endTime,
+              rawLine: line
+           });
+        }
       }
     }
   }
