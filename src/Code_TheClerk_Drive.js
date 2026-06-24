@@ -2,13 +2,14 @@
  * @file Code_TheClerk_Drive.js
  * @description THE CLERK: VERSION 26.0 (THE TRUTH ENGINE). Ingests files from Google Drive, extracts content via OCR/Text conversion, categorizes them against a taxonomy using Gemini, and routes/renames files based on strict protocols or spreadsheet overrides.
  *
- * @version 26.0.2
- * @last_modified 2024-05-24
+ * @version 26.0.3
+ * @last_modified 2026-06-24
  * @modified_by Jules
  *
  * @changelog
  * - 26.0.1: Implemented folderCache to reduce duplicate Drive API calls for identical taxonomy contexts. Increased Gemini batching parameters to 5 files per call to maximize throughput.
  * - 26.0.2: Added comprehensive JSDoc comments to configuration constants.
+ * - 26.0.3: Improved error handling by adding logging to empty catch blocks.
  */
 
 // --- 1. CONFIGURATION ---
@@ -202,7 +203,9 @@ function executeEngine(mode, currentModel) {
             const ss = getMasterSpreadsheet();
             const sessionLog = ss.getSheets().find(s => s.getSheetId().toString() === DRIVE_SESSION_LOG_GID);
             if (sessionLog) sessionLog.appendRow([new Date(), mode, currentModel, 0, "Failed: " + e.message, `${((Date.now() - sessionStart) / 1000).toFixed(1)}s`]);
-        } catch(e2){}
+        } catch(e2){
+            console.error("FATAL: Failed to write to session log: " + e2.message);
+        }
     } finally { 
         lock.releaseLock(); 
         return "Successfully swept Drive and executed The Clerk engine.";
@@ -566,7 +569,8 @@ function getDriveRules() {
             });
         }
     } catch(e) {
-        // Silently fail if sheets don't exist yet
+        // Silently fail if sheets don't exist yet, but log the warning
+        console.warn(`Drive rules sheets not found or could not be read: ${e.message}`);
     }
     return { filenameRules, folderRules };
 }
@@ -731,7 +735,11 @@ Output schema for each file object must include:
 function getArchiveFilesRecursive(folderId, processedSet, limit) {
     const list = []; 
     let rootPath = "Archive";
-    try { rootPath = DriveApp.getFolderById(folderId).getName(); } catch(e) {}
+    try {
+        rootPath = DriveApp.getFolderById(folderId).getName();
+    } catch(e) {
+        console.warn(`Failed to resolve root folder name for ID ${folderId}, defaulting to 'Archive': ${e.message}`);
+    }
     const stack = [{id: folderId, path: rootPath}];
     
     while (stack.length > 0 && list.length < limit) {
@@ -788,13 +796,17 @@ function loadKnowledgeDocs() {
     try {
         const iter1 = DriveApp.getFilesByName("TS - Clerk > System Instructions.md");
         if (iter1.hasNext()) instructions = processPromptText(iter1.next().getBlob().getDataAsString());
-    } catch(e){}
+    } catch(e){
+        console.warn(`Failed to dynamically load System Instructions document: ${e.message}`);
+    }
     
     let protocol = "";
     try {
         const iter2 = DriveApp.getFilesByName("TS - Master Asset Naming Protocol.md");
         if (iter2.hasNext()) protocol = processPromptText(iter2.next().getBlob().getDataAsString());
-    } catch(e){}
+    } catch(e){
+        console.warn(`Failed to dynamically load Naming Protocol document: ${e.message}`);
+    }
     
     if (!instructions) {
         instructions = getSafeDocText(DRIVE_DOC_IDS.INSTRUCTIONS);
