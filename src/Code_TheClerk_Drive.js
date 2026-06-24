@@ -1108,7 +1108,7 @@ function getExistingShortcutTargets() {
     if (sheet) {
       const lastRow = sheet.getLastRow();
       if (lastRow > 1) {
-        const urls = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+        const urls = sheet.getRange(2, 2, lastRow - 1, 1).getValues(); // Fix: URL is column 2 (B), not 1 (A)
         urls.forEach(row => {
           const url = row[0] ? row[0].toString().trim() : "";
           if (url) {
