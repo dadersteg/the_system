@@ -5,11 +5,12 @@
  * programmatic access to Google Tasks without using the browser.
  * (Note: Gmail, Drive, and Calendar tools have been deprecated in favor of MCP servers).
  *
- * @version 1.2.0
- * @last_modified 2026-06-05
- * @modified_by Antigravity
+ * @version 1.2.1
+ * @last_modified 2026-06-24
+ * @modified_by Jules
  *
  * @changelog
+ * - 1.2.1: Injected missing JSDoc docstrings and standardized variable naming.
  * - 1.2.0: Removed Gmail, Calendar, and Drive tools in favor of native MCP servers.
  * - 1.1.0: Added listTasksFromCLI for lightweight task queue extraction.
  * - 1.0.0: Initial creation with agent tools.
@@ -78,6 +79,13 @@ function listTasksFromCLI(listFilter) {
   }
 }
 
+/**
+ * Retrieves all Google Task lists and their associated tasks, formatted as a JSON string.
+ * This is primarily used via CLI to extract the current state of task queues.
+ *
+ * @returns {string} A JSON string containing a map of task list titles to their IDs and arrays of task titles.
+ *                   If an error occurs, returns a JSON string with an `error` property.
+ */
 function getAllTaskListsFromCLI() {
   try {
     const response = Tasks.Tasklists.list();
@@ -99,10 +107,16 @@ function getAllTaskListsFromCLI() {
   }
 }
 
+/**
+ * Scans the centralized logging spreadsheet to extract and dump the 20 most recently
+ * logged email task operations to the console. Helps monitor Agent email parsing activity.
+ *
+ * @returns {void}
+ */
 function dumpRecentEmailTasks() {
   const ss = getMasterSpreadsheet();
-  const LOG_GID = IS_PMT_ENV ? "2131515996" : "967747913";
-  const sheet = ss.getSheets().find(s => s.getSheetId().toString() === LOG_GID);
+  const logGid = IS_PMT_ENV ? "2131515996" : "967747913";
+  const sheet = ss.getSheets().find(s => s.getSheetId().toString() === logGid);
   if (!sheet) {
     console.log("Sheet not found");
     return;
