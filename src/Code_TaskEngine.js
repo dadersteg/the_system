@@ -137,7 +137,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
               cleanNotes = cleanNotes.trim();
             }
             
-            const normFinalTitle = (t.title || "").replace(/\s+/g, " ").trim();
+            const normFinalTitle = (t.title || "").replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/\s+/g, " ").trim();
             const normFinalNotes = cleanNotes.replace(/\s+/g, " ").trim();
             const normFinalDue = (t.due || "").replace(/\s+/g, " ").trim();
             const normFinalStatus = (t.status || "").replace(/\s+/g, " ").trim();
@@ -600,7 +600,18 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
                 const subMeta = Object.assign({}, baseMetadata);
                 subMeta.duration = sub.estimatedDuration || "N/A";
                 
-                const subNotes = "---SYSTEM_METADATA---\n" + JSON.stringify(subMeta) + "\n\n--- ORIGINAL TASK DATA ---\n" + (task.notes || "");
+                let cleanOriginalNotes = (task.notes || "").split('---SYSTEM_METADATA---')[0].trim();
+                
+                if (task.links && Array.isArray(task.links)) {
+                   const emailLinkObj = task.links.find(l => l.type === "email");
+                   if (emailLinkObj && emailLinkObj.link && !cleanOriginalNotes.includes(emailLinkObj.link)) {
+                       cleanOriginalNotes += `\n\n[Original Source Link]: ${emailLinkObj.link}`;
+                   }
+                } else if (task.webViewLink && !cleanOriginalNotes.includes(task.webViewLink)) {
+                   cleanOriginalNotes += `\n\n[Original Source Link]: ${task.webViewLink}`;
+                }
+                
+                const subNotes = "--- ORIGINAL TASK DATA ---\n" + cleanOriginalNotes + "\n\n---SYSTEM_METADATA---\n" + JSON.stringify(subMeta);
                 
                 const subTaskResource = {
                   title: sub.title,
@@ -811,7 +822,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       baseNotesForHash = baseNotesForHash.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
       baseNotesForHash = baseNotesForHash.trim();
       
-      const normFinalTitle = finalTitle.replace(/\s+/g, " ").trim();
+      const normFinalTitle = finalTitle.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/\s+/g, " ").trim();
       const normFinalNotes = baseNotesForHash.replace(/\s+/g, " ").trim();
       const normFinalDue = (finalDue || "").replace(/\s+/g, " ").trim();
       const normFinalStatus = (u.routingTarget === "COMPLETE" ? "completed" : "needsAction").replace(/\s+/g, " ").trim();
@@ -837,9 +848,20 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       
       if (targetListId !== listId) {
           console.log(`Moving task "${finalTitle}" from Importer to ToDo`);
+          
+          let extendedNotes = newNotesStr;
+          if (task.links && Array.isArray(task.links)) {
+             const emailLinkObj = task.links.find(l => l.type === "email");
+             if (emailLinkObj && emailLinkObj.link && !extendedNotes.includes(emailLinkObj.link)) {
+                 extendedNotes += `\n\n[Original Source Link]: ${emailLinkObj.link}`;
+             }
+          } else if (task.webViewLink && !extendedNotes.includes(task.webViewLink)) {
+             extendedNotes += `\n\n[Original Source Link]: ${task.webViewLink}`;
+          }
+
           const newTask = {
             title: finalTitle,
-            notes: newNotesStr,
+            notes: extendedNotes,
             due: finalDue,
             status: u.routingTarget === "COMPLETE" ? "completed" : "needsAction"
           };
