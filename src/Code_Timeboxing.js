@@ -1,8 +1,22 @@
 /**
  * @file src/Code_Timeboxing.js
  * @description Automatically syncs the Top 3 and Frog tasks from the 1-Day Execution Plan to Google Calendar.
+ *
+ * @version 1.0.1
+ * @last_modified 2026-06-25
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.1: Added JSDoc docstrings, type checking, and null/undefined resilience.
+ * - 1.0.0: Initial implementation.
  */
 
+/**
+ * Triggers the timeboxing synchronization process. Reads the 1-Day Execution Plan,
+ * parses the top tasks, verifies their active status, and schedules them in Google Calendar.
+ *
+ * @returns {void}
+ */
 function executeTimeboxing() {
   console.log("Starting Timeboxing sync...");
   const fileId = getExecutionPlanId();
@@ -28,7 +42,18 @@ function executeTimeboxing() {
   }
 }
 
+/**
+ * Verifies that the parsed tasks are still active and not completed or moved out of today's scope.
+ *
+ * @param {Array<Object>} parsedTasks - Array of task objects parsed from the execution plan.
+ * @returns {Array<Object>} An array containing only the verified active tasks.
+ */
 function verifyTasksAreStillActive(parsedTasks) {
+  if (!parsedTasks || !Array.isArray(parsedTasks)) {
+    console.error("verifyTasksAreStillActive: parsedTasks is null or not an array.");
+    return [];
+  }
+
   const activeTasksForToday = new Map();
   const listsToFetch = [
     SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID, 
@@ -92,7 +117,18 @@ function verifyTasksAreStillActive(parsedTasks) {
   return verifiedTasks;
 }
 
+/**
+ * Parses a markdown string to extract tasks intended for timeboxing, looking within specific sections.
+ *
+ * @param {string} markdown - The raw markdown content of the execution plan.
+ * @returns {Array<Object>} An array of task objects with id, title, startTime, endTime, and rawLine properties.
+ */
 function parseTasksForTimeboxing(markdown) {
+  if (typeof markdown !== 'string' || !markdown) {
+    console.error("parseTasksForTimeboxing: markdown is null or not a string.");
+    return [];
+  }
+
   const lines = markdown.split('\n');
   const tasks = [];
   let inTargetSection = false;
@@ -138,7 +174,19 @@ function parseTasksForTimeboxing(markdown) {
   return tasks;
 }
 
+/**
+ * Schedules the verified tasks into the default Google Calendar.
+ * Clears existing unstarted timebox events for today before scheduling to prevent duplicates.
+ *
+ * @param {Array<Object>} tasks - Array of verified task objects to schedule.
+ * @returns {void}
+ */
 function scheduleTasksToCalendar(tasks) {
+  if (!tasks || !Array.isArray(tasks)) {
+    console.error("scheduleTasksToCalendar: tasks is null or not an array.");
+    return;
+  }
+
   const calendar = CalendarApp.getDefaultCalendar();
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
