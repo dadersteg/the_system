@@ -2,11 +2,12 @@
  * @file src/Code_ListTaskLists.js
  * @description Fetches all Google Task lists and exports a JSON file to the main Drive workspace for agent context. Includes a utility to print lists to the console.
  *
- * @version 1.0.1
- * @last_modified 2026-06-15
+ * @version 1.0.2
+ * @last_modified 2026-06-25
  * @modified_by Jules
  *
  * @changelog
+ * - 1.0.2: Wrapped Tasks API calls in try-catch blocks and added null checks for response arrays to improve stability.
  * - 1.0.1: Added standardized JSDoc headers, fixed variable casing (camelCase), and removed legacy/unneeded code.
  * - 1.0.0: Initial creation.
  */
@@ -18,19 +19,24 @@
  * @returns {void}
  */
 function updateTaskList() {
-  const lists = Tasks.Tasklists.list().items;
-  if (!lists) return;
-  
-  const jsonOutput = lists.map(l => ({
-    title: l.title,
-    id: l.id,
-    updated: l.updated
-  }));
-
-  const targetFolderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
-  const fileName = "Actual_Google_Task_Lists.json";
-  
   try {
+    const response = Tasks.Tasklists.list();
+    const lists = response ? response.items : null;
+
+    if (!lists || lists.length === 0) {
+      console.warn("No task lists returned from the Tasks API.");
+      return;
+    }
+
+    const jsonOutput = lists.map(l => ({
+      title: l.title,
+      id: l.id,
+      updated: l.updated
+    }));
+
+    const targetFolderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
+    const fileName = "Actual_Google_Task_Lists.json";
+
     const targetFolder = DriveApp.getFolderById(targetFolderId);
     const jsonBlob = Utilities.newBlob(JSON.stringify(jsonOutput, null, 2), "application/json", fileName);
     
@@ -42,7 +48,7 @@ function updateTaskList() {
     }
     console.log(`Successfully exported ${lists.length} task lists to Drive.`);
   } catch (e) {
-    console.error("Failed to write JSON to Drive: " + e.message);
+    console.error("Failed to update task list: " + e.message);
   }
 }
 
@@ -53,12 +59,18 @@ function updateTaskList() {
  * @returns {void}
  */
 function printMyTaskLists() {
-  const lists = Tasks.Tasklists.list().items;
-  if (!lists) {
-    console.log("No task lists found.");
-    return;
+  try {
+    const response = Tasks.Tasklists.list();
+    const lists = response ? response.items : null;
+
+    if (!lists || lists.length === 0) {
+      console.log("No task lists found.");
+      return;
+    }
+    console.log("=== YOUR TASK LIST IDS ===");
+    lists.forEach(l => console.log(`Title: "${l.title}" --> ID: "${l.id}"`));
+    console.log("==========================");
+  } catch (e) {
+    console.error("Failed to list task lists: " + e.message);
   }
-  console.log("=== YOUR TASK LIST IDS ===");
-  lists.forEach(l => console.log(`Title: "${l.title}" --> ID: "${l.id}"`));
-  console.log("==========================");
 }
