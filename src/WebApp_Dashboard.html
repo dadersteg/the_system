@@ -550,20 +550,23 @@
       border-radius: 12px;
       text-decoration: none;
       color: var(--color-text);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       border: 1px solid transparent;
       background: transparent;
     }
     
     .list-item:hover {
-      background: rgba(241, 245, 249, 0.6); /* Desaturated slate */
+      background: rgba(148, 163, 184, 0.08); /* Refined desaturated color */
       border-color: rgba(99, 102, 241, 0.15); /* Hint of primary accent */
       transform: translateX(4px) scale(1.005);
       box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
     @media (prefers-color-scheme: dark) {
       .list-item:hover {
-        background: rgba(30, 41, 59, 0.4);
+        background: rgba(71, 85, 105, 0.15); /* Refined desaturated slate for dark mode */
         border-color: rgba(129, 140, 248, 0.2);
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       }
@@ -588,25 +591,29 @@
       font-family: 'Google Sans', sans-serif;
       font-weight: 600;
       flex-shrink: 0;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .list-item:hover .list-item-icon {
       transform: scale(1.05);
       color: var(--color-accent);
-      background: var(--color-surface);
+      background: rgba(99, 102, 241, 0.1);
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
     }
 
     @media (prefers-color-scheme: dark) {
       .list-item:hover .list-item-icon {
+        background: rgba(129, 140, 248, 0.12);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
     }
     
     .list-item-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-    .list-item-title { font-weight: 500; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--color-text); }
-    .list-item-subtitle { font-size: 13px; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .list-item-title { font-family: 'Google Sans', sans-serif; font-weight: 500; font-size: 15px; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--color-text); }
+    .list-item-subtitle { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* Pagination */
     .pagination-footer {
