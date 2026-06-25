@@ -57,12 +57,12 @@ async function getAccessToken() {
     return cachedToken;
 }
 
-const PRIVATE_TOKEN_PATH = '/Users/daniel/Documents/AGY/the_system/token.json';
+const PRIVATE_TOKEN_PATH = '/Users/daniel/Documents/AGY/the_system/auth/token.json';
 let cachedPrivateToken = null;
 let privateTokenExpiry = 0;
 
 /**
- * Returns a valid access token for the private profile (from token.json).
+ * Returns a valid access token for the private profile (from auth/token.json).
  * Caches the token and refreshes it if expired.
  * @returns {Promise<string>} The access token.
  */
@@ -72,7 +72,7 @@ async function getPrivateAccessToken() {
     }
 
     if (!fs.existsSync(PRIVATE_TOKEN_PATH)) {
-        throw new Error(`Private token file not found at ${PRIVATE_TOKEN_PATH}. Run regenerate_private_token.py first.`);
+        throw new Error(`Private token file not found at ${PRIVATE_TOKEN_PATH}. Ensure the auth credentials exist.`);
     }
 
     const tokenData = JSON.parse(fs.readFileSync(PRIVATE_TOKEN_PATH, 'utf8'));

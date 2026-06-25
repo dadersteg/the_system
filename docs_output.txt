@@ -1,0 +1,90 @@
+--- DOC 1 ---
+
+Sync: Daniel <> Traders 
+Invited     
+Attachments  
+Meeting records  
+
+
+Summary
+Meeting discussions established standardized trading templates, defined performance scorecards, and implemented automated data workflows for operations.Standardized Data Flow FrameworkThe team adopted a uniform 4 stage data structure to automate profit and loss reporting across strategies. This modular framework integrates automated MLB signals and manual inputs for qualitative trading.Operational Planning and ScorecardsThe fund established a cell based organizational structure for the second half of the year. Performance assessments will utilize a skills matrix and specific key performance indicator targets.Hybrid Strategy and ToolsLeadership set a goal of 3 approved and 2 back tested strategy ideas per trader. Participants agreed to refine the artificial intelligence workflow to better process unstructured data inputs.
+
+
+Decisions
+Aligned
+Telegram data flow transitioned to channel The team decided to transition the Telegram data feed from a group to a channel to facilitate fully automatic data ingestion.
+
+We've updated the Decisions section using your feedback.
+Let us know what you think: Helpful or Not Helpful
+
+
+Next steps
+[Daniel Adersteg] Schedule Meetings: Schedule 20 minute individual meetings with team members to discuss H2 goals and ambitions.
+[Daniel Adersteg] Optimize Spreadsheet: Clean up the unit calculator section in the spreadsheet to improve display clarity.
+[Daniel Adersteg] Resolve Fixture Logic: Resolve data discrepancies regarding cancelled games and fixture dates within the tracking tool.
+[Daniel Adersteg] Migrate Data: Port existing historical trading data into the new standardized spreadsheet format.
+[Daniel Adersteg] Update Telegram: Convert the current MLB signal Telegram group into a channel to enable full automation.
+[Daniel Adersteg] Develop Strategy Spreadsheets: Create and refine standardized spreadsheets for MLB and qualitative tennis strategies.
+[Daniel Adersteg] Define Targets: Consult Mark regarding the finalization of performance metrics and P&L goals for the second half of the year.
+[Daniel Adersteg] Reschedule Meeting: Arrange a meeting with Finn Brasher for Monday to review individual performance scorecards.
+[Daniel Adersteg] Update Readme: Update the Claude skill readme file to accurately document input requirements and procedures.
+[Daniel Adersteg] Parse Match Reports: Develop code to reverse engineer match reports into a structured data format.
+
+
+Details
+Standardized Data Flow and Trading Spreadsheets: Daniel Adersteg introduced a new standardized template for trading spreadsheets designed to automate P&L reporting, simplify data handling, and facilitate sport-agnostic analysis across different strategies (00:04:41). The goal is to move towards a uniform structure following a four-stage data flow: Inflow (automatic or manual data entry), Acknowledged (deciding to trade), Executed (live or paper trading), and Overview (standardized reporting and dashboards). Daniel Adersteg emphasized that while some strategies might feel "force-fitted" into this modular framework, maintaining a consistent flow is essential for large-scale automation and performance assessment through scorecards (00:06:02) (00:10:04).
+MLB Spreadsheet Automation and API Integration: Daniel Adersteg demonstrated the MLB spreadsheet where the "Inflow" stage is fully automated, pulling data from Telegram and the official MLB API to map schedules and scores every hour (00:06:02) (00:12:38). For MLB, the system automatically marks signals as "Acknowledged" because the process currently assumes every signal is acted upon (00:08:50) (00:12:38). A participant noted that for MLB, the "Acknowledged" and "Executed" odds should be the same as they use broker odds rather than Telegram odds, prompting Daniel Adersteg to clarify that the "Odd Source" column captures the original signal while the "Final" columns allow traders to override values or account for adjusted stakes (00:15:00) (00:18:56).
+Tennis and Qualitative Strategy Integration: Daniel Adersteg explained that the tennis quant model's inflow will primarily come from a dashboard rather than the spreadsheet itself, with "Acknowledged" remaining a manual action where traders select specific signals to follow (00:07:18). For qualitative trading, Daniel Adersteg proposed a similar funnel where traders list ideas or plans; once a decision to proceed is made, it is moved to the "Acknowledged" phase (00:10:04). A participant raised concerns about the saturation of the tennis market and how new strategies might cannibalize each other, leading Daniel Adersteg to suggest that successful ideas could be counted toward individual goals for multiple team members if they collaborate on the development (00:46:01).
+Data Handling for Multiple Platforms and Traders: The "Executed" tab is designed to be more manual, requiring traders to input actual odds from brokers and select the platform used (00:17:48). Daniel Adersteg confirmed the spreadsheet supports multiple rows for a single fixture to accommodate splitting bets across different platforms or multiple traders acting on the same signal (00:20:06). A participant pointed out that splitting bets across platforms could skew strike rate data, leading Daniel Adersteg to commit to refining the calculation logic to ensure that multiple entries for the same fixture do not artificially inflate or deflate hit rates (00:21:14).
+MLB Data Integrity and Scheduling Issues: A participant raised concerns regarding MLB-specific data issues, such as canceled games skewing turnover numbers and time zone differences causing date mismatches between signals and actual game starts (00:24:10). Daniel Adersteg noted that the current unique ID for fixtures is based on local time and game IDs, which should prevent most duplicates, but agreed to investigate how to handle rescheduled games and "Final" status to ensure turnover calculations are accurate (00:26:52). Daniel Adersteg suggested potentially switching to a fixed daily update (e.g., 10:00 AM UK time) to capture the most recent results more reliably than hourly updates (00:28:09).
+H2 Operational Planning and Cell Structure: Daniel Adersteg outlined the operational structure for the second half of the year (H2), where the fund is divided into cells (currently Cell A) consisting of various quantitative, qualitative, hybrid, and external strategies (00:34:40) (00:38:03). Strategies and markets are categorized into four levels (e.g., Level 1: Baseball, Level 2: MLB, Level 3: Men) to maintain database structure while allowing for flexible "Display Names" for team use (00:36:42).
+Performance Scorecards and Skill Matrices: Daniel Adersteg introduced performance scorecards for H2, which assess traders based on a "Skills Matrix" and "Deliverables" (00:39:27). The Skills Matrix includes core, general, and trading-specific skills, with expectations increasing based on seniority (e.g., Junior vs. Senior) (00:40:38). Deliverables are categorized into numeric KPIs (Volume, Impact, Efficiency, Consistency) and milestones like OKRs (00:42:07). Daniel Adersteg noted that targets for H2 will be finalized individually to account for different sport seasons and the timing of new model launches (00:39:27) (00:48:26).
+Hybrid Strategy Development Targets: A specific milestone for H2 is the development of "hybrid" models, with a target of three approved strategy ideas and two back-tested strategies per trader by December (00:43:24). While a participant expressed concern that the back-testing target might be a "stretch" due to data availability, Daniel Adersteg suggested using a Claude-based workflow to accelerate the ideation and testing process (00:44:51). Daniel Adersteg emphasized that these targets are intended to be flexible, as putting fixed numbers on unknown trading start dates would be an "admin exercise" rather than a meaningful goal (00:48:26).
+Claude Workflow Efficiency and Unstructured Data: A participant provided feedback that the current Claude-based "bet selection" skill felt slower than using Excel because it required structured input like fixture names and dates (00:50:02). Daniel Adersteg clarified that the tool is intended to process unstructured data, such as voice notes or "train of thought" text, and promised to update the instructions to ensure it does not require step-by-step structured prompts. Daniel Adersteg also proposed creating similar skills for generating structured match reports from free-text notes to help traders maintain a historical log and share insights more easily (00:51:29) (00:53:51).
+Meeting Wrap-up and Next Steps: Daniel Adersteg will continue porting existing data into the new spreadsheets and plans to transition the MLB Telegram group to a channel to facilitate full automation (00:30:54). Finn Brasher noted they are on annual leave tomorrow, so Daniel Adersteg rescheduled their one-on-one meeting to Monday to discuss individual goals and seniority-based scorecard adjustments (00:47:19). Daniel Adersteg aims to finalize the scorecards by the end of next week before the July period begins (00:48:26).
+
+
+You should review Gemini's notes to make sure they're accurate. Get tips and learn how Gemini takes notes
+How is the quality of these specific notes? Take a short survey to let us know your feedback, including how helpful the notes were for your needs.
+
+
+--- DOC 2 ---
+
+Mark / Daniel - Quick alignment before synch with traders
+Invited  
+Attachments 
+Meeting records  
+
+
+Summary
+The team reviewed spreadsheet rebuild phases and established standardized trader performance metrics with efficiency benchmarks.Spreadsheet Rebuild PhasesThe project integrates 4 distinct trading workflow phases into a unified system. Traders must now provide rationale for all trade decisions to ensure qualitative standards.Scorecards and MilestonesPerformance scorecards now combine skills matrices with specific deliverables. Focus for the second half of the year centers on hybrid model development.KPI Selection CriteriaKPIs are being refined to include efficiency metrics. Adding a turnover to profit efficiency ratio helps prevent skewing performance data on single metrics.
+
+
+Decisions
+Needs Further Discussion
+Integration of efficiency ratio in KPIs The team requires further evaluation of adding a turnover-to-profit efficiency metric to the trader KPI framework, dependent on reviewing previously shared reference materials.
+
+We've updated the Decisions section using your feedback.
+Let us know what you think: Helpful or Not Helpful
+
+
+Next steps
+[Daniel Adersteg] Present Spreadsheet: Present the trading spreadsheet to the traders to demonstrate its usage and gather feedback.
+[Daniel Adersteg] Refine Spreadsheet: Refine the trading spreadsheet based on the discussion with the traders.
+[Daniel Adersteg] Create Strategy Templates: Develop the trading spreadsheet templates for tennis, NBA, and NFL strategies.
+[Mark Kozyritskiy] Share KPI Spreadsheet: Locate and share the previous KPI spreadsheet link with Daniel.
+[Daniel Adersteg] Update Scorecard KPIs: Evaluate the inclusion of efficiency metrics in the trader performance scorecard based on the shared spreadsheet.
+
+
+Details
+Meeting Introduction and Overview: Daniel Adersteg opened the meeting by presenting a high-level summary of the rebuilding process for the trading spreadsheets. They explained that the project is divided into four distinct phases: inflow, acknowledge, executed, and overview. Daniel Adersteg intended to walk Mark Kozyritskiy through specific examples of how these phases vary across different trading strategies before reviewing the spreadsheet in detail (00:00:14).
+Spreadsheet Rebuild - Inflow and Acknowledge Phases: Daniel Adersteg demonstrated a tab that automatically imports data from the Telegram channel, representing the "inflow" phase. They highlighted that while data sources differ by strategy, the automated nature of the inflow remains consistent. For the "acknowledge" phase, using the external MLB (Major League Baseball) strategy as an example, the system automatically acknowledges signals, which then flow to a separate tab for the traders to review (00:01:55). On this tab, traders decide whether to "execute" or "skip" a fixture. Daniel Adersteg noted a process change: traders must now provide rationale for both skipped and actioned trades to align with qualitative trading standards. The spreadsheet includes modular, dynamic parameters for calculating unit bases—currently set at 10,000 for the MLB strategy—and allows for manual overrides of units or stakes if necessary (00:03:37).
+Spreadsheet Rebuild - Executed and Analysis Phases: Daniel Adersteg detailed the "executed" flow, which now integrates both live and paper trading into a single pipeline to facilitate easier analysis and automation (00:04:57). In this section, traders provide blue-cell inputs for actual odds and any stake deviations from the proposed amount, while other metrics like profit and loss, closing line, expected value (EV), and adjusted EV are calculated automatically. Daniel Adersteg explained that Closing Line Value (CLV) data is added retroactively on a separate tab to simplify the user experience and ensure system stability, especially if automated CLV importing is implemented later (00:06:26).
+Trader Scorecards and Skills Matrix: Daniel Adersteg outlined the structure of the trader scorecards, which combine a skills matrix (covering core, general, and trading skills) with specific deliverables like Key Performance Indicators (KPIs), milestones, and Objectives and Key Results (OKRs) (00:09:22). For the H2 period, Daniel Adersteg proposed milestones centered on "hybrid models" (traders' own models), specifically targeting three approved ideas, two back-tested models, and one model actively used for trading. While automatic trading was noted, it was not included as a target for this specific period (00:11:14).
+KPI Selection and Efficiency Metrics: Daniel Adersteg initially proposed three primary KPIs: return on turnover (ROI), number of bets, and turnover, split by model type (quantitative, qualitative, or hybrid) (00:09:22). Mark Kozyritskiy suggested referencing a previous Excel sheet that categorized KPIs into basic, intermediate, and advanced levels. Mark Kozyritskiy specifically recommended adding a "turnover to profit efficiency ratio" to ensure traders are not overperforming on a single metric while failing others, such as achieving high ROI on a very low number of bets or high turnover with break-even results (00:11:14). Daniel Adersteg agreed to consider this efficiency metric but expressed a desire to balance the number of KPIs to keep them comprehensible (00:12:56). They suggested potentially using such metrics for Quality Assurance (QA) to calibrate performance if the primary numbers flag an issue (00:14:50).
+Administrative Wrap-up and Next Steps: Mark Kozyritskiy committed to locating the link to the previously discussed KPI spreadsheet and sharing it with Daniel Adersteg once they were back at a computer (00:12:56). Daniel Adersteg planned to incorporate these insights before talking through the overview with the traders later that day, noting that definitive calls are scheduled for tomorrow. The meeting concluded with an agreement to check in via text or a later chat once the link was provided (00:14:50).
+
+
+You should review Gemini's notes to make sure they're accurate. Get tips and learn how Gemini takes notes
+How is the quality of these specific notes? Take a short survey to let us know your feedback, including how helpful the notes were for your needs.
+

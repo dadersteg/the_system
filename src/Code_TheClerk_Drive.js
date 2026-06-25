@@ -224,8 +224,15 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
     // 1. EXTRACTION & DETERMINISTIC PRE-CHECK
     batch.forEach(f => {
         let match = checkDeterministicRules(f, driveRules);
-        if (match) {
-            // Fast-path bypass
+        f.deterministicOverride = match; // Store the rule for later routing if AI is forced
+        
+        // Always force AI extraction for files likely to contain action items
+        const isDoc = (f.mime === MimeType.GOOGLE_DOCS || f.mime === "application/vnd.google-apps.document" || f.targetMime === MimeType.GOOGLE_DOCS || f.targetMime === "application/vnd.google-apps.document");
+        const fNameLower = f.name.toLowerCase();
+        const forceAI = isDoc && (fNameLower.includes("transcript") || fNameLower.includes("notes") || fNameLower.includes("meeting") || fNameLower.includes("agenda"));
+
+        if (match && !forceAI) {
+            // Fast-path bypass (no AI needed)
             f.aiBypass = match;
             validFiles.push(f);
         } else {
@@ -290,6 +297,15 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
             isBypass = true;
         } else if (aiSuccess && filesForAI.includes(f)) {
             data = aiResultsData[aiIndex++];
+            
+            // Apply deterministic routing overrides on top of AI extraction
+            if (f.deterministicOverride) {
+                data.concat_path = f.deterministicOverride.concat_path;
+                if (f.deterministicOverride.filename) data.filename = f.deterministicOverride.filename;
+                if (f.deterministicOverride.aggregator_paths && f.deterministicOverride.aggregator_paths.length > 0) {
+                    data.aggregator_paths = f.deterministicOverride.aggregator_paths;
+                }
+            }
         } else {
             return; // Handled in error logic
         }
@@ -704,8 +720,10 @@ function askGeminiStable(rules, batch, currentModel) {
     // Add instruction to extract tasks
     const taskInstruction = `
 ## ACTION EXTRACTION & CONFIRMATION MAPPING
-1. Determine if any specific, nuanced action is required FROM the file added. Do NOT suggest generic actions like "review the file". If an action is required, provide it in the \`tasks\` array with a clear \`title\` (Action Verb + Object) and \`notes\`. If no action is needed, return an empty array.
-2. If the file is a confirmation or update for an existing task from the "OPEN GOOGLE TASKS" list, output its EXACT ID in the \`mapped_task_id\` field. If this file confirms the mapped task is complete (e.g. it is a receipt, ticket, confirmation letter, or result document), provide a detailed explanation in \`mark_completed_reason\`. Otherwise, output "None" for both.
+1. EXTRACT ASSIGNED ACTIONS: If the file contains meeting notes, project plans, or explicit action items assigned to the user, extract them directly into the \`tasks\` array with a clear \`title\` (Action Verb + Object) and \`notes\`. 
+2. FILE PROCESSING ACTIONS: Determine if any implicit action is required to respond to or process the file itself. Do NOT suggest generic actions like "review the file". 
+3. If no action is needed from either of the above, return an empty array.
+4. CONFIRMATION MAPPING: If the file is a confirmation or update for an existing task from the "OPEN GOOGLE TASKS" list, output its EXACT ID in the \`mapped_task_id\` field. If this file confirms the mapped task is complete (e.g. it is a receipt, ticket, confirmation letter, or result document), provide a detailed explanation in \`mark_completed_reason\`. Otherwise, output "None" for both.
 
 Output schema for each file object must include:
 {
