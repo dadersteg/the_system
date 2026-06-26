@@ -1309,33 +1309,34 @@ function extractActionZones(text) {
 
 // --- RETROACTIVE PROCESSING SCRIPT ---
 function retroactivelyProcessTodayNotes() {
-    const namesToFind = [
-        'Notes - 202606 Mark Daniel Bi-Daily 1-1',
-        'Planning Operations - 202606 Daniel Joseph H2 Planning Notes',
-        'Planning Operations - 202606 Research Team Weekly Sharing Meeting Notes',
-        'Planning Operations - 202606 Daniel Sergey H2 Planning Notes',
-        'Planning Operations - 202606 Daniel Artem H2 Planning Notes',
-        'Planning Operations - 202606 26H2 Planning Daniel Sergey Notes',
-        '202606 H2 Planning - Daniel and Emanuele Meeting Notes',
-        'Planning Operations - 202606 Daniel Anna 26H2 Planning Notes',
-        'Planning Operations - 202606 26H2 Planning Daniel and Tom Notes',
-        'Planning Operations - 202606 Daniel Nataliya Planning Notes'
+    const exactIds = [
+        '1bfgfo8TUPSL_juh1Zaj-lO73EATIQElgjmuaAGjLEyA',
+        '1f0yvbYjJIVypGePr5oNznIHauH5FLtXzZh_F5rxhqgw',
+        '1bkJKHBEYaTpL0ODDbOivBLVU-ZMg5P7pP_Yx4mMZZSE',
+        '1v9uVDcLy_qnBBk3gd1NI42ZRci7KF4uEbXaBpNxeQr4',
+        '1boiNHVf6S-fr_8nOJFj5FhjGTRtykTq9WCUOmKiRFAY',
+        '12s0tFiQufH8s0kKAcRbrOIsrQlEOnu4Ijw90oITkejI',
+        '1032FE7G4x-pKRBvrq9PWUETeyzQqJ1qPSc07NlqXVic',
+        '1fPGswOvyR9ZKMvtyXsiIWceXH8SsyjP7Jk8p0fQQzao',
+        '1i3WBGadYjbyRtwZ-jfk37bs_atpNbYucMSVdNmCT5uw',
+        '1VaZNZt_OkpAP9gLD0EFJPH397_1_qtoJx5OgGi9NDo4',
+        '1GokKOGtJ1PwGfgW5z3FvonA72jGWE_EmtPDmHVu1dMc'
     ];
+    
     const knowledge = loadKnowledgeDocs();
     const rules = knowledge.text || "";
     let validFiles = [];
     
-    // Search Drive for all Docs modified in the last 2 days
-    const iter = DriveApp.searchFiles(`modifiedDate >= '2026-06-24' and mimeType = 'application/vnd.google-apps.document' and trashed = false`);
-    while (iter.hasNext()) {
-        const file = iter.next();
+    for (const fileId of exactIds) {
+        let file;
+        try {
+            file = DriveApp.getFileById(fileId);
+        } catch (e) {
+            console.log("Could not access file ID: " + fileId);
+            continue;
+        }
         const fName = file.getName();
-        
-        // Filter by the names we care about
-        const isMatch = namesToFind.some(n => fName.includes(n) || n.includes(fName.split(".")[0]));
-        if (!isMatch) continue;
-        
-        console.log("Found: " + fName);
+        console.log("Found via exact ID: " + fName);
         
         const fObj = {
                 id: file.getId(),
@@ -1355,7 +1356,6 @@ function retroactivelyProcessTodayNotes() {
                 validFiles.push(fObj);
             }
         }
-    }
     
     if (validFiles.length > 0) {
         console.log(`Sending ${validFiles.length} files to AI for retroactive task extraction...`);
