@@ -376,6 +376,12 @@ function runHourlyReview() {
     }
   }
   
+  if (IS_PMT_ENV) {
+     systemPrompt += "\n\nCRITICAL OVERRIDE: You are currently running in the PMT Environment. You MUST entirely omit the '**🏠 Personal:**' sections from your output format and ONLY output PMT tasks.";
+  } else {
+     systemPrompt += "\n\nCRITICAL OVERRIDE: You are currently running in the Private Environment. You MUST entirely omit the '**🎯 PMT:**' sections from your output format and ONLY output Private/Personal tasks.";
+  }
+  
   const payloadStr = JSON.stringify(payload);
   // Use the smartest model available for full-context reasoning, with fallback to 2M context if needed
   const MODEL_NAME = selectModelForPayload(payloadStr, SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_PRO);
