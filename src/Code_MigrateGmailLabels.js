@@ -1,40 +1,60 @@
+/**
+ * @file src/Code_MigrateGmailLabels.js
+ * @description Migrates and standardizes specific historical Gmail labels in the private workspace.
+ *
+ * @version 1.0.0
+ * @last_modified 2024-07-28
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.0: Initial JSDoc implementation, converted var to let/const, and standardized variable names.
+ */
+
+/**
+ * Migrates specific legacy Gmail labels to their new naming conventions.
+ * Consolidates 'CMA' into 'Carry Martens Adersteg' and '2019' tax into '19/20 UK Taxes'.
+ *
+ * @returns {void}
+ */
 function migratePrivateGmailLabels() {
   // 1. Rename CMA to Carry Martens Adersteg
-  var oldCmaName = "01 Private/05 Other/02 Relationships/CMA";
-  var newCmaName = "01 Private/05 Other/02 Relationships/Carry Martens Adersteg";
+  const oldCmaName = "01 Private/05 Other/02 Relationships/CMA";
+  const newCmaName = "01 Private/05 Other/02 Relationships/Carry Martens Adersteg";
   
-  var cmaLabel = GmailApp.getUserLabelByName(oldCmaName);
+  const cmaLabel = GmailApp.getUserLabelByName(oldCmaName);
   if (cmaLabel) {
-    var newLabel = GmailApp.getUserLabelByName(newCmaName) || GmailApp.createLabel(newCmaName);
-    var threads = cmaLabel.getThreads();
-    for (var i = 0; i < threads.length; i++) {
+    const newLabel = GmailApp.getUserLabelByName(newCmaName) || GmailApp.createLabel(newCmaName);
+    const threads = cmaLabel.getThreads();
+    for (let i = 0; i < threads.length; i++) {
       threads[i].addLabel(newLabel);
       threads[i].removeLabel(cmaLabel);
     }
     cmaLabel.deleteLabel();
-    Logger.log("Successfully migrated CMA label to Carry Martens Adersteg.");
+    console.log("Successfully migrated CMA label to Carry Martens Adersteg.");
   } else {
-    Logger.log("CMA label not found.");
+    console.log("CMA label not found.");
   }
   
   // 2. Merge 2019 into 19/20 UK Taxes
-  var oldTaxName = "01 Private/04 Finances/Tax/2019";
-  var newTaxName = "01 Private/04 Finances/Tax/19/20 UK Taxes";
+  const oldTaxName = "01 Private/04 Finances/Tax/2019";
+  const newTaxName = "01 Private/04 Finances/Tax/19/20 UK Taxes";
   
-  var oldTaxLabel = GmailApp.getUserLabelByName(oldTaxName);
-  var newTaxLabel = GmailApp.getUserLabelByName(newTaxName);
+  const oldTaxLabel = GmailApp.getUserLabelByName(oldTaxName);
+  let newTaxLabel = GmailApp.getUserLabelByName(newTaxName);
   
   if (oldTaxLabel) {
-    if (!newTaxLabel) newTaxLabel = GmailApp.createLabel(newTaxName);
+    if (!newTaxLabel) {
+      newTaxLabel = GmailApp.createLabel(newTaxName);
+    }
     
-    var threads = oldTaxLabel.getThreads();
-    for (var i = 0; i < threads.length; i++) {
+    const threads = oldTaxLabel.getThreads();
+    for (let i = 0; i < threads.length; i++) {
       threads[i].addLabel(newTaxLabel);
       threads[i].removeLabel(oldTaxLabel);
     }
     oldTaxLabel.deleteLabel();
-    Logger.log("Successfully migrated 2019 tax label to 19/20 UK Taxes.");
+    console.log("Successfully migrated 2019 tax label to 19/20 UK Taxes.");
   } else {
-    Logger.log("2019 Tax label not found.");
+    console.log("2019 Tax label not found.");
   }
 }
