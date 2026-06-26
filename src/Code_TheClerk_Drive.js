@@ -133,6 +133,15 @@ function executeEngine(mode, currentModel) {
                             console.error(`Failed to resolve shortcut target for ${f.getName()}: ${err.message}`);
                         }
                     }
+                    if (isExclusivelySharedPrivate(targetId)) {
+                        console.log(`Skipping exclusively shared private file: ${f.getName()} (ID: ${targetId})`);
+                        if (mimeType === "application/vnd.google-apps.shortcut") {
+                            f.setTrashed(true);
+                        } else {
+                            folder.removeFile(f);
+                        }
+                        continue;
+                    }
                     allFiles.push({ 
                         id: f.getId(), 
                         name: f.getName(), 
@@ -226,9 +235,13 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
         let match = checkDeterministicRules(f, driveRules);
         f.deterministicOverride = match; // Store the rule for later routing if AI is forced
         
-        // Always force AI extraction for files likely to contain action items
         const isDoc = (f.mime === MimeType.GOOGLE_DOCS || f.mime === "application/vnd.google-apps.document" || f.targetMime === MimeType.GOOGLE_DOCS || f.targetMime === "application/vnd.google-apps.document");
         const fNameLower = f.name.toLowerCase();
+        
+        // Deterministic Action Zone Extraction for Gemini Notes
+        const isGeminiNotes = isDoc && fNameLower.includes("notes by gemini");
+        
+        // Always force AI extraction for files likely to contain action items
         const forceAI = isDoc && (fNameLower.includes("transcript") || fNameLower.includes("notes") || fNameLower.includes("meeting") || fNameLower.includes("agenda"));
 
         if (match && !forceAI) {
@@ -243,6 +256,9 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                 moveToReview(f.id, extData.error);
             } else {
                 f.parts = extData.part;
+                if (isGeminiNotes) {
+                    f.actionZones = extractActionZones(extData.part.text);
+                }
                 validFiles.push(f);
             }
         }
@@ -297,6 +313,9 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
             isBypass = true;
         } else if (aiSuccess && filesForAI.includes(f)) {
             data = aiResultsData[aiIndex++];
+            
+            // Apply deterministic tasks if present
+            // Extracted items handled directly by LLM now.
             
             // Apply deterministic routing overrides on top of AI extraction
             if (f.deterministicOverride) {
@@ -740,7 +759,11 @@ Output schema for each file object must include:
 
     const parts = [{ text: rules + taskInstruction }, { text: `Analyze ${batch.length} files. Return JSON ARRAY.` }];
     batch.forEach((f, i) => { 
-        parts.push({ text: `--- FILE [${i}] ---\nFilename: ${f.name}\nMETADATA_CONTEXT:\n- dateCreated: ${f.dateCreated || "Unknown"}\n- folder_context: ${f.folderPath || "Unknown"}` }); 
+        let fileHeader = `--- FILE [${i}] ---\nFilename: ${f.name}\nMETADATA_CONTEXT:\n- dateCreated: ${f.dateCreated || "Unknown"}\n- folder_context: ${f.folderPath || "Unknown"}`;
+        if (f.actionZones && f.actionZones !== "None") {
+            fileHeader += `\n\n[DETERMINISTIC ACTION ZONES]\nThe following text blocks were deterministically extracted from the Decisions and Next Steps sections. You MUST treat this as the absolute source of truth for actions and extract every single action item, decision, or next step mentioned within this block into the tasks array.\n${f.actionZones}\n[END ACTION ZONES]\n`;
+        }
+        parts.push({ text: fileHeader });
         parts.push(f.parts); 
     });
 
@@ -789,6 +812,38 @@ Output schema for each file object must include:
 
 
 // --- 7. HELPERS ---
+
+function isExclusivelySharedPrivate(targetId) {
+  const emailA = "adersteg.daniel@gmail.com";
+  const emailB = "daniel@playmetech.net";
+  
+  try {
+    const permissionsResponse = Drive.Permissions.list(targetId, {
+      fields: "permissions(id, emailAddress, role, type)"
+    });
+    const permissions = permissionsResponse.permissions || [];
+    
+    if (permissions.length === 0) return false;
+    
+    const emailsFound = new Set();
+    
+    for (let perm of permissions) {
+      if (perm.type !== "user") {
+        return false;
+      }
+      if (!perm.emailAddress) {
+        return false;
+      }
+      emailsFound.add(perm.emailAddress.toLowerCase().trim());
+    }
+    
+    if (emailsFound.size !== 2) return false;
+    return emailsFound.has(emailA) && emailsFound.has(emailB);
+  } catch (e) {
+    console.error("Error checking permissions for target file ID " + targetId + ": " + e.message);
+    return false;
+  }
+}
 
 function getArchiveFilesRecursive(folderId, processedSet, limit) {
     const list = []; 
@@ -1050,6 +1105,10 @@ function ingestSharedFilesToInbox() {
   
   let createdCount = 0;
   files.forEach(sharedFile => {
+    if (isExclusivelySharedPrivate(sharedFile.id)) {
+      console.log(`Skipping ingestion of exclusively shared private file: ${sharedFile.name} (ID: ${sharedFile.id})`);
+      return;
+    }
     if (!existingTargets.has(sharedFile.id)) {
       let isOrganized = false;
       if (sharedFile.parents && sharedFile.parents.length > 0) {
@@ -1200,3 +1259,133 @@ function isFolderOutOfScope(folder) {
   return false;
 }
 
+// --- DETERMINISTIC ZONE PARSING ---
+function extractActionZones(text) {
+    const lines = text.split('\n');
+    let extractedLines = [];
+    let inTargetSection = false;
+    const targetHeaders = ["decisions", "next steps", "action items", "actions", "decisions made"];
+    const exitHeaders = ["summary", "details", "attendees", "notes", "agenda"];
+    
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (!line) continue;
+        
+        let lowerLine = line.toLowerCase().replace(/[^a-z ]/g, "").trim(); 
+        
+        let isPossibleHeader = line.length > 0 && line.length < 40 && !line.match(/[.!?]$/) && !line.match(/^[-*•]\s/) && !line.match(/^\d+\.\s/) && !line.includes("  ");
+        
+        if (isPossibleHeader) {
+            if (targetHeaders.some(h => lowerLine.includes(h))) {
+                inTargetSection = true;
+                extractedLines.push("--- " + line.toUpperCase() + " ---");
+                continue;
+            } else if (exitHeaders.some(h => lowerLine.includes(h))) {
+                inTargetSection = false;
+                continue;
+            } else if (lowerLine.length > 0 && lowerLine !== "content") {
+                if (inTargetSection) extractedLines.push(line);
+                continue;
+            }
+        }
+        
+        if (!inTargetSection) {
+            for (let h of targetHeaders) {
+                if (lowerLine.startsWith(h + " ") || lowerLine.includes("and " + h)) {
+                     inTargetSection = true;
+                     extractedLines.push("--- " + h.toUpperCase() + " ---");
+                     break;
+                }
+            }
+        }
+        
+        if (inTargetSection) {
+            extractedLines.push(line);
+        }
+    }
+    
+    return extractedLines.length > 0 ? extractedLines.join("\n") : "None";
+}
+
+// --- RETROACTIVE PROCESSING SCRIPT ---
+function retroactivelyProcessTodayNotes() {
+    const namesToFind = [
+        'Notes - 202606 Mark Daniel Bi-Daily 1-1',
+        'Planning Operations - 202606 Daniel Joseph H2 Planning Notes',
+        'Planning Operations - 202606 Research Team Weekly Sharing Meeting Notes',
+        'Planning Operations - 202606 Daniel Sergey H2 Planning Notes',
+        'Planning Operations - 202606 Daniel Artem H2 Planning Notes',
+        'Planning Operations - 202606 26H2 Planning Daniel Sergey Notes',
+        '202606 H2 Planning - Daniel and Emanuele Meeting Notes',
+        'Planning Operations - 202606 Daniel Anna 26H2 Planning Notes',
+        'Planning Operations - 202606 26H2 Planning Daniel and Tom Notes',
+        'Planning Operations - 202606 Daniel Nataliya Planning Notes'
+    ];
+    const knowledge = loadKnowledgeDocs();
+    const rules = knowledge.text || "";
+    let validFiles = [];
+    
+    // Search Drive for all Docs modified in the last 2 days
+    const iter = DriveApp.searchFiles(`modifiedDate >= '2026-06-24' and mimeType = 'application/vnd.google-apps.document' and trashed = false`);
+    while (iter.hasNext()) {
+        const file = iter.next();
+        const fName = file.getName();
+        
+        // Filter by the names we care about
+        const isMatch = namesToFind.some(n => fName.includes(n) || n.includes(fName.split(".")[0]));
+        if (!isMatch) continue;
+        
+        console.log("Found: " + fName);
+        
+        const fObj = {
+                id: file.getId(),
+                name: file.getName(),
+                desc: file.getDescription() || "",
+                mime: file.getMimeType(),
+                isShortcut: false,
+                dateCreated: file.getDateCreated(),
+                folderPath: "Retroactive Override",
+                sourceFolderId: "Retroactive",
+            };
+            
+            const extData = extractContentV3(fObj);
+            if (!extData.error && extData.part) {
+                fObj.parts = extData.part;
+                fObj.actionZones = extractActionZones(extData.part.text);
+                validFiles.push(fObj);
+            }
+        }
+    }
+    
+    if (validFiles.length > 0) {
+        console.log(`Sending ${validFiles.length} files to AI for retroactive task extraction...`);
+        const aiResult = askGeminiStable(rules, validFiles, "gemini-2.5-flash"); // Flash is faster for retro
+        if (aiResult.status === "SUCCESS") {
+            const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
+            let tasksCreated = 0;
+            
+            aiResult.data.forEach((data, i) => {
+                const f = validFiles[i];
+                if (data.tasks && Array.isArray(data.tasks)) {
+                    data.tasks.forEach(t => {
+                        if (t.title) {
+                            try {
+                                const targetFileUrl = `https://drive.google.com/open?id=${f.id}`;
+                                const taskNotes = `${targetFileUrl}\n[Source: ${f.name}]\n\n${t.notes || ""}`;
+                                Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
+                                tasksCreated++;
+                            } catch (e) {
+                                console.error("Task creation failed: " + e.message);
+                            }
+                        }
+                    });
+                }
+            });
+            console.log(`Retroactive run complete! Created ${tasksCreated} tasks in the AI Review list.`);
+        } else {
+            console.error("AI Extraction failed: " + aiResult.message);
+        }
+    } else {
+        console.log("No files found or extracted.");
+    }
+}
