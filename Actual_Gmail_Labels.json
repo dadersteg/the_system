@@ -2,7 +2,7 @@
   {
     "name": "00 Manual Review",
     "leaf": "00 Manual Review",
-    "unread_count": 0
+    "unread_count": 1
   },
   {
     "name": "00 No Filter",
@@ -37,7 +37,7 @@
   {
     "name": "01 Private/01 Personal Admin/01 Task Management/The System (TS)",
     "leaf": "The System (TS)",
-    "unread_count": 0
+    "unread_count": 1
   },
   {
     "name": "01 Private/01 Personal Admin/02 Contracts",
@@ -267,7 +267,7 @@
   {
     "name": "01 Private/05 Other/01 Projects/AI",
     "leaf": "AI",
-    "unread_count": 16
+    "unread_count": 17
   },
   {
     "name": "01 Private/05 Other/01 Projects/Clothes",
@@ -297,7 +297,7 @@
   {
     "name": "01 Private/05 Other/02 Relationships",
     "leaf": "02 Relationships",
-    "unread_count": 0
+    "unread_count": 1
   },
   {
     "name": "01 Private/05 Other/02 Relationships/Alexander & Gabriel",
@@ -362,7 +362,7 @@
   {
     "name": "01 Private/05 Other/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 25
+    "unread_count": 27
   },
   {
     "name": "01 Private/05 Other/03 Collections/Star Wars",
@@ -527,7 +527,7 @@
   {
     "name": "02 Work/01 Employment/01 Playmetech/01 Playmetech Admin",
     "leaf": "01 Playmetech Admin",
-    "unread_count": 1
+    "unread_count": 2
   },
   {
     "name": "02 Work/01 Employment/01 Playmetech/02 Team & Operations",
@@ -637,7 +637,7 @@
   {
     "name": "02 Work/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 15
+    "unread_count": 16
   },
   {
     "name": "03 Studies",
@@ -707,7 +707,7 @@
   {
     "name": "99 Label_Reviewed",
     "leaf": "99 Label_Reviewed",
-    "unread_count": 51
+    "unread_count": 58
   },
   {
     "name": "99 Messenger",
@@ -722,7 +722,7 @@
   {
     "name": "99 Telegram",
     "leaf": "99 Telegram",
-    "unread_count": 0
+    "unread_count": 1
   },
   {
     "name": "99 To be deleted",
@@ -742,7 +742,7 @@
   {
     "name": "daniel@martens-adersteg.com",
     "leaf": "daniel@martens-adersteg.com",
-    "unread_count": 0
+    "unread_count": 1
   },
   {
     "name": "danieladersteg@hotmail.com",
@@ -762,6 +762,6 @@
   {
     "name": "Photo_Extracted",
     "leaf": "Photo_Extracted",
-    "unread_count": 0
+    "unread_count": 1
   }
 ]
