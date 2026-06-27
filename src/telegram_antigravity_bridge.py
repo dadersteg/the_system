@@ -7,6 +7,8 @@ import html
 import datetime
 import httpx
 import websockets
+import subprocess
+import re
 from io import BytesIO
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler
@@ -22,7 +24,9 @@ logger = logging.getLogger(__name__)
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN")
 ALLOWED_USER_ID_STR = os.getenv("TELEGRAM_USER_ID", "0")
 ALLOWED_USER_ID = int(ALLOWED_USER_ID_STR) if ALLOWED_USER_ID_STR.isdigit() else 0
-def get_cdp_url() -> str:
+def get_active_cdp_ports() -> list[int]:
+    ports = []
+    # 1. Check standard DevToolsActivePort files first
     paths = [
         os.path.expanduser("~/Library/Application Support/Antigravity/DevToolsActivePort"),
         os.path.expanduser("~/Library/Application Support/Antigravity IDE/DevToolsActivePort")
@@ -34,11 +38,24 @@ def get_cdp_url() -> str:
                     lines = f.readlines()
                     if lines:
                         port = int(lines[0].strip())
-                        logger.info(f"Using dynamic CDP port: {port}")
-                        return f"http://localhost:{port}/json"
-            except Exception as e:
-                logger.error(f"Failed to read {p}: {e}")
-    return "http://localhost:9333/json"
+                        if port not in ports:
+                            ports.append(port)
+            except Exception:
+                pass
+    
+    # 2. Fallback: Check active processes via lsof
+    try:
+        out = subprocess.check_output("lsof -iTCP -sTCP:LISTEN -n -P | grep -iE 'electron|antigrav'", shell=True, text=True)
+        for line in out.splitlines():
+            match = re.search(r'TCP (?:127\.0\.0\.1|localhost|\*|\[::1\]):(\d+) \(LISTEN\)', line)
+            if match:
+                port = int(match.group(1))
+                if port not in ports:
+                    ports.append(port)
+    except Exception:
+        pass
+        
+    return ports
 
 TARGET_CONVO = None
 
@@ -48,37 +65,53 @@ def is_authorized(update: Update) -> bool:
     return update.effective_user.id == ALLOWED_USER_ID
 
 async def get_ws_url_for_target():
-    try:
-        cdp_url = get_cdp_url()
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(cdp_url)
-            pages = resp.json()
-            # Match both old "workbench.html" and new Antigravity 2.0 web-based tabs (type == "page")
-            ws_urls = [(p["webSocketDebuggerUrl"], p.get("title", "")) for p in pages if p.get("url", "").split("?")[0].endswith("workbench.html") or p.get("type") == "page"]
-            
-            if TARGET_CONVO:
-                target_lower = TARGET_CONVO.lower()
-                for url, title in ws_urls:
-                    if target_lower in title.lower():
-                        return url
-                        
-            for url, title in ws_urls:
-                try:
-                    async with websockets.connect(url) as ws:
-                        await ws.send(json.dumps({
-                            "id": 1,
-                            "method": "Runtime.evaluate",
-                            "params": {"expression": "document.hasFocus()", "returnByValue": True}
-                        }))
-                        res = json.loads(await ws.recv())
-                        if res.get("result", {}).get("result", {}).get("value") == True:
-                            return url
-                except Exception:
+    ports = get_active_cdp_ports()
+    if not ports:
+        ports = [9333] # Fallback port
+        
+    for port in ports:
+        cdp_url = f"http://localhost:{port}/json"
+        try:
+            async with httpx.AsyncClient(timeout=2.0) as client:
+                resp = await client.get(cdp_url)
+                if resp.status_code != 200:
                     continue
-            return ws_urls[0][0] if ws_urls else None
-    except Exception as e:
-        logger.error(f"Failed to fetch CDP json: {e}")
-        return None
+                pages = resp.json()
+                if not isinstance(pages, list):
+                    continue
+                
+                ws_urls = [(p.get("webSocketDebuggerUrl"), p.get("title", "")) for p in pages if (p.get("url", "").split("?")[0].endswith("workbench.html") or p.get("type") == "page") and "webSocketDebuggerUrl" in p]
+                if not ws_urls:
+                    continue
+                
+                if TARGET_CONVO:
+                    target_lower = TARGET_CONVO.lower()
+                    for url, title in ws_urls:
+                        if target_lower in title.lower():
+                            return url
+                            
+                for url, title in ws_urls:
+                    try:
+                        async with websockets.connect(url, open_timeout=1) as ws:
+                            await ws.send(json.dumps({
+                                "id": 1,
+                                "method": "Runtime.evaluate",
+                                "params": {"expression": "document.hasFocus()", "returnByValue": True}
+                            }))
+                            res = json.loads(await asyncio.wait_for(ws.recv(), timeout=1.0))
+                            if res.get("result", {}).get("result", {}).get("value") == True:
+                                return url
+                    except Exception:
+                        continue
+                        
+                # If no tab is focused, just return the first valid websocket URL from this port
+                if ws_urls:
+                    return ws_urls[0][0]
+        except Exception:
+            continue
+            
+    logger.error("Failed to find any valid CDP WebSocket URL.")
+    return None
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update): return

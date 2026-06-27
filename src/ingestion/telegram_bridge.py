@@ -279,8 +279,24 @@ async def handler(event):
     message_buffer[thread_name]['attachments'].extend(attachments)
     print(f"Buffered message for [{thread_name}] (Sending to Gmail in 5 mins...)")
 
+async def _heartbeat():
+    heartbeat_path = '/Users/daniel/Documents/AGY/the_system/logs/telegram_bridge_heartbeat.txt'
+    while True:
+        try:
+            with open(heartbeat_path, 'w') as f:
+                f.write(str(time.time()))
+        except Exception:
+            pass
+        await asyncio.sleep(60)
+
 if __name__ == '__main__':
     print("Starting LOS Telegram Bridge...")
     print("Listening for incoming messages...")
-    client.start()
-    client.run_until_disconnected()
+    try:
+        client.start()
+        client.loop.create_task(_heartbeat())
+        client.run_until_disconnected()
+    except Exception as e:
+        print(f"Fatal error in Telegram Bridge: {e}")
+    finally:
+        os._exit(1)
