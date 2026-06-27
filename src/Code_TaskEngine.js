@@ -291,7 +291,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
  * Runs the hourly execution review. Scans active task structures, pulls calendar events,
  * and calls Gemini Pro to generate an active markdown execution report ("One-Pager").
  */
-function runHourlyReview() {
+function runHourlyReview(targetDate) {
   const importerListId = SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
   const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
   const recurringListId = SYSTEM_CONFIG.TASKS.RECURRING_LIST_ID;
@@ -317,14 +317,14 @@ function runHourlyReview() {
      return;
   }
 
-  const now = new Date();
+  const now = targetDate || new Date();
   const localTimeStr = Utilities.formatDate(now, "Europe/London", "yyyy-MM-dd'T'HH:mm:ss");
   const localDayName = Utilities.formatDate(now, "Europe/London", "EEEE");
 
   const payload = {
     currentTime: `${localTimeStr} (${localDayName})`,
-    capacity: getCalendarCapacity(),
-    todayEvents: getTodayCalendarEvents(),
+    capacity: getCalendarCapacity(now),
+    todayEvents: getTodayCalendarEvents(now),
     goals: getSystemGoals(),
     allTasksContext: rawTasks.map(t => {
        let cleanNotes = t.notes;
@@ -451,7 +451,7 @@ function runHourlyReview() {
       console.log("Hourly Review Complete. Report generated.");
       
       try {
-         executeTimeboxing();
+         executeTimeboxing(targetDate);
       } catch (e) {
          console.error("Timeboxing execution failed:", e.message);
       }
@@ -930,10 +930,11 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
 /**
  * Aggregates calendar event hours for the next 30 days to compute remaining schedule capacity.
  * 
+ * @param {Date} [targetDate] Base date to start capacity check from. Defaults to now.
  * @returns {Object} Capacity hours mapped by date string key (YYYY-MM-DD).
  */
-function getCalendarCapacity() {
-  const now = new Date();
+function getCalendarCapacity(targetDate) {
+  const now = targetDate || new Date();
   const endDate = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
   try {
     const events = CalendarApp.getDefaultCalendar().getEvents(now, endDate);
@@ -952,10 +953,11 @@ function getCalendarCapacity() {
 /**
  * Retrieves list of active calendar events scheduled for the current day.
  * 
+ * @param {Date} [targetDate] Date to fetch events for. Defaults to now.
  * @returns {Object[]} Calendar event objects matching schema (title, start, end, isAllDay).
  */
-function getTodayCalendarEvents() {
-  const now = new Date();
+function getTodayCalendarEvents(targetDate) {
+  const now = targetDate || new Date();
   const yyyy = Utilities.formatDate(now, "Europe/London", "yyyy");
   const MM = Utilities.formatDate(now, "Europe/London", "MM");
   const dd = Utilities.formatDate(now, "Europe/London", "dd");
