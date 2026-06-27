@@ -150,8 +150,9 @@ async function checkBridges() {
         }
     }
 
-    // Check Cron Scripts based on output files
+    // Check Cron Scripts and Daemons based on output/heartbeat files
     const cronChecks = [
+        { name: 'telegram-bridge (heartbeat)', file: '/Users/daniel/Documents/AGY/the_system/logs/telegram_bridge_heartbeat.txt', maxAgeMs: 5 * 60 * 1000 },
         { name: 'task-sync', file: path.join(__dirname, '../../auth/Google Tasks (Combined).md'), maxAgeMs: 30 * 60 * 1000 },
         { name: 'github-sync', file: '/Users/daniel/Documents/AGY/the_system/logs/github_sync_out.log', maxAgeMs: 24 * 60 * 60 * 1000 },
         { name: 'sheet-sync-maintenance', file: '/Users/daniel/Documents/AGY/the_system/logs/sheet_sync_maintenance_out.log', maxAgeMs: 2 * 60 * 60 * 1000 },
