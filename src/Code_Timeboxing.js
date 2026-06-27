@@ -15,9 +15,11 @@
  * Triggers the timeboxing synchronization process. Reads the 1-Day Execution Plan,
  * parses the top tasks, verifies their active status, and schedules them in Google Calendar.
  *
+ * @param {Date} [targetDate] - The date to schedule tasks for.
  * @returns {void}
  */
-function executeTimeboxing() {
+function executeTimeboxing(targetDate) {
+  const now = targetDate || new Date();
   console.log("Starting Timeboxing sync...");
   const fileId = getExecutionPlanId();
   if (!fileId) {
@@ -34,11 +36,11 @@ function executeTimeboxing() {
     return;
   }
   
-  const verifiedTasks = verifyTasksAreStillActive(tasksToSchedule);
+  const verifiedTasks = verifyTasksAreStillActive(tasksToSchedule, now);
   
   console.log(`Found ${verifiedTasks.length} valid tasks to schedule after verification.`);
   if (verifiedTasks.length > 0) {
-    scheduleTasksToCalendar(verifiedTasks);
+    scheduleTasksToCalendar(verifiedTasks, now);
   }
 }
 
@@ -46,9 +48,10 @@ function executeTimeboxing() {
  * Verifies that the parsed tasks are still active and not completed or moved out of today's scope.
  *
  * @param {Array<Object>} parsedTasks - Array of task objects parsed from the execution plan.
+ * @param {Date} targetDate - The date to verify against.
  * @returns {Array<Object>} An array containing only the verified active tasks.
  */
-function verifyTasksAreStillActive(parsedTasks) {
+function verifyTasksAreStillActive(parsedTasks, targetDate) {
   if (!parsedTasks || !Array.isArray(parsedTasks)) {
     console.error("verifyTasksAreStillActive: parsedTasks is null or not an array.");
     return [];
@@ -61,7 +64,7 @@ function verifyTasksAreStillActive(parsedTasks) {
     SYSTEM_CONFIG.TASKS.RECURRING_LIST_ID
   ];
   
-  const now = new Date();
+  const now = targetDate || new Date();
   const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).getTime();
 
   listsToFetch.forEach(listId => {
@@ -175,20 +178,15 @@ function parseTasksForTimeboxing(markdown) {
 }
 
 /**
- * Schedules the verified tasks into the default Google Calendar.
- * Clears existing unstarted timebox events for today before scheduling to prevent duplicates.
- *
- * @param {Array<Object>} tasks - Array of verified task objects to schedule.
- * @returns {void}
+ * Creates calendar events on the default calendar matching task titles, 
+ * using the extracted start and end times mapped onto the targetDate.
+ * 
+ * @param {Object[]} tasks Array of objects: {id, title, startTime, endTime}.
+ * @param {Date} targetDate The date to map the timeboxes onto.
  */
-function scheduleTasksToCalendar(tasks) {
-  if (!tasks || !Array.isArray(tasks)) {
-    console.error("scheduleTasksToCalendar: tasks is null or not an array.");
-    return;
-  }
-
+function scheduleTasksToCalendar(tasks, targetDate) {
   const calendar = CalendarApp.getDefaultCalendar();
-  const now = new Date();
+  const now = targetDate || new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
   const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
   
