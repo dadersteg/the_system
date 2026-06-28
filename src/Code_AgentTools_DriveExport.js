@@ -2,19 +2,22 @@
  * @file src/Code_AgentTools_DriveExport.js
  * @description Provides functionality to export text contents of a Google Drive folder.
  *
- * @version 1.0.0
- * @last_modified 2024-06-15
+ * @version 1.0.1
+ * @last_modified 2024-06-28
  * @modified_by Jules
  *
  * @changelog
+ * - 1.0.1: Added strict MIME-type validation for getBlob().getDataAsString() and removed legacy PDF comments. Upgraded JSDoc.
  * - 1.0.0: Initial creation with JSDoc headers, error bounds, and input validation.
  */
 
 /**
- * Exports the content of files within a specific folder.
+ * Exports the content of files within a specific Google Drive folder.
+ * Iterates through all files, parsing Google Docs, skipping PDFs, and reading
+ * supported text formats (plain text and CSV) while catching unsupported types.
  *
- * @param {string} folderId The ID of the Drive folder to export.
- * @returns {string} JSON stringified object of file names and their string content, or error string.
+ * @param {string} folderId - The string ID of the Google Drive folder to process.
+ * @returns {string} A JSON stringified map of file names to their extracted string content, or an error JSON string if a failure occurs.
  */
 function exportFolder(folderId) {
   if (!folderId || typeof folderId !== 'string') {
@@ -36,10 +39,11 @@ function exportFolder(folderId) {
           const doc = DocumentApp.openById(file.getId());
           content = doc.getBody().getText();
         } else if (mimeType === MimeType.PDF) {
-          // Can't easily extract text from PDF in apps script without OCR
           content = "PDF_SKIPPED";
-        } else {
+        } else if (mimeType === MimeType.PLAIN_TEXT || mimeType === "text/csv") {
           content = file.getBlob().getDataAsString();
+        } else {
+          content = `UNSUPPORTED_MIME: ${mimeType}`;
         }
       } catch(e) {
         content = "ERROR: " + e.message;
