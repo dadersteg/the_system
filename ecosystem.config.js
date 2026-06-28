@@ -132,10 +132,10 @@ module.exports = {
     },
     {
       name: "trigger-jules-backfill",
-      script: "scripts/maintenance/trigger_jules.js",
-      args: "--chronicle-backfill",
+      script: "scripts/maintenance/run_backfill_loop.js",
       cwd: "/Users/daniel/Documents/AGY/the_system",
       autorestart: false,
+      cron_restart: "*/15 * * * *", // Check/run every 15 minutes
       env: {
         JULES_API_KEY: localEnv.JULES_API_KEY || ""
       },
