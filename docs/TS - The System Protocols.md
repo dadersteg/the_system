@@ -195,3 +195,21 @@ This section ensures that performance data is compatible with the Vantage analyt
   * Enter the relevant URN hashtag (e.g., #2026-M-001) in the Description field.
 * Vantage Readiness: Ensure that CSV exports or PDF statements are placed in the correct L4 Context folder before triggering a Vantage audit to maintain the relational mapping between the metric and the LOS path.
 
+## 7. AI Environment & Boundary Architecture
+
+This section defines the hard boundaries and touchpoints across the AI tooling ecosystem to prevent identity fragmentation between Private and Playmetech (PMT) operations.
+
+### 7.1. Identity Boundaries & Touchpoints
+*   **The Hard Boundary:** The PMT Identity (`@playmetech.net`) strictly and exclusively governs the `02 01 01 Playmetech` (PMTOS) environment. The Private Identity (`@gmail.com`) governs `01 Private`, `03 Studies`, and the remainder of `02 Work`.
+*   **The Shared Bridge:** Cross-identity sharing is restricted to explicit touchpoints. The primary bridge is the **"Contracts etc."** shared folder located under Professional Admin. Individual files should not be randomly shared across identities; they must be routed through this bridge.
+*   **The Local Bridge:** On the Mac mini, the synced `AGY` workspace contains the `agy_quantum21` sub-folder. This is the designated local staging ground for PMT-specific code and structural logic.
+
+### 7.2. Unified Notebooks (NotebookLM & Gemini)
+NotebookLM and the Gemini Web App operate on a shared "Unified Notebook" infrastructure. Notebooks act as the bounded knowledge bases (the "reference overlays") for L4 Projects.
+*   **NotebookLM Interface (Deep Curation):** Used for deep, source-grounded research, document interrogation, and creating Audio Overviews. Hallucinations are minimized here.
+*   **Gemini Web App Interface (Expansion):** Used to load a synced Notebook for active ideation, drafting, and problem-solving, leveraging Gemini's dynamic web-search capabilities grounded against the Notebook's sources.
+*   **Identity Rule:** Notebooks are tied to the Google account. You must switch browser profiles to ensure the correct Notebook context (Private vs PMT) is loaded.
+
+### 7.3. The Execution Engine (Antigravity)
+*   Antigravity operates locally on the Mac mini across the synced `AGY` workspace and the unsynced `Developer` workspace.
+*   It is identity-agnostic locally but enforces the PMT vs Private boundaries remotely via targeted APIs and MCPs.

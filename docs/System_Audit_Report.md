@@ -1,0 +1,320 @@
+# System Audit Report: Taxonomy vs Reality
+
+## 1. MISSING FOLDERS (In Taxonomy but NOT in Actuals)
+These folders are expected by the rules but don't exist physically.
+
+- `00 Manual Review`
+- `00 No Filter`
+- `00 Test`
+- `01 00 00 Private/01 01 00 Personal Admin/01 01 99 Archive`
+- `01 00 00 Private/01 02 00 Health/01 02 01 Physical Health/2026 Pregnancy`
+- `01 00 00 Private/01 02 00 Health/01 02 99 Archive`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 01 Principles, Goals & Methods`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 02 Reflection`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 03 Personal Growth Theory`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 99 Archive`
+- `01 00 00 Private/01 04 00 Finances/Services & Subscriptions`
+- `01 00 00 Private/01 05 00 Other/01 05 01 Projects/202606 Passport`
+- `01 00 00 Private/01 05 00 Other/01 05 02 Relationships/Jim Cargill`
+- `01 00 00 Private/01 05 00 Other/01 05 02 Relationships/Messages`
+- `01 00 00 Private/01 05 00 Other/01 05 02 Relationships/Niklas Johansson`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/01 Playmetech Admin`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/02 Team & Operations`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/03 Professional Growth`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/04 Finances`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/05 Projects`
+- `03 00 00 Studies/03 00 99 Studies Archive`
+- `03 00 00 Studies/03 00 99 Studies Archive/Stockholms Nation`
+- `03 00 00 Studies/03 00 99 Studies Archive/Uppsala University`
+- `03 00 00 Studies/03 01 00 Östra Real`
+- `03 00 00 Studies/03 02 00 Uppsala University`
+- `03 00 00 Studies/03 02 00 Uppsala University/03 02 01 År 1 | (2009-2010)`
+- `03 00 00 Studies/03 02 00 Uppsala University/03 02 02 År 2 | (2010-2011)`
+- `03 00 00 Studies/03 02 00 Uppsala University/03 02 03 År 3 | (2011-2012)`
+- `03 00 00 Studies/03 02 00 Uppsala University/03 02 04 År 4 | (2012, 2014)`
+- `03 00 00 Studies/03 02 00 Uppsala University/03 02 05 År 5 | (2014-2015)`
+- `03 00 00 Studies/03 03 00 Stockholms Nation`
+- `99 Google Comments`
+- `99 Label_Reviewed`
+- `99 Messenger`
+- `99 SMS`
+- `99 Telegram`
+- `99 To be deleted`
+- `99 WhatsApp`
+
+## 2. ROGUE/MISMATCHED FOLDERS (In Actuals but NOT in Taxonomy)
+These folders exist physically but are not tracked in the master rules.
+
+- `01 00 00 Private/01 01 00 Personal Admin/01 01 02 Contracts/Loyds`
+- `01 00 00 Private/01 01 00 Personal Admin/01 01 02 Contracts/Nordnet`
+- `01 00 00 Private/01 02 00 Health/01 02 01 Physical Health/Fit Data`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 00 Goals, Habits & Routines`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 00 Personal Growth Theory`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 00 Personal Growth Theory/Ben Meer "A System"`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 00 Reflection`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 00 Reflection/Data Files`
+- `01 00 00 Private/01 03 00 Personal Growth/01 03 00 Reflection/Prompts/Instructions for Journal/Reflection`
+- `01 00 00 Private/01 04 00 Finances/01 04 02 House/202510 M`
+- `01 00 00 Private/01 04 00 Finances/01 04 02 House/202601 M`
+- `01 00 00 Private/01 04 00 Finances/01 04 02 House/75006`
+- `01 00 00 Private/01 04 00 Finances/Insurance/01 04 00 > Insurance > Rimowa Bag (IR)`
+- `01 00 00 Private/01 04 00 Finances/Sources for NotebookLM`
+- `01 00 00 Private/01 04 00 Finances/Tax/16/17 UK Taxes`
+- `01 00 00 Private/01 04 00 Finances/Tax/17/18 UK Taxes`
+- `01 00 00 Private/01 04 00 Finances/Tax/18/19 UK Taxes`
+- `01 00 00 Private/01 04 00 Finances/Tax/19/20 UK Taxes`
+- `01 00 00 Private/01 04 00 Finances/Tax/20/21 UK Taxes`
+- `01 00 00 Private/01 04 00 Finances/Tax/2019`
+- `01 00 00 Private/01 04 00 Finances/Tax/22/23 UK Taxes`
+- `01 00 00 Private/01 04 00 Finances/Tax/23/24 UK Taxes`
+- `01 00 00 Private/01 04 00 Finances/Tax/24/25 UK Taxes`
+- `01 00 00 Private/01 04 00 Finances/Tax/25/26 UK Taxes`
+- `01 00 00 Private/01 05 00 Other/01 05 01 Projects/2025 09 Visa`
+- `01 00 00 Private/01 05 00 Other/01 05 01 Projects/202601 M`
+- `01 00 00 Private/01 05 00 Other/01 05 03 Collections/Clothes`
+- `01 00 00 Private/01 05 00 Other/01 05 03 Collections/Cooking`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/01 Professional Admin`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/02 Team & Operations`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/03 Professional Growth`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/04 Finances`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/05 Projects`
+- `02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201404 bConnected`
+- `02 00 00 Work/02 02 00 Career Management/201905 DB`
+- `02 00 00 Work/02 02 00 Career Management/201905 DB/Archive`
+- `02 00 00 Work/02 02 00 Career Management/201905 DB/Articles`
+- `02 00 00 Work/02 02 00 Career Management/CVs & Cover Letters/99 Archive`
+- `03 00 00 Studier`
+- `03 00 00 Studies/03 00 00`
+- `03 00 00 Studies/03 00 00/03 00 99 Studies Archive`
+- `03 00 00 Studies/03 00 00/03 00 99 Studies Archive/Stockholms Nation`
+- `03 00 00 Studies/03 00 00/03 00 99 Studies Archive/Uppsala University`
+- `99 Archive`
+- `99 Archive/01 00 99 Archive`
+- `99 Archive/01 00 99 Archive/Contacts`
+- `99 Archive/01 01 99 Archive`
+- `99 Archive/01 01 99 Archive/PoA 2020-09-07`
+- `99 Archive/01 02 99 Archive`
+- `99 Archive/01 02 99 Archive/01 02 00 Phimosis`
+- `99 Archive/01 03 99 Archive`
+- `99 Archive/01 03 99 Archive/22 Jan`
+- `99 Archive/01 03 99 Archive/Excel - Training`
+- `99 Archive/01 03 99 Archive/Excel - Training/VBA`
+- `99 Archive/01 03 99 Archive/ML`
+- `99 Archive/01 03 99 Archive/ML/Coursera - Machine Learning - Stanford`
+- `99 Archive/01 03 99 Archive/SQL`
+- `99 Archive/01 04 99 Archive`
+- `99 Archive/01 04 99 Archive/01 04 00 Nordea Cancel Services`
+- `99 Archive/01 04 99 Archive/01 04 01 BA Reimbursement ARN-LHR`
+- `99 Archive/01 04 99 Archive/01 04 01 BA Reimbursement ARN-LHR/00 Archive`
+- `99 Archive/01 04 99 Archive/01 04 99 Receipts`
+- `99 Archive/01 04 99 Archive/202410 Deliveroo Issue`
+- `99 Archive/01 04 99 Archive/50A Englands Lane - Repair Log`
+- `99 Archive/01 04 99 Archive/Air France`
+- `99 Archive/01 04 99 Archive/Amazon DD`
+- `99 Archive/01 04 99 Archive/BA Reimbursement ATL-LHR`
+- `99 Archive/01 04 99 Archive/BA Reimbursement ATL-LHR/00 Archive`
+- `99 Archive/01 04 99 Archive/BA Reimbursement ATL-LHR/20240509`
+- `99 Archive/01 04 99 Archive/BA Reimbursement ATL-LHR/CEDR Files from BA`
+- `99 Archive/01 04 99 Archive/Bank Statements`
+- `99 Archive/01 04 99 Archive/Bank Statements/Lloyds`
+- `99 Archive/01 04 99 Archive/Cancel AirBnB`
+- `99 Archive/01 04 99 Archive/CoinbaseWalletBackups`
+- `99 Archive/01 04 99 Archive/Eurowings`
+- `99 Archive/01 04 99 Archive/Eurowings/00 Archive`
+- `99 Archive/01 04 99 Archive/Försenad`
+- `99 Archive/01 04 99 Archive/Housekeeping`
+- `99 Archive/01 04 99 Archive/Housekeeping/Instructions`
+- `99 Archive/01 04 99 Archive/Hyr ut lägenhet sommar 14`
+- `99 Archive/01 04 99 Archive/Hyr ut lägenhet sommar 14/Bilder för överlämning`
+- `99 Archive/01 04 99 Archive/Inköp av teve`
+- `99 Archive/01 04 99 Archive/Inköp ny lägenhet HGB`
+- `99 Archive/01 04 99 Archive/Laundryheap`
+- `99 Archive/01 04 99 Archive/London`
+- `99 Archive/01 04 99 Archive/Moving`
+- `99 Archive/01 04 99 Archive/Moving/Pictures for ads`
+- `99 Archive/01 04 99 Archive/Pictures from Ovo 2 Feb`
+- `99 Archive/01 04 99 Archive/Return Home speaker`
+- `99 Archive/01 04 99 Archive/Return Pixel 7`
+- `99 Archive/01 04 99 Archive/SL`
+- `99 Archive/01 04 99 Archive/SW11 8EQ`
+- `99 Archive/01 04 99 Archive/SW11 8EQ/1305 Dawson House - Inventory`
+- `99 Archive/01 04 99 Archive/Statements for Amex Gold`
+- `99 Archive/01 04 99 Archive/Stipendier`
+- `99 Archive/01 04 99 Archive/Stipendier/Arkiv`
+- `99 Archive/01 04 99 Archive/Tessin`
+- `99 Archive/01 04 99 Archive/Tradera`
+- `99 Archive/01 04 99 Archive/Tradera/Kläder`
+- `99 Archive/01 04 99 Archive/Tradera/MacBook 13'`
+- `99 Archive/01 04 99 Archive/TradingGuiden`
+- `99 Archive/01 04 99 Archive/W23DY`
+- `99 Archive/01 04 99 Archive/W23DY/00 Archive`
+- `99 Archive/01 05 99 Archive`
+- `99 Archive/01 05 99 Archive/01 01 99 The System [Archived]`
+- `99 Archive/01 05 99 Archive/01 05 01 Amy`
+- `99 Archive/01 05 99 Archive/01 05 01 Julmiddagen`
+- `99 Archive/01 05 99 Archive/01 05 01 Mushrooms`
+- `99 Archive/01 05 99 Archive/01 05 01 UKC`
+- `99 Archive/01 05 99 Archive/01 05 01 UKC/Book`
+- `99 Archive/01 05 99 Archive/01 05 02 Daff`
+- `99 Archive/01 05 99 Archive/01 05 02 Daff/00 Archive`
+- `99 Archive/01 05 99 Archive/01 05 20200730-20200809 Tokyo`
+- `99 Archive/01 05 99 Archive/01 05 202008 Stockholm`
+- `99 Archive/01 05 99 Archive/01 05 Stag`
+- `99 Archive/01 05 99 Archive/01 05 Stag/Peles Tickets`
+- `99 Archive/01 05 99 Archive/0105 20230607 Nashville`
+- `99 Archive/01 05 99 Archive/202601 M`
+- `99 Archive/01 05 99 Archive/20260411 Housewarming C&D`
+- `99 Archive/01 05 99 Archive/7`
+- `99 Archive/01 05 99 Archive/7/All`
+- `99 Archive/01 05 99 Archive/7/Arkiv`
+- `99 Archive/01 05 99 Archive/7/Beskrivning, Syfte och Motto`
+- `99 Archive/01 05 99 Archive/7/Ekonomi`
+- `99 Archive/01 05 99 Archive/7/Kasserat`
+- `99 Archive/01 05 99 Archive/7/Members`
+- `99 Archive/01 05 99 Archive/7/Möten`
+- `99 Archive/01 05 99 Archive/7/Regler och Stadgar`
+- `99 Archive/01 05 99 Archive/7/Rekrytering`
+- `99 Archive/01 05 99 Archive/7/Seven Photoroom`
+- `99 Archive/01 05 99 Archive/Alexandra`
+- `99 Archive/01 05 99 Archive/Alexandra/Arkiv`
+- `99 Archive/01 05 99 Archive/BA - Baggage Claim`
+- `99 Archive/01 05 99 Archive/Bali`
+- `99 Archive/01 05 99 Archive/Bose Headphones`
+- `99 Archive/01 05 99 Archive/ED`
+- `99 Archive/01 05 99 Archive/Körkort`
+- `99 Archive/01 05 99 Archive/Körkort/Bilder`
+- `99 Archive/01 05 99 Archive/Körkort/Farsta Datatester`
+- `99 Archive/01 05 99 Archive/Maps`
+- `99 Archive/01 05 99 Archive/Maps/Chelsea`
+- `99 Archive/01 05 99 Archive/Minnesträning`
+- `99 Archive/01 05 99 Archive/Minnesträning/Associationssekvenser`
+- `99 Archive/01 05 99 Archive/Minnesträning/Bokstäver`
+- `99 Archive/01 05 99 Archive/Minnesträning/Ciero-bilder`
+- `99 Archive/01 05 99 Archive/Minnesträning/Minnesbilder`
+- `99 Archive/01 05 99 Archive/Minnesträning/Månader`
+- `99 Archive/01 05 99 Archive/Minnesträning/Nummer`
+- `99 Archive/01 05 99 Archive/Minnesträning/Ordlistor`
+- `99 Archive/01 05 99 Archive/Minnesträning/Veckodagar`
+- `99 Archive/01 05 99 Archive/Movie Analysis: AI Gender`
+- `99 Archive/01 05 99 Archive/Notes`
+- `99 Archive/01 05 99 Archive/Oseriöst`
+- `99 Archive/01 05 99 Archive/Oseriöst/Ny mapp (2)`
+- `99 Archive/01 05 99 Archive/SMS Export`
+- `99 Archive/01 05 99 Archive/Simone`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Amber`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Amorina S`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Charlotte A`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Daff Kjellström`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Dr Eleanor Drage (PhD)`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Emily Moffitt`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Flora Macdonald Johnston`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Lauren Beckingham`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Ludwig Svennerstål`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Nima S`
+- `99 Archive/01 05 99 Archive/WhatsApp Chat - Tabatha`
+- `99 Archive/01 05 99 Archive/Östra Reals Skol IF`
+- `99 Archive/01 05 99 Archive/Östra Reals Skol IF/Anmälningsblanketter + Brev`
+- `99 Archive/01 05 99 Archive/Östra Reals Skol IF/Arkiv`
+- `99 Archive/01 05 99 Archive/Östra Reals Skol IF/Copa 2008`
+- `99 Archive/01 05 99 Archive/Östra Reals Skol IF/Copa 2009`
+- `99 Archive/01 05 99 Archive/Östra Reals Skol IF/Copa de la Östra`
+- `99 Archive/01 05 99 Archive/Östra Reals Skol IF/Final 2009`
+- `99 Archive/01 05 99 Archive/Östra Reals Skol IF/Lag`
+- `99 Archive/01 05 99 Archive/Östra Reals Skol IF/Östra Reals Skolidrottsförening`
+- `99 Archive/02 00 99 Archive`
+- `99 Archive/02 00 99 Archive/Adam`
+- `99 Archive/02 00 99 Archive/Bild`
+- `99 Archive/02 00 99 Archive/CV - Behöver uppdateras`
+- `99 Archive/02 00 99 Archive/CV - Behöver uppdateras/Utnarm`
+- `99 Archive/02 00 99 Archive/Case`
+- `99 Archive/02 00 99 Archive/Case/Arkiv`
+- `99 Archive/02 00 99 Archive/Case/Case från Consulting bible`
+- `99 Archive/02 00 99 Archive/Case/Case från Preplounge`
+- `99 Archive/02 00 99 Archive/Case/LOMS Transcripts and Handouts`
+- `99 Archive/02 00 99 Archive/Case/Presentation1`
+- `99 Archive/02 00 99 Archive/Heltid 2015`
+- `99 Archive/02 00 99 Archive/Heltid 2015/ABB`
+- `99 Archive/02 00 99 Archive/Heltid 2015/AT Kearney`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Accando`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Accenture`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Arkiv`
+- `99 Archive/02 00 99 Archive/Heltid 2015/BCG`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Bain`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Bearingpoint`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Capgemini`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Centigo`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Connecta`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Deloitte`
+- `99 Archive/02 00 99 Archive/Heltid 2015/EY`
+- `99 Archive/02 00 99 Archive/Heltid 2015/ForeFront`
+- `99 Archive/02 00 99 Archive/Heltid 2015/IBM`
+- `99 Archive/02 00 99 Archive/Heltid 2015/IF`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Intressanta annonser`
+- `99 Archive/02 00 99 Archive/Heltid 2015/KPMG`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Kontaktsamtal`
+- `99 Archive/02 00 99 Archive/Heltid 2015/MCKinsey`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Nordea`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Oliver Wyman`
+- `99 Archive/02 00 99 Archive/Heltid 2015/PA - Consulting`
+- `99 Archive/02 00 99 Archive/Heltid 2015/PWC`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Preplounge`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Proofread`
+- `99 Archive/02 00 99 Archive/Heltid 2015/SEB`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Sandvik`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Scania`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Strategy&`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Tester - Statistik`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Tieto`
+- `99 Archive/02 00 99 Archive/Heltid 2015/Vattenfall`
+- `99 Archive/02 00 99 Archive/IB/DB`
+- `99 Archive/02 00 99 Archive/IB/DB/Archive`
+- `99 Archive/02 00 99 Archive/IB/DB/Articles`
+- `99 Archive/02 00 99 Archive/Ideer`
+- `99 Archive/02 00 99 Archive/Intervjufrågor`
+- `99 Archive/02 00 99 Archive/JK`
+- `99 Archive/02 00 99 Archive/Nova 100`
+- `99 Archive/02 00 99 Archive/Nova 100/ambassadörer 2012-2013`
+- `99 Archive/02 00 99 Archive/Nova 100/nova 100 -  uppsala`
+- `99 Archive/02 00 99 Archive/START`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/Accenture -Deadline 15 jan, Deadline 13 feb`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/Bearingpoint`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/CC`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/Cagermini - Deadline 9 jan`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/Connecta`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/Deloitte 18 mars`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/Ernst & Young - Deadline 12 februari`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/HM 20 Feb`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/Klarna 25 feb`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/Nordea - Deadline 31 dec`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/Nova 100`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/PRV - 19 feb`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2011/PWC - Deadline 8 jan`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014/00 - Inskickade`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014/2014xxxx - Consultant for a day - Deloitte`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014/Bemanning`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014/Betyg 201312`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014/Betyg 201405`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014/Capgemini`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014/Kasserat`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014/Nya Canegiebryggeriet`
+- `99 Archive/02 00 99 Archive/Sommarjobb 2014/SI`
+- `99 Archive/02 00 99 Archive/Studieintensiven`
+- `99 Archive/02 00 99 Archive/Studieintensiven/Matteintensiven`
+- `99 Archive/[File Review]`
+- `99 Archive/[File Review]/03 00 99 Archive`
+- `99 Archive/[File Review]/03 00 99 Archive/C++`
+- `99 Archive/[File Review]/03 00 99 Archive/Levern`
+- `99 Archive/[File Review]/03 00 99 Archive/MATLAB`
+- `99 Archive/[File Review]/03 00 99 Archive/Stockholms Nation`
+- `99 Archive/[File Review]/03 00 99 Archive/Uppsala Universitet`
+- `99 Archive/[File Review]/03 00 99 Archive/Östra Real`
+- `99 Archive/[File Review]/Batch Retro Test`
+- `Inbox (Manual)`
+- `Inbox (Manual)/Inbox (Saved from Chrome)`
+- `Inbox (Manual)/Manual Review`
+- `Inbox (Manual)/Manual Review/Manual Review (Retro)`
+- `Inbox (Manual)/Temporary`
