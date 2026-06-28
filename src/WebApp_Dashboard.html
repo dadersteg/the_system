@@ -3,8 +3,8 @@
  * @file WebApp_Dashboard.html
  * @description Premium web dashboard UI providing a central hub for tasks, health, and system management.
  * 
- * @version 1.1.3
- * @last_modified 2026-06-21
+ * @version 1.1.4
+ * @last_modified 2026-06-28
  * @modified_by Jules
  * 
  * @changelog
@@ -12,6 +12,7 @@
  * - 1.1.1: Polished .log-clear UI element with premium micro-design properties.
  * - 1.1.2: Modernized #breathe-mode-select with premium micro-design properties and 44px touch target.
  * - 1.1.3: Modernized intel cards in Reflection section with premium micro-design properties and 44px touch target.
+ * - 1.1.4: Modernized #wifie-message-box with premium micro-design properties and fluid touch target scaling.
  */
 -->
 <!DOCTYPE html>
@@ -930,6 +931,44 @@
       }
     }
 
+    #wifie-message-box {
+      width: 100%;
+      min-height: 120px;
+      padding: 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 15px;
+      resize: vertical;
+      margin-bottom: 16px;
+      background: var(--color-surface);
+      color: var(--color-text);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    #wifie-message-box:hover {
+      background: rgba(99, 102, 241, 0.02);
+      border-color: rgba(99, 102, 241, 0.2);
+    }
+
+    #wifie-message-box:focus {
+      background: rgba(99, 102, 241, 0.04);
+      border-color: var(--color-accent);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #wifie-message-box:hover {
+        background: rgba(129, 140, 248, 0.04);
+        border-color: rgba(129, 140, 248, 0.25);
+      }
+      #wifie-message-box:focus {
+        background: rgba(129, 140, 248, 0.06);
+      }
+    }
+
     /* Breathe Mode Select */
     .breathe-select {
       padding: 8px 36px 8px 16px;
@@ -1800,7 +1839,7 @@
       <div class="dash-card" style="margin-bottom: 24px; padding: 16px;">
         <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">Wifie Message Generator 💖</div>
         <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 12px;">Generates a sweet and relevant message for Carry using the latest WhatsApp context and upcoming Family calendar events.</div>
-        <textarea id="wifie-message-box" style="width: 100%; height: 100px; resize: vertical; margin-bottom: 12px; padding: 8px; border: 1px solid var(--color-border); border-radius: 6px; font-family: inherit; font-size: 13px;" placeholder="Your message will appear here..."></textarea>
+        <textarea id="wifie-message-box" placeholder="Your message will appear here..."></textarea>
         <div style="display: flex; gap: 8px;">
           <button class="btn btn-primary" onclick="generateWifieMessageBtn(this)">Generate Message</button>
           <button class="btn btn-outline" onclick="copyWifieMessageBtn()">Copy to Clipboard</button>
