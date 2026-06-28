@@ -33,6 +33,15 @@ if (taskType === '--micro-ui') {
 5. **OPT OUT CAUSE:** If the codebase is already highly optimized and you cannot find any legitimate, meaningful architectural improvements to make, you must explicitly opt out. Do not invent problems to solve. If you opt out, make zero changes and state 'No major refactoring needed at this time.'
 6. Summarize the technical debt cleared and the architectural gains clearly in the resulting Pull Request description.`;
 
+} else if (taskType === '--chronicle') {
+  title = "Chronicle Hourly Synthesis (Second Brain)";
+  promptPayload = `**TASK: Chronicle Hourly Synthesis**
+1. Read the latest YYYY-MM-DD.json file in \`data/chronicle/\`.
+2. Analyze the messages, emails, and drive activities logged in the JSON.
+3. Generate an hourly synthesis of the events. Identify patterns, key decisions, and emotional undertones.
+4. Output your synthesis as a markdown file in \`data/chronicle_insights/YYYY-MM-DD_insight.md\`. Ensure it appends to the file or creates it if it doesn't exist.
+5. If the JSON is empty or lacks meaningful new data since the last run, explicitly state "No new data to synthesize."`;
+
 } else { // --micro-backend
   title = "Daily Micro-Stability Check (Backend/Logic)";
   promptPayload = `**TASK: Daily Micro-Stability & Health Check**
