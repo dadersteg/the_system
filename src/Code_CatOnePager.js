@@ -10,6 +10,12 @@
  * - 1.0.0: Added JSDoc header and try/catch block for error handling.
  */
 
+/**
+ * Retrieves the one-pager execution plan document ID and safely extracts its text content,
+ * logging the result to the console for CLI agent ingestion.
+ *
+ * @returns {void}
+ */
 function catOnePager() {
   try {
     const fileId = getExecutionPlanId();
