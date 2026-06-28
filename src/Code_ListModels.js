@@ -79,20 +79,12 @@ function updateModelList() {
   sheet.autoResizeColumns(1, tableData[0].length);
   
   // Export to Google Drive as JSON
-  const targetFolderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
-  const fileName = "Actual_Gemini_Models.json";
-  
   try {
-    const targetFolder = DriveApp.getFolderById(targetFolderId);
-    const jsonBlob = Utilities.newBlob(JSON.stringify(jsonOutput, null, 2), "application/json", fileName);
+    const fileId = SYSTEM_CONFIG.DOCS.GEMINI_MODELS_JSON_ID;
+    const jsonString = JSON.stringify(jsonOutput, null, 2);
     
-    const existingFiles = targetFolder.getFilesByName(fileName);
-    if (existingFiles.hasNext()) {
-      existingFiles.next().setContent(jsonBlob.getDataAsString());
-    } else {
-      targetFolder.createFile(jsonBlob);
-    }
-    console.log(`Successfully updated ${models.length} models and exported to Drive.`);
+    DriveApp.getFileById(fileId).setContent(jsonString);
+    console.log(`Successfully updated ${models.length} models and exported directly to Drive ID: ${fileId}.`);
   } catch (e) {
     console.error("Failed to write JSON to Drive: " + e.message);
   }
