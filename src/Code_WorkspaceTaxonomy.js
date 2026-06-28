@@ -428,6 +428,72 @@ function syncTaxonomyToSheet() {
   // Adjust labels for PMT account context 
   // (Obsolete logic for stripping '02 Work/01 Employment/01 Playmetech/' removed as PMT is now flat)
 
+  // --- RESOLVE DRIVE IDs ---
+  data[0].push("Drive ID");
+  const rootFolderId = DriveApp.getRootFolder().getId();
+  const folderCache = { "root": rootFolderId };
+  const drivePathIndex = data[0].indexOf("Drive Path");
+  
+  for (let i = 1; i < data.length; i++) {
+    let drivePathStr = data[i][drivePathIndex];
+    if (!drivePathStr) {
+      data[i].push("");
+      continue;
+    }
+    
+    // Ignore System categories from strict Drive mapping
+    let firstPart = drivePathStr.split("/")[0] || "";
+    if (firstPart.indexOf("00 ") === 0 || firstPart.indexOf("99 ") === 0) {
+      data[i].push("");
+      continue;
+    }
+    
+    const parts = drivePathStr.split("/").map(s => s.trim());
+    let currentFolderId = folderCache["root"];
+    let currentPathStr = "";
+    let found = true;
+    
+    for (let j = 0; j < parts.length; j++) {
+      const part = parts[j];
+      if (!part) continue;
+      currentPathStr += "/" + part;
+      
+      if (folderCache[currentPathStr]) {
+        currentFolderId = folderCache[currentPathStr];
+        continue;
+      }
+      
+      try {
+        const currentFolder = DriveApp.getFolderById(currentFolderId);
+        const folders = currentFolder.getFoldersByName(part);
+        let nextFolder = null;
+        while (folders.hasNext()) {
+          const f = folders.next();
+          if (!f.isTrashed()) {
+            nextFolder = f;
+            break;
+          }
+        }
+        if (nextFolder) {
+          currentFolderId = nextFolder.getId();
+          folderCache[currentPathStr] = currentFolderId;
+        } else {
+          found = false;
+          break; // Folder doesn't exist yet
+        }
+      } catch(e) {
+        found = false;
+        break;
+      }
+    }
+    
+    if (found && folderCache[currentPathStr]) {
+      data[i].push(folderCache[currentPathStr]);
+    } else {
+      data[i].push("");
+    }
+  }
+
   // Dump to sheet
   const ss = SpreadsheetApp.openById(sheetId);
   const sheets = ss.getSheets();

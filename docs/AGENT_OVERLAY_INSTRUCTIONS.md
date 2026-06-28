@@ -4,9 +4,10 @@
 ## 1. Core System Knowledge
 Before taking any action, you must understand that this environment is a tiny node within a massive, strictly architected Life Operating System (LOS / PMTOS). 
 
-For a complete understanding of the system's infrastructure, rules, and operations, you must immediately locate and read the following core files:
-1.  `TS - System Architecture Map.md`
-2.  `LOS_Taxonomy.json` (or `PMTOS_Taxonomy.json` if in the Playmetech branch)
+For a complete understanding of the system's infrastructure, rules, and operations, you must immediately locate and read the following core files using their Google Drive IDs:
+1.  `TS - System Architecture Map.md` (Drive ID: `1lK8dyYa6I2NjtFZNzII29jLElqWHRtlb`)
+2.  `TS - The System Protocols.md` (Drive ID: `1dWxccg1FyGmdK2fayx5K8S05NW8VBpVk`)
+3.  `LOS_Taxonomy.json` (Drive ID: `199ChTlYe3xKsybllcJ3BXYUIEs8cxvWq`) OR `PMTOS_Taxonomy.json` (Drive ID: `1txdOFb0fWHc5CrfTkyaG9L_9ucRa7wZ3` if in the Playmetech branch)
 
 ## 2. Your Current Environment (The Overlay)
 You are currently operating inside a bounded "Overlay." An overlay is a transversal project or workspace that spans across the system without breaking the physical folder taxonomy. Examples of Overlays include NotebookLM notebooks, Google Workspace Projects, or Antigravity Agent environments.

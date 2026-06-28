@@ -100,13 +100,13 @@ module.exports = {
       error_file: "logs/check_bridges_daily_err.log"
     },
     {
-      name: "github-sync",
-      script: "scripts/utils/github_sync.sh",
+      name: "second-brain-sync",
+      script: "scripts/utils/second_brain_sync.sh",
       cwd: "/Users/daniel/Documents/AGY/the_system",
       cron_restart: "0 * * * *", // Runs every hour
       autorestart: false,
-      out_file: "logs/github_sync_out.log",
-      error_file: "logs/github_sync_err.log"
+      out_file: "logs/second_brain_sync_out.log",
+      error_file: "logs/second_brain_sync_err.log"
     },
     {
       name: "trigger-jules-backend",
