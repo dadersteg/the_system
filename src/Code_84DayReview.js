@@ -1,6 +1,14 @@
 /**
  * @file src/Code_84DayReview.js
  * @description Generates the 84-Day Strategic Reflection Report focusing on macro-trajectory and goal alignment.
+ *
+ * @version 1.0.1
+ * @last_modified 2024-06-28
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.1: Replaced getBlob().getDataAsString() with getSafeDocText() to handle unsupported MIME types and apply memoization.
+ * - 1.0.0: Initial version.
  */
 
 function runQuarterlyReview() {
@@ -25,8 +33,8 @@ function runQuarterlyReview() {
 
   let recentReflections = "";
   try {
-     recentReflections += DriveApp.getFileById(SYSTEM_CONFIG.DOCS.VANTAGE_LOG_ID).getBlob().getDataAsString() + "\n\n";
-     recentReflections += DriveApp.getFileById(SYSTEM_CONFIG.DOCS.RECENT_REFLECTIONS_ID).getBlob().getDataAsString();
+     recentReflections += getSafeDocText(SYSTEM_CONFIG.DOCS.VANTAGE_LOG_ID) + "\n\n";
+     recentReflections += getSafeDocText(SYSTEM_CONFIG.DOCS.RECENT_REFLECTIONS_ID);
   } catch(e) {
      console.warn("Could not fetch reflection logs:", e.message);
   }
@@ -61,8 +69,8 @@ function runQuarterlyReview() {
   try {
      const fileId = SYSTEM_CONFIG.DOCS.TASK_MASTER_QUARTERLY_PROMPT_ID;
      if (!fileId) throw new Error("TASK_MASTER_QUARTERLY_PROMPT_ID is not configured in SYSTEM_CONFIG.");
-     const file = DriveApp.getFileById(fileId);
-     systemPrompt = processPromptText(file.getBlob().getDataAsString());
+     systemPrompt = getSafeDocText(fileId);
+     if (!systemPrompt) throw new Error("systemPrompt is empty or could not be fetched.");
   } catch(e) {
      console.error("Failed to load 84-Day prompt from Drive:", e.message);
      return;
