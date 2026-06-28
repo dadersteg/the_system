@@ -576,10 +576,12 @@
     }
     
     .list-item-icon {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
       border-radius: 10px;
-      background: var(--color-icon-bg);
+      background: rgba(241, 245, 249, 0.4);
       color: var(--color-text);
       display: flex;
       align-items: center;
@@ -588,7 +590,13 @@
       font-family: 'Google Sans', sans-serif;
       font-weight: 600;
       flex-shrink: 0;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .list-item-icon {
+        background: rgba(30, 41, 59, 0.4);
+      }
     }
 
     .list-item:hover .list-item-icon {
@@ -605,8 +613,8 @@
     }
     
     .list-item-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-    .list-item-title { font-weight: 500; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--color-text); }
-    .list-item-subtitle { font-size: 13px; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .list-item-title { font-weight: 500; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--color-text); font-family: 'Google Sans', sans-serif; }
+    .list-item-subtitle { font-size: 13px; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Google Sans', sans-serif; }
 
     /* Pagination */
     .pagination-footer {
