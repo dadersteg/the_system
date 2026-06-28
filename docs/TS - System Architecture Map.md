@@ -73,13 +73,29 @@ Temporary workspaces utilized for multi-agent orchestrations. Code or artifacts 
 
 ## 4. The Knowledge Interface Layer (Overlays)
 
-Data is not just stored; it must be queried. The strict physical boundaries of the Storage Layer are transcended using "Overlays."
+Data is not just stored; it must be queried and coordinated. The strict physical boundaries of the Storage Layer are transcended using "Overlays."
 
-### 4.1 Transversal Projects & Goals
-A project or goal may physically reside in a strict location (e.g., `01 Private/05 Other/01 Projects/The System (TS)` or `02 01 01 Playmetech/05 Projects/project_ai_betting_framework`), but its knowledge implications span across the entire system. In PMTOS, Goals also function as transversal overlays, cutting across standard operational categories.
+### 4.1 The 3-Tier Project Model
+A project or goal exists across three distinct tiers:
+1.  **Strict Storage:** Physically located within a strict `05 Projects` folder in Google Drive.
+2.  **AI Reasoning:** As a **NotebookLM** notebook (created on an as-needed basis).
+3.  **Workspace Coordination:** As a **Google Workspace Project** (created on an as-needed basis). This Gemini-powered feature serves as the centralized hub for files, emails, and calendar events, actively eliminating the need to create messy Drive shortcuts.
 
-### 4.2 Unified Notebooks & Drive Projects
-To facilitate transversal access without breaking folder taxonomy, a project or goal is overlaid with a Google Drive Project and a NotebookLM/Gemini Notebook.
-*   **The Physical Location:** Strict L4 project folders (Storage).
-*   **The Knowledge Interface:** Unified Notebooks (Retrieval).
-*   **Implementation:** Every active transversal project or goal must be formally registered to a corresponding Notebook URL, providing AI agents with the precise bounded context required for execution.
+### 4.2 Base Buckets vs. Specific Overlays
+To facilitate transversal access without breaking the folder taxonomy, all Overlays (Google Keep, NotebookLM, and Workspace Projects) strictly follow the taxonomy nomenclature:
+*   **Base Buckets (L2 Taxonomy Mapping):** For broad, ad-hoc capture and analysis, overlays should be created as high-level "Base Buckets" mapping directly to L2 taxonomy nodes (e.g., `01 01 00 Personal Admin` or `02 01 00 Employment`). This unified approach applies equally to Google Keep labels, NotebookLM notebooks, and Workspace Projects.
+*   **Specific Overlays:** When an ad-hoc effort graduates into a specific project, its label/name across Keep, NotebookLM, and Workspace Projects must exactly match the specific project name defined in the taxonomy.
+
+---
+
+## 5. The Multiplicity & Cross-Linking Protocols
+
+### 5.1 The Email Multiplicity Protocol (Gmail)
+While Google Drive enforces strict "Single-Location Storage" (a physical file lives in exactly one folder), Gmail operates on "Multi-Dimensional Tagging." 
+*   The `LOS_Taxonomy.json` serves as a tag library for Gmail.
+*   The system (and The Clerk) is fully authorized to attach multiple cross-identity labels to a single email (e.g., both `01 Private/04 Finances` AND `01 Playmetech Admin/04 Finances` on a shared invoice) to ensure it surfaces in all relevant contexts.
+
+### 5.2 Google Drive Shortcut Governance
+With the introduction of Google Workspace Projects for coordination, the use of Google Drive Shortcuts is heavily restricted.
+*   Shortcuts should **not** be used to link related project files together (use Workspace Projects for this).
+*   Shortcuts are strictly reserved for establishing formal structural bridges across identity boundaries (such as the `Contract, Personal Documents` bridge). They solve strict security architecture problems, not standard organizational laziness.

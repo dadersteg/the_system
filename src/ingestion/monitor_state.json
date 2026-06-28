@@ -2,7 +2,7 @@
   "whatsapp-bridge": "online",
   "telegram-bridge": "online",
   "messenger-bridge": "online",
-  "antigravity-bridge": "online",
+  "antigravity-bridge": "offline",
   "beeper-bridge": "online",
   "task-sync": "online",
   "sheet-sync-maintenance": "online",
