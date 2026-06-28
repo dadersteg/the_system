@@ -53,8 +53,7 @@ function runMonthlyReview() {
   try {
      const fileId = SYSTEM_CONFIG.DOCS.TASK_MASTER_MONTHLY_PROMPT_ID;
      if (!fileId) throw new Error("TASK_MASTER_MONTHLY_PROMPT_ID is not configured in SYSTEM_CONFIG.");
-     const file = DriveApp.getFileById(fileId);
-     systemPrompt = processPromptText(file.getBlob().getDataAsString());
+     systemPrompt = getSafeDocText(fileId);
   } catch(e) {
      console.error("Failed to load 28-Day prompt from Drive:", e.message);
      return;
