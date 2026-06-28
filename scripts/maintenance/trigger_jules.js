@@ -36,10 +36,10 @@ if (taskType === '--micro-ui') {
 } else if (taskType === '--chronicle') {
   title = "Chronicle Hourly Synthesis (Second Brain)";
   promptPayload = `**TASK: Chronicle Hourly Synthesis**
-1. Read the latest YYYY-MM-DD.json file in \`data/chronicle/\`.
+1. Read the latest YYYY-MM-DD.json file in \`/Users/daniel/Developer/second_brain_db/data/\`.
 2. Analyze the messages, emails, and drive activities logged in the JSON.
 3. Generate an hourly synthesis of the events. Identify patterns, key decisions, and emotional undertones.
-4. Output your synthesis as a markdown file in \`data/chronicle_insights/YYYY-MM-DD_insight.md\`. Ensure it appends to the file or creates it if it doesn't exist.
+4. Output your synthesis as a markdown file in \`/Users/daniel/Developer/second_brain_db/insights/YYYY-MM-DD_insight.md\`. Ensure it appends to the file or creates it if it doesn't exist.
 5. If the JSON is empty or lacks meaningful new data since the last run, explicitly state "No new data to synthesize."`;
 
 } else { // --micro-backend
