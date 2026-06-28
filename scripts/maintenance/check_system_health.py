@@ -189,6 +189,59 @@ def check_token_file(filepath, token_name):
         log_status(False, token_name, f"Error validating token file: {str(e)}")
         return None
 
+
+def check_local_taxonomy_alignment():
+    log_section("Local Taxonomy Alignment (LLM vs Human Duality)")
+    agy_root = "/Users/daniel/Documents/AGY"
+    if not os.path.exists(agy_root):
+        log_warning("AGY Directory", f"Could not find {agy_root}")
+        return False
+        
+    success = True
+    
+    # 1. Verify Core Duality Folders Exist
+    core_duality = {
+        "the_system": "Cloud: The System (TS)",
+        "finance": "Cloud: 04 Finances",
+        "agy_pmt": "Cloud: 01 Playmetech Admin",
+        "reflection": "Cloud: Personal Growth Reflection - Vantage"
+    }
+    
+    for folder, cloud_mapping in core_duality.items():
+        if os.path.exists(os.path.join(agy_root, folder)):
+            log_status(True, f"Duality Map: {folder}", f"Exists locally. Maps to {cloud_mapping}")
+        else:
+            log_status(False, f"Duality Map: {folder}", f"Missing locally! Cannot map to {cloud_mapping}")
+            success = False
+            
+    # 2. Check for Legacy/Ghost Folders recursively in AGY
+    legacy_ghosts = ["agy_quantum21", "quantum21", "quantum_21", "01_professional_admin", "professional_admin", "playmetech_admin", "01_playmetech_admin"]
+    found_ghosts = []
+    
+    for root, dirs, files in os.walk(agy_root):
+        # Skip hidden directories and non-relevant ones
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['node_modules', 'temp_clasp', 'venv', '__pycache__']]
+        
+        for d in dirs:
+            if d.lower() in legacy_ghosts:
+                # Exception: agy_pmt/01_playmetech_admin is legally valid because it was manually scoped that way.
+                # But wait, earlier we saw:
+                # `agy_pmt/01_playmetech_admin/the_system_pmt/`
+                # If we enforce no playmetech_admin, this would flag it.
+                # Actually, the requirement was "no legacy quantum 21 or professional_admin".
+                if "professional_admin" in d.lower() or "quantum" in d.lower():
+                    found_ghosts.append(os.path.join(root, d))
+                
+    if found_ghosts:
+        log_status(False, "Legacy Ghost Folders", f"Found {len(found_ghosts)} lingering legacy folders!")
+        for ghost in found_ghosts:
+            print(f"    -> {Colors.FAIL}{ghost}{Colors.ENDC}")
+        success = False
+    else:
+        log_status(True, "Legacy Ghost Folders", "No legacy Quantum 21 or Professional Admin folders detected on disk.")
+        
+    return success
+
 def check_clasprc():
     clasprc_path = os.path.expanduser('~/.clasprc.json')
     if not os.path.exists(clasprc_path):
@@ -268,6 +321,7 @@ def main():
     check_python_packages()
     check_clasp()
     check_manifest_alignment()
+    check_local_taxonomy_alignment()
     
     log_section("Credentials File Audits")
     

@@ -146,14 +146,14 @@
     "L1 Code": "03 00 00",
     "L1 Name": "Studies",
     "L2 Code": "03 01 00",
-    "L2 Name": "\u00d6stra Real",
+    "L2 Name": "Östra Real",
     "L3 Code": "",
     "L3 Name": "",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/01 \u00d6stra Real",
-    "Concat (Path)": "03 01 00 \u00d6stra Real",
-    "Drive Path": "03 00 00 Studies/03 01 00 \u00d6stra Real"
+    "Concat (Label)": "03 Studies/01 Östra Real",
+    "Concat (Path)": "03 01 00 Östra Real",
+    "Drive Path": "03 00 00 Studies/03 01 00 Östra Real"
   },
   {
     "L1 Code": "03 00 00",
@@ -356,12 +356,12 @@
     "L2 Code": "03 02 00",
     "L2 Name": "Uppsala University",
     "L3 Code": "03 02 01",
-    "L3 Name": "\u00c5r 1 | (2009-2010)",
+    "L3 Name": "År 1 | (2009-2010)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/02 Uppsala University/01 \u00c5r 1 | (2009-2010)",
-    "Concat (Path)": "03 02 01 \u00c5r 1 | (2009-2010)",
-    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 01 \u00c5r 1 | (2009-2010)"
+    "Concat (Label)": "03 Studies/02 Uppsala University/01 År 1 | (2009-2010)",
+    "Concat (Path)": "03 02 01 År 1 | (2009-2010)",
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 01 År 1 | (2009-2010)"
   },
   {
     "L1 Code": "03 00 00",
@@ -369,12 +369,12 @@
     "L2 Code": "03 02 00",
     "L2 Name": "Uppsala University",
     "L3 Code": "03 02 02",
-    "L3 Name": "\u00c5r 2 | (2010-2011)",
+    "L3 Name": "År 2 | (2010-2011)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/02 Uppsala University/02 \u00c5r 2 | (2010-2011)",
-    "Concat (Path)": "03 02 02 \u00c5r 2 | (2010-2011)",
-    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 02 \u00c5r 2 | (2010-2011)"
+    "Concat (Label)": "03 Studies/02 Uppsala University/02 År 2 | (2010-2011)",
+    "Concat (Path)": "03 02 02 År 2 | (2010-2011)",
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 02 År 2 | (2010-2011)"
   },
   {
     "L1 Code": "03 00 00",
@@ -382,12 +382,12 @@
     "L2 Code": "03 02 00",
     "L2 Name": "Uppsala University",
     "L3 Code": "03 02 03",
-    "L3 Name": "\u00c5r 3 | (2011-2012)",
+    "L3 Name": "År 3 | (2011-2012)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/02 Uppsala University/03 \u00c5r 3 | (2011-2012)",
-    "Concat (Path)": "03 02 03 \u00c5r 3 | (2011-2012)",
-    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 03 \u00c5r 3 | (2011-2012)"
+    "Concat (Label)": "03 Studies/02 Uppsala University/03 År 3 | (2011-2012)",
+    "Concat (Path)": "03 02 03 År 3 | (2011-2012)",
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 03 År 3 | (2011-2012)"
   },
   {
     "L1 Code": "03 00 00",
@@ -395,12 +395,12 @@
     "L2 Code": "03 02 00",
     "L2 Name": "Uppsala University",
     "L3 Code": "03 02 04",
-    "L3 Name": "\u00c5r 4 | (2012, 2014)",
+    "L3 Name": "År 4 | (2012, 2014)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/02 Uppsala University/04 \u00c5r 4 | (2012, 2014)",
-    "Concat (Path)": "03 02 04 \u00c5r 4 | (2012, 2014)",
-    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 04 \u00c5r 4 | (2012, 2014)"
+    "Concat (Label)": "03 Studies/02 Uppsala University/04 År 4 | (2012, 2014)",
+    "Concat (Path)": "03 02 04 År 4 | (2012, 2014)",
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 04 År 4 | (2012, 2014)"
   },
   {
     "L1 Code": "03 00 00",
@@ -408,12 +408,12 @@
     "L2 Code": "03 02 00",
     "L2 Name": "Uppsala University",
     "L3 Code": "03 02 05",
-    "L3 Name": "\u00c5r 5 | (2014-2015)",
+    "L3 Name": "År 5 | (2014-2015)",
     "L4 Name": "",
     "L4 Description": "",
-    "Concat (Label)": "03 Studies/02 Uppsala University/05 \u00c5r 5 | (2014-2015)",
-    "Concat (Path)": "03 02 05 \u00c5r 5 | (2014-2015)",
-    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 05 \u00c5r 5 | (2014-2015)"
+    "Concat (Label)": "03 Studies/02 Uppsala University/05 År 5 | (2014-2015)",
+    "Concat (Path)": "03 02 05 År 5 | (2014-2015)",
+    "Drive Path": "03 00 00 Studies/03 02 00 Uppsala University/03 02 05 År 5 | (2014-2015)"
   },
   {
     "L1 Code": "01 00 00",
@@ -1397,11 +1397,11 @@
     "L2 Name": "Employment",
     "L3 Code": "02 01 99",
     "L3 Name": "Archive",
-    "L4 Name": "201108 Sveriges Ingenj\u00f6rer",
+    "L4 Name": "201108 Sveriges Ingenjörer",
     "L4 Description": "Historical Employment",
-    "Concat (Label)": "02 Work/01 Employment/99 Archive/201108 Sveriges Ingenj\u00f6rer",
-    "Concat (Path)": "02 01 99 Archive > 201108 Sveriges Ingenj\u00f6rer",
-    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201108 Sveriges Ingenj\u00f6rer"
+    "Concat (Label)": "02 Work/01 Employment/99 Archive/201108 Sveriges Ingenjörer",
+    "Concat (Path)": "02 01 99 Archive > 201108 Sveriges Ingenjörer",
+    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201108 Sveriges Ingenjörer"
   },
   {
     "L1 Code": "02 00 00",
@@ -1592,11 +1592,11 @@
     "L2 Name": "Other",
     "L3 Code": "01 05 99",
     "L3 Name": "Archive",
-    "L4 Name": "20210708 Br\u00f6llop",
+    "L4 Name": "20210708 Bröllop",
     "L4 Description": "Historical Project",
-    "Concat (Label)": "01 Private/05 Other/99 Archive/20210708 Br\u00f6llop",
-    "Concat (Path)": "01 05 99 Archive > 20210708 Br\u00f6llop",
-    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20210708 Br\u00f6llop"
+    "Concat (Label)": "01 Private/05 Other/99 Archive/20210708 Bröllop",
+    "Concat (Path)": "01 05 99 Archive > 20210708 Bröllop",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/20210708 Bröllop"
   },
   {
     "L1 Code": "01 00 00",
@@ -1657,11 +1657,11 @@
     "L2 Name": "Other",
     "L3 Code": "01 05 99",
     "L3 Name": "Archive",
-    "L4 Name": "K\u00f6rkort",
+    "L4 Name": "Körkort",
     "L4 Description": "Historical Project",
-    "Concat (Label)": "01 Private/05 Other/99 Archive/K\u00f6rkort",
-    "Concat (Path)": "01 05 99 Archive > K\u00f6rkort",
-    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/K\u00f6rkort"
+    "Concat (Label)": "01 Private/05 Other/99 Archive/Körkort",
+    "Concat (Path)": "01 05 99 Archive > Körkort",
+    "Drive Path": "01 00 00 Private/01 05 00 Other/01 05 99 Archive/Körkort"
   },
   {
     "L1 Code": "00 00 00",
@@ -1674,7 +1674,7 @@
     "L4 Description": "Items that the automated pipelines could not confidently categorize and require human intervention.",
     "Concat (Label)": "00 Manual Review",
     "Concat (Path)": "00 Manual Review",
-    "Drive Path": ""
+    "Drive Path": "00 Manual Review"
   },
   {
     "L1 Code": "00 00 00",
@@ -1687,7 +1687,7 @@
     "L4 Description": "Raw incoming items that intentionally bypass standard automated filtering rules.",
     "Concat (Label)": "00 No Filter",
     "Concat (Path)": "00 No Filter",
-    "Drive Path": ""
+    "Drive Path": "00 No Filter"
   },
   {
     "L1 Code": "00 00 00",
@@ -1700,7 +1700,7 @@
     "L4 Description": "Safe sandbox label used for testing automations, scripts, and Gem workflows without affecting real data.",
     "Concat (Label)": "00 Test",
     "Concat (Path)": "00 Test",
-    "Drive Path": ""
+    "Drive Path": "00 Test"
   },
   {
     "L1 Code": "00 00 00",
@@ -1713,7 +1713,7 @@
     "L4 Description": "Automated notifications from Google Docs/Drive that require a quick read but no permanent storage.",
     "Concat (Label)": "99 Google Comments",
     "Concat (Path)": "99 Google Comments",
-    "Drive Path": ""
+    "Drive Path": "99 Google Comments"
   },
   {
     "L1 Code": "00 00 00",
@@ -1726,7 +1726,7 @@
     "L4 Description": "A vital system flag applied by the Apps Scripts to indicate an item has been successfully processed and should not be analyzed again in the next batch.",
     "Concat (Label)": "99 Label_Reviewed",
     "Concat (Path)": "99 Label_Reviewed",
-    "Drive Path": ""
+    "Drive Path": "99 Label_Reviewed"
   },
   {
     "L1 Code": "00 00 00",
@@ -1739,7 +1739,7 @@
     "L4 Description": "Funnel endpoint for incoming routed SMS messages awaiting processing or task extraction.",
     "Concat (Label)": "99 SMS",
     "Concat (Path)": "99 SMS",
-    "Drive Path": ""
+    "Drive Path": "99 SMS"
   },
   {
     "L1 Code": "00 00 00",
@@ -1752,7 +1752,7 @@
     "L4 Description": "Funnel endpoint for incoming routed Telegram messages awaiting processing or task extraction.",
     "Concat (Label)": "99 Telegram",
     "Concat (Path)": "99 Telegram",
-    "Drive Path": ""
+    "Drive Path": "99 Telegram"
   },
   {
     "L1 Code": "00 00 00",
@@ -1765,7 +1765,7 @@
     "L4 Description": "Funnel endpoint for incoming routed Facebook Messenger messages awaiting processing or task extraction.",
     "Concat (Label)": "99 Messenger",
     "Concat (Path)": "99 Messenger",
-    "Drive Path": ""
+    "Drive Path": "99 Messenger"
   },
   {
     "L1 Code": "00 00 00",
@@ -1778,7 +1778,7 @@
     "L4 Description": "Funnel endpoint for incoming routed WhatsApp messages awaiting processing or task extraction.",
     "Concat (Label)": "99 WhatsApp",
     "Concat (Path)": "99 WhatsApp",
-    "Drive Path": ""
+    "Drive Path": "99 WhatsApp"
   },
   {
     "L1 Code": "00 00 00",
@@ -1791,16 +1791,6 @@
     "L4 Description": "Temporary storage and the purge queue. Items that are needed briefly or marked for the next automated/manual trash cycle.",
     "Concat (Label)": "99 To be deleted",
     "Concat (Path)": "99 To be deleted",
-    "Drive Path": ""
-  },
-  {
-    "L1 Code": "02",
-    "L1 Name": "Work",
-    "L2 Code": "01",
-    "L2 Name": "Employment",
-    "L3 Code": "01",
-    "L3 Name": "Playmetech",
-    "Concat (Label)": "02 Work/01 Employment/01 Playmetech/01 Playmetech Admin/Contract, Personal Documents",
-    "Drive Path": "02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/01 Playmetech Admin/Contract, Personal Documents"
+    "Drive Path": "99 To be deleted"
   }
 ]

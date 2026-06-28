@@ -29,7 +29,7 @@ function syncTaxonomyToSheet() {
     let currentL1Name = "";
     
     let l1Regex = /^###\s+`?(\d{2})\s+([^`\n]+)`?/;
-    let subfolderRegex = /^\s*[\*\-]\s+\*\*`?([^`:\n]+)`?\*\*:\s*(.*)$/;
+    let subfolderRegex = /^\s*[\*\-]\s+\*\*`?([^`:\n]+)`?\*\*(?::\s*(.*))?$/;
     let stratHeaderRegex = /^###\s+4\.1\.\s+Actual\s+Trading/i;
     let goalsHeaderRegex = /^###\s+4\.2\.\s+Actual\s+Strategic/i;
     
@@ -377,6 +377,18 @@ function syncTaxonomyToSheet() {
   }
 
   // --- GENERATE DRIVE PATH COLUMN ---
+  if (!isPmt) {
+    // INJECT INVISIBLE BRIDGE: For The Clerk to successfully route Daniel's PMT employment documents
+    data.push([
+      "02 00 00", "Work", 
+      "02 01 00", "Employment", 
+      "02 01 01", "Playmetech", 
+      "Contract, Personal Documents", "Bridge to PMTOS Personal Documents", 
+      "02 Work/01 Employment/01 Playmetech/01 Playmetech Admin/Contract, Personal Documents", 
+      "02 00 00 Work > 02 01 00 Employment > 02 01 01 Playmetech > 01 Playmetech Admin > Contract, Personal Documents"
+    ]);
+  }
+
   data[0].push("Drive Path");
   for (let i = 1; i < data.length; i++) {
     let row = data[i];
@@ -627,7 +639,7 @@ function syncDriveFoldersFromTaxonomy() {
 
     const isPmt = isPmtAccount();
     const BATCH_SIZE = 10;
-    const TARGET_DEPTH = 4;
+    const TARGET_DEPTH = 6; // Increased from 4 to support PMTOS nested structures (e.g. 5-level Bridge)
 
     const fileId = SYSTEM_CONFIG.DOCS.TAXONOMY_JSON_ID;
     if (!fileId) {
@@ -819,9 +831,9 @@ function resolveFolderFromTaxonomy(concatPath, taxonomy) {
     return null;
   }
 
-  // Construct the exact folder hierarchy by splitting Concat (Label)
+  // Construct the exact folder hierarchy by splitting Drive Path
   const folderNames = item["Drive Path"] ? item["Drive Path"].split("/").map(s => s.trim()) : [];
-  if (folderNames.length === 0) return null;
+  if (folderNames.length === 0) return "VIRTUAL_LABEL";
 
   const isPmt = isPmtAccount();
 
@@ -887,7 +899,7 @@ function auditWorkspaceFolders() {
 
     // Build set of valid relative paths from the taxonomy
     const validPaths = new Set();
-    const TARGET_DEPTH = 4;
+    const TARGET_DEPTH = 6; // Increased from 4 to support PMTOS nested structures (e.g. 5-level Bridge)
 
     taxonomy.forEach(item => {
       if (item && item["Drive Path"]) {
