@@ -25,15 +25,15 @@ migrations = {
     "00 Google Comments": "99 Google Comments",
     "01 Private/03 Personal Growth/01 Principles": "01 Private/03 Personal Growth/01 Principles, Goals & Methods",
     "Goals & Methods": "01 Private/03 Personal Growth/01 Principles, Goals & Methods",
-    "02 Work/01 Employment/01 Current Roles/202605 Quantum 21": "02 Work/01 Employment/01 202605 Quantum 21",
-    "02 Work/01 Employment/01 Playmetech/01 Professional Admin": "02 Work/01 Employment/01 Playmetech/01 Playmetech Admin",
+    "02 Work/01 Employment/01 Current Roles/202605 Playmetech": "02 Work/01 Employment/01 202605 Playmetech",
+    "02 Work/01 Employment/01 Playmetech/01 Playmetech Admin": "02 Work/01 Employment/01 Playmetech/01 Playmetech Admin",
     "99 Delete": "99 To be deleted",
     "03 Studies/99 Archive": "03 Studies/99 Studies Archive",
     "03 Studies/03 00 00": "03 Studies/03 Stockholms Nation",
     "daniel.adersteg@revolut.com": "02 Work/01 Employment/99 Archive/201911 Revolut",
     "01 Private/05 Other/01 Projects/Colab Notebooks": "01 Private/05 Other/01 Projects/Data Analysis & Software Development",
-    "01 Professional Admin/Task Management": "01 Private/01 Personal Admin/01 Task Management",
-    "01 Professional Admin/04 Finances/01 Purchase": "01 Private/04 Finances/01 Purchase",
+    "01 Playmetech Admin/Task Management": "01 Private/01 Personal Admin/01 Task Management",
+    "01 Playmetech Admin/04 Finances/01 Purchase": "01 Private/04 Finances/01 Purchase",
     "02 Work/02 Career Management/Job Descriptions": "02 Work/02 Career Management",
     "98 SMS": "99 SMS",
     "98 Telegram": "99 Telegram",
@@ -72,14 +72,14 @@ def update_cell(val):
         # Only replace if it matches the whole label (between commas or start/end)
         # Using a positive lookahead for end, and lookbehind/start for beginning
         pattern = r'(^|,\s*)' + re.escape(bad) + r'(?=\s*,|$)'
-        # But we need to ensure we don't replace if it's "02 Work/01 Employment/01 Quantum 21/01 Admin"
+        # But we need to ensure we don't replace if it's "02 Work/01 Employment/01 Playmetech/01 Admin"
         # Since we anchored to commas, it works perfectly!
         val = re.sub(pattern, r'\g<1>' + good.replace('\\', '\\\\'), val)
 
-    # Special case for "02 Work/01 Employment/01 Quantum 21" to "02 Work/01 Employment/01 202605 Quantum 21"
-    # we don't want to break "02 Work/01 Employment/01 Quantum 21/01 Professional Admin"
-    pattern = r'(^|,\s*)02 Work/01 Employment/01 Quantum 21(?=\s*,|$)'
-    val = re.sub(pattern, r'\g<1>02 Work/01 Employment/01 202605 Quantum 21', val)
+    # Special case for "02 Work/01 Employment/01 Playmetech" to "02 Work/01 Employment/01 202605 Playmetech"
+    # we don't want to break "02 Work/01 Employment/01 Playmetech/01 Playmetech Admin"
+    pattern = r'(^|,\s*)02 Work/01 Employment/01 Playmetech(?=\s*,|$)'
+    val = re.sub(pattern, r'\g<1>02 Work/01 Employment/01 202605 Playmetech', val)
     
     return val
 

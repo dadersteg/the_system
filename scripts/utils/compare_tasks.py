@@ -4,7 +4,7 @@ from googleapiclient.discovery import build
 
 ROOT_DIR = '/Users/daniel/Documents/AGY/the_system'
 TOKEN_FILE = os.path.join(ROOT_DIR, "token_tasks_work.json")
-MARKDOWN_FILE = os.path.join(ROOT_DIR, "../agy_quantum21/artifacts/task_review_table.md")
+MARKDOWN_FILE = os.path.join(ROOT_DIR, "../agy_pmt/artifacts/task_review_table.md")
 
 creds = Credentials.from_authorized_user_file(TOKEN_FILE)
 service = build('tasks', 'v1', credentials=creds)

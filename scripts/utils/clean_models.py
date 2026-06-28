@@ -2,7 +2,7 @@ import os
 import re
 import json
 
-base_path = "/Users/daniel/Documents/AGY/agy_quantum21/05_project_pmt/project_ai_betting_framework/06_Automated_Models"
+base_path = "/Users/daniel/Documents/AGY/agy_pmt/05_project_pmt/project_ai_betting_framework/06_Automated_Models"
 dirs = ["Graduated_Strategies", "Ready_For_Backtesting", "Active_Strategies", "Ideation_Crucible", "Archived_Strategies"]
 failed_json_path = "/Users/daniel/Documents/AGY/the_system/.agents/worker_remediation_m2/failed_models.json"
 

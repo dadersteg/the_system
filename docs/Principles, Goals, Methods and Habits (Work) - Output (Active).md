@@ -2,10 +2,10 @@
 
 | URN | Category (LOS) | Principle / Goal / Subgoal / Method / Habit / BLUF | Text | Objective(s) | Value | UoM | Measure | Active |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2024-8-000 | 02 01 00 Current Role | BLUF / Summary | Scale operations and team at Quantum 21 while protecting the asset ("I am the Product") via strict Deep Work and boundaries. | N/A | N/A | N/A | N/A | true |
-| 2026-Q2-001 | 02 01 00 Current Role | 01 Goal | Excel as Head of Operations at Quantum 21 (Achieve Target KPIs for Bonus and Carry). | Achieve Target KPIs; Acquire Domain Expertise; Protect the Asset | 1 | Achievement | Q4 | true |
+| 2024-8-000 | 02 01 00 Current Role | BLUF / Summary | Scale operations and team at Playmetech while protecting the asset ("I am the Product") via strict Deep Work and boundaries. | N/A | N/A | N/A | N/A | true |
+| 2026-Q2-001 | 02 01 00 Current Role | 01 Goal | Excel as Head of Operations at Playmetech (Achieve Target KPIs for Bonus and Carry). | Achieve Target KPIs; Acquire Domain Expertise; Protect the Asset | 1 | Achievement | Q4 | true |
 | 2026-Q2-004 | 02 01 00 Current Role | 02 Subgoal | Acquire deep domain expertise in quantitative sports betting markets. | Acquire Domain Expertise | 1 | Knowledge | Q3 | true |
-| 2026-Q2-005 | 02 01 00 Current Role | 03 Method | Domain Study: Methodically review and integrate the Quantum 21 betting intelligence knowledge base into strategy. | Acquire Domain Expertise | 100 | % | Completed | true |
+| 2026-Q2-005 | 02 01 00 Current Role | 03 Method | Domain Study: Methodically review and integrate the Playmetech betting intelligence knowledge base into strategy. | Acquire Domain Expertise | 100 | % | Completed | true |
 | 2026-Q2-006 | 02 01 00 Current Role | 03 Method | "Eat the Frog" (Ops): Execute highest-friction compliance, allocation, or team task first daily. | Achieve Target KPIs | 1 | Daily | Continuous | true |
 | 2026-Q2-007 | 02 01 00 Current Role | 04 Habit | Daily 30-min focused study block for Domain Expertise (Quantitative Wagering). | Acquire Domain Expertise | 30 | Minutes | Daily | true |
 | 2026-Q2-008 | 02 01 00 Current Role | 04 Habit | 3 Hours of Uninterrupted Deep Work block daily (Zero Slack/Email). | Protect the Asset | 3 | Hours | Daily | true |

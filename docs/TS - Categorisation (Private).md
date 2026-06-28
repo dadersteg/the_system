@@ -276,7 +276,7 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 
 ### 02 01 01 Playmetech
 
-*Active employment (also referred to as Playmetech or Q21). Playmetech / Quantum 21 operates as a highly sophisticated sports betting and i-gaming wagering syndicate. This category serves as the central repository for all professional materials related to quantitative wagering, betting market analytics, sports betting strategies, and syndicate execution blueprints. Categories mimic the 01 Private L2 structure.*
+*Active employment (also referred to as Playmetech or Q21). Playmetech / Playmetech operates as a highly sophisticated sports betting and i-gaming wagering syndicate. This category serves as the central repository for all professional materials related to quantitative wagering, betting market analytics, sports betting strategies, and syndicate execution blueprints. Categories mimic the 01 Private L2 structure.*
 
 | Code | Description |
 | :--- | :--- |

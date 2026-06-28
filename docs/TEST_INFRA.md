@@ -14,12 +14,12 @@
 
 ## Test Architecture
 - Test runner: `python tests/verify_task_table.py`
-- Test case format: Script connects to Google Tasks API, calculates active task count, parses `/Users/daniel/Documents/agy_quantum21/artifacts/task_review_table.md`, and asserts counts are equal.
+- Test case format: Script connects to Google Tasks API, calculates active task count, parses `/Users/daniel/Documents/agy_pmt/artifacts/task_review_table.md`, and asserts counts are equal.
 - Pass/Fail semantics: Exit code 0 if counts match; non-zero exit code if counts differ or files are missing.
 - Directory layout:
   - `tests/verify_task_table.py`: The validation script
   - `token_tasks_work.json`: API credentials
-  - `/Users/daniel/Documents/agy_quantum21/artifacts/task_review_table.md`: The output file to test
+  - `/Users/daniel/Documents/agy_pmt/artifacts/task_review_table.md`: The output file to test
 
 ## Real-World Application Scenarios (Tier 4)
 | # | Scenario | Features Exercised | Complexity |

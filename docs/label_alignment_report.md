@@ -40,7 +40,7 @@ Supporting the bottom-line findings, the discrepancies fit into five main struct
 *   **The Remedy:** Rename these system tags to match the exact spelling defined in the operational rules.
 
 ### Pillar 4: L4 Context Standardisation
-*   **The Issue:** Specific L4 contexts have diverged from the taxonomy. Playmetech's admin folder is named `01 Professional Admin` instead of `01 Playmetech Admin`. The Collections context is named `Useful` or `Useful & Helpful` instead of `Useful/Helpful`.
+*   **The Issue:** Specific L4 contexts have diverged from the taxonomy. Playmetech's admin folder is named `01 Playmetech Admin` instead of `01 Playmetech Admin`. The Collections context is named `Useful` or `Useful & Helpful` instead of `Useful/Helpful`.
 *   **The Remedy:** Rename the Playmetech admin label, and standardise/rename the Useful labels to `Useful/Helpful` (pending taxonomy amendment approval).
 
 ### Pillar 5: Implementation of 12 Missing Taxonomy Nodes
@@ -65,7 +65,7 @@ This section provides the complete, granular list of all 113 discrepant Gmail la
 | Current Gmail Label | Issue / Reason | Actionable Recommendation |
 | :--- | :--- | :--- |
 | `01 00 00 Private/01 05 00 Other/01 05 03 Collections/Useful` | Undocumented L4 context name; expected `Useful/Helpful` | **Rename** to `01 00 00 Private/01 05 00 Other/01 05 03 Collections/Useful/Helpful` |
-| `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/01 Professional Admin` | L4 Name mismatch: should be `01 Playmetech Admin` | **Rename** to `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/01 Playmetech Admin` |
+| `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/01 Playmetech Admin` | L4 Name mismatch: should be `01 Playmetech Admin` | **Rename** to `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/01 Playmetech Admin` |
 | `03 00 00 Studies/03 00 00` | Duplicate redundant intermediate L2 level | **Delete** label (after migrating contents, if any) |
 | `03 00 00 Studies/03 00 00/03 00 99 Studies Archive` | Redundant nested path | **Rename** to `03 00 00 Studies/03 00 99 Studies Archive` |
 | `03 00 00 Studies/03 02 00` | Missing name segment `Uppsala University` for code `03 02 00` | **Rename** to `03 00 00 Studies/03 02 00 Uppsala University` |

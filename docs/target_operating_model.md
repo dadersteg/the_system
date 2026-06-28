@@ -76,7 +76,7 @@ This document provides a comprehensive overview of the active file taxonomy, fro
 ### 02 00 00 Work
 - **02 01 00 Employment**
   - 02 01 01 Playmetech
-    - 01 Professional Admin
+    - 01 Playmetech Admin
     - 02 Team & Operations
     - 03 Professional Growth
     - 04 Finances
@@ -159,7 +159,7 @@ graph TD
     Root --> N70["02 00 00 Work"]
     N70 --> N71["02 01 00 Employment"]
     N71 --> N72["02 01 01 Playmetech"]
-    N72 --> N73["01 Professional Admin"]
+    N72 --> N73["01 Playmetech Admin"]
     N72 --> N74["02 Team & Operations"]
     N72 --> N75["03 Professional Growth"]
     N72 --> N76["04 Finances"]

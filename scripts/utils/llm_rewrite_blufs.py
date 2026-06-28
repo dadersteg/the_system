@@ -16,7 +16,7 @@ if not api_key:
     raise ValueError("Gemini API Key not found in environment variables.")
 
 # Base paths
-base_models_dir = Path("/Users/daniel/Documents/AGY/agy_quantum21/05_project_pmt/project_ai_betting_framework/06_Automated_Models")
+base_models_dir = Path("/Users/daniel/Documents/AGY/agy_pmt/05_project_pmt/project_ai_betting_framework/06_Automated_Models")
 failed_models_json = Path("/Users/daniel/Documents/AGY/the_system/.agents/worker_remediation_m2/failed_models.json")
 
 # Define response schema
