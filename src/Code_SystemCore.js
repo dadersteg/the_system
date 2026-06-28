@@ -2,11 +2,12 @@
  * @file src/Code_SystemCore.js
  * @description System core utilities providing centralized AI functions, system triggers, and testing functions.
  *
- * @version 1.0.2
- * @last_modified 2026-06-05
+ * @version 1.0.3
+ * @last_modified 2026-06-28
  * @modified_by Jules
  *
  * @changelog
+ * - 1.0.3: Implemented explicit MIME-type validation in getSafeDocText before calling getBlob().getDataAsString() to prevent crashes on unsupported types.
  * - 1.0.2: Wrapped JSON.parse(resultText) in callGemini with a try/catch block to prevent uncaught exceptions. Removed duplicated JSDoc header above _cachedDocTexts.
  * - 1.0.1: Improved error handling by replacing empty catch blocks with explicit console logging in getMasterSpreadsheet and isPmtAccount.
  * - 1.0.0: Initial creation from split of Code_Utilities.js. Added standardized documentation header, JSDoc descriptions for all functions, aggressive type checking, and error boundaries.
@@ -364,7 +365,12 @@ function getSafeDocText(id) {
     text = DocumentApp.openById(id).getBody().getText();
   } catch (e) {
     try {
-      text = DriveApp.getFileById(id).getBlob().getDataAsString();
+      const file = DriveApp.getFileById(id);
+      const mimeType = file.getMimeType();
+      if (mimeType === MimeType.GOOGLE_SHEETS || mimeType === MimeType.GOOGLE_SLIDES || mimeType === MimeType.GOOGLE_FORMS) {
+        throw new Error(`Unsupported MIME type for string extraction: ${mimeType}`);
+      }
+      text = file.getBlob().getDataAsString();
     } catch (err) {
       console.error(`Failed to fetch file/doc ${id}: ${err.message}`);
     }
