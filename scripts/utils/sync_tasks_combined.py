@@ -251,7 +251,7 @@ def write_combined_markdown(private_tasks, work_tasks, output_path, same_account
         f.write(f"> Work task descriptions and notes have been anonymized/redacted for local storage security.\n\n")
         
         # --- WORK SECTOR ---
-        f.write(f"## 💼 Work Tasks (Quantum 21 / Playmetech)\n\n")
+        f.write(f"## 💼 Work Tasks (Playmetech / Playmetech)\n\n")
         if same_account:
             f.write("> [!WARNING]\n")
             f.write("> Work OAuth token is currently authenticated to the same Google Account as Private Tasks.\n")
@@ -370,7 +370,7 @@ def main():
         print("Warning: Private Tasks API could not be connected. Skipping private sync.")
 
     # 3. Get Work API Service
-    print("\n[Auth] Fetching credentials for Work Account (Quantum 21 / Playmetech)...")
+    print("\n[Auth] Fetching credentials for Work Account (Playmetech / Playmetech)...")
     work_auth = get_credentials(work_token, work_creds, "Work Account")
     work_service = None
     if work_auth:

@@ -1,4 +1,4 @@
-# The System Protocols (v1.5)
+# The System Protocols (v1.6)
 
 Status: Active
 
@@ -202,10 +202,11 @@ This section defines the hard boundaries and touchpoints across the AI tooling e
 ### 7.1. Identity Boundaries & Touchpoints
 *   **The Hard Boundary:** The PMT Identity (`@playmetech.net`) strictly and exclusively governs the `02 01 01 Playmetech` (PMTOS) environment. The Private Identity (`@gmail.com`) governs `01 Private`, `03 Studies`, and the remainder of `02 Work`.
 *   **The Shared Bridge:** Cross-identity sharing is restricted to explicit touchpoints. The primary bridge is the **"Contracts etc."** shared folder located under Professional Admin. Individual files should not be randomly shared across identities; they must be routed through this bridge.
-*   **The Local Bridge:** On the Mac mini, the synced `AGY` workspace contains the `agy_quantum21` sub-folder. This is the designated local staging ground for PMT-specific code and structural logic.
+*   **The Local Bridge:** On the Mac mini, the synced `AGY` workspace contains the `agy_pmt` sub-folder. This is the designated local staging ground for PMT-specific code and structural logic.
 
-### 7.2. Unified Notebooks (NotebookLM & Gemini)
+### 7.2. Unified Notebooks (NotebookLM & Gemini) & The Overlay Architecture
 NotebookLM and the Gemini Web App operate on a shared "Unified Notebook" infrastructure. Notebooks act as the bounded knowledge bases (the "reference overlays") for L4 Projects.
+*   **The Overlay Architecture:** Transversal projects must physically live within the strict L1-L4 taxonomy (e.g., under `05 Projects`). However, to facilitate cross-domain knowledge retrieval, a transversal project is simultaneously represented as a Drive Project and a Unified Notebook. This allows LLMs to query the data across boundaries without breaking the strict physical storage layer.
 *   **NotebookLM Interface (Deep Curation):** Used for deep, source-grounded research, document interrogation, and creating Audio Overviews. Hallucinations are minimized here.
 *   **Gemini Web App Interface (Expansion):** Used to load a synced Notebook for active ideation, drafting, and problem-solving, leveraging Gemini's dynamic web-search capabilities grounded against the Notebook's sources.
 *   **Identity Rule:** Notebooks are tied to the Google account. You must switch browser profiles to ensure the correct Notebook context (Private vs PMT) is loaded.
@@ -213,3 +214,14 @@ NotebookLM and the Gemini Web App operate on a shared "Unified Notebook" infrast
 ### 7.3. The Execution Engine (Antigravity)
 *   Antigravity operates locally on the Mac mini across the synced `AGY` workspace and the unsynced `Developer` workspace.
 *   It is identity-agnostic locally but enforces the PMT vs Private boundaries remotely via targeted APIs and MCPs.
+
+### 7.4. The "LLM vs. Human" Folder Duality Protocol
+The use of `snake_case` in local Mac Mini workspaces (like `agy_pmt`) is a deliberate design choice to differentiate LLM-friendly CLI environments from human-friendly Google Drive environments.
+*   **Local Workspaces:** Folders intended for heavy LLM or terminal interaction MUST use `snake_case` and omit spacing (e.g., `01_playmetech_admin`).
+*   **Cloud Workspaces:** Corresponding folders in Google Drive MUST use `Title Case` and standard spacing (e.g., `01 Playmetech Admin`).
+*   Agents traversing both domains must be programmed to automatically map between these two states.
+
+### 7.5. Sandbox Promotion Protocol
+The `Developer` and `teamwork_projects` directories serve as isolated sandboxes for heavy computation and multi-agent drafting.
+*   Outputs from these sandboxes must not remain in isolation permanently if they represent finalized operational logic.
+*   **Promotion Rule:** Once a script or project in a sandbox is finalized and verified, it must be formally "promoted" (moved or copied) into the globally synced `AGY/the_system` environment to be recognized by the operational layer.

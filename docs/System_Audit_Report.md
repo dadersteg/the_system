@@ -74,12 +74,12 @@ These folders exist physically but are not tracked in the master rules.
 - `01 00 00 Private/01 05 00 Other/01 05 01 Projects/202601 M`
 - `01 00 00 Private/01 05 00 Other/01 05 03 Collections/Clothes`
 - `01 00 00 Private/01 05 00 Other/01 05 03 Collections/Cooking`
-- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21`
-- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/01 Professional Admin`
-- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/02 Team & Operations`
-- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/03 Professional Growth`
-- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/04 Finances`
-- `02 00 00 Work/02 01 00 Employment/02 01 01 Quantum 21/05 Projects`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/01 Playmetech Admin`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/02 Team & Operations`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/03 Professional Growth`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/04 Finances`
+- `02 00 00 Work/02 01 00 Employment/02 01 01 Playmetech/05 Projects`
 - `02 00 00 Work/02 01 00 Employment/02 01 99 Archive/201404 bConnected`
 - `02 00 00 Work/02 02 00 Career Management/201905 DB`
 - `02 00 00 Work/02 02 00 Career Management/201905 DB/Archive`

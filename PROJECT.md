@@ -13,7 +13,7 @@
 
 ## Code Layout
 - `the_system/build_leaderboard.py`: Main leaderboard builder script.
-- `agy_quantum21/05_project_pmt/project_ai_betting_framework/06_Automated_Models/`: Directory containing automated models and outputs.
+- `agy_pmt/05_project_pmt/project_ai_betting_framework/06_Automated_Models/`: Directory containing automated models and outputs.
 - `.agents/rules/penny.md`: Formatting standards.
 - `.agents/rules/playmetech_coo.md`: Technical and tone standards.
 

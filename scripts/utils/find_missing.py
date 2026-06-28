@@ -1,11 +1,11 @@
 import sys, re
-sys.path.append('/Users/daniel/Documents/agy_quantum21/scripts')
+sys.path.append('/Users/daniel/Documents/agy_pmt/scripts')
 import analyze_tasks
 
 tasks = analyze_tasks.get_tasks()
 api_titles = set(analyze_tasks.sanitize_md(t.get('title', '')).strip() for t in tasks)
 
-MARKDOWN_FILE = '/Users/daniel/Documents/agy_quantum21/artifacts/task_review_table.md'
+MARKDOWN_FILE = '/Users/daniel/Documents/agy_pmt/artifacts/task_review_table.md'
 md_titles = set()
 with open(MARKDOWN_FILE, 'r', encoding='utf-8') as f:
     for line in f:

@@ -11,7 +11,7 @@ from googleapiclient.discovery import build
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOKEN_FILE = os.path.join(ROOT_DIR, "token_tasks_work.json")
-MARKDOWN_FILE = os.path.join(ROOT_DIR, "../agy_quantum21/artifacts/task_review_table.md")
+MARKDOWN_FILE = os.path.join(ROOT_DIR, "../agy_pmt/artifacts/task_review_table.md")
 
 def get_api_active_task_count():
     if not os.path.exists(TOKEN_FILE):

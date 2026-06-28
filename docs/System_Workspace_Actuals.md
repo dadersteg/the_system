@@ -71,10 +71,10 @@
 - 01 Private/05 Other/99 Archive/Körkort
 - 02 Work
 - 02 Work/01 Employment
-- 02 Work/01 Employment/01 Quantum 21
-- 02 Work/01 Employment/01 Quantum 21/01 Professional Admin
-- 02 Work/01 Employment/01 Quantum 21/02 Team & Operations
-- 02 Work/01 Employment/01 Quantum 21/04 Finances
+- 02 Work/01 Employment/01 Playmetech
+- 02 Work/01 Employment/01 Playmetech/01 Playmetech Admin
+- 02 Work/01 Employment/01 Playmetech/02 Team & Operations
+- 02 Work/01 Employment/01 Playmetech/04 Finances
 - 02 Work/01 Employment/99 Archive
 - 02 Work/01 Employment/99 Archive/201102 S&P
 - 02 Work/01 Employment/99 Archive/201108 Sveriges Ingenjörer
@@ -224,8 +224,8 @@
         - UKC
   - 02 00 00 Work
     - 02 01 00 Employment
-      - 02 01 01 Quantum 21
-        - 01 Professional Admin
+      - 02 01 01 Playmetech
+        - 01 Playmetech Admin
         - 02 Team & Operations
         - 03 Professional Growth
         - 04 Finances

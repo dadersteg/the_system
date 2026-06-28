@@ -2,7 +2,7 @@ import os
 import re
 import datetime
 
-base_path = "/Users/daniel/Documents/AGY/agy_quantum21/05_project_pmt/project_ai_betting_framework/06_Automated_Models"
+base_path = "/Users/daniel/Documents/AGY/agy_pmt/05_project_pmt/project_ai_betting_framework/06_Automated_Models"
 leaderboard_path = os.path.join(base_path, "Model_Leaderboard.md")
 
 dirs = {

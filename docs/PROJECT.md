@@ -2,7 +2,7 @@
 
 ## Architecture
 - **Extractor/Analyzer**: Python script `scripts/analyze_tasks.py` to extract Google Tasks via API using `token_tasks_work.json`. It will use Gemini (or just prompt templates if manual is needed, but given the scale, likely Gemini API via a python script) to evaluate tasks based on `james.md`, `playmetech_coo.md`, and `task_master.md` personas.
-- **Output**: Generates a comprehensive markdown table at `/Users/daniel/Documents/agy_quantum21/artifacts/task_review_table.md`.
+- **Output**: Generates a comprehensive markdown table at `/Users/daniel/Documents/agy_pmt/artifacts/task_review_table.md`.
 - **E2E Testing**: Python script `tests/verify_task_table.py` to check that the row count in the output markdown matches the extracted task count.
 
 ## Milestones
@@ -21,4 +21,4 @@
 ## Code Layout
 - `scripts/analyze_tasks.py`: Main implementation.
 - `tests/verify_task_table.py`: Verification script.
-- `/Users/daniel/Documents/agy_quantum21/artifacts/task_review_table.md`: Output file.
+- `/Users/daniel/Documents/agy_pmt/artifacts/task_review_table.md`: Output file.
