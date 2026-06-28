@@ -1,5 +1,8 @@
 # Project: Google Tasks Multi-Persona Analysis
 
+> **Architectural Note:** For global topological layout, identity boundaries, and folder routing rules, refer to the [TS - System Architecture Map.md](../../../../the_system/docs/TS%20-%20System%20Architecture%20Map.md) (or equivalent path in `docs/`).
+
+
 ## Architecture
 - **Extractor/Analyzer**: Python script `scripts/analyze_tasks.py` to extract Google Tasks via API using `token_tasks_work.json`. It will use Gemini (or just prompt templates if manual is needed, but given the scale, likely Gemini API via a python script) to evaluate tasks based on `james.md`, `playmetech_coo.md`, and `task_master.md` personas.
 - **Output**: Generates a comprehensive markdown table at `/Users/daniel/Documents/agy_pmt/artifacts/task_review_table.md`.

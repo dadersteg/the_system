@@ -1,5 +1,8 @@
 # Project: Automated AI Model Remediation & Leaderboard Sync
 
+> **Architectural Note:** For global topological layout, identity boundaries, and folder routing rules, refer to the [TS - System Architecture Map.md](../../../../the_system/docs/TS%20-%20System%20Architecture%20Map.md) (or equivalent path in `docs/`).
+
+
 ## Architecture
 - `build_leaderboard.py`: Script that parses models' Concept/BLUF sections and builds `Model_Leaderboard.md`.
 - `06_Automated_Models`: Main directory containing 171 model markdown files distributed across subdirectories:

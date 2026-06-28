@@ -1,5 +1,8 @@
 # The System
 
+> **Architectural Note:** For global topological layout, identity boundaries, and folder routing rules, refer to the [TS - System Architecture Map.md](../../../../the_system/docs/TS%20-%20System%20Architecture%20Map.md) (or equivalent path in `docs/`).
+
+
 ## 1. Purpose
 "The System" is an AI-powered Executive Suite functioning as a comprehensive "Second Brain." Its primary goal is to unburden the mind by managing the administrative friction of 1 day life—triage, file categorization, task processing, and reflective planning. By handling the noise, The System allows the user to focus purely on meaningful execution and strategic growth.
 

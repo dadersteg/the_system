@@ -458,7 +458,9 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                         targetFolder = folderCache.byName[data.concat_path];
                     } else {
                         targetFolder = typeof resolveFolderFromTaxonomy === "function" ? resolveFolderFromTaxonomy(data.concat_path, parsedTaxonomy) : null;
-                        if (!targetFolder) {
+                        if (targetFolder === "VIRTUAL_LABEL") {
+                            targetFolder = null; // VIRTUAL_LABEL means no physical path. Do not fallback to ghost hunting.
+                        } else if (!targetFolder) {
                             const folders = DriveApp.getFoldersByName(data.context_id);
                             while (folders.hasNext()) {
                                 const f = folders.next();

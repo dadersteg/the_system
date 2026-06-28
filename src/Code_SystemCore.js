@@ -450,7 +450,7 @@ function isPmtAccount() {
 function processPromptText(textStr) {
   if (!textStr) return "";
   if (typeof isPmtAccount === 'function' && isPmtAccount()) {
-    return textStr
+    let pmtStr = textStr
       .replace(/\bLife Organisation System \(LOS\)/g, "Playmetech Organisation System (PMTOS)")
       .replace(/\bLife Organisation System\b/g, "Playmetech Organisation System")
       .replace(/\bLOS_Taxonomy\b/g, "PMTOS_Taxonomy")
@@ -458,8 +458,14 @@ function processPromptText(textStr) {
       .replace(/\bLOS Taxonomy\b/g, "PMTOS Taxonomy")
       .replace(/\bLOS\b/g, "PMTOS")
       .replace(/\blos\b/g, "wos");
+      
+    pmtStr += "\n\n[SYSTEM DIRECTIVE: STRICT PMTOS BOUNDARY]\nYou are operating exclusively within the Playmetech Organisation System (PMTOS). Do NOT reference or route files to private/personal LOS categories. All operations must remain strictly within the 01-05 PMTOS business boundaries.";
+    return pmtStr;
+  } else {
+    let losStr = textStr;
+    losStr += "\n\n[SYSTEM DIRECTIVE: PMTOS BRIDGE]\nWhile operating in the Life Organisation System (LOS), be aware that Playmetech business files are physically separated into the PMTOS. However, Daniel's personal employment contracts and Playmetech employment documents must be routed across the bridge to the exact label: '02 Work/01 Employment/01 Playmetech/01 Playmetech Admin/Contract, Personal Documents'.";
+    return losStr;
   }
-  return textStr;
 }
 
 /**
