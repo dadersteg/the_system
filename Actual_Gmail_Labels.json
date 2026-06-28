@@ -267,7 +267,7 @@
   {
     "name": "01 Private/05 Other/01 Projects/AI",
     "leaf": "AI",
-    "unread_count": 9
+    "unread_count": 10
   },
   {
     "name": "01 Private/05 Other/01 Projects/Clothes",
@@ -362,7 +362,7 @@
   {
     "name": "01 Private/05 Other/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 15
+    "unread_count": 16
   },
   {
     "name": "01 Private/05 Other/03 Collections/Star Wars",
@@ -705,9 +705,14 @@
     "unread_count": 0
   },
   {
+    "name": "99 Instagram",
+    "leaf": "99 Instagram",
+    "unread_count": 0
+  },
+  {
     "name": "99 Label_Reviewed",
     "leaf": "99 Label_Reviewed",
-    "unread_count": 26
+    "unread_count": 27
   },
   {
     "name": "99 Messenger",
@@ -727,7 +732,7 @@
   {
     "name": "99 To be deleted",
     "leaf": "99 To be deleted",
-    "unread_count": 7
+    "unread_count": 8
   },
   {
     "name": "99 WhatsApp",
