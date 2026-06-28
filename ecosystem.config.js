@@ -131,6 +131,18 @@ module.exports = {
       error_file: "logs/trigger_jules_backend_err.log"
     },
     {
+      name: "trigger-jules-backfill",
+      script: "scripts/maintenance/trigger_jules.js",
+      args: "--chronicle-backfill",
+      cwd: "/Users/daniel/Documents/AGY/the_system",
+      autorestart: false,
+      env: {
+        JULES_API_KEY: localEnv.JULES_API_KEY || ""
+      },
+      out_file: "logs/trigger_jules_backfill_out.log",
+      error_file: "logs/trigger_jules_backfill_err.log"
+    },
+    {
       name: "trigger-jules-ui",
       script: "scripts/maintenance/trigger_jules.js",
       args: "--micro-ui",

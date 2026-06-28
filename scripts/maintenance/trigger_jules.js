@@ -40,9 +40,59 @@ if (taskType === '--micro-ui') {
 1. Read the LATEST YYYY-MM-DD.json file in the \`data/\` directory of the repository.
 2. Read the PREVIOUS day's insight markdown file in \`insights/daily/\` (if it exists) to establish continuity.
 3. Analyze the messages, emails, and drive activities logged in the new JSON file.
-4. Generate a comprehensive daily synthesis. Identify patterns, key decisions, emotional undertones, and outstanding action items.
-5. Output your synthesis as a NEW markdown file in \`insights/daily/YYYY-MM-DD_insight.md\`.
-6. If the JSON is completely empty or lacks meaningful new data, explicitly state "No new data to synthesize."`;
+4. Generate a clear, detailed, and highly factual summary of the day. Extract key events, participants, and concrete actions taken.
+5. Maximize your deep synthesis capabilities. Weave the factual events into a cohesive narrative, identifying underlying patterns, emotional undertones, and strategic momentum.
+6. Output your synthesis as a NEW markdown file in \`insights/daily/YYYY-MM-DD_insight.md\`.
+7. If the JSON is completely empty or lacks meaningful new data, explicitly state "No new data to synthesize."`;
+  sourceRepo = "sources/github/dadersteg/second_brain_db";
+
+} else if (taskType === '--chronicle-backfill') {
+  title = "Chronicle Historical Backfill (Second Brain)";
+  
+  const fs = require('fs');
+  const path = require('path');
+  
+  const dataDir = '/Users/daniel/Developer/second_brain_db/data/';
+  const insightsDir = '/Users/daniel/Developer/second_brain_db/insights/daily/';
+  
+  // Ensure insights directory exists for checking
+  if (!fs.existsSync(insightsDir)) {
+    fs.mkdirSync(insightsDir, { recursive: true });
+  }
+
+  // Get all JSON files sorted chronologically
+  const jsonFiles = fs.readdirSync(dataDir)
+    .filter(f => f.endsWith('.json'))
+    .sort();
+    
+  // Find up to 21 files that don't have a corresponding insight.md
+  let filesToProcess = [];
+  for (const file of jsonFiles) {
+    const baseName = file.replace('.json', '');
+    const insightFile = `${baseName}_insight.md`;
+    if (!fs.existsSync(path.join(insightsDir, insightFile))) {
+      filesToProcess.push(file);
+    }
+    if (filesToProcess.length >= 21) break;
+  }
+
+  if (filesToProcess.length === 0) {
+    console.log("No unprocessed historical data found. Backfill complete.");
+    process.exit(0);
+  }
+
+  const fileListString = filesToProcess.map(f => `- data/${f}`).join('\n');
+
+  promptPayload = `**TASK: Chronicle Historical Backfill (Batch)**
+You are helping backfill a 20-year archive of daily logs.
+Please process the following ${filesToProcess.length} specific JSON files:
+${fileListString}
+
+1. For EACH of the JSON files listed above, perform a Daily Synthesis.
+2. Your synthesis for each day must be a clear, detailed, and highly factual summary of the day, extracting key events, participants, and concrete actions. 
+3. Maximize your deep synthesis capabilities. Weave the factual events of each day into a cohesive narrative.
+4. Output your syntheses as ${filesToProcess.length} separate NEW markdown files in \`insights/daily/YYYY-MM-DD_insight.md\` (matching the date of each JSON file).`;
+  
   sourceRepo = "sources/github/dadersteg/second_brain_db";
 
 } else if (taskType === '--chronicle-weekly') {

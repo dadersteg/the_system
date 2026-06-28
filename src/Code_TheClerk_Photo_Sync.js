@@ -4,8 +4,103 @@
  * uploads them natively to Google Photos, and logs them in the Photo Register.
  */
 
+function runRetroactivePhotoSync() {
+  const query = "has:attachment (subject:[Instagram] OR subject:[Messenger] OR subject:[Telegram] OR subject:[WhatsApp]) from:adersteg.daniel@gmail.com -label:Photo_Extracted";
+  const startTime = new Date().getTime();
+  const maxExecutionTimeMs = 4 * 60 * 1000; // 4 minutes
+  let threadsProcessed = 0;
+  
+  let label;
+  try {
+    label = GmailApp.getUserLabelByName("Photo_Extracted");
+    if (!label) label = GmailApp.createLabel("Photo_Extracted");
+  } catch(e) {
+    console.warn("Failed to get/create label: " + e.message);
+    return;
+  }
+  
+  const photoRegisterId = "1XIuEjl85k_eF9F5HQJzZbyLoTNccQmAc9y9YMid9q0k"; 
+  let sheet = null;
+  try {
+    const ss = SpreadsheetApp.openById(photoRegisterId);
+    sheet = ss.getSheetByName("Table 1") || ss.getSheets()[1] || ss.getActiveSheet();
+  } catch(e) {
+    console.warn("Photo Register Sheet not accessible yet: " + e.message);
+  }
+
+  while (true) {
+    if (new Date().getTime() - startTime > maxExecutionTimeMs) {
+      console.log(`Approaching time limit. Processed ${threadsProcessed} threads. Run again to continue.`);
+      break;
+    }
+    
+    const threads = GmailApp.search(query, 0, 10);
+    if (threads.length === 0) {
+      console.log(`Finished retroactive sync. Processed ${threadsProcessed} threads in total.`);
+      break;
+    }
+    
+    for (let i = 0; i < threads.length; i++) {
+      // STRICT TIME CHECK inside the thread loop
+      if (new Date().getTime() - startTime > maxExecutionTimeMs) {
+        console.log(`Approaching time limit. Processed ${threadsProcessed} threads. Run again to continue.`);
+        return;
+      }
+
+      const thread = threads[i];
+      const messages = thread.getMessages();
+      
+      const uploadResults = _processAndUploadAttachments(messages);
+      const mediaItemsToCreate = uploadResults.mediaItemsToCreate;
+      const processedImages = uploadResults.processedImages;
+      
+      let urls = [];
+      if (mediaItemsToCreate.length > 0) {
+        urls = _batchCreateMediaItems(mediaItemsToCreate);
+      }
+        
+      if (sheet && processedImages.length > 0) {
+        let rowsToWrite = [];
+        let urlIndex = 0;
+        for (let m = 0; m < processedImages.length; m++) {
+          const img = processedImages[m];
+          let photoUrl = "";
+          if (img.isWhatsApp) {
+            photoUrl = "TBU";
+          } else {
+            photoUrl = urls[urlIndex] || "";
+            urlIndex++;
+          }
+          
+          rowsToWrite.push([
+            img.name,
+            "Gmail_Import",
+            img.date,
+            "", "", 
+            photoUrl,
+            img.analysis.category || "01 Private/05 Other",
+            img.analysis.purpose || "",
+            (img.analysis.activities || []).join(", "),
+            (img.analysis.entities || []).join(", "),
+            (img.analysis.text_found || []).join(", "),
+            img.analysis.vibe || "",
+            img.analysis.is_milestone || false
+          ]);
+        }
+
+        if (rowsToWrite.length > 0) {
+           sheet.getRange(sheet.getLastRow() + 1, 1, rowsToWrite.length, rowsToWrite[0].length).setValues(rowsToWrite);
+        }
+      }
+      Utilities.sleep(2000);
+      thread.addLabel(label);
+      threadsProcessed++;
+    }
+  }
+}
+
 function processGmailPhotos() {
-  const query = "has:attachment (subject:[Instagram] OR subject:[Messenger] OR subject:[Telegram]) from:adersteg.daniel@gmail.com -label:Photo_Extracted";
+  const query = "has:attachment (subject:[Instagram] OR subject:[Messenger] OR subject:[Telegram] OR subject:[WhatsApp]) from:adersteg.daniel@gmail.com -label:Photo_Extracted";
   const threads = GmailApp.search(query, 0, 10);
   
   if (threads.length === 0) return;
@@ -39,42 +134,51 @@ function processGmailPhotos() {
     const processedImages = uploadResults.processedImages;
     
     // 3. Batch Create Media Items
+    let urls = [];
     if (mediaItemsToCreate.length > 0) {
-      const urls = _batchCreateMediaItems(mediaItemsToCreate);
+      urls = _batchCreateMediaItems(mediaItemsToCreate);
+    }
       
-      // 4. Append to Photo Register (Batched)
-      if (sheet) {
-        let rowsToWrite = [];
-        for (let m = 0; m < processedImages.length; m++) {
-          const img = processedImages[m];
-          const photoUrl = urls[m] || ""; // Match by index
-          
-          rowsToWrite.push([
-            img.name,
-            "Gmail_Import",
-            img.date,
-            "", // Lat
-            "", // Lng
-            photoUrl,
-            img.analysis.category || "01 Private/05 Other",
-            img.analysis.purpose || "",
-            (img.analysis.activities || []).join(", "),
-            (img.analysis.entities || []).join(", "),
-            (img.analysis.text_found || []).join(", "),
-            img.analysis.vibe || "",
-            img.analysis.is_milestone || false
-          ]);
+    // 4. Append to Photo Register (Batched)
+    if (sheet && processedImages.length > 0) {
+      let rowsToWrite = [];
+      let urlIndex = 0;
+      for (let m = 0; m < processedImages.length; m++) {
+        const img = processedImages[m];
+        
+        let photoUrl = "";
+        if (img.isWhatsApp) {
+          photoUrl = "TBU";
+        } else {
+          photoUrl = urls[urlIndex] || "";
+          urlIndex++;
         }
+        
+        rowsToWrite.push([
+          img.name,
+          "Gmail_Import",
+          img.date,
+          "", // Lat
+          "", // Lng
+          photoUrl,
+          img.analysis.category || "01 Private/05 Other",
+          img.analysis.purpose || "",
+          (img.analysis.activities || []).join(", "),
+          (img.analysis.entities || []).join(", "),
+          (img.analysis.text_found || []).join(", "),
+          img.analysis.vibe || "",
+          img.analysis.is_milestone || false
+        ]);
+      }
 
         if (rowsToWrite.length > 0) {
            sheet.getRange(sheet.getLastRow() + 1, 1, rowsToWrite.length, rowsToWrite[0].length).setValues(rowsToWrite);
         }
-      } else {
-        console.log(`Processed ${processedImages.length} photos, but no sheet to log.`);
-      }
-      // Mandatory delay to respect Google Photos 'concurrent write request' quota
-      Utilities.sleep(2000);
+    } else {
+      console.log(`Processed ${processedImages.length} photos, but no sheet to log.`);
     }
+    // Mandatory delay to respect Google Photos 'concurrent write request' quota
+    Utilities.sleep(2000);
     
     // Tag thread to avoid double processing
     thread.addLabel(label);
@@ -209,30 +313,38 @@ function _processAndUploadAttachments(messages) {
           // Remove brackets and make it a clean sentence
           let cleanSubject = subject.replace(/\[|\]/g, "").replace(/\s+/g, " ").trim();
           let safeFilename = cleanSubject.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_") + ".jpg";
-
-          // 1. Upload bytes (get token)
-          const uploadToken = _uploadBytesToPhotos(att, safeFilename);
-          if (!uploadToken) continue;
+          
+          let isWhatsApp = cleanSubject.toLowerCase().includes("whatsapp");
+          let uploadToken = null;
+          
+          if (!isWhatsApp) {
+            // 1. Upload bytes (get token)
+            uploadToken = _uploadBytesToPhotos(att, safeFilename);
+            if (!uploadToken) continue;
+          }
 
           // 2. Analyze with Gemini
           const analysis = _analyzePhotoWithGemini(att, { subject: subject, sender: sender, date: date, body: body });
 
-          // Strip URLs and programmatic brackets to prevent Google Photos from silently dropping the metadata as 'spam'
-          let cleanBody = body ? body.replace(/https?:\/\/[^\s]+/g, "[Link removed]").substring(0, 400).trim() : "";
-          let photoDescription = `Source: ${cleanSubject}\nDate: ${date}\nMessage: ${cleanBody}`;
+          if (!isWhatsApp) {
+            // Strip URLs and programmatic brackets to prevent Google Photos from silently dropping the metadata as 'spam'
+            let cleanBody = body ? body.replace(/https?:\/\/[^\s]+/g, "[Link removed]").substring(0, 400).trim() : "";
+            let photoDescription = `Source: ${cleanSubject}\nDate: ${date}\nMessage: ${cleanBody}`;
 
-          mediaItemsToCreate.push({
-            description: photoDescription,
-            simpleMediaItem: {
-              uploadToken: uploadToken,
-              fileName: safeFilename
-            }
-          });
+            mediaItemsToCreate.push({
+              description: photoDescription,
+              simpleMediaItem: {
+                uploadToken: uploadToken,
+                fileName: safeFilename
+              }
+            });
+          }
 
           processedImages.push({
             name: safeFilename,
             date: date,
-            analysis: analysis
+            analysis: analysis,
+            isWhatsApp: isWhatsApp
           });
 
           // Small delay to avoid hammering the upload API
