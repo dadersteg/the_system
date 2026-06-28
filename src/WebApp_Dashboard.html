@@ -3,7 +3,7 @@
  * @file WebApp_Dashboard.html
  * @description Premium web dashboard UI providing a central hub for tasks, health, and system management.
  * 
- * @version 1.1.3
+ * @version 1.1.4
  * @last_modified 2026-06-21
  * @modified_by Jules
  * 
@@ -12,6 +12,7 @@
  * - 1.1.1: Polished .log-clear UI element with premium micro-design properties.
  * - 1.1.2: Modernized #breathe-mode-select with premium micro-design properties and 44px touch target.
  * - 1.1.3: Modernized intel cards in Reflection section with premium micro-design properties and 44px touch target.
+ * - 1.1.4: Modernized .legacy-card with premium micro-design properties and 44px touch target.
  */
 -->
 <!DOCTYPE html>
@@ -696,8 +697,28 @@
       padding: 24px;
       margin-bottom: 20px;
       box-shadow: var(--card-shadow);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      min-height: 44px;
+      width: 100%;
     }
-    .legacy-card-title { font-family: 'Google Sans', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.3px; }
+
+    .legacy-card:hover {
+      background: rgba(241, 245, 249, 0.6);
+      border-color: rgba(99, 102, 241, 0.15);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .legacy-card:hover {
+        background: rgba(30, 41, 59, 0.4);
+        border-color: rgba(129, 140, 248, 0.2);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    .legacy-card-title { font-family: 'Google Sans', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.3px; transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .legacy-card:hover .legacy-card-title { color: var(--color-accent); }
     .legacy-card-desc { font-size: 14px; color: var(--color-text-muted); margin-bottom: 20px; line-height: 1.6; }
     
     /* Buttons */
@@ -1500,7 +1521,7 @@
     <div id="sec-tasks" class="section" style="padding-bottom: 100px;">
       <div class="header-area"><h1>Daily Tasks</h1></div>
       
-      <div class="legacy-card" style="margin-bottom: 32px; background: linear-gradient(145deg, var(--color-surface), rgba(255,255,255,0.4)); backdrop-filter: var(--glass-blur);">
+      <div class="legacy-card" style="margin-bottom: 32px;">
         <div class="legacy-card-title">Execution Gems</div>
         <div class="quick-links">
           <a href="https://gemini.google.com/gem/f982f396b0e5" target="_blank" class="quick-link-chip" title="Task Orchestrator">Task Master</a>
