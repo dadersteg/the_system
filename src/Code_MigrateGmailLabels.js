@@ -1,13 +1,31 @@
+/**
+ * @file src/Code_MigrateGmailLabels.js
+ * @description Migrates and consolidates specific private Gmail labels to standardize folder taxonomy.
+ *
+ * @version 1.0.0
+ * @last_modified 2026-06-28
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.0: Initial JSDoc implementation and modernization of variable declarations (var to const/let).
+ */
+
+/**
+ * Migrates and consolidates specific private Gmail labels.
+ * Renames "CMA" to "Carry Martens Adersteg" and merges "2019" taxes into "19/20 UK Taxes".
+ *
+ * @returns {void}
+ */
 function migratePrivateGmailLabels() {
   // 1. Rename CMA to Carry Martens Adersteg
-  var oldCmaName = "01 Private/05 Other/02 Relationships/CMA";
-  var newCmaName = "01 Private/05 Other/02 Relationships/Carry Martens Adersteg";
+  const oldCmaName = "01 Private/05 Other/02 Relationships/CMA";
+  const newCmaName = "01 Private/05 Other/02 Relationships/Carry Martens Adersteg";
   
-  var cmaLabel = GmailApp.getUserLabelByName(oldCmaName);
+  const cmaLabel = GmailApp.getUserLabelByName(oldCmaName);
   if (cmaLabel) {
-    var newLabel = GmailApp.getUserLabelByName(newCmaName) || GmailApp.createLabel(newCmaName);
-    var threads = cmaLabel.getThreads();
-    for (var i = 0; i < threads.length; i++) {
+    const newLabel = GmailApp.getUserLabelByName(newCmaName) || GmailApp.createLabel(newCmaName);
+    const threads = cmaLabel.getThreads();
+    for (let i = 0; i < threads.length; i++) {
       threads[i].addLabel(newLabel);
       threads[i].removeLabel(cmaLabel);
     }
@@ -18,17 +36,17 @@ function migratePrivateGmailLabels() {
   }
   
   // 2. Merge 2019 into 19/20 UK Taxes
-  var oldTaxName = "01 Private/04 Finances/Tax/2019";
-  var newTaxName = "01 Private/04 Finances/Tax/19/20 UK Taxes";
+  const oldTaxName = "01 Private/04 Finances/Tax/2019";
+  const newTaxName = "01 Private/04 Finances/Tax/19/20 UK Taxes";
   
-  var oldTaxLabel = GmailApp.getUserLabelByName(oldTaxName);
-  var newTaxLabel = GmailApp.getUserLabelByName(newTaxName);
+  const oldTaxLabel = GmailApp.getUserLabelByName(oldTaxName);
+  let newTaxLabel = GmailApp.getUserLabelByName(newTaxName);
   
   if (oldTaxLabel) {
     if (!newTaxLabel) newTaxLabel = GmailApp.createLabel(newTaxName);
     
-    var threads = oldTaxLabel.getThreads();
-    for (var i = 0; i < threads.length; i++) {
+    const threads = oldTaxLabel.getThreads();
+    for (let i = 0; i < threads.length; i++) {
       threads[i].addLabel(newTaxLabel);
       threads[i].removeLabel(oldTaxLabel);
     }
