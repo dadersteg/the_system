@@ -688,7 +688,7 @@
 
     /* Legacy Cards (Pipelines/Admin) */
     .legacy-card {
-      background: var(--color-surface);
+      background: rgba(241, 245, 249, 0.4);
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--color-border);
@@ -696,9 +696,31 @@
       padding: 24px;
       margin-bottom: 20px;
       box-shadow: var(--card-shadow);
+      min-height: 44px;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .legacy-card-title { font-family: 'Google Sans', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.3px; }
-    .legacy-card-desc { font-size: 14px; color: var(--color-text-muted); margin-bottom: 20px; line-height: 1.6; }
+
+    @media (prefers-color-scheme: dark) {
+      .legacy-card {
+        background: rgba(30, 41, 59, 0.4);
+      }
+    }
+
+    .legacy-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+      background: rgba(241, 245, 249, 0.6);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .legacy-card:hover {
+        background: rgba(30, 41, 59, 0.6);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    .legacy-card-title { font-family: 'Google Sans', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.5px; color: var(--color-text); }
+    .legacy-card-desc { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--color-text-muted); margin-bottom: 20px; line-height: 1.6; letter-spacing: 0.2px; }
     
     /* Buttons */
     .btn {
