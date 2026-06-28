@@ -264,4 +264,5 @@ async function run() {
 }
 
 console.log(`Starting Ingestion Bridge System Monitor (interval: ${CHECK_INTERVAL_MS / 60000} mins)...`);
-run();
+// Delay the initial run by 15 seconds to allow other PM2 apps to finish restarting
+setTimeout(run, 15000);
