@@ -2,9 +2,9 @@
 # Second Brain Pipeline: Runs hourly to consolidate data, sync to GitHub, and trigger Jules synthesis.
 
 # 1. Run consolidation script
-echo "[$(date)] Step 1: Consolidating Second Brain Data..."
+echo "[$(date)] Step 1: Running Daily Second Brain Sync..."
 cd "/Users/daniel/Documents/AGY/the_system" || exit 1
-/Users/daniel/Developer/AGY_caches/the_system/my_venv/bin/python3 scripts/utils/build_second_brain.py
+/Users/daniel/Developer/AGY_caches/the_system/my_venv/bin/python3 scripts/utils/daily_second_brain_sync.py
 
 # 2. Sync Database to GitHub
 echo "[$(date)] Step 2: Synchronizing Second Brain DB to GitHub..."
@@ -26,8 +26,8 @@ else
 fi
 
 # 3. Trigger Jules synthesis
-echo "[$(date)] Step 3: Triggering Jules Hourly Synthesis..."
+echo "[$(date)] Step 3: Triggering Jules Daily Synthesis..."
 cd "/Users/daniel/Documents/AGY/the_system" || exit 1
-node scripts/maintenance/trigger_jules.js --chronicle
+node scripts/maintenance/trigger_jules.js --chronicle-daily
 
 echo "[$(date)] Second Brain Pipeline Complete."

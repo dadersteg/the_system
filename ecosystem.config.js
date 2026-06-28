@@ -103,10 +103,19 @@ module.exports = {
       name: "second-brain-sync",
       script: "scripts/utils/second_brain_sync.sh",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "0 * * * *", // Runs every hour
+      cron_restart: "59 23 * * *", // Runs daily at 23:59
       autorestart: false,
       out_file: "logs/second_brain_sync_out.log",
       error_file: "logs/second_brain_sync_err.log"
+    },
+    {
+      name: "second-brain-weekly-sync",
+      script: "scripts/utils/second_brain_weekly_sync.sh",
+      cwd: "/Users/daniel/Documents/AGY/the_system",
+      cron_restart: "59 23 * * 0", // Runs weekly on Sunday at 23:59
+      autorestart: false,
+      out_file: "logs/second_brain_weekly_sync_out.log",
+      error_file: "logs/second_brain_weekly_sync_err.log"
     },
     {
       name: "trigger-jules-backend",
