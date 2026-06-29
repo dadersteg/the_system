@@ -181,17 +181,52 @@ async def inject_text_and_enter(text: str) -> str:
             
             script = f"""
             (function() {{
+                const text = {safe_text};
+                
+                // 1. Try to handle ask_question modal
+                const submitBtn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.trim() === 'Submit');
+                if (submitBtn) {{
+                    const skipBtn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.trim() === 'Skip');
+                    if (text.trim().toLowerCase() === 'skip' && skipBtn) {{
+                        skipBtn.click();
+                        return "Submitted";
+                    }}
+                    
+                    const num = parseInt(text.trim());
+                    const options = Array.from(document.querySelectorAll('input[type="radio"], input[type="checkbox"]'));
+                    
+                    if (!isNaN(num) && num > 0 && num <= options.length) {{
+                        options[num - 1].click();
+                        submitBtn.click();
+                        return "Submitted";
+                    }}
+                    
+                    const textInputs = Array.from(document.querySelectorAll('textarea, input[type="text"]'));
+                    const visibleInput = textInputs.find(i => i.offsetParent !== null && !i.disabled);
+                    if (visibleInput) {{
+                        visibleInput.focus();
+                        document.execCommand('insertText', false, text);
+                        submitBtn.click();
+                        return "Submitted";
+                    }}
+                }}
+
+                // 2. Fallback to normal chat input
                 const inputs = Array.from(document.querySelectorAll('[aria-label="Message input"]'));
                 const input = inputs[0]; 
                 if (!input) return "Missing chat input";
                 input.focus();
-                document.execCommand('insertText', false, {safe_text});
+                document.execCommand('insertText', false, text);
                 return "Ready";
             }})();
             """
             await ws.send(json.dumps({"id": 1, "method": "Runtime.evaluate", "params": {"expression": script, "returnByValue": True}}))
             res = json.loads(await ws.recv())
-            if res.get("result", {}).get("result", {}).get("value") != "Ready":
+            res_val = res.get("result", {}).get("result", {}).get("value")
+            
+            if res_val == "Submitted":
+                return "Success"
+            elif res_val != "Ready":
                 return "Missing chat input. Please ensure a chat tab is active."
                 
             await asyncio.sleep(0.2)
