@@ -137,7 +137,8 @@ module.exports = {
       autorestart: false,
       cron_restart: "*/15 * * * *", // Check/run every 15 minutes
       env: {
-        JULES_API_KEY: localEnv.JULES_API_KEY || ""
+        JULES_API_KEY: localEnv.JULES_API_KEY || "",
+        GH_TOKEN: "***REMOVED***"
       },
       out_file: "logs/trigger_jules_backfill_out.log",
       error_file: "logs/trigger_jules_backfill_err.log"
