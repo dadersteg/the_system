@@ -1,9 +1,21 @@
 /**
- * THE SYSTEM: GMAIL LABEL EXPORTER
- * Fetches all Gmail labels, populates the Label Management sheet tab,
- * and exports a JSON file to the main Drive workspace for agent context.
+ * @file src/Code_ListLabels.js
+ * @description THE SYSTEM: GMAIL LABEL EXPORTER. Fetches all Gmail labels, populates the Label Management sheet tab, and exports a JSON file to the main Drive workspace for agent context.
+ * @version 1.0.1
+ * @last_modified 2026-06-19
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.1: Added JSDoc header and comprehensive docstrings for functions. Cleaned up legacy variables and code.
+ * - 1.0.0: Initial implementation.
  */
 
+/**
+ * Fetches all Gmail labels, writes them to the Label Management sheet tab,
+ * and exports a JSON configuration to the configured main Workspace folder.
+ *
+ * @returns {void}
+ */
 function updateLabelList() {
 const ss = getMasterSpreadsheet();
   
@@ -51,11 +63,11 @@ const ss = getMasterSpreadsheet();
   sheet.autoResizeColumns(1, tableData[0].length);
   
   // 3. Export to Google Drive as JSON
-  const TARGET_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
+  const targetFolderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID; // Main Docs Workspace
   const fileName = "Actual_Gmail_Labels.json";
   
   try {
-    const targetFolder = DriveApp.getFolderById(TARGET_FOLDER_ID);
+    const targetFolder = DriveApp.getFolderById(targetFolderId);
     const jsonBlob = Utilities.newBlob(JSON.stringify(jsonOutput, null, 2), "application/json", fileName);
     
     const existingFiles = targetFolder.getFilesByName(fileName);
@@ -71,8 +83,11 @@ const ss = getMasterSpreadsheet();
 }
 
 /**
- * Cleans up legacy/messed up labels starting with '02 Work/01 Employment/' and
- * creates the correct flat WOS Gmail labels if missing.
+ * Synchronizes and aligns current Gmail labels with the organizational taxonomy.
+ * Reads the taxonomy configuration JSON from Drive, creates missing labels,
+ * and calls the migration helper for hallucinated duplications.
+ *
+ * @returns {void}
  */
 function cleanAndCreateGmailLabels() {
   const isPmt = isPmtAccount();
@@ -143,6 +158,8 @@ function cleanAndCreateGmailLabels() {
  * Safely migrates threads from duplicate Gmail labels (those with a 6-digit prefix structure,
  * e.g., starting with "01 00 00 Private" matching the Concat Path) to the correct 2-digit label 
  * (e.g., "01 Private" matching the Concat Label), and then deletes the duplicate label.
+ *
+ * @returns {void}
  */
 function migrateDuplicateGmailLabels() {
   const isPmt = typeof isPmtAccount === 'function' ? isPmtAccount() : false;
@@ -201,167 +218,4 @@ function migrateDuplicateGmailLabels() {
   });
   
   console.log(`Duplicate Gmail labels migration complete. Total migrated: ${migratedCount}`);
-}
-
-/**
- * Emergency Recovery Script: Restores lost Gmail labels caused by the migration pagination bug.
- * Reads the historical 'Execution Log' and 'Execution Log - Retro' to find the proposed labels 
- * and re-applies them without using any LLM tokens.
- */
-function recoverLostLabelsFromLog() {
-  console.log("Starting Emergency Label Recovery from Logs...");
-  
-  const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
-  const isPmt = typeof isPmtAccount === 'function' ? isPmtAccount() : false;
-  
-  // Hardcoded GIDs based on environment
-  const targetGids = isPmt ? ["2131515996"] : ["2131515996", "67786861"];
-  
-  let recoveredCount = 0;
-
-  for (const gid of targetGids) {
-    const sheet = ss.getSheets().find(s => s.getSheetId().toString() === gid);
-    if (!sheet) {
-      console.warn(`Could not find sheet with GID ${gid}`);
-      continue;
-    }
-    
-    console.log(`Processing recovery for sheet GID: ${gid}`);
-    const data = sheet.getDataRange().getValues();
-    if (data.length <= 1) continue;
-    
-    // Header row
-    const header = data[0];
-    let linkColIdx = header.indexOf("Link");
-    let proposedColIdx = header.indexOf("Proposed Recovery Labels");
-    
-    if (linkColIdx === -1) linkColIdx = 8; // Fallback
-    
-    if (proposedColIdx === -1) {
-      console.warn(`Sheet GID ${gid} does not have a 'Proposed Recovery Labels' column. Run cleanExecutionLogLabels first!`);
-      continue;
-    }
-    
-    // Iterate backwards (newest first)
-    for (let i = data.length - 1; i >= 1; i--) {
-      const row = data[i];
-      const proposedLabelsStr = row[proposedColIdx]; 
-      const linkStr = row[linkColIdx];
-      
-      if (!linkStr || !proposedLabelsStr) continue;
-      
-      // Extract thread ID from the link: https://mail.google.com/mail/u/0/#all/[THREAD_ID]
-      const match = linkStr.match(/#all\/([^&]+)/);
-      if (!match) continue;
-      
-      const threadId = match[1];
-      
-      try {
-        const thread = GmailApp.getThreadById(threadId);
-        if (!thread) continue;
-        
-        const currentLabels = thread.getLabels().map(l => l.getName());
-        
-        const targetLabels = proposedLabelsStr.split(',').map(l => l.trim()).filter(l => l);
-        
-        let needsRecovery = false;
-        for (const target of targetLabels) {
-          if (!currentLabels.includes(target) && target !== "99 Label_Reviewed" && target !== "99 To be deleted" && target !== "00 Manual Review") {
-            needsRecovery = true;
-            
-            let gLabel = GmailApp.getUserLabelByName(target);
-            if (!gLabel) {
-              gLabel = GmailApp.createLabel(target);
-            }
-            thread.addLabel(gLabel);
-            console.log(`[RECOVERED] Thread ${threadId} restored label: ${target}`);
-          }
-        }
-        
-        if (needsRecovery) {
-          recoveredCount++;
-        }
-        
-      } catch (e) {
-        // Ignore threads that might have been permanently deleted
-        console.warn(`Could not process thread ${threadId}: ${e.message}`);
-      }
-    }
-  }
-  
-  console.log(`Recovery complete. Total threads successfully restored: ${recoveredCount}`);
-}
-
-/**
- * Utility Script: Cleans the Execution Logs by translating any 6-digit hallucinated labels 
- * into the correct 2-digit Gmail labels. Writes the result to a new "Proposed Recovery Labels"
- * column without touching the original "Final Label Set" column.
- */
-function cleanExecutionLogLabels() {
-  console.log("Starting Execution Log non-destructive cleanup...");
-  
-  const ss = SpreadsheetApp.openById(SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID);
-  const isPmt = typeof isPmtAccount === 'function' ? isPmtAccount() : false;
-  
-  // Hardcoded GIDs based on environment
-  const targetGids = isPmt ? ["2131515996"] : ["2131515996", "67786861"];
-  
-  function toTwoDigitFormat(labelPath) {
-    return labelPath.split('/').map(segment => {
-      let match;
-      if ((match = segment.match(/^(\d{2}) 00 00 (.+)$/))) {
-        return `${match[1]} ${match[2].trim()}`;
-      } else if ((match = segment.match(/^\d{2} (\d{2}) 00 (.+)$/))) {
-        return `${match[1]} ${match[2].trim()}`;
-      } else if ((match = segment.match(/^\d{2} \d{2} (\d{2}) (.+)$/))) {
-        return `${match[1]} ${match[2].trim()}`;
-      }
-      return segment.trim();
-    }).join('/');
-  }
-
-  for (const gid of targetGids) {
-    const sheet = ss.getSheets().find(s => s.getSheetId().toString() === gid);
-    if (!sheet) {
-      console.warn(`Could not find sheet with GID ${gid}`);
-      continue;
-    }
-    
-    console.log(`Cleaning sheet GID: ${gid}`);
-    const data = sheet.getDataRange().getValues();
-    if (data.length <= 1) continue;
-    
-    const header = data[0];
-    let finalLabelIdx = header.indexOf("Final Label Set");
-    if (finalLabelIdx === -1) finalLabelIdx = 7; // Fallback
-    
-    // Check if Proposed Recovery Labels column exists, if not, create it
-    let proposedColIdx = header.indexOf("Proposed Recovery Labels");
-    if (proposedColIdx === -1) {
-      proposedColIdx = header.length;
-      sheet.getRange(1, proposedColIdx + 1).setValue("Proposed Recovery Labels");
-      sheet.getRange(1, proposedColIdx + 1).setFontWeight("bold");
-    }
-    
-    let updateCount = 0;
-    // Prepare a batch of values to write
-    const writeData = [];
-    
-    for (let i = 1; i < data.length; i++) {
-      const finalLabels = data[i][finalLabelIdx];
-      let proposedLabels = "";
-      
-      if (typeof finalLabels === 'string' && finalLabels) {
-        proposedLabels = finalLabels.split(',').map(l => toTwoDigitFormat(l.trim())).join(', ');
-      }
-      
-      writeData.push([proposedLabels]);
-      if (proposedLabels) updateCount++;
-    }
-    
-    // Write the proposed labels to the spreadsheet in one batch
-    sheet.getRange(2, proposedColIdx + 1, writeData.length, 1).setValues(writeData);
-    
-    console.log(`Sheet GID ${gid} cleanup complete. Wrote ${updateCount} proposed labels.`);
-  }
 }
