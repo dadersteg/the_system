@@ -929,6 +929,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
 
 /**
  * Aggregates calendar event hours for the next 30 days to compute remaining schedule capacity.
+ * Checks both Private and PMT calendars.
  * 
  * @param {Date} [targetDate] Base date to start capacity check from. Defaults to now.
  * @returns {Object} Capacity hours mapped by date string key (YYYY-MM-DD).
@@ -936,22 +937,35 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
 function getCalendarCapacity(targetDate) {
   const now = targetDate || new Date();
   const endDate = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
-  try {
-    const events = CalendarApp.getDefaultCalendar().getEvents(now, endDate);
-    const capacityMap = {};
-    events.forEach(e => {
-       const d = Utilities.formatDate(e.getStartTime(), "Europe/London", "yyyy-MM-dd");
-       if (!capacityMap[d]) capacityMap[d] = 0;
-       capacityMap[d] += (e.getEndTime().getTime() - e.getStartTime().getTime()) / 3600000;
-    });
-    return capacityMap;
-  } catch(e) {
-    return { error: "Could not fetch calendar" };
-  }
+  const capacityMap = {};
+  
+  const calendarsToCheck = [
+    "adersteg.daniel@gmail.com",
+    "daniel@playmetech.net"
+  ];
+
+  calendarsToCheck.forEach(calId => {
+    try {
+      const calendar = CalendarApp.getCalendarById(calId);
+      if (calendar) {
+        const events = calendar.getEvents(now, endDate);
+        events.forEach(e => {
+           const d = Utilities.formatDate(e.getStartTime(), "Europe/London", "yyyy-MM-dd");
+           if (!capacityMap[d]) capacityMap[d] = 0;
+           capacityMap[d] += (e.getEndTime().getTime() - e.getStartTime().getTime()) / 3600000;
+        });
+      }
+    } catch (e) {
+      console.warn("Could not fetch calendar capacity for: " + calId, e.message);
+    }
+  });
+
+  return Object.keys(capacityMap).length > 0 ? capacityMap : { error: "Could not fetch calendars" };
 }
 
 /**
  * Retrieves list of active calendar events scheduled for the current day.
+ * Checks both Private and PMT calendars.
  * 
  * @param {Date} [targetDate] Date to fetch events for. Defaults to now.
  * @returns {Object[]} Calendar event objects matching schema (title, start, end, isAllDay).
@@ -961,29 +975,36 @@ function getTodayCalendarEvents(targetDate) {
   const yyyy = Utilities.formatDate(now, "Europe/London", "yyyy");
   const MM = Utilities.formatDate(now, "Europe/London", "MM");
   const dd = Utilities.formatDate(now, "Europe/London", "dd");
+  
+  const startOfDay = new Date(yyyy, MM - 1, dd, 0, 0, 0);
+  const endOfDay = new Date(yyyy, MM - 1, dd, 23, 59, 59);
 
-  const approxStart = new Date(`${yyyy}-${MM}-${dd}T00:00:00Z`);
-  const approxEnd = new Date(`${yyyy}-${MM}-${dd}T23:59:59Z`);
+  let mergedEvents = [];
+  const calendarsToCheck = [
+    "adersteg.daniel@gmail.com",
+    "daniel@playmetech.net"
+  ];
 
-  const startOffset = Utilities.formatDate(approxStart, "Europe/London", "XXX");
-  const endOffset = Utilities.formatDate(approxEnd, "Europe/London", "XXX");
+  calendarsToCheck.forEach(calId => {
+    try {
+      const calendar = CalendarApp.getCalendarById(calId);
+      if (calendar) {
+        const events = calendar.getEvents(startOfDay, endOfDay);
+        const mapped = events.map(e => ({
+          title: e.getTitle(),
+          start: Utilities.formatDate(e.getStartTime(), "Europe/London", "HH:mm"),
+          end: Utilities.formatDate(e.getEndTime(), "Europe/London", "HH:mm"),
+          isAllDay: e.isAllDayEvent(),
+          source: calId
+        }));
+        mergedEvents = mergedEvents.concat(mapped);
+      }
+    } catch(e) {
+      console.warn("Could not fetch today's events for: " + calId, e.message);
+    }
+  });
 
-  const startStr = `${yyyy}-${MM}-${dd}T00:00:00${startOffset}`;
-  const endStr = `${yyyy}-${MM}-${dd}T23:59:59${endOffset}`;
-
-  const startOfDay = new Date(startStr);
-  const endOfDay = new Date(endStr);
-  try {
-    const events = CalendarApp.getDefaultCalendar().getEvents(startOfDay, endOfDay);
-    return events.map(e => ({
-       title: e.getTitle(),
-       start: Utilities.formatDate(e.getStartTime(), "Europe/London", "HH:mm"),
-       end: Utilities.formatDate(e.getEndTime(), "Europe/London", "HH:mm"),
-       isAllDay: e.isAllDayEvent()
-    }));
-  } catch(e) {
-    return [];
-  }
+  return mergedEvents;
 }
 
 /**

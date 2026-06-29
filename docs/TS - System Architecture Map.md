@@ -80,8 +80,10 @@ A transversal project or goal exists across four distinct overlay tiers:
 1.  **Strict Storage:** Physically located within a strict `05 Projects` folder in Google Drive.
 2.  **AI Reasoning:** As a **NotebookLM** notebook (created on an as-needed basis).
 3.  **Workspace Coordination:** As a **Google Workspace Project** (created on an as-needed basis). This Gemini-powered feature serves as the centralized hub for files, emails, and calendar events, actively eliminating the need to create messy Drive shortcuts.
-4.  **Execution Environment:** As an **Antigravity Agent Project**. Antigravity projects are transversal execution environments. They can bind multiple physical local directories (e.g., `/AGY/the_system` + `/Developer/some_script`) into a single conversational agent context.
-
+4.  **Execution Environment:** As an **Antigravity Agent Project**. Antigravity projects are transversal execution environments that act as isolated sandboxes. 
+    *   **Dual Mounting:** They can bind multiple physical local directories (e.g., `/AGY/finance` + `/Developer/finance`) into a single conversational agent context.
+    *   **LOS Prefixing:** Project names in the Antigravity UI must use the strict LOS prefix (e.g., `01 04 00 Finance`) to visually enforce the taxonomy without breaking underlying physical `snake_case` folder paths.
+    *   **Scheduled Tasks:** Automated sidecars and scheduled tasks must be routed to specific Project IDs to prevent conversation bloat in the sidebar, matching the execution context to the appropriate domain (or the AGY catch-all).
 ### 4.2 Base Buckets vs. Specific Overlays
 To facilitate transversal access without breaking the folder taxonomy, all Overlays (Google Keep, NotebookLM, Workspace Projects, and Antigravity Projects) strictly follow the taxonomy nomenclature:
 *   **Base Buckets (L2 Taxonomy Mapping):** For broad, ad-hoc capture and analysis, overlays should be created as high-level "Base Buckets" mapping directly to L2 taxonomy nodes (e.g., `01 01 00 Personal Admin` or `02 01 00 Employment`). This unified approach applies equally to Google Keep labels, NotebookLM notebooks, and Workspace Projects.

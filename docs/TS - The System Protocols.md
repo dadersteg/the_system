@@ -212,9 +212,12 @@ NotebookLM and the Gemini Web App operate on a shared "Unified Notebook" infrast
 *   **Identity Rule:** Notebooks are tied to the Google account. You must switch browser profiles to ensure the correct Notebook context (Private vs PMT) is loaded.
 
 ### 7.3. The Execution Engine (Antigravity)
-*   Antigravity operates locally on the Mac mini across the synced `AGY` workspace and the unsynced `Developer` workspace.
-*   It is identity-agnostic locally but enforces the PMT vs Private boundaries remotely via targeted APIs and MCPs.
-
+*   **The Engine:** Antigravity operates locally on the Mac mini across the synced `AGY` workspace and the unsynced `Developer` workspace. It is identity-agnostic locally but enforces boundaries remotely via targeted APIs and MCPs.
+*   **Isolated Sandboxes (Projects):** In the UI, Projects are transversal execution environments that act as isolated sandboxes to limit blast radius (e.g., separating `Finance` from `The System`).
+    *   **Dual Mounting:** Domain projects explicitly mount both the synced operational folder (e.g., `AGY/finance`) and the unsynced developer folder (e.g., `Developer/finance`), allowing agents to read docs and write code seamlessly without polluting Drive.
+    *   **LOS Naming:** Project names in the Antigravity UI must use the strict LOS prefix (e.g., `01 04 00 Finance`) to visually map to the taxonomy without breaking physical `snake_case` folder paths.
+    *   **The Omniscient Catch-All:** A master `AGY` project exists to provide omniscient access to both `/Documents/AGY/` and `/Developer/` for cross-domain analysis.
+    *   **Scheduled Tasks:** Automated sidecars and scheduled tasks must be routed to specific Project IDs to prevent conversation bloat in the sidebar.
 ### 7.4. The "LLM vs. Human" Folder Duality Protocol
 The use of `snake_case` in local Mac Mini workspaces (like `agy_pmt`) is a deliberate design choice to differentiate LLM-friendly CLI environments from human-friendly Google Drive environments.
 *   **Local Workspaces:** Folders intended for heavy LLM or terminal interaction MUST use `snake_case` and omit spacing (e.g., `01_playmetech_admin`).
