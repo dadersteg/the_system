@@ -225,37 +225,49 @@ function scheduleTasksToCalendar(tasks, targetDate) {
         if (proposedEnd > now) {
            // --- COLLISION DETECTION ---
            let hasCollision = false;
-           const response = Calendar.Events.list('primary', {
-             timeMin: proposedStart.toISOString(),
-             timeMax: proposedEnd.toISOString(),
-             singleEvents: true,
-             maxResults: 50
-           });
-           const overlappingEvents = response.items || [];
+           const calendarsToCheck = [
+             "adersteg.daniel@gmail.com",
+             "daniel@playmetech.net"
+           ];
            
-           for (const oe of overlappingEvents) {
-              if (oe.start.date) continue; // All day event
-              if (oe.summary && oe.summary.startsWith("[TS] ")) continue;
-              if (oe.transparency === 'transparent') continue; // Free event
+           for (const calId of calendarsToCheck) {
+              if (hasCollision) break;
               
-              const oeStart = new Date(oe.start.dateTime).getTime();
-              const oeEnd = new Date(oe.end.dateTime).getTime();
-              
-              // Only trigger collision if the overlap is substantial (e.g. > 1 minute)
-              // to avoid edge cases where events end exactly at the start minute of the next.
-              if (oeEnd <= proposedStart.getTime() + 60000 || 
-                  oeStart >= proposedEnd.getTime() - 60000) {
-                 continue;
+              try {
+                 const response = Calendar.Events.list(calId, {
+                   timeMin: proposedStart.toISOString(),
+                   timeMax: proposedEnd.toISOString(),
+                   singleEvents: true,
+                   maxResults: 50
+                 });
+                 const overlappingEvents = response.items || [];
+                 
+                 for (const oe of overlappingEvents) {
+                    if (oe.start.date) continue; // All day event
+                    if (oe.summary && oe.summary.startsWith("[TS] ")) continue;
+                    if (oe.transparency === 'transparent') continue; // Free event
+                    
+                    const oeStart = new Date(oe.start.dateTime).getTime();
+                    const oeEnd = new Date(oe.end.dateTime).getTime();
+                    
+                    // Only trigger collision if the overlap is substantial (e.g. > 1 minute)
+                    if (oeEnd <= proposedStart.getTime() + 60000 || 
+                        oeStart >= proposedEnd.getTime() - 60000) {
+                       continue;
+                    }
+                    
+                    if (task.rawLine && task.rawLine.toLowerCase().includes(oe.summary.toLowerCase())) {
+                       console.log(`Collision bypassed: AI explicitly scheduled "${task.title}" during "${oe.summary}".`);
+                       continue;
+                    }
+                    
+                    console.log(`Collision detected with "${oe.summary}" on calendar ${calId}. Skipping ${task.title}.`);
+                    hasCollision = true;
+                    break;
+                 }
+              } catch (e) {
+                 console.warn("Could not check collisions for calendar: " + calId, e.message);
               }
-              
-              if (task.rawLine && task.rawLine.toLowerCase().includes(oe.summary.toLowerCase())) {
-                 console.log(`Collision bypassed: AI explicitly scheduled "${task.title}" during "${oe.summary}".`);
-                 continue;
-              }
-              
-              console.log(`Collision detected: AI timebox "${task.title}" overlaps with real meeting "${oe.summary}". Skipping.`);
-              hasCollision = true;
-              break;
            }
            
            if (!hasCollision) {
