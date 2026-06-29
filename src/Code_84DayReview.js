@@ -25,8 +25,8 @@ function runQuarterlyReview() {
 
   let recentReflections = "";
   try {
-     recentReflections += DriveApp.getFileById(SYSTEM_CONFIG.DOCS.VANTAGE_LOG_ID).getBlob().getDataAsString() + "\n\n";
-     recentReflections += DriveApp.getFileById(SYSTEM_CONFIG.DOCS.RECENT_REFLECTIONS_ID).getBlob().getDataAsString();
+     recentReflections += getSafeDocText(SYSTEM_CONFIG.DOCS.VANTAGE_LOG_ID) + "\n\n";
+     recentReflections += getSafeDocText(SYSTEM_CONFIG.DOCS.RECENT_REFLECTIONS_ID);
   } catch(e) {
      console.warn("Could not fetch reflection logs:", e.message);
   }
@@ -61,8 +61,8 @@ function runQuarterlyReview() {
   try {
      const fileId = SYSTEM_CONFIG.DOCS.TASK_MASTER_QUARTERLY_PROMPT_ID;
      if (!fileId) throw new Error("TASK_MASTER_QUARTERLY_PROMPT_ID is not configured in SYSTEM_CONFIG.");
-     const file = DriveApp.getFileById(fileId);
-     systemPrompt = processPromptText(file.getBlob().getDataAsString());
+     systemPrompt = getSafeDocText(fileId);
+     if (!systemPrompt) throw new Error("System prompt is empty or could not be loaded.");
   } catch(e) {
      console.error("Failed to load 84-Day prompt from Drive:", e.message);
      return;
