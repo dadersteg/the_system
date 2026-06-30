@@ -624,7 +624,7 @@
     .page-info { font-size: 13px; color: var(--color-text-muted); font-weight: 500; }
     
     .page-btn {
-      background: var(--color-surface);
+      background: rgba(241, 245, 249, 0.4);
       border: 1px solid var(--color-border);
       border-radius: 10px;
       padding: 0 16px;
@@ -634,7 +634,7 @@
       align-items: center;
       justify-content: center;
       font-size: 14px;
-      color: var(--color-text);
+      color: var(--color-text-muted);
       cursor: pointer;
       font-family: 'Google Sans', sans-serif;
       font-weight: 600;
@@ -650,20 +650,23 @@
     
     @media (prefers-color-scheme: dark) {
       .page-btn {
+        background: rgba(30, 41, 59, 0.4);
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       }
     }
     
     .page-btn:hover:not(:disabled) {
-      background: var(--color-hover);
+      background: rgba(99, 102, 241, 0.08);
       color: var(--color-accent);
-      border-color: var(--color-accent);
+      border-color: rgba(99, 102, 241, 0.25);
       transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
     }
     
     @media (prefers-color-scheme: dark) {
       .page-btn:hover:not(:disabled) {
+        background: rgba(129, 140, 248, 0.12);
+        border-color: rgba(129, 140, 248, 0.3);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
       }
     }
