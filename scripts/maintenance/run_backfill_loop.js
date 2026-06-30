@@ -29,11 +29,23 @@ if (state.status === 'WAITING_FOR_PR') {
     
     let mergedAny = false;
     for (const pr of prs) {
-      if (pr.title.includes("Chronicle Historical Backfill")) {
+      // Check if PR is from Jules
+      if (pr.title.toLowerCase().includes("backfill") || pr.title.toLowerCase().includes("historical")) {
         console.log(`[Backfill Loop] Found Jules PR #${pr.number}: ${pr.title}`);
-        console.log(`[Backfill Loop] Auto-merging PR #${pr.number}...`);
-        execSync(`gh pr merge ${pr.number} --squash --admin`, { cwd: REPO_DIR, stdio: 'inherit' });
-        mergedAny = true;
+        
+        try {
+          console.log(`[Backfill Loop] Auto-merging PR #${pr.number}...`);
+          execSync(`gh pr merge ${pr.number} --squash --admin`, { cwd: REPO_DIR, stdio: 'inherit' });
+          mergedAny = true;
+          break; // Stop after merging one successfully to avoid conflicting with duplicates
+        } catch (mergeErr) {
+          console.error(`[Backfill Loop] Failed to merge PR #${pr.number}. It likely has conflicts. Closing it...`);
+          try {
+            execSync(`gh pr close ${pr.number}`, { cwd: REPO_DIR, stdio: 'inherit' });
+          } catch (closeErr) {
+            console.error(`[Backfill Loop] Failed to close PR #${pr.number}:`, closeErr.message);
+          }
+        }
       }
     }
 
@@ -42,6 +54,14 @@ if (state.status === 'WAITING_FOR_PR') {
       execSync('git pull origin main', { cwd: REPO_DIR, stdio: 'inherit' });
       state.status = 'IDLE';
       saveState(state);
+      
+      // Also close any remaining duplicate PRs just to be clean
+      for (const pr of prs) {
+        if (!mergedAny && (pr.title.toLowerCase().includes("backfill") || pr.title.toLowerCase().includes("historical"))) {
+             try { execSync(`gh pr close ${pr.number}`, { cwd: REPO_DIR }); } catch(e) {}
+        }
+      }
+      
       console.log("[Backfill Loop] State reset to IDLE. The next cron run will trigger the next batch.");
     } else {
       console.log("[Backfill Loop] No open Jules backfill PRs found yet. Still waiting for Jules to finish synthesis...");
