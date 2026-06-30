@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
@@ -42,8 +43,17 @@ def fetch_and_parse(sheets_service, spreadsheet_id, gid, source_name, date_str, 
     for row in rows[1:]:
         if len(row) <= ts_index:
             continue
-        ts = row[ts_index]
-        if ts.startswith(date_str):
+        ts = row[ts_index].strip()
+        try:
+            if ts and ts[0].isalpha():
+                dt = parsedate_to_datetime(ts)
+                date_str_parsed = dt.strftime('%Y-%m-%d')
+            else:
+                date_str_parsed = ts[:10]
+        except Exception:
+            continue
+            
+        if date_str_parsed == date_str:
             event = {"source": source_name, "type": "event"}
             for i, val in enumerate(row):
                 if i < len(headers) and headers[i]:
@@ -62,7 +72,7 @@ def main():
     
     # 1. Emails & Messages
     print("Fetching Emails & Messages...")
-    email_events = fetch_and_parse(service, MASTER_SPREADSHEET_ID, EMAIL_TRIAGE_GID, "email_triage", today_str, 0)
+    email_events = fetch_and_parse(service, MASTER_SPREADSHEET_ID, EMAIL_TRIAGE_GID, "email_triage", today_str, 1)
     all_events.extend(email_events)
     print(f"  Found {len(email_events)} events.")
     

@@ -1,6 +1,7 @@
 import os
 import json
 from collections import defaultdict
+from email.utils import parsedate_to_datetime
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
@@ -55,8 +56,15 @@ def fetch_all_and_group(sheets_service, spreadsheet_id, gid, source_name, ts_ind
             continue
             
         # Parse timestamp to YYYY-MM-DD
-        # Timestamps can be '2026-04-30 17:02', '2007-11-16T22:25:00Z', etc.
-        date_str = ts[:10]
+        try:
+            if ts[0].isalpha():
+                dt = parsedate_to_datetime(ts)
+                date_str = dt.strftime('%Y-%m-%d')
+            else:
+                date_str = ts[:10]
+        except Exception:
+            continue
+            
         # Basic validation
         if len(date_str) == 10 and date_str[4] == '-' and date_str[7] == '-':
             event = {"source": source_name, "type": "event"}
@@ -75,9 +83,9 @@ def main():
     
     grouped_events = defaultdict(list)
     
-    fetch_all_and_group(service, MASTER_SPREADSHEET_ID, EMAIL_TRIAGE_GID, "email_triage", 0, grouped_events)
+    fetch_all_and_group(service, MASTER_SPREADSHEET_ID, EMAIL_TRIAGE_GID, "email_triage", 1, grouped_events)
     fetch_all_and_group(service, MASTER_SPREADSHEET_ID, DRIVE_FILES_GID, "drive", 0, grouped_events)
-    fetch_all_and_group(service, MASTER_SPREADSHEET_ID, RETRO_EMAILS_GID, "email_retro", 0, grouped_events)
+    fetch_all_and_group(service, MASTER_SPREADSHEET_ID, RETRO_EMAILS_GID, "email_retro", 1, grouped_events)
     fetch_all_and_group(service, MASTER_SPREADSHEET_ID, RETRO_FILES_GID, "drive_retro", 0, grouped_events)
     fetch_all_and_group(service, PHOTO_SPREADSHEET_ID, PHOTO_TABLE_GID, "photo", 2, grouped_events)
     
