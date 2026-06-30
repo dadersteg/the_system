@@ -1,8 +1,21 @@
 /**
  * @file src/Code_28DayReview.js
  * @description Generates the 28-Day Strategic Pruning Report by aggressively pruning the backlog and aligning tasks with overarching goals.
+ *
+ * @version 1.0.0
+ * @last_modified 2024-07-28
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.0: Added standardized JSDoc headers and variable naming.
  */
 
+/**
+ * Generates the 28-Day Strategic Pruning Report by aggregating tasks,
+ * calling the AI model for review, and saving the output to Google Drive.
+ *
+ * @returns {void}
+ */
 function runMonthlyReview() {
   const importerListId = SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
   const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
@@ -129,6 +142,12 @@ function runMonthlyReview() {
   }
 }
 
+/**
+ * Writes the generated markdown report to the designated Google Drive file.
+ *
+ * @param {string} markdownStr The markdown content of the 28-Day report.
+ * @returns {string|null} The URL of the updated or created file, or null if it fails.
+ */
 function write28DayReport(markdownStr) {
   const fileId = SYSTEM_CONFIG.GENERATED_OUTPUTS.DAY_28_STRATEGIC;
   if (!fileId) {
@@ -149,6 +168,12 @@ function write28DayReport(markdownStr) {
   }
 }
 
+/**
+ * Trigger wrapper for the 28-Day Strategic Review.
+ * Executes the review every 28 days based on a base reference date.
+ *
+ * @returns {void}
+ */
 function monthlyReviewTriggerWrapper() {
   const now = new Date();
   const currentHour = now.getHours();
@@ -158,8 +183,8 @@ function monthlyReviewTriggerWrapper() {
   
   // Calculate days difference (ignoring hours/minutes to avoid DST drift)
   const nowUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-  const diffTime = nowUtc.getTime() - baseDate.getTime();
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  const diffTimeMs = nowUtc.getTime() - baseDate.getTime();
+  const diffDays = Math.round(diffTimeMs / (1000 * 60 * 60 * 24));
   
   // Execute every 28 days (diffDays % 28 === 0) at 9:00
   if (diffDays >= 0 && diffDays % 28 === 0 && [9].includes(currentHour)) {
