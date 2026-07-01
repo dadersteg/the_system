@@ -54,7 +54,16 @@ function runMonthlyReview() {
      const fileId = SYSTEM_CONFIG.DOCS.TASK_MASTER_MONTHLY_PROMPT_ID;
      if (!fileId) throw new Error("TASK_MASTER_MONTHLY_PROMPT_ID is not configured in SYSTEM_CONFIG.");
      const file = DriveApp.getFileById(fileId);
-     systemPrompt = processPromptText(file.getBlob().getDataAsString());
+     const mimeType = file.getMimeType();
+     let text = "";
+     if (mimeType === MimeType.GOOGLE_DOCS) {
+       text = DocumentApp.openById(fileId).getBody().getText();
+     } else if (mimeType === MimeType.PLAIN_TEXT || mimeType === "text/plain") {
+       text = file.getBlob().getDataAsString();
+     } else {
+       throw new Error(`Unsupported MIME type: ${mimeType}`);
+     }
+     systemPrompt = processPromptText(text);
   } catch(e) {
      console.error("Failed to load 28-Day prompt from Drive:", e.message);
      return;
