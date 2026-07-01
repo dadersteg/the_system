@@ -7,6 +7,6 @@
   "task-sync": "online",
   "sheet-sync-maintenance": "online",
   "github-sync": "online",
-  "TaskMasterEngine-Private": "offline",
-  "TaskMasterEngine-PMT": "offline"
+  "TaskMasterEngine-Private": "online",
+  "TaskMasterEngine-PMT": "online"
 }
