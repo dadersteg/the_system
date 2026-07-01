@@ -1,7 +1,11 @@
 /**
- * 📱 Facebook Messenger Ingestion Bridge
- * Listens for incoming Messenger messages and forwards them to Gmail
- * via the Ingestion Bridge webhook.
+ * @file messenger_bridge.js
+ * @description 📱 Facebook Messenger Ingestion Bridge. Listens for incoming Messenger messages and forwards them to Gmail via the Ingestion Bridge webhook.
+ * @version 1.0.0
+ * @last_modified 2026-06-28
+ * @modified_by Jules
+ * @changelog
+ * - 1.0.0: Added standardized documentation header and improved error logging for empty catch blocks.
  *
  * Architecture: Same pattern as whatsapp_bridge.js
  * - Connects using saved appState (cookies)
@@ -41,7 +45,7 @@ try {
     const blockedData = fs.readFileSync(__dirname + '/blocked_threads.json', 'utf8');
     blockedThreads = JSON.parse(blockedData).map(t => t.toLowerCase());
 } catch (e) {
-    // optional
+    console.log("No blocked_threads.json found or failed to parse, continuing without blocklist. " + e.message);
 }
 
 function loadState() {
@@ -131,7 +135,9 @@ async function runStartupSync(api) {
                                     });
                                 });
                                 userNames = userInfo;
-                            } catch (_) {}
+                            } catch (e) {
+                                console.warn(`Failed to resolve user names for thread ${threadID}: ${e.message || e}`);
+                            }
 
                             relevantMessages.forEach(msg => {
                                 const senderName = userNames[msg.senderID]?.name || `User ${msg.senderID}`;
