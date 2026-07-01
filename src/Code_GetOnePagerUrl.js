@@ -16,10 +16,14 @@
  * @returns {void}
  */
 function getOnePagerUrl() {
-  const fileId = getExecutionPlanId();
-  if (fileId) {
-    console.log(DriveApp.getFileById(fileId).getUrl());
-  } else {
-    console.log("Execution plan file not found");
+  try {
+    const fileId = getExecutionPlanId();
+    if (fileId) {
+      console.log(DriveApp.getFileById(fileId).getUrl());
+    } else {
+      console.warn("Execution plan file not found");
+    }
+  } catch (e) {
+    console.error(`getOnePagerUrl encountered an error: ${e.message}`);
   }
 }
