@@ -210,7 +210,12 @@ async function checkBridges() {
                 const tmRows = rows.filter(r => r[1] === 'TaskMasterEngine' && r[2] === 'SUCCESS');
                 if (tmRows.length > 0) {
                     const lastRow = tmRows[tmRows.length - 1];
-                    const lastTime = new Date(lastRow[0]).getTime();
+                    let dateStr = lastRow[0];
+                    const match = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(.*)$/);
+                    if (match) {
+                        dateStr = `${match[3]}-${match[2]}-${match[1]}${match[4]}`;
+                    }
+                    const lastTime = new Date(dateStr).getTime();
                     const ageMs = Date.now() - lastTime;
                     
                     const stateKey = `TaskMasterEngine-${sheet.env}`;

@@ -78,15 +78,29 @@ function updateModelList() {
   
   sheet.autoResizeColumns(1, tableData[0].length);
   
-  // Export to Google Drive as JSON
+  // Export to Google Drive as Markdown
   try {
     const fileId = SYSTEM_CONFIG.DOCS.GEMINI_MODELS_JSON_ID;
-    const jsonString = JSON.stringify(jsonOutput, null, 2);
     
-    DriveApp.getFileById(fileId).setContent(jsonString);
-    console.log(`Successfully updated ${models.length} models and exported directly to Drive ID: ${fileId}.`);
+    let mdString = "# Actual Gemini Models\n\n";
+    mdString += "This document contains the latest technical specifications and context windows of the Gemini model ecosystem.\n\n";
+    
+    jsonOutput.forEach(model => {
+      mdString += `## ${model.displayName || model.id}\n`;
+      mdString += `- **ID**: \`${model.id}\`\n`;
+      mdString += `- **Version**: ${model.version}\n`;
+      mdString += `- **Description**: ${model.description}\n`;
+      mdString += `- **Input Limit**: ${model.inputLimit} tokens\n`;
+      mdString += `- **Output Limit**: ${model.outputLimit} tokens\n`;
+      mdString += `- **Thinking Capabilities**: ${model.thinking ? 'Yes' : 'No'}\n\n`;
+    });
+    
+    const file = DriveApp.getFileById(fileId);
+    file.setName("Actual_Gemini_Models.md");
+    file.setContent(mdString);
+    console.log(`Successfully updated ${models.length} models and exported as Markdown to Drive ID: ${fileId}.`);
   } catch (e) {
-    console.error("Failed to write JSON to Drive: " + e.message);
+    console.error("Failed to write Markdown to Drive: " + e.message);
   }
 }
 
