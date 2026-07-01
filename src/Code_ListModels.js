@@ -1,11 +1,12 @@
 /**
  * @file src/Code_ListModels.js
  * @description THE SYSTEM: GEMINI MODEL EXPORTER. Fetches available Gemini models from the API, populates the dedicated sheet tab, and exports to Google Drive as JSON.
- * @version 1.0.1
- * @last_modified 2026-06-19
+ * @version 1.0.2
+ * @last_modified 2026-06-25
  * @modified_by Jules
  *
  * @changelog
+ * - 1.0.2: Improved error handling, API key validation, and status code checking in getModelsForCLI().
  * - 1.0.1: Injected comprehensive JSDoc docstrings, standardized variable casing, and verified syntax.
  * - 1.0.0: Initial version.
  */
@@ -104,12 +105,26 @@ function updateModelList() {
  * @returns {Array<string>|string} An array of model names on success, or an error message string on failure.
  */
 function getModelsForCLI() {
-  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-  const response = UrlFetchApp.fetch(url, {muteHttpExceptions: true});
-  const data = JSON.parse(response.getContentText());
-  if (data.models) {
-    return data.models.map(m => m.name);
+  try {
+    const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
+    if (!apiKey) {
+      return "Error: Missing Gemini API Key in Script Properties.";
+    }
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+    const response = UrlFetchApp.fetch(url, {muteHttpExceptions: true});
+
+    if (response.getResponseCode() !== 200) {
+      return "Error: API Request failed with status " + response.getResponseCode() + ". Details: " + response.getContentText();
+    }
+
+    const data = JSON.parse(response.getContentText());
+    if (data && data.models) {
+      return data.models.map(m => m.name);
+    }
+
+    return "Error: Malformed API response structure.";
+  } catch (error) {
+    return "Error executing getModelsForCLI: " + error.message;
   }
-  return "Error: " + response.getContentText();
 }
