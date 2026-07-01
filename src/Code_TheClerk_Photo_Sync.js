@@ -1,9 +1,23 @@
 /**
- * @file Code_TheClerk_Photo_Sync.js
- * @description Extracts automated photo backups from Messenger, Instagram, and Telegram,
- * uploads them natively to Google Photos, and logs them in the Photo Register.
+ * @file src/Code_TheClerk_Photo_Sync.js
+ * @description Extracts automated photo backups from Messenger, Instagram, and Telegram, uploads them natively to Google Photos, and logs them in the Photo Register.
+ *
+ * @version 1.0.1
+ * @last_modified 2024-05-24
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.1: Added comprehensive JSDoc/Google-style docstrings. Standardized variable naming. Cleaned up code.
+ * - 1.0.0: Initial implementation.
  */
 
+/**
+ * Processes automated photo backup emails from Messenger, Instagram, and Telegram.
+ * Extracts image attachments, uploads them to Google Photos, and logs metadata
+ * (including AI analysis) to the Photo Register sheet.
+ *
+ * @returns {void}
+ */
 function processGmailPhotos() {
   const query = "has:attachment (subject:[Instagram] OR subject:[Messenger] OR subject:[Telegram]) from:adersteg.daniel@gmail.com -label:Photo_Extracted";
   const threads = GmailApp.search(query, 0, 10);
@@ -81,6 +95,14 @@ function processGmailPhotos() {
   }
 }
 
+/**
+ * Uploads raw image bytes to Google Photos to obtain an upload token.
+ * This token is required before calling the batchCreate API.
+ *
+ * @param {GoogleAppsScript.Base.Blob} blob - The image blob to upload.
+ * @param {string} filename - The target filename.
+ * @returns {string|null} The upload token string if successful, or null on failure.
+ */
 function _uploadBytesToPhotos(blob, filename) {
   const token = ScriptApp.getOAuthToken();
   const uploadOptions = {
@@ -107,6 +129,12 @@ function _uploadBytesToPhotos(blob, filename) {
   return null;
 }
 
+/**
+ * Submits a batch request to Google Photos to create new media items using upload tokens.
+ *
+ * @param {Array<Object>} mediaItems - Array of media item objects containing descriptions and uploadTokens.
+ * @returns {Array<string>} An array of product URLs corresponding to the created media items.
+ */
 function _batchCreateMediaItems(mediaItems) {
   const token = ScriptApp.getOAuthToken();
   const createOptions = {
@@ -143,6 +171,13 @@ function _batchCreateMediaItems(mediaItems) {
   return urls;
 }
 
+/**
+ * Analyzes an image using the Gemini API to extract rich metadata and contextual information.
+ *
+ * @param {GoogleAppsScript.Base.Blob} blob - The image blob to analyze.
+ * @param {Object} msgContext - Context from the original email (subject, sender, date, body).
+ * @returns {Object} Parsed JSON object containing the Gemini analysis, or empty object on failure.
+ */
 function _analyzePhotoWithGemini(blob, msgContext) {
   const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
   if (!apiKey) return {};
@@ -187,8 +222,9 @@ function _analyzePhotoWithGemini(blob, msgContext) {
 /**
  * Processes messages to extract image attachments, uploads them, and performs AI analysis.
  * Extracted from processGmailPhotos to improve error handling and readability.
- * @param {GoogleAppsScript.Gmail.GmailMessage[]} messages
- * @returns {Object} { processedImages, mediaItemsToCreate }
+ *
+ * @param {Array<GoogleAppsScript.Gmail.GmailMessage>} messages - Array of Gmail messages to process.
+ * @returns {Object} Object containing arrays for `processedImages` and `mediaItemsToCreate`.
  */
 function _processAndUploadAttachments(messages) {
   let processedImages = [];
