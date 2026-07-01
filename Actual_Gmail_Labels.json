@@ -2,7 +2,7 @@
   {
     "name": "00 Manual Review",
     "leaf": "00 Manual Review",
-    "unread_count": 1
+    "unread_count": 0
   },
   {
     "name": "00 No Filter",
@@ -37,7 +37,7 @@
   {
     "name": "01 Private/01 Personal Admin/01 Task Management/The System (TS)",
     "leaf": "The System (TS)",
-    "unread_count": 0
+    "unread_count": 2
   },
   {
     "name": "01 Private/01 Personal Admin/02 Contracts",
@@ -172,7 +172,7 @@
   {
     "name": "01 Private/04 Finances/Banking",
     "leaf": "Banking",
-    "unread_count": 2
+    "unread_count": 0
   },
   {
     "name": "01 Private/04 Finances/Budgeting & Planning",
@@ -267,7 +267,7 @@
   {
     "name": "01 Private/05 Other/01 Projects/AI",
     "leaf": "AI",
-    "unread_count": 12
+    "unread_count": 13
   },
   {
     "name": "01 Private/05 Other/01 Projects/Clothes",
@@ -297,12 +297,12 @@
   {
     "name": "01 Private/05 Other/02 Relationships",
     "leaf": "02 Relationships",
-    "unread_count": 1
+    "unread_count": 0
   },
   {
     "name": "01 Private/05 Other/02 Relationships/Alexander & Gabriel",
     "leaf": "Alexander & Gabriel",
-    "unread_count": 1
+    "unread_count": 0
   },
   {
     "name": "01 Private/05 Other/02 Relationships/Carry Martens Adersteg",
@@ -362,7 +362,7 @@
   {
     "name": "01 Private/05 Other/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 19
+    "unread_count": 21
   },
   {
     "name": "01 Private/05 Other/03 Collections/Star Wars",
@@ -495,31 +495,6 @@
     "unread_count": 0
   },
   {
-    "name": "02 Work/01 Employment/01 202605 Quantum 21",
-    "leaf": "01 202605 Quantum 21",
-    "unread_count": 0
-  },
-  {
-    "name": "02 Work/01 Employment/01 202605 Quantum 21/01 Professional Admin",
-    "leaf": "01 Professional Admin",
-    "unread_count": 0
-  },
-  {
-    "name": "02 Work/01 Employment/01 202605 Quantum 21/02 Team & Operations",
-    "leaf": "02 Team & Operations",
-    "unread_count": 0
-  },
-  {
-    "name": "02 Work/01 Employment/01 202605 Quantum 21/03 Professional Growth",
-    "leaf": "03 Professional Growth",
-    "unread_count": 0
-  },
-  {
-    "name": "02 Work/01 Employment/01 202605 Quantum 21/05 Projects",
-    "leaf": "05 Projects",
-    "unread_count": 0
-  },
-  {
     "name": "02 Work/01 Employment/01 Playmetech",
     "leaf": "01 Playmetech",
     "unread_count": 0
@@ -537,7 +512,7 @@
   {
     "name": "02 Work/01 Employment/01 Playmetech/02 Team & Operations",
     "leaf": "02 Team & Operations",
-    "unread_count": 1
+    "unread_count": 0
   },
   {
     "name": "02 Work/01 Employment/01 Playmetech/03 Professional Growth",
@@ -552,11 +527,6 @@
   {
     "name": "02 Work/01 Employment/01 Playmetech/05 Projects",
     "leaf": "05 Projects",
-    "unread_count": 0
-  },
-  {
-    "name": "02 Work/01 Employment/01 Quantum 21",
-    "leaf": "01 Quantum 21",
     "unread_count": 0
   },
   {
@@ -642,7 +612,7 @@
   {
     "name": "02 Work/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 1
+    "unread_count": 0
   },
   {
     "name": "03 Studies",
@@ -717,7 +687,7 @@
   {
     "name": "99 Label_Reviewed",
     "leaf": "99 Label_Reviewed",
-    "unread_count": 37
+    "unread_count": 34
   },
   {
     "name": "99 Messenger",
@@ -732,12 +702,12 @@
   {
     "name": "99 Telegram",
     "leaf": "99 Telegram",
-    "unread_count": 2
+    "unread_count": 0
   },
   {
     "name": "99 To be deleted",
     "leaf": "99 To be deleted",
-    "unread_count": 10
+    "unread_count": 8
   },
   {
     "name": "99 WhatsApp",
@@ -772,6 +742,6 @@
   {
     "name": "Photo_Extracted",
     "leaf": "Photo_Extracted",
-    "unread_count": 2
+    "unread_count": 0
   }
 ]
