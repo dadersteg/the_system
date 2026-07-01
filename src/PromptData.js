@@ -1,3 +1,22 @@
+/**
+ * @file src/PromptData.js
+ * @description Centralized module for managing and updating AI system prompts stored in Google Docs.
+ * @version 1.0.1
+ * @last_modified 2024-05-24
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.1: Added comprehensive JSDoc headers/docstrings, and standardized error handling across all methods.
+ * - 1.0.0: Initial implementation.
+ */
+
+/**
+ * Updates the '1 Day Operations' (Daily) system prompt stored in Google Drive.
+ * Generates the prompt content as an array of strings, writes it to the designated Document ID,
+ * and clears the associated Script Cache to ensure subsequent runs retrieve the fresh prompt.
+ *
+ * @returns {string} A success message if updated correctly, or an error message on failure.
+ */
 function patchDailyPrompt() {
   const text = [
     "[SYSTEM INSTRUCTION]",
@@ -83,12 +102,23 @@ function patchDailyPrompt() {
   ].join("\n");
   
   const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
-  const file = DriveApp.getFileById(promptId);
-  file.setContent(text);
-  CacheService.getScriptCache().remove("TASK_MASTER_DAILY_PROMPT");
-  return "Prompt updated successfully.";
+  try {
+    const file = DriveApp.getFileById(promptId);
+    file.setContent(text);
+    CacheService.getScriptCache().remove("TASK_MASTER_DAILY_PROMPT");
+    return "Prompt updated successfully.";
+  } catch (error) {
+    return "Error updating Daily Prompt: " + error.message;
+  }
 }
 
+/**
+ * Updates the 'Route Mode' system prompt for The Clerk (Notes) stored in Google Drive.
+ * Generates the prompt content specifically designed for extracting tasks and determining
+ * a target LOS folder for messy, unstructured notes, then writes it to the designated Document ID.
+ *
+ * @returns {string} A success message if updated correctly, or an error message on failure.
+ */
 function patchNotesRoutePrompt() {
   const text = [
     "# The Clerk Notes (Route Mode) - System Prompt",
@@ -126,11 +156,18 @@ function patchNotesRoutePrompt() {
     const file = DriveApp.getFileById(promptId);
     file.setContent(text);
     return "Route Mode Prompt updated successfully.";
-  } catch (e) {
-    return "Error updating Route Mode Prompt: " + e.message;
+  } catch (error) {
+    return "Error updating Route Mode Prompt: " + error.message;
   }
 }
 
+/**
+ * Updates the 'Clean-in-Place Mode' system prompt for The Clerk (Notes) stored in Google Drive.
+ * Generates the prompt content specifically designed for extracting critical tasks and structuring
+ * in-context meeting notes without re-categorizing them, then writes it to the designated Document ID.
+ *
+ * @returns {string} A success message if updated correctly, or an error message on failure.
+ */
 function patchNotesCleanPrompt() {
   const text = [
     "# The Clerk Notes (Clean-in-Place Mode) - System Prompt",
@@ -165,12 +202,19 @@ function patchNotesCleanPrompt() {
     const file = DriveApp.getFileById(promptId);
     file.setContent(text);
     return "Clean Mode Prompt updated successfully.";
-  } catch (e) {
-    return "Error updating Clean Mode Prompt: " + e.message;
+  } catch (error) {
+    return "Error updating Clean Mode Prompt: " + error.message;
   }
 }
 
 
+/**
+ * Updates the 'Task Master' (Global Routing) system prompt stored in Google Drive.
+ * Generates the prompt content outlining rules for evaluating tasks based on the Eisenhower Matrix,
+ * splits long tasks, and sets routing targets, then writes it to the designated Document ID.
+ *
+ * @returns {string} A success message if updated correctly, or an error message on failure.
+ */
 function patchSystemPrompt() {
   const text = [
     "[SYSTEM INSTRUCTION]",
@@ -201,8 +245,8 @@ function patchSystemPrompt() {
     file.setContent(text);
     CacheService.getScriptCache().remove("TASK_MASTER_PROMPT_V2");
     return "System Prompt updated successfully.";
-  } catch (e) {
-    return "Error updating System Prompt: " + e.message;
+  } catch (error) {
+    return "Error updating System Prompt: " + error.message;
   }
 }
 
