@@ -6,5 +6,7 @@
   "beeper-bridge": "online",
   "task-sync": "online",
   "sheet-sync-maintenance": "online",
-  "github-sync": "online"
+  "github-sync": "online",
+  "TaskMasterEngine-Private": "offline",
+  "TaskMasterEngine-PMT": "offline"
 }
