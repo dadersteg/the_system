@@ -42,7 +42,9 @@ function uploadCSVFromCLI(spreadsheetId, sheetName, csvContent) {
       sheet.clear();
     }
     
-    sheet.getRange(1, 1, csvData.length, csvData[0].length).setValues(csvData);
+    const maxCols = Math.max(...csvData.map(r => r.length));
+    csvData.forEach(r => { while(r.length < maxCols) r.push(''); });
+    sheet.getRange(1, 1, csvData.length, maxCols).setValues(csvData);
     console.log(`Success: CSV uploaded to spreadsheet ID "${spreadsheetId}", tab "${sheetName}". Total rows: ${csvData.length}`);
   } catch (e) {
     console.error(`Failed to upload CSV: ${e.message}`);
