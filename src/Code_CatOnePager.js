@@ -21,7 +21,11 @@ function catOnePager() {
   try {
     const fileId = getExecutionPlanId();
     if (fileId) {
-      console.log(DriveApp.getFileById(fileId).getBlob().getDataAsString());
+      const text = getSafeDocText(fileId);
+      if (!text) {
+        throw new Error(`Failed to retrieve valid text from file ID: ${fileId}`);
+      }
+      console.log(text);
     } else {
       console.warn("Execution plan file not found");
     }
