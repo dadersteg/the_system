@@ -25,8 +25,8 @@ function getTaskMasterSystemPrompt() {
      const docId = SYSTEM_CONFIG.DOCS.TASK_MASTER_PROMPT_ID;
      if (!docId) return "SYSTEM PROMPT MISSING";
      
-     const file = DriveApp.getFileById(docId);
-     const text = processPromptText(file.getBlob().getDataAsString());
+     const text = getSafeDocText(docId);
+     if (!text) throw new Error("Failed to load prompt text.");
      
      cache.put("TASK_MASTER_PROMPT_V2", text.substring(0, 100000), 21600); // 6 hours
      return text;
@@ -50,8 +50,8 @@ function getTaskMasterDailyPrompt() {
      const docId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
      if (!docId) return "SYSTEM PROMPT MISSING";
      
-     const file = DriveApp.getFileById(docId);
-     const text = processPromptText(file.getBlob().getDataAsString());
+     const text = getSafeDocText(docId);
+     if (!text) throw new Error("Failed to load daily prompt text.");
      
      cache.put("TASK_MASTER_DAILY_PROMPT", text.substring(0, 100000), 21600); // 6 hours
      return text;
@@ -352,11 +352,10 @@ function runHourlyReview(targetDate) {
   let systemPrompt = "";
   const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
   if (promptId) {
-     systemPrompt = DriveApp.getFileById(promptId).getBlob().getDataAsString();
+     systemPrompt = getSafeDocText(promptId);
   } else {
      console.warn("TASK_MASTER_DAILY_PROMPT_ID is not set in SYSTEM_CONFIG.");
   }
-  systemPrompt = processPromptText(systemPrompt);
   
   let configOverrides = { "temperature": 0.2 };
   const configMatch = systemPrompt.match(/^\s*```(?:json)?\s*([\s\S]*?)\s*```/i);
@@ -1022,9 +1021,13 @@ function getSystemGoals() {
     const workId = SYSTEM_CONFIG.DOCS.WORK_GOALS_FILE_ID;
     
     let goalsText = "=== PERSONAL GOALS ===\n";
-    goalsText += DriveApp.getFileById(personalId).getBlob().getDataAsString();
+    let pText = getSafeDocText(personalId);
+    if (!pText) throw new Error("Failed to load personal goals text.");
+    goalsText += pText;
     goalsText += "\n\n=== PMT GOALS ===\n";
-    goalsText += DriveApp.getFileById(workId).getBlob().getDataAsString();
+    let wText = getSafeDocText(workId);
+    if (!wText) throw new Error("Failed to load work goals text.");
+    goalsText += wText;
     
     cache.put("SYSTEM_GOALS_V2", goalsText.substring(0, 100000), 21600); // Cache for 6 hours
     return goalsText;
@@ -1048,7 +1051,9 @@ function getSystemTaxonomy() {
      const docId = SYSTEM_CONFIG.DOCS.TAXONOMY_JSON_ID;
      if (!docId) return "[]";
      
-     const text = DriveApp.getFileById(docId).getBlob().getDataAsString();
+     const text = getSafeDocText(docId);
+     if (!text) throw new Error("Failed to load taxonomy text.");
+
      cache.put("SYSTEM_TAXONOMY_V2", text.substring(0, 100000), 21600);
      return text;
   } catch(e) {

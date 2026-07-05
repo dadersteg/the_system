@@ -910,7 +910,7 @@ function loadKnowledgeDocs() {
     let instructions = "";
     try {
         const iter1 = DriveApp.getFilesByName("TS - Clerk > System Instructions.md");
-        if (iter1.hasNext()) instructions = processPromptText(iter1.next().getBlob().getDataAsString());
+        if (iter1.hasNext()) instructions = getSafeDocText(iter1.next().getId());
     } catch(e){
         console.warn(`Failed to dynamically load System Instructions document: ${e.message}`);
     }
@@ -918,7 +918,7 @@ function loadKnowledgeDocs() {
     let protocol = "";
     try {
         const iter2 = DriveApp.getFilesByName("TS - Master Asset Naming Protocol.md");
-        if (iter2.hasNext()) protocol = processPromptText(iter2.next().getBlob().getDataAsString());
+        if (iter2.hasNext()) protocol = getSafeDocText(iter2.next().getId());
     } catch(e){
         console.warn(`Failed to dynamically load Naming Protocol document: ${e.message}`);
     }
@@ -933,7 +933,7 @@ function loadKnowledgeDocs() {
     let taxonomyJson = "";
     try {
         if (DRIVE_DOC_IDS.TAXONOMY_JSON) {
-            taxonomyJson = DriveApp.getFileById(DRIVE_DOC_IDS.TAXONOMY_JSON).getBlob().getDataAsString();
+            taxonomyJson = getSafeDocText(DRIVE_DOC_IDS.TAXONOMY_JSON);
         }
     } catch(e) {
         console.error("Failed to load TAXONOMY_JSON: " + e.message);
