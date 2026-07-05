@@ -1,54 +1,55 @@
 # 7 Day Roadmap
 *Auto-generated weekly lookahead.*
 
-**BLUF:** The upcoming week features a heavily constrained start on Sunday (June 28th) with 8.5 busy hours, but opens up significantly from Monday onwards with 10.5+ available hours daily. The strategic focus is on completing major mid-year financial reviews and resolving critical AI system integrations (AGY/Gemini) to unblock the "Antigravity" system build. Given the Sunday bottleneck, heavy reflection and system tasks should be deferred to the ample white space later in the week.
+**BLUF:** This week's strategic focus is heavily weighted towards personal administration, mid-year financial reviews, and relationship maintenance. Calendar capacity is strong early in the week (averaging 11 available hours daily), but July 9th presents a massive bottleneck with zero availability due to overlapping or multi-day events. To ensure success, all critical path items and "Frogs" must be front-loaded between July 5th and July 8th.
 
 ## 👑 THE WEEKLY FROGS (Must Win)
 *(The top 2-3 massive Q2 tasks that define success for the week.)*
 **💼 Work:** *(ONLY list tasks here if their category begins with "02")*
+*(No work tasks scheduled for this period)*
 
 **🏠 Personal:** *(ONLY list tasks here if their category begins with "01" or "N/A")*
 - [ ] [Q2] Mid-Year 2026 Financial Review (01 04 00 Finances > Budgeting & Planning)
-- [ ] [Q2] Re-think codex/Gem approach for AGY integration (01 01 01 Task Management > The System (TS))
-- [ ] [Q2] Configure Gemini/Drive/NotebookLM for cloud-native access (01 01 01 Task Management > The System (TS))
+- [ ] [Q2] Confirm Skatteverket name registration (01 01 02 Contracts > Signature)
+- [ ] [Q2] Review audit report and implementation plan for Cellisior registry (01 01 01 Task Management > The System (TS))
 
 ## 📅 THE 7-DAY QUEUE
 *(Tasks slated for completion this week, excluding the frogs. Split by Work and Personal.)*
 **💼 Work:** *(ONLY list tasks here if their category begins with "02")*
+*(No work tasks scheduled for this period)*
 
 **🏠 Personal:** *(ONLY list tasks here if their category begins with "01" or "N/A")*
-- [ ] [Q1] Troubleshoot and restore Telegram bridge connectivity (30m)
-- [ ] [Q2] Integrate Gemini Notebooks into the_system (1h)
-- [ ] [Q2] Fix time boxing script to account for weekends (1h)
-- [ ] [Q2] Investigate and potentially execute Pimlico project (1h)
-- [ ] [Q3] Check availability for electrician to replace bathroom spotlights (15m)
-- [ ] [Q3] Review and configure Google Vids personal avatar settings in Admin console (15m)
-- [ ] [Q2] Confirm Skatteverket name registration (30m)
-- [ ] [Q2] Update Wedding Project Plan (1h)
-- [ ] [Q2] Request photographer meals from venue (30m)
-- [ ] [Q2] Perform 1-day planning (End of day) (30m)
-- [ ] [Q2] Daily screen-free time with Carry (30m)
-- [ ] [Q2] Perform 2-day reflection (15m)
-- [ ] [Q2] Complete daily workout (1h)
-- [ ] [Q2] Daily 4-7-8 Breathing Protocol (5m)
-- [ ] [Q2] Daily Walking (15m)
-- [ ] [Q2] Perform 1-day planning (Start of day) (15m)
-- [ ] [Q2] Execute morning habits (N/A)
-- [ ] [Q2] Plan weekly date with Carry (2h)
-- [ ] [Q2] Attend Therapy Session (1h)
-- [ ] [Q2] Perform 7-day planning (1h)
+- [ ] [Q1] Submit nomination form to HR (5m)
 - [ ] [Q2] Monthly Budget Setup & Review (45m)
-- [ ] [Q2] Perform 14-day reflection (30m)
-- [ ] [Q2] Perform 28-day reflection (1h)
-- [ ] [Q2] Perform 84-day reflection (2h)
+- [ ] [Q2] Buy £36,000 VWRP (SIPP Core) – HL Market Order (15m)
+- [ ] [Q2] Buy crypto exposure MSTR and Bitmine in SIPP when US markets open (15m)
+- [ ] [Q2] Investigate and arrange repair for Carina's ring (30m)
+- [ ] [Q2] Plan weekly date with Carry (2h)
 - [ ] [Q2] Monthly Date with Carry (2h)
+- [ ] [Q2] Attend Therapy Session (1h)
 - [ ] [Q2] Declutter Physical Space (1h)
-- [ ] [Q2] Attend appointment at Paul Edmonds (1h)
+- [ ] [Q2] Perform 28-day reflection (1h)
+- [ ] [Q2] Perform 7-day planning (1h)
+- [ ] [Q2] System Maintenance: Download Google Photos Takeout (1h)
+- [ ] [Q2] Contact electrician regarding smart spots installation (15m)
+- [ ] [Q2] Complete daily workout (1h)
+- [ ] [Q2] Daily Walking (15m)
+- [ ] [Q2] Daily 4-7-8 Breathing Protocol (5m)
+- [ ] [Q2] Daily screen-free time with Carry (30m)
+- [ ] [Q2] Perform 1-day planning (Start of day) (15m)
+- [ ] [Q2] Perform 1-day planning (End of day) (30m)
+- [ ] [Q2] Perform 2-day reflection (15m)
+- [ ] [Q2] Execute morning habits (N/A)
+- [ ] [Q3] Review baby item request from Carry (15m)
+- [ ] [Q3] Check Premium Bond prize amount (5m)
+- [ ] [Q3] Review Charlotte's London visit calendar event (5m)
+- [ ] [Q3] Track status of Lillemor's health and recovery (5m)
+- [ ] [Q3] Attend dinner with Charlotte at Zephyr (5m)
 
 ## ⚠️ UPCOMING BOTTLENECKS
 *(Identify specific days in the next 7 days that are overloaded based on the calendar. Provide tactical advice on what to defer.)*
-- **June 28th (Sunday) Overload:** You have 8.5 busy hours and only 3.5 available hours, yet a massive stack of heavy reflection tasks (84-day, 28-day, 7-day) and system configurations are scheduled for today. 
-- **Tactical Advice:** Defer the 84-day reflection (2h), 28-day reflection (1h), and the Gemini cloud-native configuration (1h) to June 29th or 30th, where you have 10.5+ hours of available capacity. Protect Sunday's limited 3.5 hours strictly for essential daily habits, the Monthly Budget Setup, and recovery.
+- **July 9th (Thursday):** Critical overload detected (75.6 busy hours logged, 0 available hours). This indicates a major multi-day event, travel block, or calendar conflict. **Tactical Advice:** Defer all non-essential daily habits and administrative tasks on this day. Front-load all Q2 financial and system tasks to July 6th-8th to ensure they are not derailed by Thursday's zero-capacity block.
+- **July 5th (Sunday):** Moderate capacity constraint (8 busy hours, 4 available hours). **Tactical Advice:** Focus strictly on the weekly planning, budget setup, and the Mid-Year Financial Review frog. Push lower-tier tasks to Monday or Tuesday when you have 10+ hours of availability.
 
 ---
-*Report dynamically generated by gemini-pro-latest on 28/06/2026, 09:47:16*
+*Report dynamically generated by gemini-pro-latest on 05/07/2026, 09:47:07*
