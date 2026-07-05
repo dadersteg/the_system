@@ -25,8 +25,8 @@ function getTaskMasterSystemPrompt() {
      const docId = SYSTEM_CONFIG.DOCS.TASK_MASTER_PROMPT_ID;
      if (!docId) return "SYSTEM PROMPT MISSING";
      
-     const text = getSafeDocText(docId);
-     if (!text) throw new Error("Failed to load prompt text.");
+     const file = DriveApp.getFileById(docId);
+     const text = processPromptText(file.getBlob().getDataAsString());
      
      cache.put("TASK_MASTER_PROMPT_V2", text.substring(0, 100000), 21600); // 6 hours
      return text;
@@ -50,8 +50,8 @@ function getTaskMasterDailyPrompt() {
      const docId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
      if (!docId) return "SYSTEM PROMPT MISSING";
      
-     const text = getSafeDocText(docId);
-     if (!text) throw new Error("Failed to load daily prompt text.");
+     const file = DriveApp.getFileById(docId);
+     const text = processPromptText(file.getBlob().getDataAsString());
      
      cache.put("TASK_MASTER_DAILY_PROMPT", text.substring(0, 100000), 21600); // 6 hours
      return text;
@@ -288,6 +288,82 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
 // ============================================================================
 
 /**
+ * Calculates a strict array of 30-minute time slots available for scheduling today.
+ * Enforces boundary rules (e.g., PMT max 3 hrs on Sunday).
+ * Removes any slots that overlap with existing calendar events.
+ * 
+ * @param {string} dayName Current day name (e.g., 'Sunday')
+ * @param {boolean} isPMTEnv True if in PMT environment
+ * @param {Array} todayEvents Array of events from getTodayCalendarEvents
+ * @returns {string[]} Array of 30-min slot strings
+ */
+function calculateAvailableTimeSlots(dayName, isPMTEnv, todayEvents) {
+  let rawSlots = [];
+  
+  function generate(startH, startM, endH, endM) {
+    let slots = [];
+    let curH = startH, curM = startM;
+    while (curH < endH || (curH === endH && curM < endM)) {
+      let nextH = curH;
+      let nextM = curM + 30;
+      if (nextM >= 60) {
+        nextH += 1;
+        nextM -= 60;
+      }
+      let sStr = Utilities.formatString("%02d:%02d", curH, curM);
+      let eStr = Utilities.formatString("%02d:%02d", nextH, nextM);
+      slots.push({start: sStr, end: eStr});
+      curH = nextH;
+      curM = nextM;
+    }
+    return slots;
+  }
+
+  if (isPMTEnv) {
+    if (dayName === "Saturday") {
+      return []; // No PMT
+    } else if (dayName === "Sunday") {
+      // Max 3 hours (six 30-min slots)
+      rawSlots = generate(10, 0, 13, 0);
+    } else {
+      // Weekday PMT: 09:30 - 19:30
+      rawSlots = generate(9, 30, 19, 30);
+    }
+  } else {
+    // Private
+    if (dayName === "Saturday" || dayName === "Sunday") {
+      // 10:00 - 18:00
+      rawSlots = generate(10, 0, 18, 0);
+      // Cap at 4 hours (8 slots) to ensure free time
+      rawSlots = rawSlots.slice(0, 8); 
+    } else {
+      // Weekday Private: 07:00-09:30 and 19:30-22:00
+      rawSlots = generate(7, 0, 9, 30).concat(generate(19, 30, 22, 0));
+    }
+  }
+
+  // Deduct overlaps
+  let validSlots = [];
+  rawSlots.forEach(slot => {
+     let overlap = false;
+     for (let i = 0; i < todayEvents.length; i++) {
+        let ev = todayEvents[i];
+        if (ev.isAllDay) { overlap = true; break; }
+        if (slot.start < ev.end && slot.end > ev.start) {
+           overlap = true;
+           break;
+        }
+     }
+     if (!overlap) {
+        validSlots.push(slot.start + " - " + slot.end);
+     }
+  });
+  
+  return validSlots;
+}
+
+
+/**
  * Runs the hourly execution review. Scans active task structures, pulls calendar events,
  * and calls Gemini Pro to generate an active markdown execution report ("One-Pager").
  */
@@ -321,10 +397,12 @@ function runHourlyReview(targetDate) {
   const localTimeStr = Utilities.formatDate(now, "Europe/London", "yyyy-MM-dd'T'HH:mm:ss");
   const localDayName = Utilities.formatDate(now, "Europe/London", "EEEE");
 
+  const todayEvents = getTodayCalendarEvents(now);
   const payload = {
     currentTime: `${localTimeStr} (${localDayName})`,
     capacity: getCalendarCapacity(now),
-    todayEvents: getTodayCalendarEvents(now),
+    todayEvents: todayEvents,
+    availableTimeSlots: calculateAvailableTimeSlots(localDayName, IS_PMT_ENV, todayEvents),
     goals: getSystemGoals(),
     allTasksContext: rawTasks.map(t => {
        let cleanNotes = t.notes;
@@ -352,10 +430,11 @@ function runHourlyReview(targetDate) {
   let systemPrompt = "";
   const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
   if (promptId) {
-     systemPrompt = getSafeDocText(promptId);
+     systemPrompt = DriveApp.getFileById(promptId).getBlob().getDataAsString();
   } else {
      console.warn("TASK_MASTER_DAILY_PROMPT_ID is not set in SYSTEM_CONFIG.");
   }
+  systemPrompt = processPromptText(systemPrompt);
   
   let configOverrides = { "temperature": 0.2 };
   const configMatch = systemPrompt.match(/^\s*```(?:json)?\s*([\s\S]*?)\s*```/i);
@@ -376,9 +455,17 @@ function runHourlyReview(targetDate) {
   }
   
   if (IS_PMT_ENV) {
-     systemPrompt += "\n\nCRITICAL OVERRIDE: You are currently running in the PMT Environment. You MUST entirely omit the '**🏠 Personal:**' sections from your output format and ONLY output PMT tasks.";
+     let envOverride = "You MUST entirely omit the '**🏠 Personal:**' sections from your output format and ONLY output PMT tasks.";
+     if (localDayName === "Saturday" || localDayName === "Sunday") {
+         envOverride += " CRITICAL: Today is the weekend. You MUST NOT schedule any PMT tasks today. Output a summary stating that PMT tasks are not permitted on weekends.";
+     }
+     systemPrompt += "\n\nCRITICAL OVERRIDE: You are currently running in the PMT Environment. " + envOverride;
   } else {
-     systemPrompt += "\n\nCRITICAL OVERRIDE: You are currently running in the Private Environment. You MUST entirely omit the '**🎯 PMT:**' sections from your output format and ONLY output Private/Personal tasks.";
+     let privOverride = "You MUST entirely omit the '**🎯 PMT:**' sections from your output format and ONLY output Private/Personal tasks.";
+     if (localDayName === "Saturday" || localDayName === "Sunday") {
+         privOverride += " CRITICAL: It is the weekend. You MUST schedule Private tasks strictly between 10:00 and 18:00.";
+     }
+     systemPrompt += "\n\nCRITICAL OVERRIDE: You are currently running in the Private Environment. " + privOverride;
   }
   
   const payloadStr = JSON.stringify(payload);
@@ -928,7 +1015,6 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
 
 /**
  * Aggregates calendar event hours for the next 30 days to compute remaining schedule capacity.
- * Checks both Private and PMT calendars.
  * 
  * @param {Date} [targetDate] Base date to start capacity check from. Defaults to now.
  * @returns {Object} Capacity hours mapped by date string key (YYYY-MM-DD).
@@ -936,35 +1022,22 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
 function getCalendarCapacity(targetDate) {
   const now = targetDate || new Date();
   const endDate = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
-  const capacityMap = {};
-  
-  const calendarsToCheck = [
-    "adersteg.daniel@gmail.com",
-    "daniel@playmetech.net"
-  ];
-
-  calendarsToCheck.forEach(calId => {
-    try {
-      const calendar = CalendarApp.getCalendarById(calId);
-      if (calendar) {
-        const events = calendar.getEvents(now, endDate);
-        events.forEach(e => {
-           const d = Utilities.formatDate(e.getStartTime(), "Europe/London", "yyyy-MM-dd");
-           if (!capacityMap[d]) capacityMap[d] = 0;
-           capacityMap[d] += (e.getEndTime().getTime() - e.getStartTime().getTime()) / 3600000;
-        });
-      }
-    } catch (e) {
-      console.warn("Could not fetch calendar capacity for: " + calId, e.message);
-    }
-  });
-
-  return Object.keys(capacityMap).length > 0 ? capacityMap : { error: "Could not fetch calendars" };
+  try {
+    const events = CalendarApp.getDefaultCalendar().getEvents(now, endDate);
+    const capacityMap = {};
+    events.forEach(e => {
+       const d = Utilities.formatDate(e.getStartTime(), "Europe/London", "yyyy-MM-dd");
+       if (!capacityMap[d]) capacityMap[d] = 0;
+       capacityMap[d] += (e.getEndTime().getTime() - e.getStartTime().getTime()) / 3600000;
+    });
+    return capacityMap;
+  } catch(e) {
+    return { error: "Could not fetch calendar" };
+  }
 }
 
 /**
  * Retrieves list of active calendar events scheduled for the current day.
- * Checks both Private and PMT calendars.
  * 
  * @param {Date} [targetDate] Date to fetch events for. Defaults to now.
  * @returns {Object[]} Calendar event objects matching schema (title, start, end, isAllDay).
@@ -974,36 +1047,29 @@ function getTodayCalendarEvents(targetDate) {
   const yyyy = Utilities.formatDate(now, "Europe/London", "yyyy");
   const MM = Utilities.formatDate(now, "Europe/London", "MM");
   const dd = Utilities.formatDate(now, "Europe/London", "dd");
-  
-  const startOfDay = new Date(yyyy, MM - 1, dd, 0, 0, 0);
-  const endOfDay = new Date(yyyy, MM - 1, dd, 23, 59, 59);
 
-  let mergedEvents = [];
-  const calendarsToCheck = [
-    "adersteg.daniel@gmail.com",
-    "daniel@playmetech.net"
-  ];
+  const approxStart = new Date(`${yyyy}-${MM}-${dd}T00:00:00Z`);
+  const approxEnd = new Date(`${yyyy}-${MM}-${dd}T23:59:59Z`);
 
-  calendarsToCheck.forEach(calId => {
-    try {
-      const calendar = CalendarApp.getCalendarById(calId);
-      if (calendar) {
-        const events = calendar.getEvents(startOfDay, endOfDay);
-        const mapped = events.map(e => ({
-          title: e.getTitle(),
-          start: Utilities.formatDate(e.getStartTime(), "Europe/London", "HH:mm"),
-          end: Utilities.formatDate(e.getEndTime(), "Europe/London", "HH:mm"),
-          isAllDay: e.isAllDayEvent(),
-          source: calId
-        }));
-        mergedEvents = mergedEvents.concat(mapped);
-      }
-    } catch(e) {
-      console.warn("Could not fetch today's events for: " + calId, e.message);
-    }
-  });
+  const startOffset = Utilities.formatDate(approxStart, "Europe/London", "XXX");
+  const endOffset = Utilities.formatDate(approxEnd, "Europe/London", "XXX");
 
-  return mergedEvents;
+  const startStr = `${yyyy}-${MM}-${dd}T00:00:00${startOffset}`;
+  const endStr = `${yyyy}-${MM}-${dd}T23:59:59${endOffset}`;
+
+  const startOfDay = new Date(startStr);
+  const endOfDay = new Date(endStr);
+  try {
+    const events = CalendarApp.getDefaultCalendar().getEvents(startOfDay, endOfDay);
+    return events.map(e => ({
+       title: e.getTitle(),
+       start: Utilities.formatDate(e.getStartTime(), "Europe/London", "HH:mm"),
+       end: Utilities.formatDate(e.getEndTime(), "Europe/London", "HH:mm"),
+       isAllDay: e.isAllDayEvent()
+    }));
+  } catch(e) {
+    return [];
+  }
 }
 
 /**
@@ -1021,13 +1087,9 @@ function getSystemGoals() {
     const workId = SYSTEM_CONFIG.DOCS.WORK_GOALS_FILE_ID;
     
     let goalsText = "=== PERSONAL GOALS ===\n";
-    let pText = getSafeDocText(personalId);
-    if (!pText) throw new Error("Failed to load personal goals text.");
-    goalsText += pText;
+    goalsText += DriveApp.getFileById(personalId).getBlob().getDataAsString();
     goalsText += "\n\n=== PMT GOALS ===\n";
-    let wText = getSafeDocText(workId);
-    if (!wText) throw new Error("Failed to load work goals text.");
-    goalsText += wText;
+    goalsText += DriveApp.getFileById(workId).getBlob().getDataAsString();
     
     cache.put("SYSTEM_GOALS_V2", goalsText.substring(0, 100000), 21600); // Cache for 6 hours
     return goalsText;
@@ -1051,9 +1113,7 @@ function getSystemTaxonomy() {
      const docId = SYSTEM_CONFIG.DOCS.TAXONOMY_JSON_ID;
      if (!docId) return "[]";
      
-     const text = getSafeDocText(docId);
-     if (!text) throw new Error("Failed to load taxonomy text.");
-
+     const text = DriveApp.getFileById(docId).getBlob().getDataAsString();
      cache.put("SYSTEM_TAXONOMY_V2", text.substring(0, 100000), 21600);
      return text;
   } catch(e) {

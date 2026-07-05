@@ -1,22 +1,3 @@
-/**
- * @file src/PromptData.js
- * @description Centralized module for managing and updating AI system prompts stored in Google Docs.
- * @version 1.0.1
- * @last_modified 2024-05-24
- * @modified_by Jules
- *
- * @changelog
- * - 1.0.1: Added comprehensive JSDoc headers/docstrings, and standardized error handling across all methods.
- * - 1.0.0: Initial implementation.
- */
-
-/**
- * Updates the '1 Day Operations' (Daily) system prompt stored in Google Drive.
- * Generates the prompt content as an array of strings, writes it to the designated Document ID,
- * and clears the associated Script Cache to ensure subsequent runs retrieve the fresh prompt.
- *
- * @returns {string} A success message if updated correctly, or an error message on failure.
- */
 function patchDailyPrompt() {
   const text = [
     "[SYSTEM INSTRUCTION]",
@@ -48,9 +29,10 @@ function patchDailyPrompt() {
     "- **BLUF:** Must begin with a 1-3 sentence summary of the immediate tactical reality.",
     "- **Single Task Appearance:** A task MUST ONLY appear once in the entire report.",
     "- **Tags:** Use Eisenhower tags (`[Q1]`, `[Q2]`, etc.) immediately before the task name.",
-    "- **Timeboxing Formatting:** For the Frogs and Today's Top 3, you MUST schedule them in your calendar using a strict 24-HOUR time block format at the very start of the line: `[HH:MM - HH:MM]` (e.g. `[13:00 - 14:30]`). Do NOT use 12-hour AM/PM format.",
+    "- **Timeboxing Formatting:** For the Frogs and Today's Top 3, you MUST schedule them in your calendar using a strict 24-HOUR time block format at the very start of the line: `[HH:MM - HH:MM]` (e.g. `[13:00 - 13:30]`). Do NOT use 12-hour AM/PM format.",
+    "- **CRITICAL TIMEBOXING RULE:** You MUST ONLY map your tasks to the exact time blocks provided in the `availableTimeSlots` JSON array. Assign exactly one task per slot. Do not invent your own time blocks. If you run out of available time slots, you MUST leave the remaining tasks unscheduled or push them to the backlog. If there are 0 slots available, you MUST output an empty plan.",
     "- **Timeboxing Boundaries (Weekdays):** Monday-Friday, PMT Tasks MUST be scheduled between 09:30 and 19:30. Personal Tasks MUST be scheduled either BEFORE work (07:00 - 09:30) or AFTER work (19:30 - 22:00). Do NOT schedule Personal tasks during work hours (09:30 - 19:30).",
-    "- **Timeboxing Boundaries (Weekends):** Saturday: NO PMT Tasks allowed. Sunday: PMT Tasks allowed for a MAXIMUM of 3 hours total. On BOTH Saturday and Sunday, Personal tasks MUST be scheduled between 10:00 and 18:00.",
+    "- **Timeboxing Boundaries (Weekends):** Saturday and Sunday: NO PMT Tasks allowed. On BOTH Saturday and Sunday, Personal tasks MUST be scheduled between 10:00 and 18:00.",
     "- **Timeboxing Conflicts & Set Times:** You MUST read the `capacity` block (calendar events) and completely AVOID scheduling tasks over existing meetings. If a Google Task specifies a particular set time in its title or notes, you MUST honor that time exactly.",
     "- **Output Format:** Output ONLY the exact markdown structure below. No JSON blocks.",
     "",
@@ -103,23 +85,12 @@ function patchDailyPrompt() {
   ].join("\n");
   
   const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
-  try {
-    const file = DriveApp.getFileById(promptId);
-    file.setContent(text);
-    CacheService.getScriptCache().remove("TASK_MASTER_DAILY_PROMPT");
-    return "Prompt updated successfully.";
-  } catch (error) {
-    return "Error updating Daily Prompt: " + error.message;
-  }
+  const file = DriveApp.getFileById(promptId);
+  file.setContent(text);
+  CacheService.getScriptCache().remove("TASK_MASTER_DAILY_PROMPT");
+  return "Prompt updated successfully.";
 }
 
-/**
- * Updates the 'Route Mode' system prompt for The Clerk (Notes) stored in Google Drive.
- * Generates the prompt content specifically designed for extracting tasks and determining
- * a target LOS folder for messy, unstructured notes, then writes it to the designated Document ID.
- *
- * @returns {string} A success message if updated correctly, or an error message on failure.
- */
 function patchNotesRoutePrompt() {
   const text = [
     "# The Clerk Notes (Route Mode) - System Prompt",
@@ -157,18 +128,11 @@ function patchNotesRoutePrompt() {
     const file = DriveApp.getFileById(promptId);
     file.setContent(text);
     return "Route Mode Prompt updated successfully.";
-  } catch (error) {
-    return "Error updating Route Mode Prompt: " + error.message;
+  } catch (e) {
+    return "Error updating Route Mode Prompt: " + e.message;
   }
 }
 
-/**
- * Updates the 'Clean-in-Place Mode' system prompt for The Clerk (Notes) stored in Google Drive.
- * Generates the prompt content specifically designed for extracting critical tasks and structuring
- * in-context meeting notes without re-categorizing them, then writes it to the designated Document ID.
- *
- * @returns {string} A success message if updated correctly, or an error message on failure.
- */
 function patchNotesCleanPrompt() {
   const text = [
     "# The Clerk Notes (Clean-in-Place Mode) - System Prompt",
@@ -203,19 +167,12 @@ function patchNotesCleanPrompt() {
     const file = DriveApp.getFileById(promptId);
     file.setContent(text);
     return "Clean Mode Prompt updated successfully.";
-  } catch (error) {
-    return "Error updating Clean Mode Prompt: " + error.message;
+  } catch (e) {
+    return "Error updating Clean Mode Prompt: " + e.message;
   }
 }
 
 
-/**
- * Updates the 'Task Master' (Global Routing) system prompt stored in Google Drive.
- * Generates the prompt content outlining rules for evaluating tasks based on the Eisenhower Matrix,
- * splits long tasks, and sets routing targets, then writes it to the designated Document ID.
- *
- * @returns {string} A success message if updated correctly, or an error message on failure.
- */
 function patchSystemPrompt() {
   const text = [
     "[SYSTEM INSTRUCTION]",
@@ -246,8 +203,8 @@ function patchSystemPrompt() {
     file.setContent(text);
     CacheService.getScriptCache().remove("TASK_MASTER_PROMPT_V2");
     return "System Prompt updated successfully.";
-  } catch (error) {
-    return "Error updating System Prompt: " + error.message;
+  } catch (e) {
+    return "Error updating System Prompt: " + e.message;
   }
 }
 
