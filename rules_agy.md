@@ -1,0 +1,69 @@
+# Antigravity Workspace Rules: The System
+
+This is the central workspace rules file for **The System**. Verne and all other native Antigravity agents must read and adhere to these guidelines to ensure architectural stability, prevent execution blocks, and avoid OAuth/scope synchronization issues.
+
+---
+
+## 1. Project Stack & Architecture
+* **Primary Language/Framework:** JavaScript (Google Apps Script runtime V8), Python 3.9+ (local automation/sync utilities).
+* **Workspace Engine:** Managed locally via `clasp` (Command Line Apps Script Projects) for code syncing, and Git/GitHub for version control.
+* **Git Protocol (CRITICAL):** Because `clasp push` is decoupled from version control, the local Git history will drift behind the live code. To prevent wiping out uncommitted work, you MUST run a global git commit (e.g., `git add -u && git commit -m "saving progress"`) at the end of your task or shift to ensure all your changes are preserved in Git.
+
+---
+
+## 2. Google OAuth & Manifest Separation Protocol (CRITICAL)
+Both **The System** (`the_system`) and **Reflection** (`reflection`) Apps Script projects **MUST** be linked to **separate** Google Cloud Platform (GCP) projects with distinct OAuth Client Applications.
+
+This separation prevents the **Scope Downgrade Loop** and headless execution blocks:
+1. **No Shared GCP Project:** `the_system` and `reflection` must have different `projectId` settings in their respective `.clasp.json` configurations.
+2. **Strict Health Scope Exclusion from The System:**
+   - The `oauthScopes` array in [the_system/src/appsscript.json](src/appsscript.json) **MUST NOT** contain any Google Health API scopes (e.g., activity, sleep, or health metrics).
+   - Google Health scopes require a restricted "reauth" (invalid_rapt) challenge, which blocks headless agent tasks and standard `clasp` command execution. 
+   - Only `reflection` (which runs interactively for Vantage auditing) is permitted to include Google Health scopes.
+3. **Invalidating Cached Authorizations:**
+   - If a script encounters a permission denied error without prompting the user with an authorization modal, ask the user to open the Apps Script editor, select the `0_AuthScopeFixer` script, choose the `triggerAuthPrompt` function, and click **Run**. This will touch all active services and trigger Google's OAuth consent popup.
+
+---
+
+## 3. Local Python Credentials & Token Auditing
+Local integration scripts (e.g., Python sync scripts) rely on client credentials (`client_secret.json`) and generated credentials (`token.json`).
+
+1. **Deleted OAuth Client Recovery:**
+   - If a local script fails with a `deleted_client` error, the Client ID has been deleted or changed in the GCP Console.
+   - Download the new active client ID JSON credentials, overwrite `the_system/client_secret.json`, delete the stale `token.json` files, and re-run the Python script to trigger the browser OAuth consent flow.
+2. **System Health Check CLI:**
+   - Run the health checker from the root of `the_system/` workspace to verify python dependencies, clasp connection, and token validity:
+     ```bash
+     ./scripts/maintenance/check_system_health.py
+     ```
+
+---
+
+## 4. Documentation Integrity
+* Always maintain the diagnostic utilities (`0_AuthScopeFixer.js` in Apps Script, `check_system_health.py` locally) as new Google Services or resource endpoints are added to the system.
+* Document any new system sheets, drive folders, or task lists in [TS - Auth & Resource Troubleshooting.md](docs/TS%20-%20Auth%20&%20Resource%20Troubleshooting.md) and inside the verifier scripts.
+
+---
+
+## 5. Gemini Models Reference
+* **CRITICAL:** When answering questions about Gemini models, their specs, context windows, or availability, ALWAYS reference the [data/Actual_Gemini_Models.json](data/Actual_Gemini_Models.json) file in this workspace. 
+* Do not rely on outdated files like `context_gemini_models.md` or internal training data for this information.
+
+---
+
+## 6. Workspace Organization Protocol
+To prevent directory clutter, all agents must adhere to the following file placement rules:
+1. **One-Off Scripts:** Any temporary or utility script (e.g., test files, single-use data parsers) MUST be placed in `scripts/utils/` or the `scratch/` directory. Do NOT create Python scripts in the root directory unless they are core system executables.
+2. **Data & State Files:** JSON exports, state files, and data dumps MUST be placed in `data/`.
+3. **Documentation:** Markdown documentation MUST be placed in `docs/`. Agent prompts and system instructions MUST go in `docs/prompts/`.
+4. **Logs & Output:** Output logs, tree dumps, and process tracking files MUST be placed in `logs/`.
+5. **Assets:** PDFs, images, and non-text artifacts MUST be placed in `assets/`.
+6. **Configuration & Credentials:** Only core system configurations (e.g., `.env`, `fca-config.json`, `rules.agy`, `.clasp.json`) and credentials (`token.json`, `client_secret.json`) are permitted in the root directory.
+
+---
+
+## 7. Dual-Environment Clasp Deployment Protocol
+* **No Direct Configuration Edits:** AI agents are strictly forbidden from editing `.clasp.json` directly.
+* **No Direct Clasp Push:** AI agents are strictly forbidden from running `clasp push` directly.
+* **Mandated Deployment Script:** AI agents must always use `./deploy.sh private` or `./deploy.sh work` to deploy code to Google Apps Script.
+* **Environment Parity:** AI agents must ensure environment parity by syncing changes to both the private and work environments (i.e. deploying to both targets when making changes).
