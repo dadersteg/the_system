@@ -364,7 +364,13 @@ function getSafeDocText(id) {
     text = DocumentApp.openById(id).getBody().getText();
   } catch (e) {
     try {
-      text = DriveApp.getFileById(id).getBlob().getDataAsString();
+      const file = DriveApp.getFileById(id);
+      const mime = file.getMimeType();
+      if (mime === MimeType.GOOGLE_SHEETS) {
+        console.warn(`getSafeDocText: Skipping getDataAsString() for unsupported MIME type (Google Sheets) on file ID ${id}.`);
+      } else {
+        text = file.getBlob().getDataAsString();
+      }
     } catch (err) {
       console.error(`Failed to fetch file/doc ${id}: ${err.message}`);
     }
