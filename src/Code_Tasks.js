@@ -1085,21 +1085,13 @@ let cachedTaxonomy = null;
  */
 function getTaxonomyDocument() {
   if (cachedTaxonomy) return cachedTaxonomy;
-  try {
-    const fileId = SYSTEM_CONFIG.DOCS.TAXONOMY_DOC_ID;
-    const file = DriveApp.getFileById(fileId);
-    cachedTaxonomy = file.getBlob().getDataAsString();
+  const text = getSafeDocText(SYSTEM_CONFIG.DOCS.TAXONOMY_DOC_ID);
+  if (text) {
+    cachedTaxonomy = text;
     return cachedTaxonomy;
-  } catch (e) {
-    try {
-      const doc = DocumentApp.openById(SYSTEM_CONFIG.DOCS.TAXONOMY_DOC_ID);
-      cachedTaxonomy = doc.getBody().getText();
-      return cachedTaxonomy;
-    } catch (e2) {
-      console.error("Failed to fetch taxonomy document from Drive:", e2.message);
-      return "Taxonomy document could not be loaded.";
-    }
   }
+  console.error("Failed to fetch taxonomy document from Drive: No text returned");
+  return "Taxonomy document could not be loaded.";
 }
 
 /**
@@ -1110,15 +1102,11 @@ function getTaxonomyDocument() {
 function getTaskMasterPrompt() {
   const docId = SYSTEM_CONFIG.DOCS.TASK_MASTER_PROMPT_ID;
   if (docId) {
-    try {
-      try {
-        return DocumentApp.openById(docId).getBody().getText();
-      } catch (e1) {
-        return DriveApp.getFileById(docId).getBlob().getDataAsString();
-      }
-    } catch (e) {
-      console.error("Failed to load Task Master Prompt Document: " + e.message);
+    const text = getSafeDocText(docId);
+    if (text) {
+      return text;
     }
+    console.error("Failed to load Task Master Prompt Document: No text returned or could not be loaded.");
   }
   return null;
 }
