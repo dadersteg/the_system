@@ -14,7 +14,9 @@
  * Generates the 28-Day Strategic Pruning Report by aggregating tasks,
  * calling the AI model for review, and saving the output to Google Drive.
  *
+ * @function runMonthlyReview
  * @returns {void}
+ * @throws {Error} If the prompt file cannot be loaded from Google Drive or if all API attempts fail.
  */
 function runMonthlyReview() {
   const importerListId = SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
@@ -40,21 +42,21 @@ function runMonthlyReview() {
     currentTime: new Date().toISOString(),
     goals: getSystemGoals(),
     allTasksContext: rawTasks.map(t => {
-       let cleanNotes = t.notes;
+       let cleanedNotes = t.notes;
        let metadata = {};
-       const metaSplit = cleanNotes.split('---SYSTEM_METADATA---');
-       if (metaSplit.length > 1) {
+       const metaSplitData = cleanedNotes.split('---SYSTEM_METADATA---');
+       if (metaSplitData.length > 1) {
           try {
-             metadata = JSON.parse(metaSplit[1].trim());
+             metadata = JSON.parse(metaSplitData[1].trim());
           } catch(e) {}
        }
-       cleanNotes = metaSplit[0].replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
-       cleanNotes = cleanNotes.replace(/\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
+       cleanedNotes = metaSplitData[0].replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
+       cleanedNotes = cleanedNotes.replace(/\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
        return { 
          title: t.title, 
          due: t.due, 
          updated: t.updated,
-         notes: cleanNotes.trim(),
+         notes: cleanedNotes.trim(),
          category_path: metadata.category_path || "N/A",
          goal: metadata.goal || "N/A",
          duration: metadata.duration || "N/A"
@@ -66,17 +68,8 @@ function runMonthlyReview() {
   try {
      const fileId = SYSTEM_CONFIG.DOCS.TASK_MASTER_MONTHLY_PROMPT_ID;
      if (!fileId) throw new Error("TASK_MASTER_MONTHLY_PROMPT_ID is not configured in SYSTEM_CONFIG.");
-     const file = DriveApp.getFileById(fileId);
-     const mimeType = file.getMimeType();
-     let text = "";
-     if (mimeType === MimeType.GOOGLE_DOCS) {
-       text = DocumentApp.openById(fileId).getBody().getText();
-     } else if (mimeType === MimeType.PLAIN_TEXT || mimeType === "text/plain") {
-       text = file.getBlob().getDataAsString();
-     } else {
-       throw new Error(`Unsupported MIME type: ${mimeType}`);
-     }
-     systemPrompt = processPromptText(text);
+     systemPrompt = getSafeDocText(fileId);
+     if (!systemPrompt) throw new Error("Prompt is empty or file could not be read.");
   } catch(e) {
      console.error("Failed to load 28-Day prompt from Drive:", e.message);
      return;
@@ -154,8 +147,9 @@ function runMonthlyReview() {
 /**
  * Writes the generated markdown report to the designated Google Drive file.
  *
- * @param {string} markdownStr The markdown content of the 28-Day report.
- * @returns {string|null} The URL of the updated or created file, or null if it fails.
+ * @function write28DayReport
+ * @param {string} markdownStr - The markdown content of the 28-Day report.
+ * @returns {string|null} The URL of the updated or created file, or null if an error occurs.
  */
 function write28DayReport(markdownStr) {
   const fileId = SYSTEM_CONFIG.GENERATED_OUTPUTS.DAY_28_STRATEGIC;
@@ -179,8 +173,9 @@ function write28DayReport(markdownStr) {
 
 /**
  * Trigger wrapper for the 28-Day Strategic Review.
- * Executes the review every 28 days based on a base reference date.
+ * Executes the review every 28 days based on a base reference date (May 10, 2026).
  *
+ * @function monthlyReviewTriggerWrapper
  * @returns {void}
  */
 function monthlyReviewTriggerWrapper() {
