@@ -207,10 +207,14 @@ function _analyzePhotoWithGemini(blob, msgContext) {
   
   try {
     const res = UrlFetchApp.fetch(url, options);
-    const json = JSON.parse(res.getContentText());
-    if (json.candidates && json.candidates[0]) {
-      const text = json.candidates[0].content.parts[0].text;
-      return JSON.parse(text);
+    if (res.getResponseCode() === 200) {
+      const json = JSON.parse(res.getContentText());
+      if (json.candidates && json.candidates[0]) {
+        const text = json.candidates[0].content.parts[0].text;
+        return JSON.parse(text);
+      }
+    } else {
+      console.warn("Gemini analysis failed with HTTP " + res.getResponseCode() + ": " + res.getContentText());
     }
   } catch(e) {
     console.error("Gemini analysis failed: " + e.message);
