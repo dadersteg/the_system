@@ -13,13 +13,10 @@
 const BRIDGE_SECRET = "MOW_BRIDGE_SECRET_2026";
 
 /**
- * Handles GET requests (e.g. MacroDroid query-parameter style).
- * REMOVED: Clashes with Dashboard doGet.
+ * Handles incoming POST requests and delegates to the unified webhook processor.
+ * @param {Object} e - The Google Apps Script event object for POST requests.
+ * @returns {GoogleAppsScript.Content.TextOutput} The JSON response indicating success or failure.
  */
-// function doGet(e) {
-//   return processWebhook(e);
-// }
-
 function doPost(e) {
   if (e && e.parameter && e.parameter.action) {
     return doGet(e);
@@ -40,6 +37,8 @@ function doPost(e) {
 /**
  * Unified request handler for both GET and POST.
  * Supports: JSON body, form-encoded body, and URL query parameters.
+ * @param {Object} e - The Google Apps Script event object.
+ * @returns {GoogleAppsScript.Content.TextOutput} The JSON response indicating success or failure.
  */
 function processWebhook(e) {
   try {
@@ -75,7 +74,7 @@ function processWebhook(e) {
     // If the b64 flag is set, subject/body/name are already base64-encoded UTF-8.
     // Pass them directly into raw MIME to preserve emojis.
     // If not set, base64-encode them now so the MIME path is unified.
-    var subjectB64, bodyB64, nameB64;
+    let subjectB64, bodyB64, nameB64;
     if (payload.b64) {
       subjectB64 = payload.subject;
       bodyB64    = payload.body;
@@ -116,12 +115,12 @@ function processWebhook(e) {
 function findExistingThread(subjectB64) {
   try {
     // Decode subject to plain text for the search query
-    var subject = Utilities.newBlob(Utilities.base64Decode(subjectB64)).getDataAsString('UTF-8');
+    const subject = Utilities.newBlob(Utilities.base64Decode(subjectB64)).getDataAsString('UTF-8');
     // Use in:anywhere so we find the thread even if it was moved to Trash or archived
-    var query = 'subject:"' + subject + '" from:me to:me in:anywhere';
-    var threads = GmailApp.search(query, 0, 1);
+    const query = 'subject:"' + subject + '" from:me to:me in:anywhere';
+    const threads = GmailApp.search(query, 0, 1);
     if (threads && threads.length > 0) {
-      var thread = threads[0];
+      const thread = threads[0];
       // Force the thread back to the inbox and mark it unread so the user sees the new message
       thread.moveToInbox();
       thread.markUnread();
@@ -148,30 +147,30 @@ function findExistingThread(subjectB64) {
  * @param {Array} attachments - Array of {filename, mimeType, base64} objects.
  */
 function sendRawMimeEmail(to, subjectB64, bodyB64, nameB64, references, attachments) {
-  var boundary = "boundary_" + Math.random().toString(36).substr(2);
-  var messageId = "<" + Math.random().toString(36).substr(2) + "@ingestion.bridge>";
+  const boundary = "boundary_" + Math.random().toString(36).substr(2);
+  const messageId = "<" + Math.random().toString(36).substr(2) + "@ingestion.bridge>";
 
   // Decode subject to plain text
-  var bodyText = Utilities.newBlob(Utilities.base64Decode(bodyB64)).getDataAsString('UTF-8');
+  let bodyText = Utilities.newBlob(Utilities.base64Decode(bodyB64)).getDataAsString('UTF-8');
 
   // Look up existing thread to chain into
-  var existingThreadId = findExistingThread(subjectB64);
+  const existingThreadId = findExistingThread(subjectB64);
 
   if (existingThreadId) {
     try {
-      var thread = GmailApp.getThreadById(existingThreadId);
-      var existingMessages = thread.getMessages();
-      var normalizedThreadText = "";
-      for (var i = 0; i < existingMessages.length; i++) {
+      const thread = GmailApp.getThreadById(existingThreadId);
+      const existingMessages = thread.getMessages();
+      let normalizedThreadText = "";
+      for (let i = 0; i < existingMessages.length; i++) {
         normalizedThreadText += normalizeText(existingMessages[i].getPlainBody());
       }
 
-      var snippets = bodyText.split(/[\r\n]*---[\r\n]*/);
-      var filteredSnippets = [];
-      for (var j = 0; j < snippets.length; j++) {
-        var snippet = snippets[j].trim();
+      const snippets = bodyText.split(/[\r\n]*---[\r\n]*/);
+      const filteredSnippets = [];
+      for (let j = 0; j < snippets.length; j++) {
+        const snippet = snippets[j].trim();
         if (!snippet) continue;
-        var normalizedSnippet = normalizeText(snippet);
+        const normalizedSnippet = normalizeText(snippet);
         if (normalizedThreadText.indexOf(normalizedSnippet) === -1) {
           filteredSnippets.push(snippet);
         } else {
@@ -192,7 +191,7 @@ function sendRawMimeEmail(to, subjectB64, bodyB64, nameB64, references, attachme
   }
 
   // Build MIME headers - subject and name use RFC 2047 base64 encoding
-  var mimeLines = [
+  const mimeLines = [
     "To: " + to,
     "Subject: =?UTF-8?B?" + subjectB64 + "?=",
     "From: =?UTF-8?B?" + nameB64 + "?= <" + to + ">",
@@ -238,9 +237,9 @@ function sendRawMimeEmail(to, subjectB64, bodyB64, nameB64, references, attachme
 
   // The MIME envelope is entirely ASCII (all emoji content is base64-encoded),
   // so a simple Utilities.base64Encode on the ASCII string is safe.
-  var raw = Utilities.base64EncodeWebSafe(mimeLines.join("\r\n"));
+  const raw = Utilities.base64EncodeWebSafe(mimeLines.join("\r\n"));
 
-  var sendPayload = { raw: raw };
+  const sendPayload = { raw: raw };
   if (existingThreadId) {
     sendPayload.threadId = existingThreadId;
   }
@@ -251,11 +250,12 @@ function sendRawMimeEmail(to, subjectB64, bodyB64, nameB64, references, attachme
 /**
  * 🔒 Run this function ONCE manually from the Apps Script editor to authorize
  * the Gmail advanced service (gmail.modify scope) used by the ingestion bridge.
+ * @returns {void}
  */
 function authorizeGmailSend() {
-  var subjectB64 = Utilities.base64Encode("Bridge Auth Test", Utilities.Charset.UTF_8);
-  var bodyB64    = Utilities.base64Encode("This is a test to authorize the gmail.modify scope.", Utilities.Charset.UTF_8);
-  var nameB64    = Utilities.base64Encode("Atlas Bridge", Utilities.Charset.UTF_8);
+  const subjectB64 = Utilities.base64Encode("Bridge Auth Test", Utilities.Charset.UTF_8);
+  const bodyB64    = Utilities.base64Encode("This is a test to authorize the gmail.modify scope.", Utilities.Charset.UTF_8);
+  const nameB64    = Utilities.base64Encode("Atlas Bridge", Utilities.Charset.UTF_8);
   sendRawMimeEmail(
     Session.getActiveUser().getEmail(),
     subjectB64,
