@@ -68,6 +68,7 @@ This document provides a comprehensive overview of the active file taxonomy, fro
     - 202603 Airwallex
     - 202603 OLIX
     - 202604 Deel
+    - 202607 Humanoid
     - CVs & Cover Letters
     - Grades & Certificates
 - **02 03 00 Work**
@@ -151,6 +152,7 @@ graph TD
     N61 --> N62["202603 Airwallex"]
     N61 --> N63["202603 OLIX"]
     N61 --> N64["202604 Deel"]
+    N61 --> N64a["202607 Humanoid"]
     N61 --> N65["CVs & Cover Letters"]
     N61 --> N66["Grades & Certificates"]
     N59 --> N67["02 03 00 Work"]
