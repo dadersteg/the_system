@@ -292,6 +292,11 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                             computed_category = " > ".join(title_parts[:-1]).strip()
                             computed_title = title_parts[-1].strip()
                             
+                        if computed_title.startswith("[Milestone]"):
+                            computed_title = computed_title.replace("[Milestone]", "", 1).strip()
+                            if milestone == "None":
+                                milestone = "TRUE"
+                            
                         parent_category = computed_category
                         sub_category = ""
                         if " > " in computed_category:
@@ -364,6 +369,10 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                     if len(title_parts) >= 2:
                         computed_category = " > ".join(title_parts[:-1]).strip()
                         computed_title = title_parts[-1].strip()
+                        
+                    if computed_title.startswith("[Milestone]"):
+                        computed_title = computed_title.replace("[Milestone]", "", 1).strip()
+                        milestone = "TRUE"
                     
                     parent_category = computed_category
                     sub_category = ""
@@ -472,6 +481,11 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                     if len(title_parts) >= 2:
                         computed_category = " > ".join(title_parts[:-1]).strip()
                         computed_title = title_parts[-1].strip()
+                        
+                    if computed_title.startswith("[Milestone]"):
+                        computed_title = computed_title.replace("[Milestone]", "", 1).strip()
+                        if milestone == "None":
+                            milestone = "TRUE"
                         
                     parent_category = computed_category
                     sub_category = ""

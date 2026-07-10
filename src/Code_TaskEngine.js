@@ -679,6 +679,44 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
          console.log(`Executing automated task split for task ${u.taskId}`);
          let allInsertsSucceeded = true;
          
+         let actualParentId = u.taskId;
+         let actualParentListId = listId;
+         let milestoneTitle = u.recommendedTitle || task.title || "";
+         if (!milestoneTitle.startsWith("[Milestone]")) {
+             milestoneTitle = "[Milestone] " + milestoneTitle;
+         }
+         
+         if (listId !== todoListId) {
+             console.log(`Moving parent task ${u.taskId} to ToDo list to become Milestone.`);
+             try {
+                 const newParentResource = {
+                     title: milestoneTitle,
+                     notes: task.notes,
+                     due: task.due,
+                     status: task.status
+                 };
+                 const movedParent = Tasks.Tasks.insert(newParentResource, todoListId);
+                 actualParentId = movedParent.id;
+                 actualParentListId = todoListId;
+                 
+                 if (isAssignedTask) {
+                     Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
+                 } else {
+                     Tasks.Tasks.remove(listId, u.taskId);
+                 }
+             } catch (e) {
+                 console.error(`Failed to move parent task: ${e.message}`);
+                 return;
+             }
+         } else {
+             console.log(`Renaming parent task ${u.taskId} to Milestone.`);
+             try {
+                 Tasks.Tasks.patch({ title: milestoneTitle }, listId, u.taskId);
+             } catch (e) {
+                 console.error(`Failed to rename parent task: ${e.message}`);
+             }
+         }
+         
          const baseMetadata = {
            goal: u.alignedGoal || "TBD",
            category_path: u.category_path || "N/A",
@@ -712,7 +750,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
                   status: "needsAction"
                 };
                 
-                const created = Tasks.Tasks.insert(subTaskResource, todoListId);
+                const created = Tasks.Tasks.insert(subTaskResource, actualParentListId, { parent: actualParentId });
                 newTasksCreated.push(created);
              } catch (e) {
                 console.error(`Failed to insert sub-task ${sub.title}: ${e.message}`);
@@ -721,18 +759,9 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
          }
          
          if (allInsertsSucceeded && newTasksCreated.length > 0) {
-             console.log(`Successfully split ${u.taskId}. Deleting original parent task.`);
-             try {
-                if (isAssignedTask) {
-                   Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
-                } else {
-                   Tasks.Tasks.remove(listId, u.taskId);
-                }
-             } catch (e) {
-                console.warn(`Could not completely delete parent task ${u.taskId}: ${e.message}`);
-             }
+             console.log(`Successfully split ${u.taskId} into Milestone with native sub-tasks.`);
          } else {
-             console.log(`Split inserts partially failed for ${u.taskId}. Parent task is retained.`);
+             console.log(`Split inserts partially failed for ${u.taskId}.`);
          }
          return; 
       }
