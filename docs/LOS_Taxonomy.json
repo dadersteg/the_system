@@ -1318,6 +1318,20 @@
   {
     "L1 Code": "02 00 00",
     "L1 Name": "Work",
+    "L2 Code": "02 02 00",
+    "L2 Name": "Career Management",
+    "L3 Code": "",
+    "L3 Name": "",
+    "L4 Name": "202607 Humanoid",
+    "L4 Description": "**Active Application:** Job application and interview process.",
+    "Concat (Label)": "02 Work/02 Career Management/202607 Humanoid",
+    "Concat (Path)": "02 02 00 Career Management > 202607 Humanoid",
+    "Drive Path": "02 00 00 Work/02 02 00 Career Management/202607 Humanoid",
+    "Drive ID": "10uCsswFRmUCgYfnJJLA6OFJ-Mk4e9YIW"
+  },
+  {
+    "L1 Code": "02 00 00",
+    "L1 Name": "Work",
     "L2 Code": "02 03 00",
     "L2 Name": "Collections",
     "L3 Code": "",

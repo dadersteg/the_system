@@ -297,6 +297,7 @@ While L1-L4 represent the strict, AI-navigable "Skeleton" of the system, **L5 an
 | **202603 Airwallex** | **Active Application:** Job application and interview process. |
 | **202604 Deel** | **Active Application:** Job application and interview process. |
 | **202603 OLIX** | **Active Application:** Job application and interview process. |
+| **202607 Humanoid** | **Active Application:** Job application and interview process. |
 
 ---
 

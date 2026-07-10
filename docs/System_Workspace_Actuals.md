@@ -247,6 +247,7 @@
       - 202603 Airwallex
       - 202603 OLIX
       - 202604 Deel
+      - 202607 Humanoid
       - CVs & Cover Letters
         - 99 Archive
       - Grades & Certificates
