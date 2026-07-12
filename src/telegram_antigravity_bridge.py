@@ -542,6 +542,138 @@ async def screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = update.callback_query.message if update.callback_query else update.message
         await msg.reply_photo(photo=BytesIO(data), caption="📸 Live State")
 
+async def answer_question(text: str, do_submit: bool = True) -> str:
+    ws_url = await get_ws_url_for_target()
+    if not ws_url:
+        return "Bridge offline"
+
+    try:
+        async with websockets.connect(ws_url, open_timeout=1) as ws:
+            safe_text = json.dumps(text)
+            safe_submit = "true" if do_submit else "false"
+            
+            script = f"""
+            (function() {{
+                const text = {safe_text}.toLowerCase();
+                const doSubmit = {safe_submit};
+                let clicked = false;
+                let submitBtnFound = null;
+                
+                // Find ALL buttons on the page
+                const allButtons = Array.from(document.querySelectorAll("button, [role='button'], .antigravity-option"));
+                
+                // If text is a number, we look for "Option X:" or "X." or exact match
+                const num = parseInt(text, 10);
+                let targetBtn = null;
+                
+                if (!isNaN(num) && num > 0) {{
+                    targetBtn = allButtons.find(b => {{
+                        const t = (b.innerText || b.innerHTML || "").toLowerCase();
+                        return t.includes(`option ${{num}}`) || t.startsWith(`${{num}}.`);
+                    }});
+                    
+                    if (!targetBtn) {{
+                    }}
+                }}
+                
+                if (!targetBtn) {{
+                    targetBtn = allButtons.find(b => (b.innerText || "").toLowerCase().includes(text));
+                }}
+                
+                if (targetBtn) {{
+                    targetBtn.click();
+                    clicked = true;
+                    return "Success";
+                }}
+                
+                const inputs = Array.from(document.querySelectorAll("input[type='text'], textarea"));
+                const visibleInputs = inputs.filter(i => i.offsetParent !== null);
+                if (visibleInputs.length > 0) {{
+                    const writeIn = visibleInputs[visibleInputs.length - 1];
+                    const prototype = Object.getPrototypeOf(writeIn);
+                    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, "value") ? Object.getOwnPropertyDescriptor(prototype, "value").set : null;
+                    const valueSetter = Object.getOwnPropertyDescriptor(writeIn, "value") ? Object.getOwnPropertyDescriptor(writeIn, "value").set : null;
+                    if (prototypeValueSetter && valueSetter !== prototypeValueSetter) prototypeValueSetter.call(writeIn, {safe_text});
+                    else if (valueSetter) valueSetter.call(writeIn, {safe_text});
+                    else writeIn.value = {safe_text};
+                    writeIn.dispatchEvent(new Event("input", {{ bubbles: true }}));
+                    writeIn.dispatchEvent(new Event("change", {{ bubbles: true }}));
+                    
+                    clicked = true;
+                    const container = writeIn.closest("form") || writeIn.parentElement.parentElement;
+                    if (container) {{
+                        submitBtnFound = container.querySelector("button[type='submit'], button[aria-label='Send'], button");
+                    }}
+                }}
+                
+                if (!clicked) return "Could not find matching option or text input.";
+                
+                if (doSubmit) {{
+                    return new Promise(resolve => {{
+                        setTimeout(() => {{
+                            if (submitBtnFound) {{
+                                submitBtnFound.click();
+                                resolve("Success");
+                                return;
+                            }}
+                            
+                            const dialog = document.querySelector("[role='dialog'], dialog, .antigravity-modal") || document.body;
+                            const buttons = Array.from(dialog.querySelectorAll("button, [role='button'], input[type='submit']"));
+                            let submitBtn = buttons.find(b => {{
+                                const t = (b.innerText || b.value || "").trim().toLowerCase();
+                                return t.includes("submit") || t.includes("confirm") || t.includes("send");
+                            }});
+                            
+                            if (submitBtn) {{
+                                submitBtn.click();
+                                resolve("Success");
+                            }} else {{
+                                resolve("Filled option, but could not find 'Submit' button.");
+                            }}
+                        }}, 200);
+                    }});
+                }}
+                return "Success (Not submitted yet)";
+            }})();
+            """
+            await ws.send(json.dumps({
+                "id": 1,
+                "method": "Runtime.evaluate",
+                "params": {"expression": script, "returnByValue": True, "awaitPromise": True}
+            }))
+            res = json.loads(await asyncio.wait_for(ws.recv(), timeout=2.0))
+            return res.get("result", {}).get("result", {}).get("value", "Unknown error")
+    except Exception as e:
+        logger.error(f"Error answering question: {e}")
+        return str(e)
+
+async def reply_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_authorized(update): return
+    msg = update.message
+    if msg.reply_to_message and msg.reply_to_message.from_user.id == context.bot.id:
+        text = msg.text.strip()
+        res = await answer_question(text)
+        await msg.reply_text("✅ Answer submitted!" if res == "Success" else f"⚠️ {res}")
+
+async def answer_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_authorized(update): return
+    txt = " ".join(context.args)
+    if not txt:
+        await update.message.reply_text("Usage: /answer <text>")
+        return
+    res = await answer_question(txt)
+    await update.message.reply_text("✅ Answer submitted!" if res == "Success" else f"⚠️ {res}")
+
+async def select_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_authorized(update): return
+    txt = " ".join(context.args)
+    if not txt:
+        await update.message.reply_text("Usage: /select <text>")
+        return
+    res = await answer_question(txt, do_submit=False)
+    await update.message.reply_text("✅ Option selected!" if res == "Success (Not submitted yet)" else f"⚠️ {res}")
+
+
 async def main():
     if BOT_TOKEN == "YOUR_BOT_TOKEN": return
     application = ApplicationBuilder().token(BOT_TOKEN).build()
@@ -552,6 +684,10 @@ async def main():
     application.add_handler(CommandHandler("overview", overview))
     application.add_handler(CommandHandler("status", overview))
     application.add_handler(CallbackQueryHandler(button_handler))
+    application.add_handler(CommandHandler("answer", answer_command))
+    application.add_handler(CommandHandler("select", select_command))
+    from telegram.ext import MessageHandler, filters
+    application.add_handler(MessageHandler(filters.REPLY & filters.TEXT, reply_handler))
     
     await application.initialize()
     await application.start()
@@ -563,6 +699,7 @@ async def main():
         await application.updater.stop()
         await application.stop()
         await application.shutdown()
+
 
 if __name__ == '__main__':
     asyncio.run(main())
