@@ -72,7 +72,7 @@
   {
     "name": "01 Private/02 Health/01 Physical Health/Medical Appointments & Tests",
     "leaf": "Medical Appointments & Tests",
-    "unread_count": 0
+    "unread_count": 1
   },
   {
     "name": "01 Private/02 Health/02 Mental Health",
@@ -112,7 +112,7 @@
   {
     "name": "01 Private/04 Finances",
     "leaf": "04 Finances",
-    "unread_count": 0
+    "unread_count": 2
   },
   {
     "name": "01 Private/04 Finances/01 Purchase",
@@ -172,7 +172,7 @@
   {
     "name": "01 Private/04 Finances/Banking",
     "leaf": "Banking",
-    "unread_count": 2
+    "unread_count": 4
   },
   {
     "name": "01 Private/04 Finances/Budgeting & Planning",
@@ -222,7 +222,7 @@
   {
     "name": "01 Private/05 Other",
     "leaf": "05 Other",
-    "unread_count": 9
+    "unread_count": 1
   },
   {
     "name": "01 Private/05 Other/01 Projects",
@@ -267,7 +267,7 @@
   {
     "name": "01 Private/05 Other/01 Projects/AI",
     "leaf": "AI",
-    "unread_count": 16
+    "unread_count": 21
   },
   {
     "name": "01 Private/05 Other/01 Projects/Clothes",
@@ -282,7 +282,7 @@
   {
     "name": "01 Private/05 Other/01 Projects/Data Analysis & Software Development",
     "leaf": "Data Analysis & Software Development",
-    "unread_count": 0
+    "unread_count": 2
   },
   {
     "name": "01 Private/05 Other/01 Projects/Declutter",
@@ -302,7 +302,7 @@
   {
     "name": "01 Private/05 Other/02 Relationships/Alexander & Gabriel",
     "leaf": "Alexander & Gabriel",
-    "unread_count": 1
+    "unread_count": 0
   },
   {
     "name": "01 Private/05 Other/02 Relationships/Carry Martens Adersteg",
@@ -327,7 +327,7 @@
   {
     "name": "01 Private/05 Other/02 Relationships/Messages",
     "leaf": "Messages",
-    "unread_count": 1
+    "unread_count": 2
   },
   {
     "name": "01 Private/05 Other/02 Relationships/Niklas Johansson",
@@ -362,12 +362,12 @@
   {
     "name": "01 Private/05 Other/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 25
+    "unread_count": 35
   },
   {
     "name": "01 Private/05 Other/03 Collections/Star Wars",
     "leaf": "Star Wars",
-    "unread_count": 1
+    "unread_count": 0
   },
   {
     "name": "01 Private/05 Other/03 Collections/Useful",
@@ -502,7 +502,7 @@
   {
     "name": "02 Work/01 Employment/01 Playmetech/01 Playmetech Admin",
     "leaf": "01 Playmetech Admin",
-    "unread_count": 1
+    "unread_count": 2
   },
   {
     "name": "02 Work/01 Employment/01 Playmetech/01 Playmetech Admin/Contract, Personal Documents",
@@ -528,6 +528,16 @@
     "name": "02 Work/01 Employment/01 Playmetech/05 Projects",
     "leaf": "05 Projects",
     "unread_count": 0
+  },
+  {
+    "name": "02 Work/01 Employment/01 Playmetech/HR Operations",
+    "leaf": "HR Operations",
+    "unread_count": 0
+  },
+  {
+    "name": "02 Work/01 Employment/01 Quantum 21",
+    "leaf": "01 Quantum 21",
+    "unread_count": 1
   },
   {
     "name": "02 Work/01 Employment/99 Archive",
@@ -595,6 +605,11 @@
     "unread_count": 0
   },
   {
+    "name": "02 Work/02 Career Management/202607 Humanoid",
+    "leaf": "202607 Humanoid",
+    "unread_count": 0
+  },
+  {
     "name": "02 Work/02 Career Management/CVs & Cover Letters",
     "leaf": "CVs & Cover Letters",
     "unread_count": 0
@@ -612,7 +627,7 @@
   {
     "name": "02 Work/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 3
+    "unread_count": 12
   },
   {
     "name": "03 Studies",
@@ -687,7 +702,7 @@
   {
     "name": "99 Label_Reviewed",
     "leaf": "99 Label_Reviewed",
-    "unread_count": 45
+    "unread_count": 64
   },
   {
     "name": "99 Messenger",
@@ -707,7 +722,7 @@
   {
     "name": "99 To be deleted",
     "leaf": "99 To be deleted",
-    "unread_count": 12
+    "unread_count": 5
   },
   {
     "name": "99 WhatsApp",
@@ -742,6 +757,6 @@
   {
     "name": "Photo_Extracted",
     "leaf": "Photo_Extracted",
-    "unread_count": 2
+    "unread_count": 3
   }
 ]

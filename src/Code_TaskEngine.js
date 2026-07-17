@@ -95,6 +95,59 @@ function runTaskMasterDailyPlan() {
 }
 
 /**
+ * Standardizes a task's title, notes, due date, and status to compute its MD5-Base64 hash.
+ * 
+ * @param {string} title
+ * @param {string} notes
+ * @param {string} due
+ * @param {string} status
+ * @param {boolean} stripTitleTags
+ * @returns {string} The computed MD5-Base64 hash.
+ */
+function getStandardizedTaskHash(title, notes, due, status, stripTitleTags) {
+  let normTitle = title || "";
+  let normNotes = notes || "";
+  let normDue = due || "";
+  let normStatus = status || "";
+
+  const tagRegex = /(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g;
+
+  if (stripTitleTags) {
+    normTitle = normTitle.replace(tagRegex, "");
+  }
+  normTitle = normTitle.replace(/\s+/g, " ").trim();
+
+  const parts = normNotes.split('---SYSTEM_METADATA---');
+  const baseNotes = parts[0];
+  const lines = baseNotes.split(/\r?\n/);
+  const filteredLines = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    
+    if (trimmed.indexOf("SYS:") === 0) {
+      continue;
+    }
+
+    const noTags = line.replace(tagRegex, "");
+    const isEmptyOrPipes = /^[ \t|]*$/.test(noTags);
+    if (isEmptyOrPipes) {
+      continue;
+    }
+
+    filteredLines.push(noTags);
+  }
+
+  normNotes = filteredLines.join(" ").replace(/\s+/g, " ").trim();
+  normDue = normDue.replace(/\s+/g, " ").trim();
+  normStatus = normStatus.replace(/\s+/g, " ").trim();
+
+  const taskContentForHash = normTitle + "|" + normNotes + "|" + normDue + "|" + normStatus;
+  return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, taskContentForHash));
+}
+
+/**
  * Internal executor pipeline for the Task Master AI engine.
  * Pulls tasks needing review, formats the payload context, calls Gemini API,
  * and processes/applies the scheduled updates back to Google Tasks.
@@ -137,13 +190,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
               cleanNotes = cleanNotes.trim();
             }
             
-            const normFinalTitle = (t.title || "").replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/\s+/g, " ").trim();
-            const normFinalNotes = cleanNotes.replace(/\s+/g, " ").trim();
-            const normFinalDue = (t.due || "").replace(/\s+/g, " ").trim();
-            const normFinalStatus = (t.status || "").replace(/\s+/g, " ").trim();
-            
-            const taskContentForHash = normFinalTitle + "|" + normFinalNotes + "|" + normFinalDue + "|" + normFinalStatus;
-            const currentHash = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, taskContentForHash));
+            const currentHash = getStandardizedTaskHash(t.title, t.notes, t.due, t.status, true);
             
             let userConstraint = "";
             
@@ -168,7 +215,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
                cleanNotes += `\n[SYSTEM DIRECTIVE - STRICT USER CONSTRAINT: ${userConstraint}]`;
             }
             
-            const needsReview = !aiHashMatch;
+            const needsReview = (listId === importerListId) || !aiHashMatch;
             
             rawTasks.push({
                id: t.id,
@@ -205,11 +252,14 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const dayName = days[now.getDay()];
 
+  const activeMilestones = rawTasks.filter(t => t.listId === SYSTEM_CONFIG.TASKS.TODO_LIST_ID && t.title && t.title.startsWith("[Milestone]")).map(t => ({ id: t.id, title: t.title }));
+
   const payload = {
     currentTime: `${now.toISOString()} (${dayName})`,
     capacity: capacity,
     goals: goals,
     taxonomy: taxonomy,
+    activeMilestones: activeMilestones,
     allTasksContext: rawTasks.map(t => ({id: t.id, title: t.title, due: t.due, status: t.status})),
     tasksToRoute: tasksToRoute.map(t => ({id: t.id, title: t.title, notes: t.notes, due: t.due, status: t.status}))
   };
@@ -398,12 +448,15 @@ function runHourlyReview(targetDate) {
   const localDayName = Utilities.formatDate(now, "Europe/London", "EEEE");
 
   const todayEvents = getTodayCalendarEvents(now);
+  const activeMilestones = rawTasks.filter(t => t.title && t.title.startsWith("[Milestone]")).map(t => ({ id: t.id, title: t.title }));
+
   const payload = {
     currentTime: `${localTimeStr} (${localDayName})`,
     capacity: getCalendarCapacity(now),
     todayEvents: todayEvents,
     availableTimeSlots: calculateAvailableTimeSlots(localDayName, IS_PMT_ENV, todayEvents),
     goals: getSystemGoals(),
+    activeMilestones: activeMilestones,
     allTasksContext: rawTasks.map(t => {
        let cleanNotes = t.notes;
        let metadata = {};
@@ -595,12 +648,14 @@ function executeTaskMasterGemini(payloadObj, systemInstruction) {
           "type": "OBJECT",
           "properties": {
             "taskId": { "type": "STRING" },
-            "routingTarget": { "type": "STRING", "description": "SCHEDULE, BACKLOG, DELETE, COMPLETE, RETAIN_IMPORTER, SPLIT" },
-            "recommendedDeadline": { "type": "STRING", "description": "YYYY-MM-DD format. Required if SCHEDULE." },
-            "estimatedDuration": { "type": "STRING", "description": "e.g. 5m, 15m, 1h, 2h. MAX limit is 2h. Default to 5m for quick tasks." },
-            "alignedGoal": { "type": "STRING", "description": "The URN (e.g. 2026-MD-NEW-045) of the System Goal this task serves. You must find this URN in the provided goals tables. If the task is a mandatory administrative chore that does not advance a specific strategic goal, output 'Maintenance'." },
-            "category_path": { "type": "STRING", "description": "The EXACT value from the 'Concat (Path)' field of the provided Taxonomy JSON. You MUST use the full path format (e.g. '01 05 01 Projects > AI'). Do NOT use the Label format or hallucinate paths." },
-            "recommendedTitle": { "type": "STRING", "description": "Keep concise, action-oriented. CRITICAL: NEVER remove people's names, Case Refs, or unique identifiers from the title. Preserve all vital context." },
+            "taskId": { "type": "STRING", "description": "The exact ID of the task being updated." },
+            "routingTarget": { "type": "STRING", "description": "One of: SCHEDULE, BACKLOG, DELETE, COMPLETE, RETAIN_IMPORTER, SPLIT." },
+            "estimatedDuration": { "type": "STRING", "description": "Time required. Example: '5m', '30m', '1h', '2h'." },
+            "alignedGoal": { "type": "STRING", "description": "The URN of the System Goal this task serves. Example: 'urn:goal:system:2'" },
+            "category_path": { "type": "STRING", "description": "The exact valid System Taxonomy category path." },
+            "recommendedTitle": { "type": "STRING", "description": "Polished, actionable task title." },
+            "recommendedMilestone": { "type": "STRING", "description": "The EXACT title of the active milestone this task belongs to, or 'None' if it does not belong to an active milestone." },
+            "recommendedDeadline": { "type": "STRING", "description": "Format YYYY-MM-DD. Use only for hard external deadlines." },
             "systemComment": { "type": "STRING", "description": "AI questions or feedback to the user. CRITICAL: If routingTarget is 'DELETE' or 'COMPLETE', you MUST provide a detailed rationale here explaining why this task was deleted or marked completed." },
             "clearUserComment": { "type": "BOOLEAN", "description": "Set to true if you have processed the user's DA: instruction." },
             "newSubTasks": {
@@ -661,10 +716,13 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       }
       
       // Reject non-string fields
-      ['estimatedDuration', 'alignedGoal', 'category_path', 'recommendedTitle', 'recommendedDeadline', 'systemComment'].forEach(key => {
-          if (u[key] !== undefined && u[key] !== null && typeof u[key] !== 'string') {
-              u[key] = undefined;
-          }
+      ['estimatedDuration', 'alignedGoal', 'category_path', 'recommendedTitle', 'recommendedMilestone', 'recommendedDeadline', 'systemComment'].forEach(key => {
+        if (!u[key] || u[key] === "null") u[key] = "";
+        if (key !== 'recommendedMilestone' && u[key] === "None") u[key] = "";
+        
+        if (u[key] !== undefined && u[key] !== null && typeof u[key] !== 'string') {
+            u[key] = undefined;
+        }
       });
       
       const listId = taskIdMap[u.taskId];
@@ -674,6 +732,62 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       if (!task) return;
       
       const isAssignedTask = !!(task.assignmentInfo || (task.webViewLink && (task.webViewLink.includes("docs.google.com") || task.webViewLink.includes("chat.google.com"))));
+
+      // Resolve due date (finalDue) early
+      const originalDate = task.due;
+      const rawNotes = task.notes || "";
+      const daMatch = rawNotes.match(/^DA:\s*(.*)$/m);
+      const daCommentText = daMatch ? daMatch[1].trim() : "";
+
+      let isFutureDate = false;
+      if (originalDate && !originalDate.includes("2099-12-31")) {
+        const todayStr = Utilities.formatDate(new Date(), "Europe/London", "yyyy-MM-dd");
+        const taskDateStr = Utilities.formatDate(new Date(originalDate), "Europe/London", "yyyy-MM-dd");
+        if (taskDateStr >= todayStr) {
+          isFutureDate = true;
+        }
+      }
+
+      if (isFutureDate && u.routingTarget === "BACKLOG") {
+        console.log(`Task ${u.taskId} has future date ${originalDate}. Overriding BACKLOG -> SCHEDULE.`);
+        u.routingTarget = "SCHEDULE";
+        if (!u.recommendedDeadline) u.recommendedDeadline = originalDate;
+      }
+
+      let finalDue = originalDate;
+      const daDateMatch = daCommentText.match(/\b(\d{4}-\d{2}-\d{2})\b/);
+      const daLockMatch = daCommentText.toLowerCase().includes("keep date") || daCommentText.toLowerCase().includes("lock date") || daCommentText.toLowerCase().includes("do not change date") || daCommentText.toLowerCase().includes("do not reschedule");
+
+      if (daLockMatch && originalDate) {
+        finalDue = originalDate;
+        console.log(`DA comment lock date found. Keeping original date ${originalDate} for task ${u.taskId}`);
+      } else if (daDateMatch) {
+        try {
+          finalDue = new Date(daDateMatch[1] + "T00:00:00.000Z").toISOString();
+          console.log(`DA comment date override found: ${daDateMatch[1]} for task ${u.taskId}`);
+        } catch (e) {
+          console.warn(`Failed to parse DA override date: ${daDateMatch[1]}`);
+        }
+      } else if (u.routingTarget === "BACKLOG") {
+        finalDue = new Date("2099-12-31T00:00:00Z").toISOString();
+      } else if (u.routingTarget === "TODAY") {
+        const todayStr = Utilities.formatDate(new Date(), "Europe/London", "yyyy-MM-dd");
+        finalDue = todayStr + "T00:00:00.000Z";
+      } else if (u.recommendedDeadline !== undefined) {
+        if (u.recommendedDeadline === "None") {
+          finalDue = null;
+        } else if (u.recommendedDeadline === "") {
+          if (originalDate) {
+            finalDue = originalDate;
+          }
+        } else {
+          try {
+            finalDue = new Date(u.recommendedDeadline).toISOString();
+          } catch (e) {
+            console.warn(`Invalid deadline format for task ${u.taskId}: ${u.recommendedDeadline}`);
+          }
+        }
+      }
 
       if (u.routingTarget === "SPLIT" && u.newSubTasks && u.newSubTasks.length > 0) {
          console.log(`Executing automated task split for task ${u.taskId}`);
@@ -692,7 +806,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
                  const newParentResource = {
                      title: milestoneTitle,
                      notes: task.notes,
-                     due: task.due,
+                     due: finalDue,
                      status: task.status
                  };
                  const movedParent = Tasks.Tasks.insert(newParentResource, todoListId);
@@ -741,12 +855,15 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
                    cleanOriginalNotes += `\n\n[Original Source Link]: ${task.webViewLink}`;
                 }
                 
-                const subNotes = "--- ORIGINAL TASK DATA ---\n" + cleanOriginalNotes + "\n\n---SYSTEM_METADATA---\n" + JSON.stringify(subMeta);
+                const baseSubNotes = "--- ORIGINAL TASK DATA ---\n" + cleanOriginalNotes + "\n\n";
+                const subHash = getStandardizedTaskHash(sub.title, baseSubNotes, finalDue || "", "needsAction", true);
+                subMeta.ai_hash = subHash;
+                const subNotes = baseSubNotes + "---SYSTEM_METADATA---\n" + JSON.stringify(subMeta);
                 
                 const subTaskResource = {
                   title: sub.title,
                   notes: subNotes,
-                  due: task.due, 
+                  due: finalDue, 
                   status: "needsAction"
                 };
                 
@@ -772,22 +889,26 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       
       let targetListId = listId;
       if (u.routingTarget === "DELETE") {
-          targetListId = SYSTEM_CONFIG.TASKS.TO_BE_DELETED_LIST_ID;
+          targetListId = getOrCreateTriageQuarantineListId();
       } else if (u.routingTarget === "REVIEW") {
           targetListId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID;
       } else if (listId === importerListId && u.routingTarget !== "RETAIN_IMPORTER") {
           targetListId = todoListId;
       }
       
-      if (isAssignedTask) {
+      if (targetListId === SYSTEM_CONFIG.TASKS.TO_BE_DELETED_LIST_ID) {
+          targetListId = getOrCreateTriageQuarantineListId();
+      }
+      
+      if (isAssignedTask && listId !== importerListId) {
           targetListId = listId;
       }
       
-      let daComment = "DA:";
       let sysComment = "SYS:";
-      let otherNotes = [];
+      let daComment = "DA:";
+      let milestoneLine = "";
+      const otherNotes = [];
       
-      const rawNotes = task.notes || "";
       const parts = rawNotes.split('---SYSTEM_METADATA---');
       const textBlock = parts[0];
       
@@ -843,6 +964,10 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
           } else {
              sysComment = trimmed;
           }
+        } else if (trimmed.startsWith("Milestone:")) {
+          milestoneLine = trimmed;
+        } else if (trimmed.startsWith("Context:")) {
+          return;
         } else {
           otherNotes.push(line);
         }
@@ -860,43 +985,13 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
             }
          });
       }
-      
       if (u.systemComment) sysComment = `SYS: ${u.systemComment}`;
       
-      const originalDate = task.due;
-      let isFutureDate = false;
-      if (originalDate && !originalDate.includes("2099-12-31")) {
-        const todayStr = Utilities.formatDate(new Date(), "Europe/London", "yyyy-MM-dd");
-        const taskDateStr = Utilities.formatDate(new Date(originalDate), "Europe/London", "yyyy-MM-dd");
-        if (taskDateStr >= todayStr) {
-          isFutureDate = true;
-        }
+      if (u.recommendedMilestone) {
+         milestoneLine = `Milestone: ${u.recommendedMilestone}`;
       }
-
-      if (isFutureDate && u.routingTarget === "BACKLOG") {
-        console.log(`Task ${u.taskId} has future date ${originalDate}. Overriding BACKLOG -> SCHEDULE.`);
-        u.routingTarget = "SCHEDULE";
-        if (!u.recommendedDeadline) u.recommendedDeadline = originalDate;
-      }
-
-      let finalDue = originalDate;
-      if (u.routingTarget === "BACKLOG") {
-        finalDue = new Date("2099-12-31T00:00:00Z").toISOString();
-      } else if (u.recommendedDeadline !== undefined) {
-        if (u.recommendedDeadline === "None") {
-          finalDue = null;
-        } else if (u.recommendedDeadline === "") {
-          if (originalDate) {
-            finalDue = originalDate;
-          }
-        } else {
-          try {
-            finalDue = new Date(u.recommendedDeadline).toISOString();
-          } catch (e) {
-            console.warn(`Invalid deadline format for task ${u.taskId}: ${u.recommendedDeadline}`);
-          }
-        }
-      }
+      
+      // finalDue was already resolved at the start of loop
       
       existingMetadata.duration = u.estimatedDuration || existingMetadata.duration || "N/A";
       existingMetadata.goal = u.alignedGoal || existingMetadata.goal || "TBD";
@@ -919,6 +1014,11 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
          finalNotes.push("");
       }
       
+      if (existingMetadata.category_path) {
+         finalNotes.push(`Context: ${existingMetadata.category_path}`);
+         finalNotes.push("");
+      }
+      
       const cleanedOtherNotes = otherNotes.join('\n').trim();
       if (cleanedOtherNotes) {
          finalNotes.push(cleanedOtherNotes);
@@ -932,24 +1032,16 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       finalNotes.push(`[DEADLINE: ${visibleDeadline}] | [DURATION: ${visibleDuration}] | [GOAL: ${visibleGoal}]`);
       finalNotes.push("");
       finalNotes.push(sysComment || "SYS:");
+      if (milestoneLine) {
+         finalNotes.push(milestoneLine);
+      }
       finalNotes.push(daComment || "DA:");
       
       finalNotes.push("");
       finalNotes.push("---SYSTEM_METADATA---");
       
       const rawNotesStr = finalNotes.join('\n');
-      const metaSplitForHash = rawNotesStr.split('---SYSTEM_METADATA---');
-      let baseNotesForHash = metaSplitForHash[0];
-      baseNotesForHash = baseNotesForHash.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
-      baseNotesForHash = baseNotesForHash.trim();
-      
-      const normFinalTitle = finalTitle.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/\s+/g, " ").trim();
-      const normFinalNotes = baseNotesForHash.replace(/\s+/g, " ").trim();
-      const normFinalDue = (finalDue || "").replace(/\s+/g, " ").trim();
-      const normFinalStatus = (u.routingTarget === "COMPLETE" ? "completed" : "needsAction").replace(/\s+/g, " ").trim();
-      
-      const finalContentForHash = normFinalTitle + "|" + normFinalNotes + "|" + normFinalDue + "|" + normFinalStatus;
-      const currentHash = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, finalContentForHash));
+      const currentHash = getStandardizedTaskHash(finalTitle, rawNotesStr, finalDue, u.routingTarget === "COMPLETE" ? "completed" : "needsAction", true);
       existingMetadata.ai_hash = currentHash;
       
       finalNotes.push(JSON.stringify(existingMetadata));
@@ -967,6 +1059,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
         }
       }
       
+      let activeTaskId = u.taskId;
       if (targetListId !== listId) {
           console.log(`Moving task "${finalTitle}" from Importer to ToDo`);
           
@@ -988,6 +1081,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
           };
           
           const createdTask = Tasks.Tasks.insert(newTask, targetListId);
+          activeTaskId = createdTask.id;
           
           if (isAssignedTask) {
              console.log(`Assigned task identified. Marking original task ${u.taskId} as completed.`);
@@ -1012,12 +1106,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
              if (finalStatus === "completed") {
                 PropertiesService.getScriptProperties().deleteProperty("ai_hash_" + u.taskId);
              } else {
-                let cNotes = task.notes || "";
-                cNotes = cNotes.split('---SYSTEM_METADATA---')[0].replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "").replace(/\s+/g, " ").trim();
-                const nTitle = (task.title || "").replace(/\s+/g, " ").trim();
-                const nDue = (task.due || "").replace(/\s+/g, " ").trim();
-                const nStatus = finalStatus.replace(/\s+/g, " ").trim();
-                const assignedHash = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, nTitle + "|" + cNotes + "|" + nDue + "|" + nStatus));
+                const assignedHash = getStandardizedTaskHash(task.title, task.notes, task.due, finalStatus, true);
                 PropertiesService.getScriptProperties().setProperty("ai_hash_" + u.taskId, assignedHash);
              }
           } else {
@@ -1030,6 +1119,37 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
              Tasks.Tasks.patch(patchObj, listId, u.taskId);
           }
       }
+      
+      if (u.recommendedMilestone && u.recommendedMilestone !== "None" && targetListId === todoListId) {
+          try {
+             const todoTasks = Tasks.Tasks.list(todoListId, { showCompleted: false, showHidden: false, maxResults: 100 }).items || [];
+             
+             const normalizeMilestoneTitle = (title) => {
+                 if (!title) return "";
+                 return title.replace(/^\[Milestone\]\s*/i, "").trim().toLowerCase();
+             };
+             const normRecommended = normalizeMilestoneTitle(u.recommendedMilestone);
+             let matchedMilestone = todoTasks.find(t => normalizeMilestoneTitle(t.title) === normRecommended);
+             
+             if (!matchedMilestone) {
+                 console.log(`Milestone '${u.recommendedMilestone}' not found. Creating it dynamically...`);
+                 const newMilestone = {
+                     title: u.recommendedMilestone.startsWith("[Milestone]") ? u.recommendedMilestone : `[Milestone] ${u.recommendedMilestone}`,
+                     status: "needsAction"
+                 };
+                 matchedMilestone = Tasks.Tasks.insert(newMilestone, todoListId);
+             }
+             
+             if (matchedMilestone && matchedMilestone.id) {
+                  Utilities.sleep(800); // Wait for API propagation of newly created tasks
+                  executeWithRetry(() => Tasks.Tasks.move(targetListId, activeTaskId, { parent: matchedMilestone.id }));
+                  console.log(`Natively parented task ${activeTaskId} to milestone ${matchedMilestone.id}`);
+              }
+           } catch(e) {
+              console.error(`Failed to natively parent task: ${e.message}`);
+           }
+      }
+      
       Utilities.sleep(100);
     } catch (e) {
       console.error("Failed to update task: " + u.taskId, e.message);
@@ -1197,4 +1317,44 @@ function writeOnePager(markdownStr, isDailyPlan) {
      return null;
   }
 }
+
+/**
+ * Searches for a task list named 'Triage Quarantine'. If it exists, returns its ID;
+ * otherwise, creates a new task list named 'Triage Quarantine' and returns its ID.
+ * 
+ * @returns {string} The ID of the 'Triage Quarantine' task list.
+ */
+function getOrCreateTriageQuarantineListId() {
+  let pageToken;
+  do {
+    try {
+      const response = Tasks.Tasklists.list({
+        maxResults: 100,
+        pageToken: pageToken
+      });
+      const items = response.items || [];
+      const match = items.find(list => list.title === "Triage Quarantine");
+      if (match) {
+        return match.id;
+      }
+      pageToken = response.nextPageToken;
+    } catch (e) {
+      console.error("Error listing task lists: " + e.message);
+      pageToken = undefined;
+    }
+  } while (pageToken);
+
+  // If not found, create it
+  try {
+    const newList = Tasks.Tasklists.insert({
+      title: "Triage Quarantine"
+    });
+    console.log("Created task list 'Triage Quarantine' with ID: " + newList.id);
+    return newList.id;
+  } catch (e) {
+    console.error("Failed to create 'Triage Quarantine' task list: " + e.message);
+    throw e;
+  }
+}
+
 // Trigger clasp deployment timezone fix

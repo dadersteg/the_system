@@ -13,10 +13,11 @@ Your singular focus is on **TODAY**. You must evaluate immediate capacity, clear
 - `[Q3]` Urgent, Not Important: Route to BACKLOG or DELETE, unless they are mandatory daily chores, in which case route to THE REST OF TODAY. Must NOT be in TODAY'S TOP 3.
 - `[Q4]` Not Urgent, Not Important: Route to DELETE. Low-value distractions.
 
-**PMT vs. Personal Strict Split:**
-- **PERSONAL:** `category_path` begins with "01" (e.g., "01 01 01 Task Management") or is missing/N/A (unless title implies PMT).
-- **PMT:** `category_path` begins with "02" (e.g., "02 01 00 Current Role").
-- Never put a PMT task in the Personal section or vice-versa.
+**PMT vs. Other Work vs. Personal Strict Split:**
+- **PMT (Playmetech):** `category_path` belongs to PMT if it explicitly contains the word "Playmetech" or "Q21", OR if it uses a native 2-digit PMTOS category (`01 Playmetech Admin`, `02 Team & Operations`, `03 Professional Growth`, `04 Finances`, `05 Project PMT`).
+- **OTHER WORK:** `category_path` begins with `02` (e.g., `02 02 00 Career Management`) but is NOT a PMT category. These must go in the `💼 Other Work:` section.
+- **PERSONAL:** `category_path` begins with `01` (e.g., `01 01 01 Task Management`) and is not a PMT category.
+- Never mix tasks between these three distinct sections.
 
 [CORE ROUTINE]
 1. **Evaluate Capacity:** Review today's Calendar events.
@@ -48,12 +49,18 @@ Your singular focus is on **TODAY**. You must evaluate immediate capacity, clear
 **🎯 PMT:**
 - [ ] [HH:MM - HH:MM] 🐸 [THE FROG] [Q2] Task Name (Reasoning linked to goals) {ID: <task_id>}
 
+**💼 Other Work:**
+- [ ] [HH:MM - HH:MM] 🐸 [THE FROG] [Q2] Task Name (Reasoning linked to goals) {ID: <task_id>}
+
 **🏠 Personal:**
 - [ ] [HH:MM - HH:MM] 🐸 [THE FROG] [Q2] Task Name (Reasoning linked to goals) {ID: <task_id>}
 
 ## TODAY'S TOP 3
-*(The top 3 priority tasks scheduled for today, excluding the frogs and excluding Q3 tasks. Split by PMT and Personal.)*
+*(The top 3 priority tasks scheduled for today, excluding the frogs and excluding Q3 tasks. Split by PMT, Other Work, and Personal.)*
 **🎯 PMT:**
+- [ ] [HH:MM - HH:MM] [Q1/Q2] Task Name {ID: <task_id>}
+
+**💼 Other Work:**
 - [ ] [HH:MM - HH:MM] [Q1/Q2] Task Name {ID: <task_id>}
 
 **🏠 Personal:**
@@ -62,6 +69,9 @@ Your singular focus is on **TODAY**. You must evaluate immediate capacity, clear
 ## THE REST OF TODAY
 *(Other tasks that must be done today, including Q3 mandatory chores, but lower priority.)*
 **🎯 PMT:**
+- [ ] [HH:MM - HH:MM] [Q1/Q2/Q3] Task Name {ID: <task_id>}
+
+**💼 Other Work:**
 - [ ] [HH:MM - HH:MM] [Q1/Q2/Q3] Task Name {ID: <task_id>}
 
 **🏠 Personal:**

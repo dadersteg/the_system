@@ -62,9 +62,9 @@ function runTheClerkEmailOngoing() {
   
   // THE PHOTO EXTRACTOR: Process any new Telegram/Messenger backup photos
   try {
-    processGmailPhotos();
+    runRetroactivePhotoSync();
   } catch(e) {
-    console.warn("processGmailPhotos failed: " + e.message);
+    console.warn("runRetroactivePhotoSync failed: " + e.message);
   }
   
   return "Successfully swept inbox and executed triage engine.";
@@ -224,7 +224,12 @@ function _syncTasksForThread(validActions, primaryCategoryLabel, labelToPathMap,
             metadata.deadline = deadlineVal;
         }
 
-        const notes = `${threadUrl}\nContext: ${finalCategoryPath}\n\n${actionTitle}\n\nSYS: Pending initial review.\nDA:\n\n---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+        const baseNotes = `${threadUrl}\nContext: ${finalCategoryPath}\n\n${actionTitle}\n\nSYS: Pending initial review.\nDA:\n\n`;
+        const dueVal = (deadlineVal !== "None") ? deadlineVal + "T00:00:00.000Z" : "";
+        const initialHash = getStandardizedTaskHash(cleanTitle, baseNotes, dueVal, "needsAction", true);
+        metadata.ai_hash = initialHash;
+
+        const notes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
 
         try {
            const taskPayload = {
@@ -232,7 +237,7 @@ function _syncTasksForThread(validActions, primaryCategoryLabel, labelToPathMap,
               notes: notes
            };
            if (deadlineVal !== "None") {
-              taskPayload.due = deadlineVal + "T00:00:00.000Z";
+              taskPayload.due = dueVal;
            }
            const created = Tasks.Tasks.insert(taskPayload, importerListId);
            syncedTaskIds.push(created.id);

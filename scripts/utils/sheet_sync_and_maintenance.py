@@ -212,18 +212,38 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
     try:
         res = sheet_api.values().get(
             spreadsheetId=spreadsheet_id,
-            range=f"'{sheet_title}'!A2:Q5000"
+            range=f"'{sheet_title}'!A2:R5000"
         ).execute()
         existing_rows = res.get("values", [])
 
         for r in existing_rows:
-            if len(r) > 14:
-                tid = r[14]
-                status = r[6]
-                if status in ["Completed", "Deleted"]:
-                    if tid:
-                        existing_ids.add(tid)
-                    completed_rows.append(r)
+            # Pad row to prevent index out of bounds
+            r = (r + [""] * 18)[:18]
+            
+            # The row could be in the old 17-column format (where index 4 is Title, index 5 is Notes, index 6 is Status)
+            # or it could be in the new 18-column format (where index 4 is Milestone, index 5 is Title, index 6 is Notes, index 7 is Status).
+            # We can detect this by checking if the Status is at index 6 or index 7.
+            status_index = 7 if r[7] in ["Completed", "Deleted", "TODO", "AI Review", "Active"] else 6
+            
+            if status_index == 6:
+                # Old 17-column layout. We need to parse Milestone from System Comment (index 12)
+                sys_comment = r[12]
+                milestone = ""
+                m_match = re.search(r'Milestone:\s*\[?(.*?)\]?(?:\s*\||$)', sys_comment, re.IGNORECASE)
+                if m_match:
+                    milestone = m_match.group(1).strip()
+                
+                # Shift elements to create 18-column layout
+                new_r = r[:4] + [milestone] + r[4:17]
+                r = new_r
+
+            tid = r[15] # In 18-column layout, Task ID is at index 15
+            status = r[7] # In 18-column layout, Status is at index 7
+            
+            if status in ["Completed", "Deleted"]:
+                if tid:
+                    existing_ids.add(tid)
+                completed_rows.append(r)
         print(f"Loaded existing sheet: {len(existing_rows)} rows total, preserved {len(completed_rows)} completed/deleted tasks.")
     except Exception as e:
         print(f"No existing log rows read or error: {e}. Presuming 0 completed tasks.")
@@ -241,10 +261,6 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
         list_id = lst['id']
         list_title = lst['title']
         
-        # Skip delete list (handled separately)
-        if "deleted" in list_title.lower():
-            continue
-            
         is_recurring = "recurring" in list_title.lower()
         print(f"Fetching completed and active tasks in list '{list_title}'...")
         page_token = None
@@ -292,10 +308,16 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                             computed_category = " > ".join(title_parts[:-1]).strip()
                             computed_title = title_parts[-1].strip()
                             
+                        milestone = "None"
+                        if title.startswith("[Milestone]"):
+                            milestone = "Milestone"
+                        else:
+                            m_match = re.search(r'Milestone:\s*(.*)$', raw_notes, re.MULTILINE)
+                            if m_match:
+                                milestone = m_match.group(1).strip()
+
                         if computed_title.startswith("[Milestone]"):
-                            computed_title = computed_title.replace("[Milestone]", "", 1).strip()
-                            if milestone == "None":
-                                milestone = "TRUE"
+                            milestone = "Milestone"
                             
                         parent_category = computed_category
                         sub_category = ""
@@ -321,6 +343,7 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                             list_title,
                             parent_category,
                             sub_category,
+                            milestone,
                             computed_title,
                             clean_notes,
                             "Completed",
@@ -370,9 +393,16 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                         computed_category = " > ".join(title_parts[:-1]).strip()
                         computed_title = title_parts[-1].strip()
                         
+                    milestone = "None"
+                    if title.startswith("[Milestone]"):
+                        milestone = "Milestone"
+                    else:
+                        m_match = re.search(r'Milestone:\s*(.*)$', raw_notes, re.MULTILINE)
+                        if m_match:
+                            milestone = m_match.group(1).strip()
+
                     if computed_title.startswith("[Milestone]"):
-                        computed_title = computed_title.replace("[Milestone]", "", 1).strip()
-                        milestone = "TRUE"
+                        milestone = "Milestone"
                     
                     parent_category = computed_category
                     sub_category = ""
@@ -386,6 +416,7 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                     sys_match = re.search(r'^SYS:\s*(.*)$', raw_notes, re.MULTILINE)
                     if sys_match:
                         sys_comment = sys_match.group(1).strip()
+                        
                     da_match = re.search(r'^DA:\s*(.*)$', raw_notes, re.MULTILINE)
                     if da_match:
                         da_comment = da_match.group(1).strip()
@@ -394,6 +425,7 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                         'list_title': list_title,
                         'parent_category': parent_category,
                         'sub_category': sub_category,
+                        'milestone': milestone,
                         'computed_title': computed_title,
                         'clean_notes': clean_notes,
                         'status': status,
@@ -420,6 +452,7 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
             t['list_title'],
             t['parent_category'],
             t['sub_category'],
+            t['milestone'],
             t['computed_title'],
             t['clean_notes'],
             t['status'],
@@ -482,10 +515,16 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                         computed_category = " > ".join(title_parts[:-1]).strip()
                         computed_title = title_parts[-1].strip()
                         
+                    milestone = "None"
+                    if title.startswith("[Milestone]"):
+                        milestone = "Milestone"
+                    else:
+                        m_match = re.search(r'Milestone:\s*(.*)$', raw_notes, re.MULTILINE)
+                        if m_match:
+                            milestone = m_match.group(1).strip()
+
                     if computed_title.startswith("[Milestone]"):
-                        computed_title = computed_title.replace("[Milestone]", "", 1).strip()
-                        if milestone == "None":
-                            milestone = "TRUE"
+                        milestone = "Milestone"
                         
                     parent_category = computed_category
                     sub_category = ""
@@ -511,6 +550,7 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                         "To be Deleted",
                         parent_category,
                         sub_category,
+                        milestone,
                         computed_title,
                         clean_notes,
                         "Deleted",
@@ -539,6 +579,7 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
         "Task List", 
         "Category", 
         "Sub-Category",
+        "Milestone",
         "Task Title", 
         "Notes", 
         "Status", 
@@ -561,8 +602,8 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
         has_changes = True
     else:
         for r_exist, r_new in zip(existing_rows, combined_data):
-            r_exist_padded = (r_exist + [""] * 17)[:17]
-            r_new_padded = (r_new + [""] * 17)[:17]
+            r_exist_padded = (r_exist + [""] * 18)[:18]
+            r_new_padded = (r_new + [""] * 18)[:18]
             if r_exist_padded[1:] != r_new_padded[1:]:
                 has_changes = True
                 break
@@ -577,10 +618,10 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
         print(f"Clearing spreadsheet '{sheet_title}' for {label}...")
         sheet_api.values().clear(
             spreadsheetId=spreadsheet_id,
-            range=f"'{sheet_title}'!A1:Q5000"
+            range=f"'{sheet_title}'!A1:R5000"
         ).execute()
         
-        write_range = f"'{sheet_title}'!A1:Q{len(payload)}"
+        write_range = f"'{sheet_title}'!A1:R{len(payload)}"
         print(f"Writing {len(payload)} rows to {label} '{sheet_title}' (Active: {len(active_rows)}, Preserved Completed: {len(completed_rows)}, New Completed: {len(new_completed_rows)})...")
         sheet_api.values().update(
             spreadsheetId=spreadsheet_id,

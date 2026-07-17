@@ -93,7 +93,7 @@ const SYSTEM_CONFIG = {
   },
   
   GENERATED_OUTPUTS: {
-    DAY_1_EXECUTION_PLAN: IS_PMT_ENV ? "1zCKlhaTchntW-2Lk1_el7ShnOzZSqmO7" : "1_TMGaK2U00kMeagblJjrcD6MJFcY18Kq",
+    DAY_1_EXECUTION_PLAN: IS_PMT_ENV ? "19EZbnoqaa3_3zgV0ZYi0l_SiPK0cqkOM" : "1AG-03T6r4J-7mrlJ6ODl3FRY1yAtU0NC",
     DAY_7_ROADMAP: IS_PMT_ENV ? "18rIhK5SX4gS9rNQNvYkXkMFCCVqKcLO_YNJFqqcqEnA" : "1V_iybOjHzp4S9UdTHKWj4QlK-wDUsAU3",
     DAY_28_STRATEGIC: IS_PMT_ENV ? "1TcHyODoMm5zziuu6COD86qQroOFyMz05KtddAEsb0bY" : "1B2jahfmNQt8iwPWHCXnFYwDirJWkyt3u",
     DAY_84_STRATEGIC: IS_PMT_ENV ? "1P0LgSK70Ztn772hrHtTOK7s8IM55llxnaVk_AeZuthA" : "1arJFUz4LPw4SaEfN6aY-0dYUS5ifKD7R",
@@ -130,7 +130,8 @@ const SYSTEM_CONFIG = {
     NOTES_LOG: "967747913",
     LABEL_MANAGEMENT: "1007497112",
     EMAIL_RETRO_LOG: "",
-    GEMINI_MODELS: "1704335578"
+    GEMINI_MODELS: "1704335578",
+    ANTIGRAVITY_LOG: "162650355"
   },
   
   STATE: {
@@ -159,10 +160,12 @@ const SYSTEM_CONFIG = {
                      "1yr9bPJcprkfYSbDnAD0z4TDJLgR8D5wt"  // Gemini Meeting Notes
                    ]),
     OUT_OF_SCOPE: [
+                     // Developer Workspaces
+                     "15zCcz4VPaL0VLM-cg0kPEHoaJRZHpxDK", // AGY (Master Folder)
+                     "1W1VyU1ANNNgoq3KrIq1spT_DOpDFyq3A", // agy_pmt (PMT Workspace)
+                     "1MuDEjRgrh6l2wvtpdoi3Tiq_oRUjzBwx", // Legacy PMT Workspace
+                     
                      // PMT Local Folders
-                     "1iuy0Ewq-m-ZDgUOkzQt6juDeqK9QaW5W", // 00 Inbox (PMT)
-                     "1VnfJ8SJkwpmQB6ASImsk_-czonEC2RCl", // MacMini Desktop (PMT)
-                     "1W3hfHcmIa3jXsY4Mv2q2WnHsoYt1IlkH", // MacMini Downloads (PMT)
                      "1kNQj91SMLlAUsOzAiBBmsjLoQXunRANG", // MBA Desktop (PMT)
                      "15RKY62cIZp0MYGPCtkaZ7Z4_Pn8bsPeB", // MBA Downloads (PMT)
                      "1UclbKZ_K7gwwgZN3UynHqb3yvOte2V1-", // MBA Documents (PMT)
@@ -185,6 +188,10 @@ const SYSTEM_CONFIG = {
     ROUTE_MODE: (IS_PMT_ENV ? ["1dKBJ8w8B2-O06uh-5N9WhIoavj8uMzmM"] : ["1yKMLA11aEG3FI8UuWSsGHP9X-fgBBEfa"]),
     CLEAN_MODE: (IS_PMT_ENV ? ["1dZuVjvnWwWTe4qwXKs6huK8qVKGR1WDT"] : ["1ImPaXVXQetcaCFE9aY9DT0AM3thGXcEc"]),
     RUNNING_DOCS: []
+  },
+
+  CALENDARS: {
+    CROSS_ENV_ID: IS_PMT_ENV ? "adersteg.daniel@gmail.com" : "daniel@playmetech.net"
   }
 };
 

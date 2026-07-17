@@ -138,6 +138,7 @@ async def set_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def send_control_panel(update: Update, text: str, photo_bytes: bytes = None):
     keyboard = [
         [
+
             InlineKeyboardButton("✅ Approve", callback_data='approve'),
             InlineKeyboardButton("❌ Reject", callback_data='reject'),
         ],
@@ -149,6 +150,7 @@ async def send_control_panel(update: Update, text: str, photo_bytes: bytes = Non
     reply_markup = InlineKeyboardMarkup(keyboard)
     msg = update.callback_query.message if update.callback_query else update.message
     
+    msg = update.callback_query.message if update.callback_query else update.message
     if photo_bytes:
         await msg.reply_photo(photo=BytesIO(photo_bytes), caption=text, reply_markup=reply_markup)
     else:
@@ -683,6 +685,7 @@ async def main():
     application.add_handler(CommandHandler("screenshot", screenshot))
     application.add_handler(CommandHandler("overview", overview))
     application.add_handler(CommandHandler("status", overview))
+
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(CommandHandler("answer", answer_command))
     application.add_handler(CommandHandler("select", select_command))

@@ -108,79 +108,27 @@ module.exports = {
       out_file: "logs/second_brain_sync_out.log",
       error_file: "logs/second_brain_sync_err.log"
     },
+
     {
-      name: "second-brain-weekly-sync",
-      script: "scripts/utils/second_brain_weekly_sync.sh",
+      name: "antigravity-cloud-backfill",
+      script: "scripts/utils/backfill_antigravity_logs.py",
+      args: "--max-hours 1",
+      interpreter: "python3",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "59 23 * * 0", // Runs weekly on Sunday at 23:59
+      cron_restart: "0 1 * * *", // 1:00 AM Daily
       autorestart: false,
-      out_file: "logs/second_brain_weekly_sync_out.log",
-      error_file: "logs/second_brain_weekly_sync_err.log"
+      out_file: "logs/antigravity_cloud_backfill_out.log",
+      error_file: "logs/antigravity_cloud_backfill_err.log"
     },
     {
-      name: "trigger-jules-backend",
-      script: "scripts/maintenance/trigger_jules.js",
-      args: "--micro-backend",
+      name: "local-gemini-weekly-sync",
+      script: "scripts/maintenance/run_local_weekly_synthesis.py",
+      interpreter: "python3",
       cwd: "/Users/daniel/Documents/AGY/the_system",
-      env: {
-        JULES_API_KEY: localEnv.JULES_API_KEY || ""
-      },
-      cron_restart: "0 2 * * *", // 2:00 AM Daily
+      cron_restart: "0 2 * * 0", // 2:00 AM Every Sunday
       autorestart: false,
-      out_file: "logs/trigger_jules_backend_out.log",
-      error_file: "logs/trigger_jules_backend_err.log"
-    },
-    {
-      name: "trigger-jules-backfill",
-      script: "scripts/maintenance/run_backfill_loop.js",
-      cwd: "/Users/daniel/Documents/AGY/the_system",
-      autorestart: false,
-      cron_restart: "*/15 * * * *", // Check/run every 15 minutes
-      env: {
-        JULES_API_KEY: localEnv.JULES_API_KEY || "",
-        GH_TOKEN: "***REMOVED***"
-      },
-      out_file: "logs/trigger_jules_backfill_out.log",
-      error_file: "logs/trigger_jules_backfill_err.log"
-    },
-    {
-      name: "trigger-jules-ui",
-      script: "scripts/maintenance/trigger_jules.js",
-      args: "--micro-ui",
-      cwd: "/Users/daniel/Documents/AGY/the_system",
-      env: {
-        JULES_API_KEY: localEnv.JULES_API_KEY || ""
-      },
-      cron_restart: "0 3 * * *", // 3:00 AM Daily
-      autorestart: false,
-      out_file: "logs/trigger_jules_ui_out.log",
-      error_file: "logs/trigger_jules_ui_err.log"
-    },
-    {
-      name: "trigger-jules-cleanup",
-      script: "scripts/maintenance/trigger_jules.js",
-      args: "--micro-cleanup",
-      cwd: "/Users/daniel/Documents/AGY/the_system",
-      env: {
-        JULES_API_KEY: localEnv.JULES_API_KEY || ""
-      },
-      cron_restart: "0 4 * * *", // 4:00 AM Daily
-      autorestart: false,
-      out_file: "logs/trigger_jules_cleanup_out.log",
-      error_file: "logs/trigger_jules_cleanup_err.log"
-    },
-    {
-      name: "trigger-jules-major",
-      script: "scripts/maintenance/trigger_jules.js",
-      args: "--major",
-      cwd: "/Users/daniel/Documents/AGY/the_system",
-      env: {
-        JULES_API_KEY: localEnv.JULES_API_KEY || ""
-      },
-      cron_restart: "0 5 * * 0,3", // 5:00 AM Wednesday & Sunday
-      autorestart: false,
-      out_file: "logs/trigger_jules_major_out.log",
-      error_file: "logs/trigger_jules_major_err.log"
+      out_file: "logs/local_gemini_weekly_sync_out.log",
+      error_file: "logs/local_gemini_weekly_sync_err.log"
     }
   ]
 };

@@ -29,7 +29,9 @@ function executeTimeboxing(targetDate) {
   
   const file = DriveApp.getFileById(fileId);
   const markdown = file.getBlob().getDataAsString();
+  console.log("Read markdown file of length: " + markdown.length + " | Preview: " + markdown.substring(0, 100).replace(/\n/g, '\\n'));
   const tasksToSchedule = parseTasksForTimeboxing(markdown);
+  console.log("parseTasksForTimeboxing returned " + tasksToSchedule.length + " tasks.");
   
   if (tasksToSchedule.length === 0) {
     console.log("No tasks found to timebox.");
@@ -71,7 +73,7 @@ function verifyTasksAreStillActive(parsedTasks, targetDate) {
     let pageToken;
     do {
       try {
-        const response = Tasks.Tasks.list(listId, { showCompleted: false, showHidden: false, showAssigned: true, maxResults: 100, pageToken: pageToken });
+        const response = Tasks.Tasks.list(listId, { showCompleted: false, showHidden: false,  maxResults: 100, pageToken: pageToken });
         if (response.items) {
            response.items.forEach(t => {
                if (t.status !== 'completed' && t.title) {
@@ -101,8 +103,8 @@ function verifyTasksAreStillActive(parsedTasks, targetDate) {
      if (task.id && activeTasksForToday.has(task.id)) {
         task.title = activeTasksForToday.get(task.id); // Use the actual Task title, not the AI generated one
         verifiedTasks.push(task);
-     } else if (!task.id) {
-        // Fallback to title matching if ID is missing
+     } else {
+        // Fallback to title matching if ID is missing OR if the AI hallucinated/mixed up the ID
         let found = false;
         for (const [id, title] of activeTasksForToday.entries()) {
            if (title.toLowerCase() === task.title.toLowerCase()) {
@@ -111,9 +113,10 @@ function verifyTasksAreStillActive(parsedTasks, targetDate) {
               break;
            }
         }
-        if (!found) console.warn(`Task "${task.title}" is completed, missing ID, or moved. Skipping timebox.`);
-     } else {
-        console.warn(`Task ID "${task.id}" (${task.title}) is completed or moved to a future date. Skipping timebox.`);
+        if (!found) {
+           const idStr = task.id ? ` (ID: ${task.id})` : "";
+           console.warn(`Task "${task.title}"${idStr} is completed, moved, or not found. Skipping timebox.`);
+        }
      }
   }
   
@@ -135,9 +138,16 @@ function parseTasksForTimeboxing(markdown) {
   const lines = markdown.split('\n');
   const tasks = [];
   let inTargetSection = false;
+  let currentSectionType = null;
   
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
+    
+    if (line.includes("**🏠 Personal:**")) {
+      currentSectionType = "Personal";
+    } else if (line.includes("**🎯 PMT:**")) {
+      currentSectionType = "PMT";
+    }
     
     const upperLine = line.toUpperCase();
     if (upperLine.includes("EAT THE FROG") || upperLine.includes("TODAY'S TOP 3") || upperLine.includes("ROUTINES") || upperLine.includes("THE REST OF TODAY")) {
@@ -150,14 +160,30 @@ function parseTasksForTimeboxing(markdown) {
     }
     
     if (inTargetSection && line.startsWith("- [ ]")) {
-      const regex = /- \[ \]\s*(?:\[(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})\]\s*)?(?:(?:🐸|\\ud83d\\udc38)\s*)?(?:\[THE FROG\]\s*)?\[Q[1-4]\]\s*(.*?)(?:\s*\{ID:\s*(.*?)\})?(?:\s*\((.*?)\))?$/i;
-      const match = line.match(regex);
+      let cleanLine = line;
+      let id = null;
+      
+      // Extract ID if present
+      const idMatch = cleanLine.match(/\{ID:\s*(.*?)\}/i);
+      if (idMatch) {
+         id = idMatch[1].trim();
+         cleanLine = cleanLine.replace(idMatch[0], "").trim();
+      }
+      
+      // Extract trailing parentheses (notes) if present
+      const noteMatch = cleanLine.match(/\s*\((.*?)\)$/);
+      if (noteMatch) {
+         cleanLine = cleanLine.replace(noteMatch[0], "").trim();
+      }
+      
+      // Now parse the timebox and title
+      const regex = /- \[ \]\s*(?:\[(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})\]\s*)?(?:(?:🐸|\\ud83d\\udc38)\s*)?(?:\[THE FROG\]\s*)?(?:\[Q[1-4]\]\s*)?(.*)$/i;
+      const match = cleanLine.match(regex);
       
       if (match) {
         const startTime = match[1];
         const endTime = match[2];
         let title = match[3] ? match[3].trim() : "";
-        const id = match[4] ? match[4].trim() : null;
         
         // Remove markdown artifacts like trailing hyphens if the AI appended notes
         if (title.endsWith(" -")) title = title.slice(0, -2).trim();
@@ -168,9 +194,12 @@ function parseTasksForTimeboxing(markdown) {
               title: title,
               startTime: startTime,
               endTime: endTime,
-              rawLine: line
+              rawLine: line,
+              sectionType: currentSectionType
            });
         }
+      } else {
+        console.warn("Regex failed to match cleaned line: " + cleanLine);
       }
     }
   }
@@ -190,16 +219,36 @@ function scheduleTasksToCalendar(tasks, targetDate) {
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
   const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
   
-  const existingEvents = calendar.getEvents(startOfDay, endOfDay);
-  existingEvents.forEach(e => {
-    if (e.getTitle().startsWith("[TS] ")) {
-      // Only delete future blocks. Keep blocks that have already started as a historical diary record.
-      if (e.getStartTime() > now) {
-         e.deleteEvent();
+  const calendarsToClean = [calendar];
+  if (typeof SYSTEM_CONFIG !== 'undefined' && SYSTEM_CONFIG.CALENDARS && SYSTEM_CONFIG.CALENDARS.CROSS_ENV_ID) {
+    try {
+      const crossCal = CalendarApp.getCalendarById(SYSTEM_CONFIG.CALENDARS.CROSS_ENV_ID);
+      if (crossCal) {
+        calendarsToClean.push(crossCal);
       }
+    } catch (e) {
+      console.warn(`Could not get cross-environment calendar: ${e.message}`);
+    }
+  }
+
+  calendarsToClean.forEach(cal => {
+    try {
+      const existingEvents = cal.getEvents(startOfDay, endOfDay);
+      existingEvents.forEach(e => {
+        if (e.getTitle().startsWith("[TS] ")) {
+          // Only delete future blocks. Keep blocks that have already started as a historical diary record.
+          if (e.getStartTime() > now) {
+             e.deleteEvent();
+          }
+        }
+      });
+    } catch (e) {
+      console.warn(`Could not clean events for calendar: ${e.message}`);
     }
   });
   
+  const isPmt = (typeof IS_PMT_ENV !== 'undefined') ? IS_PMT_ENV : false;
+
   for (const task of tasks) {
     if (task.startTime && task.endTime) {
       const startParts = task.startTime.split(':');
@@ -225,54 +274,80 @@ function scheduleTasksToCalendar(tasks, targetDate) {
         if (proposedEnd > now) {
            // --- COLLISION DETECTION ---
            let hasCollision = false;
-           const calendarsToCheck = [
-             "adersteg.daniel@gmail.com",
-             "daniel@playmetech.net"
-           ];
+           let overlappingEvents = [];
+           const calendarsToCheck = ['primary'];
+           if (typeof SYSTEM_CONFIG !== 'undefined' && SYSTEM_CONFIG.CALENDARS && SYSTEM_CONFIG.CALENDARS.CROSS_ENV_ID) {
+               calendarsToCheck.push(SYSTEM_CONFIG.CALENDARS.CROSS_ENV_ID);
+           }
            
+           const timeMinStr = Utilities.formatDate(proposedStart, "Europe/London", "yyyy-MM-dd'T'HH:mm:ssXXX");
+           const timeMaxStr = Utilities.formatDate(proposedEnd, "Europe/London", "yyyy-MM-dd'T'HH:mm:ssXXX");
+
            for (const calId of calendarsToCheck) {
-              if (hasCollision) break;
+               try {
+                   const response = Calendar.Events.list(calId, {
+                     timeMin: timeMinStr,
+                     timeMax: timeMaxStr,
+                     singleEvents: true,
+                     maxResults: 50
+                   });
+                   if (response.items && response.items.length > 0) {
+                       response.items.forEach(e => {
+                           e.sourceCalId = calId;
+                       });
+                       overlappingEvents = overlappingEvents.concat(response.items);
+                   }
+               } catch (e) {
+                   console.warn(`Could not fetch events for calendar ${calId}: ${e.message}`);
+               }
+           }
+           
+           for (const oe of overlappingEvents) {
+              if (oe.start.date) continue; // All day event
+              if (oe.summary && oe.summary.startsWith("[TS] ") && oe.sourceCalId === 'primary') continue;
+              if (oe.transparency === 'transparent') continue; // Free event
               
-              try {
-                 const response = Calendar.Events.list(calId, {
-                   timeMin: proposedStart.toISOString(),
-                   timeMax: proposedEnd.toISOString(),
-                   singleEvents: true,
-                   maxResults: 50
-                 });
-                 const overlappingEvents = response.items || [];
-                 
-                 for (const oe of overlappingEvents) {
-                    if (oe.start.date) continue; // All day event
-                    if (oe.summary && oe.summary.startsWith("[TS] ")) continue;
-                    if (oe.transparency === 'transparent') continue; // Free event
-                    
-                    const oeStart = new Date(oe.start.dateTime).getTime();
-                    const oeEnd = new Date(oe.end.dateTime).getTime();
-                    
-                    // Only trigger collision if the overlap is substantial (e.g. > 1 minute)
-                    if (oeEnd <= proposedStart.getTime() + 60000 || 
-                        oeStart >= proposedEnd.getTime() - 60000) {
-                       continue;
-                    }
-                    
-                    if (task.rawLine && task.rawLine.toLowerCase().includes(oe.summary.toLowerCase())) {
-                       console.log(`Collision bypassed: AI explicitly scheduled "${task.title}" during "${oe.summary}".`);
-                       continue;
-                    }
-                    
-                    console.log(`Collision detected with "${oe.summary}" on calendar ${calId}. Skipping ${task.title}.`);
-                    hasCollision = true;
-                    break;
-                 }
-              } catch (e) {
-                 console.warn("Could not check collisions for calendar: " + calId, e.message);
+              const oeStart = new Date(oe.start.dateTime).getTime();
+              const oeEnd = new Date(oe.end.dateTime).getTime();
+              
+              // Only trigger collision if the overlap is substantial (e.g. > 1 minute)
+              // to avoid edge cases where events end exactly at the start minute of the next.
+              if (oeEnd <= proposedStart.getTime() + 60000 || 
+                  oeStart >= proposedEnd.getTime() - 60000) {
+                 continue;
               }
+              
+              if (oe.summary && task.rawLine && task.rawLine.toLowerCase().includes(oe.summary.toLowerCase())) {
+                 console.log(`Collision bypassed: AI explicitly scheduled "${task.title}" during "${oe.summary}".`);
+                 continue;
+              }
+              
+              console.log(`Collision detected: AI timebox "${task.title}" overlaps with real meeting "${oe.summary}". Skipping.`);
+              hasCollision = true;
+              break;
            }
            
            if (!hasCollision) {
                console.log(`Scheduling ${task.title} at ${task.startTime}-${task.endTime} as requested by AI.`);
-               const newEvent = calendar.createEvent("[TS] " + task.title, proposedStart, proposedEnd);
+               
+               let targetCal = calendar;
+               if (task.sectionType) {
+                  const isTypePmt = (task.sectionType === "PMT");
+                  if (isTypePmt !== isPmt) {
+                     if (typeof SYSTEM_CONFIG !== 'undefined' && SYSTEM_CONFIG.CALENDARS && SYSTEM_CONFIG.CALENDARS.CROSS_ENV_ID) {
+                        try {
+                           const crossCal = CalendarApp.getCalendarById(SYSTEM_CONFIG.CALENDARS.CROSS_ENV_ID);
+                           if (crossCal) {
+                              targetCal = crossCal;
+                           }
+                        } catch (e) {
+                           console.warn(`Could not fetch cross-environment calendar for scheduling: ${e.message}`);
+                        }
+                     }
+                  }
+               }
+               
+               const newEvent = targetCal.createEvent("[TS] " + task.title, proposedStart, proposedEnd);
                newEvent.setVisibility(CalendarApp.Visibility.PRIVATE);
                newEvent.setColor(CalendarApp.EventColor.ORANGE);
            }
@@ -286,4 +361,45 @@ function scheduleTasksToCalendar(tasks, targetDate) {
       console.warn(`No AI time block provided for ${task.title}. Skipping.`);
     }
   }
+}
+
+/**
+ * Cleans up all [TS] timeboxed events for today.
+ */
+function cleanupTodayTimeboxes() {
+  const calendar = CalendarApp.getDefaultCalendar();
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+  
+  const existingEvents = calendar.getEvents(startOfDay, endOfDay);
+  let deletedCount = 0;
+  existingEvents.forEach(e => {
+    if (e.getTitle().startsWith("[TS] ")) {
+      e.deleteEvent();
+      deletedCount++;
+    }
+  });
+  console.log("Deleted " + deletedCount + " [TS] timeboxed events for today.");
+}
+
+/**
+ * Cleans up all [TS] timeboxed events for tomorrow.
+ */
+function cleanupTomorrowTimeboxes() {
+  const calendar = CalendarApp.getDefaultCalendar();
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const startOfDay = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 0, 0, 0);
+  const endOfDay = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 23, 59, 59);
+  
+  const existingEvents = calendar.getEvents(startOfDay, endOfDay);
+  let deletedCount = 0;
+  existingEvents.forEach(e => {
+    if (e.getTitle().startsWith("[TS] ")) {
+      e.deleteEvent();
+      deletedCount++;
+    }
+  });
+  console.log("Deleted " + deletedCount + " [TS] timeboxed events for tomorrow.");
 }
