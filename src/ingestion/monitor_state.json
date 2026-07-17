@@ -8,5 +8,9 @@
   "sheet-sync-maintenance": "online",
   "github-sync": "online",
   "TaskMasterEngine-Private": "online",
-  "TaskMasterEngine-PMT": "online"
+  "TaskMasterEngine-PMT": "online",
+  "trigger-jules-backend": "offline",
+  "trigger-jules-ui": "offline",
+  "trigger-jules-cleanup": "offline",
+  "local-gemini-backfill": "offline"
 }

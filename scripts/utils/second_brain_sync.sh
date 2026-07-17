@@ -25,9 +25,4 @@ else
   echo "No local changes in DB."
 fi
 
-# 3. Trigger Jules synthesis
-echo "[$(date)] Step 3: Triggering Jules Daily Synthesis..."
-cd "/Users/daniel/Documents/AGY/the_system" || exit 1
-node scripts/maintenance/trigger_jules.js --chronicle-daily
-
 echo "[$(date)] Second Brain Pipeline Complete."

@@ -20,46 +20,100 @@ Details
 Meeting Introduction and Overview: Daniel Adersteg opened the meeting by presenting a high-level summary.`;
 
 function extractActionZones(text) {
+    // Defensive type checking
+    if (typeof text !== 'string') {
+        return "None";
+    }
+    
     const lines = text.split('\n');
     let extractedLines = [];
     let inTargetSection = false;
     const targetHeaders = ["decisions", "next steps", "action items", "actions", "decisions made"];
     const exitHeaders = ["summary", "details", "attendees", "notes", "agenda"];
     
+    // Helper to normalize a line for header checking
+    function normalizeHeader(str) {
+        return str.toLowerCase()
+                  .replace(/[^a-z ]/g, " ") // replace non-letters with spaces
+                  .replace(/\s+/g, " ")      // condense spaces
+                  .trim();
+    }
+    
+    // Helper to check if the line starts with list/bullet/checkbox formatting
+    function isListLine(str) {
+        let trimmed = str.trim();
+        return /^[-\*•✓●★☐☑☒□]/.test(trimmed) || /^\[[ xX]?\]/.test(trimmed) || /^\d+\.\s/.test(trimmed);
+    }
+    
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (!line) continue;
         
-        let lowerLine = line.toLowerCase().replace(/[^a-z ]/g, "").trim(); 
+        let clean = normalizeHeader(line);
         
-        // Is it a standalone header?
-        let isPossibleHeader = line.length > 0 && line.length < 40 && !line.match(/[.!?]$/) && !line.match(/^[-*•]\s/) && !line.match(/^\d+\.\s/) && !line.includes("  ");
+        // Check if the line is a header by length and keyword match
+        let isTargetHeader = false;
+        let isExitHeader = false;
         
-        if (isPossibleHeader) {
-            if (targetHeaders.some(h => lowerLine.includes(h))) {
-                inTargetSection = true;
-                extractedLines.push("--- " + line.toUpperCase() + " ---");
-                continue;
-            } else if (exitHeaders.some(h => lowerLine.includes(h))) {
-                inTargetSection = false;
-                continue;
-            } else if (lowerLine.length > 0 && lowerLine !== "content") {
-                // Ignore subheaders, keep staying in target section!
-                if (inTargetSection) extractedLines.push(line);
-                continue;
+        // A header is expected to be relatively short (e.g. less than 35 characters clean, and max 4 words)
+        if (clean.length > 0 && clean.length < 35 && clean.split(" ").length <= 4) {
+            
+            // If the line starts with a list bullet/checkbox, it can only be a header if it is formatted as one.
+            let isList = isListLine(line);
+            let hasHeaderFormatting = !isList || line.endsWith(":") || line.includes("**") || targetHeaders.includes(clean) || exitHeaders.includes(clean);
+            
+            if (hasHeaderFormatting) {
+                isTargetHeader = targetHeaders.some(h => {
+                    return clean === h || clean === h + "s" || clean === "key " + h || clean === "key " + h + "s" ||
+                           clean === "immediate " + h || clean === "immediate " + h + "s" ||
+                           clean === "agreed " + h || clean === "agreed " + h + "s" ||
+                           clean === "team " + h || clean === "team " + h + "s" ||
+                           clean === "our " + h || clean === "our " + h + "s";
+                });
+                
+                isExitHeader = exitHeaders.some(h => {
+                    return clean === h || clean === h + "s" || clean === "meeting " + h || clean === "meeting " + h + "s" ||
+                           clean === "discussion " + h || clean === "discussion " + h + "s" ||
+                           clean === "executive " + h || clean === "executive " + h + "s" ||
+                           clean === "general " + h || clean === "general " + h + "s" ||
+                           clean === "additional " + h || clean === "additional " + h + "s";
+                });
             }
         }
         
-        // Also check if a long paragraph starts with a target header (e.g. "Meeting Wrap-up and Next Steps:")
-        if (!inTargetSection) {
-            for (let h of targetHeaders) {
-                if (lowerLine.startsWith(h + " ") || lowerLine.includes("and " + h)) {
-                     inTargetSection = true;
-                     extractedLines.push("--- " + h.toUpperCase() + " ---");
-                     // We also want to capture this line since the paragraph IS the content!
-                     break;
+        // Fallback for target headers if the line is not matched by length (e.g. "and Decisions Made")
+        if (!isTargetHeader && !inTargetSection) {
+            isTargetHeader = targetHeaders.some(h => {
+                if (clean === h) return true;
+                if (clean.startsWith(h + " ")) return true;
+                // If it is an inline/fallback match like "and next steps", it must be part of a header/hybrid line (which has a colon)
+                if (clean.includes("and " + h) && line.includes(":")) return true;
+                return false;
+            });
+        }
+        
+        if (isTargetHeader) {
+            inTargetSection = true;
+            // For standalone headers (short), use the original line text.
+            // For long paragraphs with inline headers, use the matched header keyword.
+            if (line.length < 50) {
+                extractedLines.push("--- " + line.toUpperCase() + " ---");
+                continue;
+            } else {
+                let matchedH = targetHeaders.find(h => clean.startsWith(h + " ") || clean.includes("and " + h) || clean === h);
+                extractedLines.push("--- " + (matchedH || "next steps").toUpperCase() + " ---");
+                
+                // If it's a long hybrid line (header and content together), it typically has a colon followed by content.
+                // Otherwise, it's just a long heading, so we should skip double-pushing.
+                if (!line.includes(": ")) {
+                    continue;
                 }
             }
+        }
+        
+        if (isExitHeader) {
+            inTargetSection = false;
+            continue;
         }
         
         if (inTargetSection) {

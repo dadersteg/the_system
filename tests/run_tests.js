@@ -50,12 +50,30 @@ const Tasks = {
       const newTask = JSON.parse(JSON.stringify(taskObj));
       if (!newTask.id) newTask.id = Math.random().toString();
       tasksDb[listId].push(newTask);
+      return newTask;
     },
     remove: (listId, taskId) => {
       apiCalls.push({ action: 'remove', listId, taskId });
       if (tasksDb[listId]) {
          tasksDb[listId] = tasksDb[listId].filter(t => String(t.id) !== String(taskId));
       }
+    }
+  },
+  Tasklists: {
+    list: (options) => {
+      apiCalls.push({ action: 'list_tasklists', options });
+      return {
+        items: Object.keys(tasksDb).map(name => ({
+          id: name,
+          title: name === 'delete-list' ? 'To Be Deleted' : (name === 'quarantine-list' ? 'Triage Quarantine' : name)
+        }))
+      };
+    },
+    insert: (resource) => {
+      apiCalls.push({ action: 'insert_tasklist', resource });
+      const newId = resource.title.toLowerCase().replace(/\s+/g, '-') + '-list';
+      tasksDb[newId] = [];
+      return { id: newId, title: resource.title };
     }
   }
 };
@@ -65,7 +83,11 @@ const Utilities = {
   formatDate: (date, tz, fmt) => '2026-06-02',
   computeDigest: () => [1,2,3],
   DigestAlgorithm: { MD5: 'MD5' },
-  base64Encode: () => 'hash123'
+  base64Encode: () => 'hash123',
+  formatString: (fmt, ...args) => {
+    let i = 0;
+    return fmt.replace(/%02d/g, () => String(args[i++]).padStart(2, '0'));
+  }
 };
 
 const DriveApp = {
@@ -167,7 +189,8 @@ const sandbox = {
   callGemini: callGeminiMock,
   selectModelForPayload: () => 'gemini-1.5-pro',
   executeTimeboxing: () => {},
-  processPromptText: (text) => text || ""
+  processPromptText: (text) => text || "",
+  IS_PMT_ENV: false
 };
 
 vm.createContext(sandbox);

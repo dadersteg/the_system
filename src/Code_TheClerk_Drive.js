@@ -425,9 +425,18 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                 data.tasks.forEach(t => {
                     if (t.title) {
                         try {
-                            const taskNotes = `${targetFileUrl}\n[Source: ${file.getName()}]\n\n${t.notes || ""}`;
-                            const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
-                            Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
+                             const baseNotes = `${targetFileUrl}\n[Source: ${file.getName()}]\n\n${t.notes || ""}\n\nSYS: Pending initial review.\nDA:\n\n`;
+                             const metadata = {
+                                duration: "15m",
+                                goal: "Maintenance",
+                                category_path: "Inbox",
+                                created_at: new Date().toISOString()
+                             };
+                             const initialHash = getStandardizedTaskHash(t.title, baseNotes, "", "needsAction", true);
+                             metadata.ai_hash = initialHash;
+                             const taskNotes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+                             const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
+                             Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
                             tasksCreated++;
                             extractedTasksLog.push(t.title);
                         } catch (e) {
@@ -741,7 +750,7 @@ function askGeminiStable(rules, batch, currentModel) {
     // Add instruction to extract tasks
     const taskInstruction = `
 ## ACTION EXTRACTION & CONFIRMATION MAPPING
-1. EXTRACT ASSIGNED ACTIONS: If the file contains meeting notes, project plans, or explicit action items assigned to the user, extract them directly into the \`tasks\` array with a clear \`title\` (Action Verb + Object) and \`notes\`. 
+1. EXTRACT ASSIGNED ACTIONS: If the file contains meeting notes, project plans, or explicit action items, extract ONLY the actions assigned specifically to "Daniel Adersteg" or "Daniel". DO NOT extract actions assigned to any other person. Extract them directly into the \`tasks\` array with a clear \`title\` (Action Verb + Object) and \`notes\`. 
 2. FILE PROCESSING ACTIONS: Determine if any implicit action is required to respond to or process the file itself. Do NOT suggest generic actions like "review the file". 
 3. If no action is needed from either of the above, return an empty array.
 4. CONFIRMATION MAPPING: If the file is a confirmation or update for an existing task from the "OPEN GOOGLE TASKS" list, output its EXACT ID in the \`mapped_task_id\` field. If this file confirms the mapped task is complete (e.g. it is a receipt, ticket, confirmation letter, or result document), provide a detailed explanation in \`mark_completed_reason\`. Otherwise, output "None" for both.
@@ -1263,42 +1272,100 @@ function isFolderOutOfScope(folder) {
 
 // --- DETERMINISTIC ZONE PARSING ---
 function extractActionZones(text) {
+    // Defensive type checking
+    if (typeof text !== 'string') {
+        return "None";
+    }
+    
     const lines = text.split('\n');
     let extractedLines = [];
     let inTargetSection = false;
     const targetHeaders = ["decisions", "next steps", "action items", "actions", "decisions made"];
     const exitHeaders = ["summary", "details", "attendees", "notes", "agenda"];
     
+    // Helper to normalize a line for header checking
+    function normalizeHeader(str) {
+        return str.toLowerCase()
+                  .replace(/[^a-z ]/g, " ") // replace non-letters with spaces
+                  .replace(/\s+/g, " ")      // condense spaces
+                  .trim();
+    }
+    
+    // Helper to check if the line starts with list/bullet/checkbox formatting
+    function isListLine(str) {
+        let trimmed = str.trim();
+        return /^[-\*•✓●★☐☑☒□]/.test(trimmed) || /^\[[ xX]?\]/.test(trimmed) || /^\d+\.\s/.test(trimmed);
+    }
+    
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (!line) continue;
         
-        let lowerLine = line.toLowerCase().replace(/[^a-z ]/g, "").trim(); 
+        let clean = normalizeHeader(line);
         
-        let isPossibleHeader = line.length > 0 && line.length < 40 && !line.match(/[.!?]$/) && !line.match(/^[-*•]\s/) && !line.match(/^\d+\.\s/) && !line.includes("  ");
+        // Check if the line is a header by length and keyword match
+        let isTargetHeader = false;
+        let isExitHeader = false;
         
-        if (isPossibleHeader) {
-            if (targetHeaders.some(h => lowerLine.includes(h))) {
-                inTargetSection = true;
-                extractedLines.push("--- " + line.toUpperCase() + " ---");
-                continue;
-            } else if (exitHeaders.some(h => lowerLine.includes(h))) {
-                inTargetSection = false;
-                continue;
-            } else if (lowerLine.length > 0 && lowerLine !== "content") {
-                if (inTargetSection) extractedLines.push(line);
-                continue;
+        // A header is expected to be relatively short (e.g. less than 35 characters clean, and max 4 words)
+        if (clean.length > 0 && clean.length < 35 && clean.split(" ").length <= 4) {
+            
+            // If the line starts with a list bullet/checkbox, it can only be a header if it is formatted as one.
+            let isList = isListLine(line);
+            let hasHeaderFormatting = !isList || line.endsWith(":") || line.includes("**") || targetHeaders.includes(clean) || exitHeaders.includes(clean);
+            
+            if (hasHeaderFormatting) {
+                isTargetHeader = targetHeaders.some(h => {
+                    return clean === h || clean === h + "s" || clean === "key " + h || clean === "key " + h + "s" ||
+                           clean === "immediate " + h || clean === "immediate " + h + "s" ||
+                           clean === "agreed " + h || clean === "agreed " + h + "s" ||
+                           clean === "team " + h || clean === "team " + h + "s" ||
+                           clean === "our " + h || clean === "our " + h + "s";
+                });
+                
+                isExitHeader = exitHeaders.some(h => {
+                    return clean === h || clean === h + "s" || clean === "meeting " + h || clean === "meeting " + h + "s" ||
+                           clean === "discussion " + h || clean === "discussion " + h + "s" ||
+                           clean === "executive " + h || clean === "executive " + h + "s" ||
+                           clean === "general " + h || clean === "general " + h + "s" ||
+                           clean === "additional " + h || clean === "additional " + h + "s";
+                });
             }
         }
         
-        if (!inTargetSection) {
-            for (let h of targetHeaders) {
-                if (lowerLine.startsWith(h + " ") || lowerLine.includes("and " + h)) {
-                     inTargetSection = true;
-                     extractedLines.push("--- " + h.toUpperCase() + " ---");
-                     break;
+        // Fallback for target headers if the line is not matched by length (e.g. "and Decisions Made")
+        if (!isTargetHeader && !inTargetSection) {
+            isTargetHeader = targetHeaders.some(h => {
+                if (clean === h) return true;
+                if (clean.startsWith(h + " ")) return true;
+                // If it is an inline/fallback match like "and next steps", it must be part of a header/hybrid line (which has a colon)
+                if (clean.includes("and " + h) && line.includes(":")) return true;
+                return false;
+            });
+        }
+        
+        if (isTargetHeader) {
+            inTargetSection = true;
+            // For standalone headers (short), use the original line text.
+            // For long paragraphs with inline headers, use the matched header keyword.
+            if (line.length < 50) {
+                extractedLines.push("--- " + line.toUpperCase() + " ---");
+                continue;
+            } else {
+                let matchedH = targetHeaders.find(h => clean.startsWith(h + " ") || clean.includes("and " + h) || clean === h);
+                extractedLines.push("--- " + (matchedH || "next steps").toUpperCase() + " ---");
+                
+                // If it's a long hybrid line (header and content together), it typically has a colon followed by content.
+                // Otherwise, it's just a long heading, so we should skip double-pushing.
+                if (!line.includes(": ")) {
+                    continue;
                 }
             }
+        }
+        
+        if (isExitHeader) {
+            inTargetSection = false;
+            continue;
         }
         
         if (inTargetSection) {
@@ -1312,17 +1379,7 @@ function extractActionZones(text) {
 // --- RETROACTIVE PROCESSING SCRIPT ---
 function retroactivelyProcessTodayNotes() {
     const exactIds = [
-        '1bfgfo8TUPSL_juh1Zaj-lO73EATIQElgjmuaAGjLEyA',
-        '1f0yvbYjJIVypGePr5oNznIHauH5FLtXzZh_F5rxhqgw',
-        '1bkJKHBEYaTpL0ODDbOivBLVU-ZMg5P7pP_Yx4mMZZSE',
-        '1v9uVDcLy_qnBBk3gd1NI42ZRci7KF4uEbXaBpNxeQr4',
-        '1boiNHVf6S-fr_8nOJFj5FhjGTRtykTq9WCUOmKiRFAY',
-        '12s0tFiQufH8s0kKAcRbrOIsrQlEOnu4Ijw90oITkejI',
-        '1032FE7G4x-pKRBvrq9PWUETeyzQqJ1qPSc07NlqXVic',
-        '1fPGswOvyR9ZKMvtyXsiIWceXH8SsyjP7Jk8p0fQQzao',
-        '1i3WBGadYjbyRtwZ-jfk37bs_atpNbYucMSVdNmCT5uw',
-        '1VaZNZt_OkpAP9gLD0EFJPH397_1_qtoJx5OgGi9NDo4',
-        '1GokKOGtJ1PwGfgW5z3FvonA72jGWE_EmtPDmHVu1dMc'
+        // 'paste_your_drive_file_id_here'
     ];
     
     const knowledge = loadKnowledgeDocs();
@@ -1373,7 +1430,16 @@ function retroactivelyProcessTodayNotes() {
                         if (t.title) {
                             try {
                                 const targetFileUrl = `https://drive.google.com/open?id=${f.id}`;
-                                const taskNotes = `${targetFileUrl}\n[Source: ${f.name}]\n\n${t.notes || ""}`;
+                                const baseNotes = `${targetFileUrl}\n[Source: ${f.name}]\n\n${t.notes || ""}\n\nSYS: Pending initial review.\nDA:\n\n`;
+                                const metadata = {
+                                   duration: "15m",
+                                   goal: "Maintenance",
+                                   category_path: "Inbox",
+                                   created_at: new Date().toISOString()
+                                };
+                                const initialHash = getStandardizedTaskHash(t.title, baseNotes, "", "needsAction", true);
+                                metadata.ai_hash = initialHash;
+                                const taskNotes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
                                 Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
                                 tasksCreated++;
                             } catch (e) {

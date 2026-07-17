@@ -18,8 +18,9 @@
  * @returns {void}
  */
 function updateTaskList() {
-  const lists = Tasks.Tasklists.list().items;
-  if (!lists) return;
+  const rawLists = Tasks.Tasklists.list().items || [];
+  const lists = rawLists.filter(l => !(l.title || "").toLowerCase().includes("quarantine"));
+  if (lists.length === 0) return;
   
   const jsonOutput = lists.map(l => ({
     title: l.title,

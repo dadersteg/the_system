@@ -236,11 +236,14 @@ function buildTaskExportRow(task, taskList, emailInfo, exportTs, rowCounter, val
     subCategory = catParts.slice(1).join(">").trim();
   }
 
+  const milestoneVal = extractMilestone(task.title, task.notes);
+
   return [
     urn, 
     taskList.title, 
     parentCategory, 
     subCategory,
+    milestoneVal,
     computedTitle, 
     cleanTaskNotes, 
     status, 
@@ -290,6 +293,7 @@ function getExportHeaders() {
     "Task List", 
     "Category", 
     "Sub-Category",
+    "Milestone",
     "Task Title", 
     "Notes", 
     "Status", 
@@ -299,7 +303,7 @@ function getExportHeaders() {
     "Goal", 
     "Link", 
     "System Comment", 
-    "DA Comment",
+    "DA Comment", 
     "Task ID", 
     "Task List ID", 
     "Original Status"
@@ -318,6 +322,7 @@ function getExportDescriptions() {
     "Current List", 
     "Extracted " + tax + " category parent node", 
     "Extracted " + tax + " category leaf/sub-category node",
+    "Associated milestone or 'Milestone' if the task itself is a milestone",
     "Current Title of the task", 
     "Task notes (stripped of metadata)", 
     "Status (needsAction/completed/Completed/Deleted)", 
@@ -406,6 +411,7 @@ function syncCompletedTasksLog() {
         if (response.items) {
           response.items.forEach(task => {
             if (task.status === "completed") {
+              const compDate = new Date(task.completed || task.updated || new Date().toISOString());
               PropertiesService.getScriptProperties().deleteProperty("ai_hash_" + task.id);
               if (!existingIds.has(task.id)) {
                 let link = "";
@@ -453,16 +459,17 @@ function syncCompletedTasksLog() {
                   subCategory = catParts.slice(1).join(">").trim();
                 }
 
-                const compDate = new Date(task.completed || task.updated || new Date().toISOString());
                 const compTimeStr = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd HH:mm:ss");
                 const cleanCompTime = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd");
                 const urn = `urn:task:completed-${task.id}`;
+                const milestoneVal = extractMilestone(task.title, task.notes);
 
                 rowsToAdd.push([
                   urn,
                   list.title,
                   parentCategory,
                   subCategory,
+                  milestoneVal,
                   computedTitle,
                   cleanNotes,
                   "Completed",
@@ -480,7 +487,11 @@ function syncCompletedTasksLog() {
                 existingIds.add(task.id);
                 addedCount++;
               }
-              tasksToDelete.push({ listId: list.id, taskId: task.id });
+              const nowTime = new Date().getTime();
+              const cutoffTime = nowTime - (14 * 24 * 60 * 60 * 1000); // 14 days ago in ms
+              if (compDate.getTime() < cutoffTime) {
+                tasksToDelete.push({ listId: list.id, taskId: task.id });
+              }
             }
           });
         }
@@ -636,11 +647,14 @@ function purgeToBeDeletedTasks() {
                 subCategory = catParts.slice(1).join(">").trim();
               }
 
+              const milestoneVal = extractMilestone(t.title, t.notes);
+
               rowsToAdd.push([
                 urn,
                 "To Be Deleted",
                 parentCategory,
                 subCategory,
+                milestoneVal,
                 computedTitle,
                 cleanNotes,
                 "Deleted",
@@ -826,8 +840,15 @@ function fetchTaskLists() {
   try {
     const response = Tasks.Tasklists.list();
     const EXCLUDED_LIST_IDS = [SYSTEM_CONFIG.TASKS.RECURRING_LIST_ID];
-    const items = (response.items || []).filter(list => !EXCLUDED_LIST_IDS.includes(list.id));
-    return items.length > 0 ? items : null;
+    const items = response.items || [];
+    
+    const quarantineList = items.find(list => (list.title || "") === "Triage Quarantine");
+    if (quarantineList) {
+      EXCLUDED_LIST_IDS.push(quarantineList.id);
+    }
+    
+    const filtered = items.filter(list => !EXCLUDED_LIST_IDS.includes(list.id));
+    return filtered.length > 0 ? filtered : null;
   } catch (e) {
     console.error(`Critical API Failure (Tasklists.list): ${e.message}`);
     return null;
@@ -1544,4 +1565,19 @@ function extractExternalLinkFromText(text) {
     }
   }
   return null;
+}
+
+/**
+ * Helper to extract the milestone name from a task title or its notes.
+ * 
+ * @param {string} title Task title.
+ * @param {string} notes Task notes.
+ * @returns {string} Milestone name or "None".
+ */
+function extractMilestone(title, notes) {
+  if (title && title.startsWith("[Milestone]")) {
+    return "Milestone";
+  }
+  const match = (notes || "").match(/^Milestone:\s*(.*)$/m);
+  return match ? match[1].trim() : "None";
 }

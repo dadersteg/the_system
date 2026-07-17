@@ -89,7 +89,10 @@ function listTasksFromCLI(listFilter) {
 function getAllTaskListsFromCLI() {
   try {
     const response = Tasks.Tasklists.list();
-    const lists = response.items.map(l => ({ id: l.id, title: l.title }));
+    const items = response.items || [];
+    const lists = items
+      .filter(l => !(l.title || "").toLowerCase().includes("quarantine"))
+      .map(l => ({ id: l.id, title: l.title }));
     
     // Also fetch tasks from each list to see what's there
     const results = {};

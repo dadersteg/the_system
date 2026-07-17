@@ -33,7 +33,10 @@ def get_api_active_task_count():
             break
 
     for task_list in task_lists:
+        list_title = task_list['title']
         list_id = task_list['id']
+        if any(k in list_title.lower() for k in ["deleted", "quarantine"]):
+            continue
         page_token = None
         while True:
             tasks_results = service.tasks().list(

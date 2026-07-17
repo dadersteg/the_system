@@ -42,6 +42,13 @@ function runRetroactivePhotoSync() {
     console.warn("Photo Register Sheet not accessible yet: " + e.message);
   }
 
+  let deterministicRules = [];
+  try {
+    deterministicRules = getDeterministicRules() || [];
+  } catch(e) {
+    console.warn("Failed to retrieve deterministic rules: " + e.message);
+  }
+
   while (true) {
     if (new Date().getTime() - startTime > maxExecutionTimeMs) {
       console.log(`Approaching time limit. Processed ${threadsProcessed} threads. Run again to continue.`);
@@ -63,7 +70,40 @@ function runRetroactivePhotoSync() {
 
       const thread = threads[i];
       const messages = thread.getMessages();
-      
+      if (messages.length === 0) continue;
+
+      const firstMsg = messages[0];
+      const sender = firstMsg.getFrom();
+      const subject = firstMsg.getSubject();
+
+      // Extract thread body context (matching Code_TheClerk_Email.js logic)
+      let body = "";
+      if (messages.length === 1) {
+        body = messages[0].getPlainBody().substring(0, 3000);
+      } else {
+        const recentMessages = messages.slice(-3);
+        const bodies = recentMessages.map((m, idx) => `--- MSG ${idx+1} (FROM: ${m.getFrom()}) ---\n${m.getPlainBody().substring(0, 1500)}`);
+        body = bodies.join('\n\n');
+      }
+
+      // Evaluate thread against deterministic rules
+      let skipThread = false;
+      try {
+        const ruleMatch = _evaluateDeterministicRules(sender, subject, body, deterministicRules);
+        if (ruleMatch && ruleMatch.skipAI === true) {
+          console.log(` > Skipping photo backup for thread "${subject}" due to skipAI spreadsheet rule match.`);
+          skipThread = true;
+        }
+      } catch(e) {
+        console.warn("Error evaluating deterministic rules: " + e.message);
+      }
+
+      if (skipThread) {
+        thread.addLabel(label);
+        threadsProcessed++;
+        continue;
+      }
+
       const uploadResults = _processAndUploadAttachments(messages);
       const mediaItemsToCreate = uploadResults.mediaItemsToCreate;
       const processedImages = uploadResults.processedImages;

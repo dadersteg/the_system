@@ -48,6 +48,12 @@ function exportTrackers() {
   if (driveLogSheet) {
     _exportLogData(driveLogSheet, "Drive", exportFolderId);
   }
+
+  // Export Antigravity Log
+  const antigravityLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.ANTIGRAVITY_LOG);
+  if (antigravityLogSheet) {
+    _exportLogData(antigravityLogSheet, "Antigravity", exportFolderId);
+  }
 }
 
 /**
@@ -76,28 +82,46 @@ function _exportLogData(sheet, typeName, folderId) {
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) return;
 
-  const headerRowIdx = data[0].findIndex(h => h && (h.toString().toLowerCase().includes('link') || h.toString().toLowerCase().includes('original name'))) === -1 && data.length > 1 ? 1 : 0;
+  const headerRowIdx = data[0].findIndex(h => h && (h.toString().toLowerCase().includes('link') || h.toString().toLowerCase().includes('original name') || h.toString().toLowerCase().includes('convo id'))) === -1 && data.length > 1 ? 1 : 0;
   const headers = data[headerRowIdx].map(h => h.toString().trim().toLowerCase());
   
-  const colMap = typeName === "Email" ? {
-    timestamp: headers.findIndex(h => h === "timestamp"),
-    subject: headers.findIndex(h => h === "subject"),
-    sender: headers.findIndex(h => h === "sender"),
-    labels: headers.findIndex(h => h === "final label set"),
-    summary: headers.findIndex(h => h === "ai summary"),
-    actions: headers.findIndex(h => h === "ai action items"),
-    link: headers.findIndex(h => h === "link"),
-    status: headers.findIndex(h => h === "inbox status")
-  } : {
-    timestamp: headers.findIndex(h => h === "timestamp"),
-    originalName: headers.findIndex(h => h === "original name"),
-    finalName: headers.findIndex(h => h === "final name"),
-    summary: headers.findIndex(h => h === "summary"),
-    targetPath: headers.findIndex(h => h === "target folder path"),
-    url: headers.findIndex(h => h === "url"),
-    status: headers.findIndex(h => h === "status"),
-    mappedTask: headers.findIndex(h => h === "mapped task")
-  };
+  let colMap;
+  if (typeName === "Email") {
+    colMap = {
+      timestamp: headers.findIndex(h => h === "timestamp"),
+      subject: headers.findIndex(h => h === "subject"),
+      sender: headers.findIndex(h => h === "sender"),
+      labels: headers.findIndex(h => h === "final label set"),
+      summary: headers.findIndex(h => h === "ai summary"),
+      actions: headers.findIndex(h => h === "ai action items"),
+      link: headers.findIndex(h => h === "link"),
+      status: headers.findIndex(h => h === "inbox status")
+    };
+  } else if (typeName === "Drive") {
+    colMap = {
+      timestamp: headers.findIndex(h => h === "timestamp"),
+      originalName: headers.findIndex(h => h === "original name"),
+      finalName: headers.findIndex(h => h === "final name"),
+      summary: headers.findIndex(h => h === "summary"),
+      targetPath: headers.findIndex(h => h === "target folder path"),
+      url: headers.findIndex(h => h === "url"),
+      status: headers.findIndex(h => h === "status"),
+      mappedTask: headers.findIndex(h => h === "mapped task")
+    };
+  } else if (typeName === "Antigravity") {
+    colMap = {
+      timestamp: headers.findIndex(h => h === "date"), // The sheet uses "Date" for timestamp
+      convoId: headers.findIndex(h => h === "convo id"),
+      type: headers.findIndex(h => h === "type"),
+      name: headers.findIndex(h => h === "name of convo"),
+      created: headers.findIndex(h => h === "convo created date"),
+      purpose: headers.findIndex(h => h === "purpose of convo"),
+      summary: headers.findIndex(h => h === "summary of work last 24 hours")
+    };
+  } else {
+    console.error(`_exportLogData failed: unknown typeName ${typeName}`);
+    return;
+  }
 
   const tsIndex = colMap.timestamp !== -1 ? colMap.timestamp : 0; // Default to first column if missing
   

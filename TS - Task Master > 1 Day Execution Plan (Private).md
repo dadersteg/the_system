@@ -1,49 +1,58 @@
 # 1 Day Execution Plan
 *Auto-generated based on today's capacity and system goals.*
 
-**BLUF:** Today is Sunday, 2026-07-12. The tactical focus is entirely on personal reflection, system planning, and health maintenance, navigating around afternoon and evening social commitments. Per the Private Environment override, all PMT operations have been suspended, and the schedule strictly adheres to the 22:00 cognitive shutdown boundary.
+**BLUF:** It is currently 16:07 on Friday, leaving a tight window of execution before your 20:00 dinner with Nadia & Flo. Per the Private Environment override, all PMT tasks have been omitted to focus entirely on critical personal operations, specifically time-sensitive medical appointments and Carina's birthday preparations.
 
 ## "EAT THE FROG" (The Apex Tasks)
+*(Identify ONE for PMT and ONE for Personal. Both must include the 🐸 emoji and reasoning linked to goals.)*
+
 **🏠 Personal:**
-- [ ] [12:25 - 14:25] 🐸 [THE FROG] [Q2] Perform 84-day reflection (Critical for long-term alignment, goal tracking, and maintaining the minimalist lifestyle system) {ID: OHRyOHJZM0p3XzBwX2VUdg}
+- [ ] [19:00 - 19:30] 🐸 [THE FROG] [Q2] Review Carry's Tax Status (High-leverage administrative task ensuring financial compliance and peace of mind for your partner) {ID: STV0SHFhMktJVVdEamFCMA}
 
 ## TODAY'S TOP 3
+*(The top 3 priority tasks scheduled for today, excluding the frogs and excluding Q3 tasks. Split by PMT, Other Work, and Personal.)*
+
 **🏠 Personal:**
-- [ ] [14:25 - 15:25] [Q2] Perform 28-day reflection {ID: WjhST1RpUVZFSXd3V21IVg}
-- [ ] [17:30 - 18:30] [Q2] Complete daily workout {ID: Zkh6V1czT1M4RHo3R2dxZg}
-- [ ] [18:30 - 19:15] [Q2] Perform 7-day planning {ID: dmFDLWU4aXNFUTNZak1ONw}
+- [ ] [16:45 - 17:15] [Q1] Attend remote progesterone consultation {ID: R2JaWjFxQnBkM1dZV0xneA}
+- [ ] [17:15 - 17:30] [Q1] Schedule obstetric ultrasound appointment {ID: SXo2ZVpraWZjMGlqZV8zcg}
+- [ ] [18:30 - 19:00] [Q1] Research and select birthday gift for Carina {ID: MGRkbC1QY1dfMDBFRWFuYg}
 
 ## THE REST OF TODAY
+*(Other tasks that must be done today, including Q3 mandatory chores, but lower priority.)*
+
 **🏠 Personal:**
-- [ ] [12:10 - 12:25] [Q3] Perform 1-day planning (Start of day) {ID: NHFGbWNCZHNiQ2UwYUp6Qw}
-- [ ] [15:25 - 15:30] [Q1] Perform daily thoracic and neck exercises as prescribed {ID: X1ZONVc0b2ZuV3plQy1tZg}
-- [ ] [19:15 - 19:30] [Q2] Daily Walking {ID: VVV3ZnhlU3NiU2RWNFQwdw}
-- [ ] [19:30 - 20:00] [Q2] Daily screen-free time with Carry {ID: XzRYbGszZWpoRU0tbDg1MA}
-- [ ] [21:00 - 21:30] [Q1] Perform 1-day planning (End of day) {ID: SEJvdXlUcXVHR081ZThoQQ}
-- [ ] [21:30 - 21:45] [Q2] Perform 2-day reflection {ID: MDJ4NEROMlpiVnRFTzZKNg}
-- [ ] [21:45 - 21:50] [Q3] Daily 4-7-8 Breathing Protocol {ID: SDBjYnh1WFdOUEt3ck9NWg}
+- [ ] [15:45 - 16:45] [Q2] Complete daily workout {ID: LVlOMHM0Y0t0T0hBam5MRA}
+- [ ] [17:30 - 17:45] [Q2] Perform 2-day reflection {ID: WmtqOG9CTTlELW5tX3R2bw}
+- [ ] [17:45 - 18:00] [Q3] Review 'User Guidelines' tab for outdated references {ID: RW1QMVZRQVQ3R2d0R2dHSQ}
+- [ ] [18:00 - 18:30] [Q2] Perform 1-day planning (End of day) {ID: aVhDd3EyOUs4X0hfcUVRXw}
+- [ ] [19:30 - 20:00] [Q3] Daily Walking {ID: VWRKbXNGTDhGY05vY0JzeA}
+- [ ] [21:00 - 21:30] [Q2] Daily screen-free time with Carry {ID: bFREd04wSnZRajlHQ1ZhbA}
+- [ ] [21:45 - 22:00] [Q3] Daily 4-7-8 Breathing Protocol {ID: N3RiUUJEaEN1aTZ5UGZ0aw}
 
 ## 🗓️ THIS WEEK
-- [ ] [Q1] Attend video physiotherapy appointment
-- [ ] [Q1] Attend Therapy Session
-- [ ] [Q2] [Milestone] Debug and Refactor Antigravity DOM Dumper Script
-- [ ] [Q2] [Milestone] Apply for British passport name change
-- [ ] [Q2] [Milestone] Execute Q3 Financial Review
-- [ ] [Q2] Monthly Budget Setup & Review
+- [ ] [Q1] Attend EMS session at Vive Fitness Westminster
+- [ ] [Q1] Purchase LoveShackFancy x Hunter gift for Carry
+- [ ] [Q2] Apply for British Passport (Name Change)
+- [ ] [Q2] Confirm name registration with Skatteverket
+- [ ] [Q2] Find and book new dentist
+- [ ] [Q2] Attend Therapy Session
 - [ ] [Q2] Plan weekly date with Carry
 
 ## 🎯 THIS MONTH (Radar)
-- [ ] [Q2] Decide on AXA Health Insurance Plan
+- [ ] [Q2] Analyze shared video material
+- [ ] [Q2] Fix/glue the closet door
+- [ ] [Q2] Update Wedding Project Plan
+- [ ] [Q2] Track Liverpool FC ballot outcome
 - [ ] [Q2] Monthly Date with Carry
 - [ ] [Q2] Declutter Physical Space
 
 ## BOTTLENECKS & SYS ALERTS
-- **Cognitive Load Warning:** Today features an unusually heavy stack of reflection and planning tasks (84-day, 28-day, 7-day, 2-day, and 1-day). Ensure you take mental breaks between these deep-thinking blocks to avoid decision fatigue.
-- **Scheduling Constraints:** Calendar events at 15:30 (Lunch) and 20:00 (Charlotte) create hard boundaries. The schedule has been tightly packed to ensure all tasks are completed before the strict 22:00 digital shutdown.
+*(Identify any bottlenecks, overloaded days, or systemic warnings. Write actionable advice.)*
+- **Time Constraint Alert:** With the current time at 16:07 and a hard block for dinner at 20:00, your evening execution window is highly fragmented. You must transition immediately from your workout into the medical consultations (Progesterone & Ultrasound) to ensure they are completed before the end of standard business hours.
 
 ## 🗑️ QUARANTINE & TRIAGE CLEARANCE
-- **Backlog Maintenance:** Tasks with 2099 due dates (e.g., `Update Digital Signature`, `Review AI Gmail inbox features`) remain safely quarantined in the backlog for future processing.
-- **Missing Metadata:** Task `U3htMzBSZWZRd0pTOTNFeQ` (Execute morning habits) lacked proper duration and category metadata and was scheduled for tomorrow; it has been bypassed for today's execution.
+*(Brief summary of tasks proposed for deletion or moved to backlog, and items processed from the Importer.)*
+- **Backlogged/Deferred:** Google Photos Takeout, Temple of the Jedi Order engagement, AXA Health Insurance decision, digital signature recreation, and Swedish passport collection have all been successfully routed to the backlog or deferred to Autumn per system instructions.
 
 ---
 *Report dynamically generated by gemini-pro-latest*

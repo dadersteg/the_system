@@ -28,7 +28,7 @@ def fetch_active_tasks(service):
         for lst in lists:
             list_id = lst['id']
             list_title = lst['title']
-            if "deleted" in list_title.lower():
+            if "deleted" in list_title.lower() or "quarantine" in list_title.lower():
                 continue
             
             tasks = []

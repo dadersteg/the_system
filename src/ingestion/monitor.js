@@ -157,9 +157,8 @@ async function checkBridges() {
         { name: 'github-sync', file: '/Users/daniel/Documents/AGY/the_system/logs/github_sync_out.log', maxAgeMs: 24 * 60 * 60 * 1000 },
         { name: 'sheet-sync-maintenance', file: '/Users/daniel/Documents/AGY/the_system/logs/sheet_sync_maintenance_out.log', maxAgeMs: 2 * 60 * 60 * 1000 },
         { name: 'check-bridges-daily', file: '/Users/daniel/Documents/AGY/the_system/logs/check_bridges_daily_out.log', maxAgeMs: 25 * 60 * 60 * 1000 },
-        { name: 'trigger-jules-backend', file: '/Users/daniel/Documents/AGY/the_system/logs/trigger_jules_backend_out.log', maxAgeMs: 25 * 60 * 60 * 1000 },
-        { name: 'trigger-jules-ui', file: '/Users/daniel/Documents/AGY/the_system/logs/trigger_jules_ui_out.log', maxAgeMs: 25 * 60 * 60 * 1000 },
-        { name: 'trigger-jules-cleanup', file: '/Users/daniel/Documents/AGY/the_system/logs/trigger_jules_cleanup_out.log', maxAgeMs: 25 * 60 * 60 * 1000 }
+        { name: 'antigravity-cloud-backfill', file: '/Users/daniel/Documents/AGY/the_system/logs/antigravity_cloud_backfill_out.log', maxAgeMs: 25 * 60 * 60 * 1000 },
+        { name: 'local-gemini-weekly-sync', file: '/Users/daniel/Documents/AGY/the_system/logs/local_gemini_weekly_sync_out.log', maxAgeMs: 8 * 24 * 60 * 60 * 1000 }
     ];
 
     for (const check of cronChecks) {

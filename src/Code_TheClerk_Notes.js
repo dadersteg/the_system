@@ -143,9 +143,18 @@ function processRunningNoteById(fileId, batchLogs, recentContext = "") {
                 data.tasks.forEach(t => {
                     if (t.title) {
                         try {
-                            const taskNotes = `${file.getUrl()}\n[Source: ${file.getName()}]\n\n${t.notes || ""}`;
-                            const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
-                            Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
+                             const baseNotes = `${file.getUrl()}\n[Source: ${file.getName()}]\n\n${t.notes || ""}\n\nSYS: Pending initial review.\nDA:\n\n`;
+                             const metadata = {
+                                duration: "15m",
+                                goal: "Maintenance",
+                                category_path: "Inbox",
+                                created_at: new Date().toISOString()
+                             };
+                             const initialHash = getStandardizedTaskHash(t.title, baseNotes, "", "needsAction", true);
+                             metadata.ai_hash = initialHash;
+                             const taskNotes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+                             const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
+                             Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
                             tasksCreated++;
                             
                             finalMarkdown += `- **${t.title}**\n`;
@@ -259,9 +268,18 @@ function processNotesFolder(folderId, mode, systemPrompt, taxonomyJson, batchLog
                         data.tasks.forEach(t => {
                             if (t.title) {
                                 try {
-                                    const taskNotes = `${file.getUrl()}\n[Source: ${file.getName()}]\n\n${t.notes || ""}`;
-                                    const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
-                                    Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
+                                     const baseNotes = `${file.getUrl()}\n[Source: ${file.getName()}]\n\n${t.notes || ""}\n\nSYS: Pending initial review.\nDA:\n\n`;
+                                     const metadata = {
+                                        duration: "15m",
+                                        goal: "Maintenance",
+                                        category_path: "Inbox",
+                                        created_at: new Date().toISOString()
+                                     };
+                                     const initialHash = getStandardizedTaskHash(t.title, baseNotes, "", "needsAction", true);
+                                     metadata.ai_hash = initialHash;
+                                     const taskNotes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+                                     const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
+                                     Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
                                     tasksCreated++;
                                     
                                     finalMarkdown += `- **${t.title}**\n`;
