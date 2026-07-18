@@ -10,19 +10,39 @@ let tasksDb = {
 
 const Tasks = {
   Tasks: {
-    list: (listId) => ({ items: tasksDb[listId] || [] }),
-    get: (listId, taskId) => (tasksDb[listId] || []).find(t => t.id === taskId),
+    list: (listId, options) => ({ items: (tasksDb[listId] || []) }),
+    get: (listId, taskId) => (tasksDb[listId] || []).find(t => String(t.id) === String(taskId)),
     patch: (patchObj, listId, taskId) => {
       const list = tasksDb[listId];
-      const idx = list.findIndex(t => t.id === taskId);
-      if (idx !== -1) list[idx] = { ...list[idx], ...patchObj };
+      if (list) {
+        const idx = list.findIndex(t => String(t.id) === String(taskId));
+        if (idx !== -1) list[idx] = { ...list[idx], ...patchObj };
+      }
     },
-    insert: (taskObj, listId) => { tasksDb[listId].push(taskObj); },
-    remove: (listId, taskId) => { tasksDb[listId] = tasksDb[listId].filter(t => t.id !== taskId); },
-    update: (taskObj, listId, taskId) => {
-      const list = tasksDb[listId];
-      const idx = list.findIndex(t => t.id === taskId);
-      if (idx !== -1) list[idx] = taskObj;
+    insert: (taskObj, listId) => {
+      if (!tasksDb[listId]) tasksDb[listId] = [];
+      const newTask = JSON.parse(JSON.stringify(taskObj));
+      if (!newTask.id) newTask.id = Math.random().toString();
+      tasksDb[listId].push(newTask);
+      return newTask;
+    },
+    remove: (listId, taskId) => {
+      if (tasksDb[listId]) {
+        tasksDb[listId] = tasksDb[listId].filter(t => String(t.id) !== String(taskId));
+      }
+    }
+  },
+  Tasklists: {
+    list: (options) => ({
+      items: Object.keys(tasksDb).map(name => ({
+        id: name,
+        title: name === 'to-be-deleted-list' ? 'To Be Deleted' : (name === 'triage-quarantine-list' ? 'Triage Quarantine' : name)
+      }))
+    }),
+    insert: (resource) => {
+      const newId = resource.title.toLowerCase().replace(/\s+/g, '-') + '-list';
+      tasksDb[newId] = [];
+      return { id: newId, title: resource.title };
     }
   }
 };
@@ -36,9 +56,9 @@ const Utilities = {
 };
 
 const consoleMock = {
-  log: () => {},
-  warn: () => {},
-  error: () => {}
+  log: (...args) => console.log('MockLog:', ...args),
+  warn: (...args) => console.warn('MockWarn:', ...args),
+  error: (...args) => console.error('MockError:', ...args)
 };
 
 // We simulate Gemini strictly following Task_Master_Prompt.md
@@ -73,7 +93,9 @@ const sandbox = {
   getTaskMasterSystemPrompt: () => "mock prompt",
   getCalendarCapacity: () => [],
   getSystemGoals: () => [],
-  getSystemTaxonomy: () => []
+  getSystemTaxonomy: () => [],
+  logSystemHeartbeat: () => {},
+  processPromptText: (t) => t || ""
 };
 
 vm.createContext(sandbox);
@@ -86,19 +108,21 @@ function runOracle() {
   ];
   tasksDb['todo-list'] = [];
   tasksDb['to-be-deleted-list'] = [];
+  tasksDb['triage-quarantine-list'] = [];
   
   sandbox.runTaskMasterEngine();
   
-  const task1 = tasksDb['to-be-deleted-list'].find(t => t.title.includes('Junk')) ||
-                tasksDb['todo-list'].find(t => t.title.includes('Junk')) ||
-                tasksDb['importer-list'].find(t => t.title.includes('Junk'));
+  const task1 = (tasksDb['triage-quarantine-list'] || []).find(t => t.title.includes('Junk')) ||
+                (tasksDb['to-be-deleted-list'] || []).find(t => t.title.includes('Junk')) ||
+                (tasksDb['todo-list'] || []).find(t => t.title.includes('Junk')) ||
+                (tasksDb['importer-list'] || []).find(t => t.title.includes('Junk'));
   
   if (task1 && task1.title.includes("99 To be deleted")) {
     console.log("PASS: Task was correctly marked for deletion.");
   } else {
     const title = task1 ? task1.title : 'undefined';
     console.log(`FAIL: Task title is '${title}'. It was NOT marked for deletion.`);
-    console.log(`Task is currently in ${tasksDb['to-be-deleted-list'].length > 0 ? 'to-be-deleted-list' : (tasksDb['todo-list'].length > 0 ? 'todo-list' : 'importer-list')}.`);
+    console.log(`Task is currently in triage-quarantine-list: ${tasksDb['triage-quarantine-list'] ? tasksDb['triage-quarantine-list'].length : 0}`);
     process.exit(1);
   }
 }

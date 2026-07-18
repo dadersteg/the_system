@@ -58,7 +58,9 @@ const sandbox = {
   CacheService: { getScriptCache: () => ({ get: () => null, put: () => {} }) },
   console: consoleMock,
   callGemini: callGeminiMock,
-  selectModelForPayload: () => 'gemini'
+  selectModelForPayload: () => 'gemini',
+  logSystemHeartbeat: () => {},
+  processPromptText: (t) => t || ""
 };
 
 vm.createContext(sandbox);

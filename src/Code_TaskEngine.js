@@ -272,7 +272,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
      return;
   }
   
-  if (aiResult.taskUpdates && aiResult.taskUpdates.length > 0) {
+  if (aiResult.taskUpdates && Array.isArray(aiResult.taskUpdates) && aiResult.taskUpdates.length > 0) {
       console.log(`Executing Semantic Cross-Check for ${aiResult.taskUpdates.length} proposed updates...`);
 
       // Extract IDs defensively
@@ -304,7 +304,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
                                "You MUST return ALL original tasks from proposedUpdates, even if unmodified. Do not omit any tasks. Respond ONLY with valid JSON.";
       const crossCheckResult = executeTaskMasterGemini(crossCheckPayload, crossCheckPrompt);
       
-      if (crossCheckResult && crossCheckResult.taskUpdates) {
+      if (crossCheckResult && Array.isArray(crossCheckResult.taskUpdates)) {
           console.log("Semantic Cross-Check complete. Applying finalized updates.");
           const crossCheckMap = {};
           crossCheckResult.taskUpdates.forEach(u => {
