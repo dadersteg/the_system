@@ -33,6 +33,8 @@ RENAME_MAPPING = {
     536537641: "5 Import - Drive Directory Tree",
     2131515996: "5 Import - Email Triage Log",
     1580572397: "5 Import - Google Tasks Log",
+    1580572400: "5 Import - Completed Tasks Log",
+    1799689203: "3 Config - Email Rules Receiver",
     809034738: "5 Import - Drive Files Log",
     967747913: "5 Import - Notes Log",
     1835375017: "5 Import - Reset Actions Log",
@@ -50,6 +52,7 @@ HIDDEN_GIDS = {
     938516466,   # File Naming Rules
     1297520241,  # File Folder Rules
     1799689202,  # Email Aliases
+    1799689203,  # Email Rules Receiver
     1287896098,  # Workspace Taxonomy
     1704335578,  # Gemini Models
     1007497112,  # Gmail Labels
@@ -67,6 +70,7 @@ ORDERED_GIDS = [
     1679876125,  # Email Rules
     2131515996,  # Email Triage Log
     1580572397,  # Google Tasks Log
+    1580572400,  # Completed Tasks Log
     809034738,   # Drive Files Log
     967747913    # Notes Log
 ]
@@ -265,11 +269,13 @@ def populate_index_tab(service, spreadsheet_id, label):
         (1679876125, "2 Input - Email Rules", "Deterministic email routing rules (1-row freeze)", "2 Input", "Visible"),
         (2131515996, "5 Import - Email Triage Log", "Processing log of processed email threads (1-row freeze)", "5 Import", "Visible"),
         (1580572397, "5 Import - Google Tasks Log", "Sync log of user tasks (1-row freeze)", "5 Import", "Visible"),
+        (1580572400, "5 Import - Completed Tasks Log", "Sync log of completed/deleted tasks (1-row freeze)", "5 Import", "Visible"),
         (809034738, "5 Import - Drive Files Log", "Sync log of routed files (1-row freeze)", "5 Import", "Visible"),
         (967747913, "5 Import - Notes Log", "Ingestion log of processed Google Docs", "5 Import", "Visible"),
         (938516466, "2 Input - File Naming Rules", "Drive filename matching rules", "2 Input", "Hidden"),
         (1297520241, "2 Input - File Folder Rules", "Drive folder ID matching rules", "2 Input", "Hidden"),
         (1799689202, "3 Config - Email Aliases", "Whitelist of user email addresses to ignore", "3 Config", "Hidden"),
+        (1799689203, "3 Config - Email Rules Receiver", "Email rules receiver GID mapping configuration", "3 Config", "Hidden"),
         (1704335578, "5 Import - Gemini Models", "Reference table of available Gemini AI models", "5 Import", "Hidden"),
         (1007497112, "5 Import - Gmail Labels", "Reference table of current user Gmail labels", "5 Import", "Hidden"),
         (1287896098, "3 Config - Workspace Taxonomy", "Full taxonomy reference list", "3 Config", "Hidden"),
