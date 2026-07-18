@@ -11,12 +11,18 @@ import re
 import json
 import datetime
 import time
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-TASK_REVIEW_GID = 1580572400  # Target Completed Tasks Log GID to prevent collision with active tasks
-PRIVATE_SPREADSHEET_ID = "13bU68Lg4l0qV6-iSoZRrwSgHHS6jfA7yrrx9YLuXNNY"
-WORK_SPREADSHEET_ID = "1FO-iNKasPpen9MpG2Urt7IFFgw4psrm6sArxjuAWDxY"
+from lib.config import (
+    TASK_REVIEW_GID,
+    PRIVATE_SPREADSHEET_ID,
+    WORK_SPREADSHEET_ID,
+    SHEET_TOKEN_PATH,
+    PRIVATE_TOKEN_PATH,
+    WORK_TOKEN_PATH
+)
+from lib.google_auth import get_service
 
 
 def get_sheets_service():
@@ -25,9 +31,7 @@ def get_sheets_service():
     Returns:
         googleapiclient.discovery.Resource: Sheets service instance.
     """
-    token_path = "/Users/daniel/Documents/AGY/the_system/auth/token.json"
-    creds = Credentials.from_authorized_user_file(token_path)
-    return build('sheets', 'v4', credentials=creds)
+    return get_service('sheets', 'v4', SHEET_TOKEN_PATH, account_name="Sheets Log")
 
 
 def get_tasks_service(token_path):
@@ -39,8 +43,7 @@ def get_tasks_service(token_path):
     Returns:
         googleapiclient.discovery.Resource: Tasks service instance.
     """
-    creds = Credentials.from_authorized_user_file(token_path)
-    return build('tasks', 'v1', credentials=creds)
+    return get_service('tasks', 'v1', token_path, account_name="Tasks API")
 
 
 def get_sheet_title_by_gid(sheets_service, spreadsheet_id, gid):
@@ -662,7 +665,7 @@ def main():
     # Private Spreadsheet
     sync_and_maintain_account(
         sheets_service, 
-        '/Users/daniel/Documents/AGY/the_system/auth/token_tasks.json', 
+        PRIVATE_TOKEN_PATH, 
         PRIVATE_SPREADSHEET_ID, 
         'Private'
     )
@@ -670,11 +673,10 @@ def main():
     # Work Spreadsheet
     sync_and_maintain_account(
         sheets_service, 
-        '/Users/daniel/Documents/AGY/the_system/auth/token_tasks_work.json', 
+        WORK_TOKEN_PATH, 
         WORK_SPREADSHEET_ID, 
         'Work'
     )
-
 
 if __name__ == "__main__":
     main()

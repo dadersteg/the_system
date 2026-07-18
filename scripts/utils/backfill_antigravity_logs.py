@@ -7,36 +7,17 @@ import re
 import time
 import csv
 import argparse
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-
-PRIVATE_SPREADSHEET_ID = "13bU68Lg4l0qV6-iSoZRrwSgHHS6jfA7yrrx9YLuXNNY"
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from lib.config import PRIVATE_SPREADSHEET_ID, SHEET_TOKEN_PATH
+from lib.google_auth import get_service
 
 def get_sheets_service():
-    creds_path = "/Users/daniel/Documents/AGY/the_system/auth/credentials.json"
-    token_path = "/Users/daniel/Documents/AGY/the_system/auth/token.json"
     scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-    
-    if os.path.exists(token_path):
-        creds = Credentials.from_authorized_user_file(token_path, scopes)
-        return build('sheets', 'v4', credentials=creds)
-    raise Exception("Token missing - Please authenticate using another flow first.")
+    return get_service('sheets', 'v4', SHEET_TOKEN_PATH, account_name="Sheets Log")
 
 def get_gemini_api_key():
-    env_path = "/Users/daniel/Documents/AGY/the_system/.env"
-    try:
-        with open(env_path, "r") as f:
-            for line in f:
-                if line.startswith("SYSTEM_GEMINI_API_KEY="):
-                    val = line.split("=", 1)[1].strip()
-                    if val.startswith("'") and val.endswith("'"):
-                        val = val[1:-1]
-                    elif val.startswith('"') and val.endswith('"'):
-                        val = val[1:-1]
-                    return val
-    except Exception as e:
-        print(f"Failed to read .env: {e}")
-    return None
+    return os.environ.get("SYSTEM_GEMINI_API_KEY")
 
 def call_gemini_flash(prompt_text):
     api_key = get_gemini_api_key()

@@ -5,22 +5,18 @@ import time
 import requests
 from datetime import datetime
 
-API_KEY_ENV_PATH = "/Users/daniel/Documents/AGY/the_system/.env"
-DAILY_DIR = "/Users/daniel/Developer/second_brain_db/insights/daily/"
-WEEKLY_DIR = "/Users/daniel/Developer/second_brain_db/insights/weekly/"
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+import lib.config
+
+DAILY_DIR = os.path.expanduser("~/Developer/second_brain_db/insights/daily/")
+WEEKLY_DIR = os.path.expanduser("~/Developer/second_brain_db/insights/weekly/")
 
 def get_api_key():
-    if not os.path.exists(API_KEY_ENV_PATH):
-        print(f"Error: .env file not found at {API_KEY_ENV_PATH}")
-        return None
-        
-    with open(API_KEY_ENV_PATH, 'r') as f:
-        for line in f:
-            if line.startswith("SYSTEM_GEMINI_API_KEY="):
-                # Handle possible quotes
-                return line.split("=", 1)[1].strip().strip("'").strip('"')
-    print("Error: SYSTEM_GEMINI_API_KEY not found in .env")
-    return None
+    key = os.environ.get("SYSTEM_GEMINI_API_KEY")
+    if not key:
+        print("Error: SYSTEM_GEMINI_API_KEY not found in .env")
+    return key
 
 def main():
     api_key = get_api_key()

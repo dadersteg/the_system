@@ -3,6 +3,9 @@ import re
 import datetime
 import json
 import time
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 from lib.config import (
     PRIVATE_TOKEN_PATH,
     WORK_TOKEN_PATH,
