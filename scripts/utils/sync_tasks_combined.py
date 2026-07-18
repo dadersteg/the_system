@@ -2,6 +2,7 @@ import os
 import re
 import datetime
 import json
+import time
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -61,6 +62,37 @@ def get_credentials(token_path, creds_path, account_name):
             
     return creds
 
+def fetch_all_pages(request_method, **kwargs):
+    """Fetches all pages from a paginated Google API list method, with retry and backoff."""
+    items = []
+    page_token = None
+    max_retries = 3
+    while True:
+        if page_token:
+            kwargs['pageToken'] = page_token
+        elif 'pageToken' in kwargs:
+            del kwargs['pageToken']
+            
+        retries = 0
+        response = None
+        while retries <= max_retries:
+            try:
+                response = request_method(**kwargs).execute()
+                break
+            except Exception as e:
+                retries += 1
+                if retries > max_retries:
+                    print(f"Error fetching page after {max_retries} retries: {e}")
+                    raise e
+                print(f"Error fetching page (retry {retries}/{max_retries}): {e}")
+                time.sleep(2 ** retries)
+                
+        items.extend(response.get('items', []))
+        page_token = response.get('nextPageToken')
+        if not page_token:
+            break
+    return items
+
 def strip_system_metadata(text):
     """Strips the internal ---SYSTEM_METADATA--- block that The System's Task Engine
     appends to task notes. Without this, the block appears as garbled inline text
@@ -91,7 +123,7 @@ def get_los_code_from_metadata(notes):
 def get_or_create_quarantine_list(service):
     """Retrieves or creates a task list named 'Triage Quarantine' in the given service."""
     try:
-        task_lists = service.tasklists().list(maxResults=100).execute().get('items', [])
+        task_lists = fetch_all_pages(service.tasklists().list, maxResults=100)
         for lst in task_lists:
             if lst.get('title') == 'Triage Quarantine':
                 return lst['id']
@@ -184,46 +216,54 @@ def check_and_route_tasks(private_service, work_service):
 
     # --- 1. Private to Work ---
     try:
-        private_lists = private_service.tasklists().list(maxResults=20).execute().get('items', [])
+        private_lists = fetch_all_pages(private_service.tasklists().list, maxResults=100)
         for lst in private_lists:
             list_id = lst['id']
             list_title = lst['title']
             if "deleted" in list_title.lower() or "recurring" in list_title.lower() or "quarantine" in list_title.lower(): continue
             
-            tasks = private_service.tasks().list(tasklist=list_id, showCompleted=False).execute().get('items', [])
+            tasks = fetch_all_pages(private_service.tasks().list, tasklist=list_id, showCompleted=False)
             for task in tasks:
                 title = task.get('title', '')
                 notes = task.get('notes', '')
                 category_path = get_los_code_from_metadata(notes)
                 
                 is_work = False
+                needs_recovery = False
                 if "[ROUTED_TO_PRIVATE]" in notes:
                     is_work = False # Prevent bouncing back to Work
+                elif "[ROUTED_TO_WORK]" in notes:
+                    needs_recovery = True
                 else:
                     if is_pmt_task(category_path, title, notes):
                         is_work = True
                         
-                if is_work:
+                if is_work or needs_recovery:
                     print(f"[Gateway] Found Work task in private list '{list_title}': '{title}'")
                     try:
-                        # Inject anti-bounce tag and AI constraint
-                        if "[ROUTED_TO_WORK]" not in notes:
+                        if is_work:
+                            # 1. Patch original task
                             if "---SYSTEM_METADATA---" in notes:
                                 notes = notes.replace("---SYSTEM_METADATA---", "[ROUTED_TO_WORK]\n---SYSTEM_METADATA---")
                             else:
                                 notes += "\n[ROUTED_TO_WORK]"
+                            private_service.tasks().patch(tasklist=list_id, task=task['id'], body={'id': task['id'], 'notes': notes}).execute()
                             
-                        constraint = "Must classify as Work/PMTOS. Do not use 01 or 02 01 99."
-                        if "DA:" in notes:
-                            notes = re.sub(r'DA:(.*)$', lambda m: f"DA: {m.group(1).strip()} | {constraint}" if m.group(1).strip() else f"DA: {constraint}", notes, flags=re.MULTILINE)
+                            # 2. Insert to dest
+                            constraint = "Must classify as Work/PMTOS. Do not use 01 or 02 01 99."
+                            dest_notes = notes
+                            if "DA:" in dest_notes:
+                                dest_notes = re.sub(r'DA:(.*)$', lambda m: f"DA: {m.group(1).strip()} | {constraint}" if m.group(1).strip() else f"DA: {constraint}", dest_notes, flags=re.MULTILINE)
+                            else:
+                                dest_notes = dest_notes.replace("---SYSTEM_METADATA---", f"DA: {constraint}\n---SYSTEM_METADATA---")
+    
+                            work_task_body = {'title': title, 'notes': dest_notes, 'due': task.get('due')}
+                            inserted = work_service.tasks().insert(tasklist=WORK_TASKS_DEST, body=work_task_body).execute()
+                            print(f"[Gateway] Pushed task to Work default list. (ID: {inserted['id']})")
                         else:
-                            notes = notes.replace("---SYSTEM_METADATA---", f"DA: {constraint}\n---SYSTEM_METADATA---")
-
-                        work_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}
-                        inserted = work_service.tasks().insert(tasklist=WORK_TASKS_DEST, body=work_task_body).execute()
-                        print(f"[Gateway] Pushed task to Work default list. (ID: {inserted['id']})")
+                            print(f"[Gateway] Recovering partially routed task '{title}'. Skipping insert to prevent duplicates.")
                         
-                        # Move to source account's Triage Quarantine list
+                        # 3. Move to Quarantine
                         quarantine_list_id = get_or_create_quarantine_list(private_service)
                         quarantine_body = {
                             'title': task.get('title'),
@@ -234,6 +274,7 @@ def check_and_route_tasks(private_service, work_service):
                         private_service.tasks().insert(tasklist=quarantine_list_id, body=quarantine_body).execute()
                         print(f"[Gateway] Quarantined original task in Private account.")
 
+                        # 4. Delete from source
                         private_service.tasks().delete(tasklist=list_id, task=task['id']).execute()
                         print(f"[Gateway] Removed task from Private list.")
                         routed_count += 1
@@ -244,46 +285,54 @@ def check_and_route_tasks(private_service, work_service):
 
     # --- 2. Work to Private ---
     try:
-        work_lists = work_service.tasklists().list(maxResults=20).execute().get('items', [])
+        work_lists = fetch_all_pages(work_service.tasklists().list, maxResults=100)
         for lst in work_lists:
             list_id = lst['id']
             list_title = lst['title']
             if "deleted" in list_title.lower() or "recurring" in list_title.lower() or "quarantine" in list_title.lower(): continue
             
-            tasks = work_service.tasks().list(tasklist=list_id, showCompleted=False).execute().get('items', [])
+            tasks = fetch_all_pages(work_service.tasks().list, tasklist=list_id, showCompleted=False)
             for task in tasks:
                 title = task.get('title', '')
                 notes = task.get('notes', '')
                 category_path = get_los_code_from_metadata(notes)
                 
                 is_private = False
+                needs_recovery = False
                 if "[ROUTED_TO_WORK]" in notes:
                     is_private = False # Prevent bouncing back to Private
+                elif "[ROUTED_TO_PRIVATE]" in notes:
+                    needs_recovery = True
                 else:
                     if is_private_task(category_path, title, notes):
                         is_private = True
                         
-                if is_private:
+                if is_private or needs_recovery:
                     print(f"[Gateway] Found Personal task in work list '{list_title}': '{title}'")
                     try:
-                        # Inject anti-bounce tag and AI constraint
-                        if "[ROUTED_TO_PRIVATE]" not in notes:
+                        if is_private:
+                            # 1. Patch original task
                             if "---SYSTEM_METADATA---" in notes:
                                 notes = notes.replace("---SYSTEM_METADATA---", "[ROUTED_TO_PRIVATE]\n---SYSTEM_METADATA---")
                             else:
                                 notes += "\n[ROUTED_TO_PRIVATE]"
-                                
-                        constraint = "Must classify as Personal/LOS. Do not use 02."
-                        if "DA:" in notes:
-                            notes = re.sub(r'DA:(.*)$', lambda m: f"DA: {m.group(1).strip()} | {constraint}" if m.group(1).strip() else f"DA: {constraint}", notes, flags=re.MULTILINE)
+                            work_service.tasks().patch(tasklist=list_id, task=task['id'], body={'id': task['id'], 'notes': notes}).execute()
+                            
+                            # 2. Insert to dest
+                            constraint = "Must classify as Personal/LOS. Do not use 02."
+                            dest_notes = notes
+                            if "DA:" in dest_notes:
+                                dest_notes = re.sub(r'DA:(.*)$', lambda m: f"DA: {m.group(1).strip()} | {constraint}" if m.group(1).strip() else f"DA: {constraint}", dest_notes, flags=re.MULTILINE)
+                            else:
+                                dest_notes = dest_notes.replace("---SYSTEM_METADATA---", f"DA: {constraint}\n---SYSTEM_METADATA---")
+    
+                            private_task_body = {'title': title, 'notes': dest_notes, 'due': task.get('due')}
+                            inserted = private_service.tasks().insert(tasklist=PRIVATE_TASKS_DEST, body=private_task_body).execute()
+                            print(f"[Gateway] Pushed task to Private default list. (ID: {inserted['id']})")
                         else:
-                            notes = notes.replace("---SYSTEM_METADATA---", f"DA: {constraint}\n---SYSTEM_METADATA---")
-
-                        private_task_body = {'title': title, 'notes': notes, 'due': task.get('due')}
-                        inserted = private_service.tasks().insert(tasklist=PRIVATE_TASKS_DEST, body=private_task_body).execute()
-                        print(f"[Gateway] Pushed task to Private default list. (ID: {inserted['id']})")
+                            print(f"[Gateway] Recovering partially routed task '{title}'. Skipping insert to prevent duplicates.")
                         
-                        # Move to source account's Triage Quarantine list
+                        # 3. Move to Quarantine
                         quarantine_list_id = get_or_create_quarantine_list(work_service)
                         quarantine_body = {
                             'title': task.get('title'),
@@ -294,6 +343,7 @@ def check_and_route_tasks(private_service, work_service):
                         work_service.tasks().insert(tasklist=quarantine_list_id, body=quarantine_body).execute()
                         print(f"[Gateway] Quarantined original task in Work account.")
 
+                        # 4. Delete from source
                         work_service.tasks().delete(tasklist=list_id, task=task['id']).execute()
                         print(f"[Gateway] Removed task from Work list.")
                         routed_count += 1
@@ -308,7 +358,7 @@ def fetch_tasks_from_service(service, label):
     """Fetches all active tasks from all tasklists of a service."""
     all_tasks = {}
     try:
-        task_lists = service.tasklists().list(maxResults=20).execute().get('items', [])
+        task_lists = fetch_all_pages(service.tasklists().list, maxResults=100)
         for lst in task_lists:
             list_id = lst['id']
             list_title = lst['title']
@@ -317,7 +367,7 @@ def fetch_tasks_from_service(service, label):
             if "deleted" in list_title.lower() or "quarantine" in list_title.lower():
                 continue
                 
-            tasks = service.tasks().list(tasklist=list_id, showCompleted=False).execute().get('items', [])
+            tasks = fetch_all_pages(service.tasks().list, tasklist=list_id, showCompleted=False)
             if tasks:
                 all_tasks[list_title] = tasks
     except Exception as e:

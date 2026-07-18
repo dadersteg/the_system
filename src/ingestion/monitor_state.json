@@ -12,5 +12,6 @@
   "trigger-jules-backend": "offline",
   "trigger-jules-ui": "offline",
   "trigger-jules-cleanup": "offline",
-  "local-gemini-backfill": "offline"
+  "local-gemini-backfill": "offline",
+  "telegram-bridge (heartbeat)": "offline"
 }

@@ -1,59 +1,66 @@
 # 1 Day Execution Plan
 *Auto-generated based on today's capacity and system goals.*
 
-**BLUF:** It is currently 16:07 on Saturday. The tactical focus for the remainder of the day is utilizing the final 1 hour and 53 minutes of weekend capacity (strictly ending at 18:00) to clear high-priority personal admin and financial tasks. All PMT and Work tasks have been successfully firewalled for the weekend to protect cognitive recovery.
+**BLUF:** Operating under strict weekend constraints, all private tasks are scheduled between 10:00 and 18:00. PMT tasks have been entirely omitted per the Private Environment override, focusing solely on critical system maintenance, security token rotation, and personal routines.
 
 ## "EAT THE FROG" (The Apex Tasks)
 *(Identify ONE for PMT and ONE for Personal. Both must include the 🐸 emoji and reasoning linked to goals.)*
 
+**💼 Other Work:**
+- [ ] None scheduled for today.
+
 **🏠 Personal:**
-- [ ] [13:15 - 14:15] 🐸 [THE FROG] [Q2] Declutter Physical Space (Directly advances 'Cultivate a Minimalist Lifestyle' goal by clearing the physical environment) {ID: OGRRYTdiT0lmZk1HZjdlaA}
+- [ ] [13:15 - 14:15] 🐸 [THE FROG] [Q2] Declutter Physical Space (Directly supports the goal to cultivate a minimalist lifestyle and clears physical/mental space) {ID: OGRRYTdiT0lmZk1HZjdlaA}
 
 ## TODAY'S TOP 3
 *(The top 3 priority tasks scheduled for today, excluding the frogs and excluding Q3 tasks. Split by PMT, Other Work, and Personal.)*
 
+**💼 Other Work:**
+- [ ] None scheduled for today.
+
 **🏠 Personal:**
-- [ ] [16:15 - 17:00] [Q2] Monthly Budget Setup & Review {ID: VVg1Z2VrTEo3TXRzclhuag}
-- [ ] [17:00 - 17:30] [Q1] Complete Self Assessment registration for Carina {ID: SjhUUGdQUDlqOFNoakV4Xw}
-- [ ] [17:30 - 18:00] [Q2] Perform 14-day reflection {ID: V1VmYlcyRmtnSlJHR255Qw}
+- [ ] [10:30 - 11:00] [Q1] Investigate and restart telegram-bridge cron job {ID: SGtFdmpHMXRWYWdRZE4zUg}
+- [ ] [11:00 - 11:30] [Q1] Rotate and revoke exposed Telegram Bot Tokens in dadersteg/the_system {ID: cTdWVFBvWUN3UkVZdC1scQ}
+- [ ] [14:30 - 15:00] [Q2] Daily screen-free time with Carry {ID: LVduOXBybjlfNjJaai1mYw}
 
 ## THE REST OF TODAY
 *(Other tasks that must be done today, including Q3 mandatory chores, but lower priority.)*
 
+**💼 Other Work:**
+- [ ] None scheduled for today.
+
 **🏠 Personal:**
-- [ ] [14:30 - 15:00] [Q2] Daily screen-free time with Carry {ID: LVduOXBybjlfNjJaai1mYw}
-- [ ] [15:00 - 15:05] [Q2] Daily 4-7-8 Breathing Protocol {ID: QXVxcVNoZDBzd0VNZWdmaQ}
+- [ ] [14:15 - 14:30] [Q3] Daily Walking {ID: akJfMUlhOHhCZWZVb2ZCUQ}
+- [ ] [15:00 - 15:05] [Q3] Daily 4-7-8 Breathing Protocol {ID: QXVxcVNoZDBzd0VNZWdmaQ}
 - [ ] [15:05 - 15:20] [Q2] Perform 2-day reflection {ID: Q3B1eHI1ZmtnUk9mY0dQRg}
 - [ ] [15:20 - 15:50] [Q2] Perform 1-day planning (End of day) {ID: c3NtRjZQRnAtdkxBLU9zYQ}
+- [ ] [15:50 - 16:05] [Q2] Reply to Alexander regarding workplace trading policies {ID: UG5aN21XaXQ2akFqZUxYNA}
 
 ## 🗓️ THIS WEEK
 - [ ] [Q1] File SA108 and SA100 tax returns
-- [ ] [Q1] Calculate Carina's 2025/26 UK Capital Gains Tax liability
-- [ ] [Q1] Decide on AXA Health Insurance Plan
+- [ ] [Q2] Calculate Carina's 2025/26 UK Capital Gains Tax liability
 - [ ] [Q2] Find and book new dentist
 - [ ] [Q2] Analyze shared video material
-- [ ] [Q2] Fix/glue the closet door
 - [ ] [Q2] Update Wedding Project Plan
-- [ ] [Q2] Attend Therapy Session
-- [ ] [Q2] Plan weekly date with Carry
+- [ ] [Q3] Fix/glue the closet door
 
 ## 🎯 THIS MONTH (Radar)
-- [ ] [Q2] Confirm name registration with Skatteverket
-- [ ] [Q2] Track Liverpool FC ballot outcome
+- [ ] [Q2] Follow up on Carina's Self Assessment registration
 - [ ] [Q2] Monthly Date with Carry
 - [ ] [Q2] Renew SBF Queue Fee
 - [ ] [Q2] Track BFI event attendance
 
 ## BOTTLENECKS & SYS ALERTS
 *(Identify any bottlenecks, overloaded days, or systemic warnings. Write actionable advice.)*
-- **Capacity Alert:** You are rapidly approaching the 18:00 weekend hard-stop for task execution. Ensure the budget setup and 14-day reflection are completed promptly to transition into evening recovery.
-- **Systemic Warning:** Multiple tax-related deadlines (SA108, SA100, Capital Gains) are clustered next week (July 24-25). Allocate deep work blocks early next week to prevent an administrative bottleneck.
+- **Security Alert:** Exposed Telegram Bot Tokens pose an immediate security risk and must be rotated today. This has been prioritized in Today's Top 3.
+- **System Constraint Warning:** The current time is 20:07, but weekend scheduling rules strictly enforce 10:00 - 18:00 blocks. Tasks have been retroactively timeboxed to comply with system governance and align with today's calendar events.
 
 ## 🗑️ QUARANTINE & TRIAGE CLEARANCE
 *(Brief summary of tasks proposed for deletion or moved to backlog, and items processed from the Importer.)*
-- **Moved to Backlog:** Future-dated tasks including British Passport application (Nov 2026), Fin Taylor event tracking, and Google Photos Takeout (Autumn).
-- **Quarantined:** AI evaluation tasks (Gemini, POP/IMAP) and manual signature recreation have been deferred to free up immediate weekend capacity.
-- **Deleted/Ignored:** All PMT and Other Work tasks have been hidden per the Private Environment weekend override.
+- Moved "Decide on AXA Health Insurance Plan" to backlog (August 31st) to align with employer health insurance confirmation.
+- Moved "Apply for British Passport (Name Change)" to backlog (November 2026).
+- Moved "Engage with Temple of the Jedi Order" to backlog per user instruction.
+- Moved "Manual recreation of digital signature" to backlog until capacity allows for focused manual design.
 
 ---
 *Report dynamically generated by gemini-pro-latest*

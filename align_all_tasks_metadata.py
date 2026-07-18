@@ -7,6 +7,7 @@ import datetime
 import hashlib
 import base64
 import argparse
+import time
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -62,6 +63,37 @@ def get_service(token_path):
         creds.refresh(Request())
     return build('tasks', 'v1', credentials=creds)
 
+def fetch_all_pages(request_method, **kwargs):
+    """Fetches all pages from a paginated Google API list method, with retry and backoff."""
+    items = []
+    page_token = None
+    max_retries = 3
+    while True:
+        if page_token:
+            kwargs['pageToken'] = page_token
+        elif 'pageToken' in kwargs:
+            del kwargs['pageToken']
+            
+        retries = 0
+        response = None
+        while retries <= max_retries:
+            try:
+                response = request_method(**kwargs).execute()
+                break
+            except Exception as e:
+                retries += 1
+                if retries > max_retries:
+                    print(f"Error fetching page after {max_retries} retries: {e}")
+                    raise e
+                print(f"Error fetching page (retry {retries}/{max_retries}): {e}")
+                time.sleep(2 ** retries)
+                
+        items.extend(response.get('items', []))
+        page_token = response.get('nextPageToken')
+        if not page_token:
+            break
+    return items
+
 def align_profile(profile_name, token_path):
     print(f"=== Aligning Profile: {profile_name} ===")
     service = get_service(token_path)
@@ -69,7 +101,7 @@ def align_profile(profile_name, token_path):
         return
     
     try:
-        lists = service.tasklists().list(maxResults=100).execute().get('items', [])
+        lists = fetch_all_pages(service.tasklists().list, maxResults=100)
     except Exception as e:
         print(f"Error listing task lists: {e}")
         return
@@ -84,7 +116,7 @@ def align_profile(profile_name, token_path):
         print(f"Processing list: {list_title}")
         
         try:
-            tasks = service.tasks().list(tasklist=list_id, showCompleted=False, showHidden=False).execute().get('items', [])
+            tasks = fetch_all_pages(service.tasks().list, tasklist=list_id, showCompleted=False, showHidden=False)
         except Exception as e:
             print(f"  Error fetching tasks for list {list_title}: {e}")
             continue
