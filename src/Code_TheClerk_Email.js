@@ -472,7 +472,6 @@ function _evaluateDeterministicRules(sender, subject, body, deterministicRules) 
 }
 
 function callLLMWithSourceContext(subject, from, body, docInstructions, taxonomyJson, existing, ss, isRetro, modelName, inlineImages, systemNotes, personalGoalsStr, workGoalsStr, openTasksStr) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`;
   
   // 1. Fetch prompt from docInstructions (which now contains placeholders)
   let finalPrompt = docInstructions;
@@ -502,102 +501,52 @@ function callLLMWithSourceContext(subject, from, body, docInstructions, taxonomy
     });
   }
   
-  const payload = { 
-    "contents": [{ "parts": parts }], 
-    "generationConfig": { 
-      "responseMimeType": "application/json", 
-      "temperature": 0.1,
-      "responseSchema": {
-        "type": "OBJECT",
-        "properties": {
-          "categories": { "type": "ARRAY", "items": { "type": "STRING" } },
-          "keepInInbox": { "type": "BOOLEAN" },
-          "markAsRead": { "type": "BOOLEAN" },
-          "deleteEmail": { "type": "BOOLEAN" },
-          "summary": { "type": "STRING" },
-          "actionItems": { 
-            "type": "ARRAY", 
-            "items": { 
-              "type": "OBJECT",
-              "properties": {
-                "title": { "type": "STRING" },
-                "goal_urn": { "type": "STRING" },
-                "category_path": { "type": "STRING" },
-                "deadline": { "type": "STRING", "description": "YYYY-MM-DD or None" },
-                "mapped_task_id": { "type": "STRING", "description": "If this email is a confirmation or update for an existing OPEN TASK, output its EXACT ID here. Otherwise 'None'."},
-                "mark_completed_reason": { "type": "STRING", "description": "If this email confirms the mapped task is complete, provide a detailed reason why (e.g. 'Flight confirmation received'). Otherwise 'None'."}
-              },
-              "required": ["title", "goal_urn", "category_path", "deadline"]
-            } 
-          }
-        },
-        "required": ["categories", "keepInInbox", "markAsRead", "deleteEmail", "summary", "actionItems"]
+  const schema = {
+    "type": "OBJECT",
+    "properties": {
+      "categories": { "type": "ARRAY", "items": { "type": "STRING" } },
+      "keepInInbox": { "type": "BOOLEAN" },
+      "markAsRead": { "type": "BOOLEAN" },
+      "deleteEmail": { "type": "BOOLEAN" },
+      "summary": { "type": "STRING" },
+      "actionItems": { 
+        "type": "ARRAY", 
+        "items": { 
+          "type": "OBJECT",
+          "properties": {
+            "title": { "type": "STRING" },
+            "goal_urn": { "type": "STRING" },
+            "category_path": { "type": "STRING" },
+            "deadline": { "type": "STRING", "description": "YYYY-MM-DD or None" },
+            "mapped_task_id": { "type": "STRING", "description": "If this email is a confirmation or update for an existing OPEN TASK, output its EXACT ID here. Otherwise 'None'."},
+            "mark_completed_reason": { "type": "STRING", "description": "If this email confirms the mapped task is complete, provide a detailed reason why (e.g. 'Flight confirmation received'). Otherwise 'None'."}
+          },
+          "required": ["title", "goal_urn", "category_path", "deadline"]
+        } 
       }
-    } 
+    },
+    "required": ["categories", "keepInInbox", "markAsRead", "deleteEmail", "summary", "actionItems"]
   };
   
-  const maxRetries = 3;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const response = UrlFetchApp.fetch(url, { method: "post", contentType: "application/json", payload: JSON.stringify(payload), muteHttpExceptions: true });
-      
-      if (response.getResponseCode() !== 200) {
-        console.error(`[Attempt ${attempt}/${maxRetries}] LLM API Error: ${response.getContentText()}`);
-        if (response.getResponseCode() >= 500 || response.getResponseCode() === 429) {
-           if (attempt < maxRetries) {
-             Utilities.sleep(attempt * 2500); // 2.5s, 5.0s backoff
-             continue;
-           }
-        }
-        return null; // Fatal failure
-      }
-      
-      const json = JSON.parse(response.getContentText());
-      if (!json.candidates || json.candidates.length === 0 || !json.candidates[0].content || !json.candidates[0].content.parts || json.candidates[0].content.parts.length === 0) {
-        throw new Error("Empty candidates returned from Gemini API");
-      }
-      const rawText = json.candidates[0].content.parts[0].text;
-      
-      // Fix: Use greedy regex to match the full JSON object, or just strip markdown and parse.
-      let cleanText = rawText.replace(/```json/gi, '').replace(/```/gi, '').trim();
-      
-      // Try parsing directly first
-      let parsed;
-      try {
-        parsed = JSON.parse(cleanText);
-      } catch (e) {
-        // Fallback: extract from first { to last }
-        const match = cleanText.match(/\{[\s\S]*\}/);
-        if (!match) throw new Error("No JSON object found in response");
-        
-        let jsonStr = match[0];
-        // Clean common LLM hallucinations like trailing commas
-        jsonStr = jsonStr.replace(/,\s*([\}\]])/g, '$1');
-        parsed = JSON.parse(jsonStr);
-      }
-      
-      let cats = [];
-      if (parsed.categories && Array.isArray(parsed.categories)) cats = parsed.categories;
-      else if (parsed.category && parsed.category !== "Skip") cats = [parsed.category];
+  const parsed = callGemini(parts, modelName, "You are a helpful email clerk assistant.", schema);
+  
+  if (parsed && !parsed.error) {
+    let cats = [];
+    if (parsed.categories && Array.isArray(parsed.categories)) cats = parsed.categories;
+    else if (parsed.category && parsed.category !== "Skip") cats = [parsed.category];
 
-      return { 
-        categories: cats, 
-        keepInInbox: parsed.keepInInbox ?? true, 
-        markAsRead: parsed.markAsRead ?? false,
-        deleteEmail: parsed.deleteEmail ?? false,
-        summary: parsed.summary || "",
-        actionItems: parsed.actionItems || []
-      };
-    } catch (e) { 
-      console.error(`[Attempt ${attempt}/${maxRetries}] Error parsing LLM response: ${e.message}`);
-      if (attempt < maxRetries) {
-          Utilities.sleep(attempt * 2500);
-          continue;
-      }
-      return null; 
-    }
+    return { 
+      categories: cats, 
+      keepInInbox: parsed.keepInInbox ?? true, 
+      markAsRead: parsed.markAsRead ?? false,
+      deleteEmail: parsed.deleteEmail ?? false,
+      summary: parsed.summary || "",
+      actionItems: parsed.actionItems || []
+    };
+  } else {
+    console.error(`LLM API Error: ${parsed ? parsed.error : "Unknown Error"}`);
+    return null;
   }
-  return null;
 }
 
 function executeAtomicCleanup(thread, config, existingLabels) {

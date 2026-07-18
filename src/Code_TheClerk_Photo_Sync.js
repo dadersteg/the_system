@@ -238,43 +238,23 @@ function _batchCreateMediaItems(mediaItems) {
  * @returns {Object} Parsed JSON object containing the Gemini analysis, or empty object on failure.
  */
 function _analyzePhotoWithGemini(blob, msgContext) {
-  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
-  if (!apiKey) return {};
-
-  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE + ":generateContent?key=" + apiKey;
   const base64Image = Utilities.base64Encode(blob.getBytes());
+  const prompt = "Analyze this image and return a JSON object with: category (from TS taxonomy), purpose, activities (array), entities (array), text_found (array), vibe, is_milestone (boolean)." + (msgContext ? `\n\nOriginal Message Context:\n- Subject: ${msgContext.subject}\n- Sender: ${msgContext.sender}\n- Date: ${msgContext.date}\n- Body: ${msgContext.body ? msgContext.body.substring(0, 500) : ''}` : "");
   
-  const payload = {
-    contents: [{
-      parts: [
-        { text: "Analyze this image and return a JSON object with: category (from TS taxonomy), purpose, activities (array), entities (array), text_found (array), vibe, is_milestone (boolean)." + (msgContext ? `\n\nOriginal Message Context:\n- Subject: ${msgContext.subject}\n- Sender: ${msgContext.sender}\n- Date: ${msgContext.date}\n- Body: ${msgContext.body ? msgContext.body.substring(0, 500) : ''}` : "") },
-        { inlineData: { mimeType: blob.getContentType(), data: base64Image } }
-      ]
-    }],
-    generationConfig: {
-      responseMimeType: "application/json",
-      temperature: 0.2
-    }
-  };
-  
-  const options = {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-  
-  try {
-    const res = UrlFetchApp.fetch(url, options);
-    const json = JSON.parse(res.getContentText());
-    if (json.candidates && json.candidates[0]) {
-      const text = json.candidates[0].content.parts[0].text;
-      return JSON.parse(text);
-    }
-  } catch(e) {
-    console.error("Gemini analysis failed: " + e.message);
+  const parts = [
+    { text: prompt },
+    { inlineData: { mimeType: blob.getContentType(), data: base64Image } }
+  ];
+
+  const modelName = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE || "gemini-2.5-flash";
+  const parsed = callGemini(parts, modelName, "You are an expert image analyzer.", null);
+
+  if (parsed && !parsed.error) {
+    return parsed;
+  } else {
+    console.error("Gemini analysis failed: " + (parsed ? parsed.error : "Unknown error"));
+    return {};
   }
-  return {};
 }
 
 
