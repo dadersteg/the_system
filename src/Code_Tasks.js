@@ -1249,29 +1249,24 @@ function bulkFetchGmailThreads(threadIds) {
   if (!threadIds || threadIds.length === 0) return threadMap;
 
   const uniqueIds = Array.from(new Set(threadIds));
-  const BATCH_SIZE = 20;
 
-  for (let i = 0; i < uniqueIds.length; i += BATCH_SIZE) {
-    const batch = uniqueIds.slice(i, i + BATCH_SIZE);
-    const query = batch.map(id => `id:${id}`).join(" OR ");
+  for (let i = 0; i < uniqueIds.length; i++) {
+    const id = uniqueIds[i];
     try {
-      const threads = GmailApp.search(query, 0, batch.length);
-      threads.forEach(thread => {
-        if (thread) {
-          const tId = thread.getId();
-          threadMap[tId] = thread;
-          try {
-            const msgs = thread.getMessages();
-            msgs.forEach(msg => {
-              threadMap[msg.getId()] = thread;
-            });
-          } catch (err) {
-            // Ignore message fetch errors
-          }
+      const thread = GmailApp.getThreadById(id);
+      if (thread) {
+        threadMap[id] = thread;
+        try {
+          const msgs = thread.getMessages();
+          msgs.forEach(msg => {
+            threadMap[msg.getId()] = thread;
+          });
+        } catch (err) {
+          // Ignore message fetch errors
         }
-      });
+      }
     } catch (e) {
-      console.warn(`Bulk fetch failed for batch starting at index ${i}: ${e.message}`);
+      console.warn(`Fetch failed for thread id ${id}: ${e.message}`);
     }
   }
   return threadMap;

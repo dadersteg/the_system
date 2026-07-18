@@ -673,6 +673,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
   console.log("============================");
   
   let hasErrors = false;
+  let cachedTodoTasks = null;
   updates.forEach(u => {
     if (!u || typeof u !== 'object') {
        console.warn("Invalid task update object: ", JSON.stringify(u));
@@ -1089,7 +1090,18 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       
       if (u.recommendedMilestone && u.recommendedMilestone !== "None" && targetListId === todoListId) {
           try {
-             const todoTasks = Tasks.Tasks.list(todoListId, { showCompleted: false, showHidden: false, maxResults: 100 }).items || [];
+             if (!cachedTodoTasks) {
+                cachedTodoTasks = [];
+                let pageToken;
+                do {
+                   const response = Tasks.Tasks.list(todoListId, { showCompleted: false, showHidden: false, maxResults: 100, pageToken: pageToken });
+                   if (response.items) {
+                      cachedTodoTasks.push(...response.items);
+                   }
+                   pageToken = response.nextPageToken;
+                } while (pageToken);
+             }
+             const todoTasks = cachedTodoTasks;
              
              const normalizeMilestoneTitle = (title) => {
                  if (!title) return "";
