@@ -71,7 +71,6 @@ function setupSystemTriggers() {
     ScriptApp.newTrigger("updateLabelList").timeBased().everyDays(1).atHour(2).create();
     ScriptApp.newTrigger("updateTaskList").timeBased().everyDays(1).atHour(2).create();
     ScriptApp.newTrigger("syncTaxonomyToSheet").timeBased().everyHours(1).create();
-    ScriptApp.newTrigger("exportTriageTasksToDrive").timeBased().everyDays(1).atHour(2).create();
     ScriptApp.newTrigger("exportTrackers").timeBased().everyHours(1).create();
 
     // ========================================================
