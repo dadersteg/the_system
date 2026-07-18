@@ -3,6 +3,18 @@ from unittest.mock import MagicMock, patch
 import sys
 import os
 
+# Mock google libraries before importing the script
+sys.modules['google'] = MagicMock()
+sys.modules['google.auth'] = MagicMock()
+sys.modules['google.auth.transport'] = MagicMock()
+sys.modules['google.auth.transport.requests'] = MagicMock()
+sys.modules['google.oauth2'] = MagicMock()
+sys.modules['google.oauth2.credentials'] = MagicMock()
+sys.modules['google_auth_oauthlib'] = MagicMock()
+sys.modules['google_auth_oauthlib.flow'] = MagicMock()
+sys.modules['googleapiclient'] = MagicMock()
+sys.modules['googleapiclient.discovery'] = MagicMock()
+
 # Adjust path to import scripts.utils.sync_tasks_combined
 sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
 from scripts.utils.sync_tasks_combined import (
@@ -56,6 +68,16 @@ class MockGoogleTasksService:
                             self.service._tasks_data[tasklist] = []
                         self.service._tasks_data[tasklist].append(new_task)
                         return new_task
+                return Request()
+            def patch(self, tasklist, task, body):
+                self.service.calls.append(('tasks.patch', {'tasklist': tasklist, 'task': task, 'body': body}))
+                class Request:
+                    def execute(inner_self):
+                        for t in self.service._tasks_data.get(tasklist, []):
+                            if t.get('id') == task:
+                                t.update(body)
+                                return t
+                        return None
                 return Request()
             def delete(self, tasklist, task):
                 self.service.calls.append(('tasks.delete', {'tasklist': tasklist, 'task': task}))
