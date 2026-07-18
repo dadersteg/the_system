@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "The System task-management suite",
   "scripts": {
-    "test": "node tests/test_gid_separation.js && node tests/run_tests.js && node tests/test_taxonomy_and_cleanup.js && node tests/test_timeboxing_routing.js && node tests/test_hash_equivalence.js && node tests/test_webapp_auth.js && node tests/test_credentials_exposure.js && node tests/test_history_secrets_purge.js && node tests/test_remediation_gates.js && node tests/adversarial_stress_test.js && node tests/oracle_prompt_mismatch.js && node tests/test_exclusive_sharing.js && node tests/test_extract_action_zones_stress.js && python3 -m unittest tests/test_deploy_validation.py && python3 -m unittest tests/test_sync_quarantine.py"
+    "test": "node tests/test_gid_separation.js && node tests/test_column_indices.js && node tests/run_tests.js && node tests/test_taxonomy_and_cleanup.js && node tests/test_timeboxing_routing.js && node tests/test_hash_equivalence.js && node tests/test_webapp_auth.js && node tests/test_credentials_exposure.js && node tests/test_history_secrets_purge.js && node tests/test_remediation_gates.js && node tests/adversarial_stress_test.js && node tests/oracle_prompt_mismatch.js && node tests/test_exclusive_sharing.js && node tests/test_extract_action_zones_stress.js && python3 -m unittest tests/test_deploy_validation.py && python3 -m unittest tests/test_sync_quarantine.py"
   },
   "devDependencies": {},
   "dependencies": {}

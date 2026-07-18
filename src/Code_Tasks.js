@@ -381,11 +381,16 @@ function syncCompletedTasksLog() {
   if (existingData.length > 1 && existingData[0].findIndex(h => h.toString().trim().toLowerCase() === "link") === -1) {
     headerRowIdx = 1;
   }
+  const headers = getExportHeaders();
+  const taskIdIdx = headers.indexOf("Task ID") !== -1 ? headers.indexOf("Task ID") : 15;
+  const statusIdx = headers.indexOf("Status") !== -1 ? headers.indexOf("Status") : 7;
+  
   for (let i = headerRowIdx + 1; i < existingData.length; i++) {
     const row = existingData[i];
-    const tid = row.length >= 15 ? row[14] : row[0];
-    const status = row.length >= 7 ? row[6] : "";
-    if (tid && (status === "Completed" || status === "Deleted")) {
+    const tid = row.length > taskIdIdx ? row[taskIdIdx] : row[0];
+    const status = row.length > statusIdx ? row[statusIdx] : "";
+    const statusLower = status ? status.toString().trim().toLowerCase() : "";
+    if (tid && (statusLower === "completed" || statusLower === "deleted")) {
       existingIds.add(tid);
     }
   }
@@ -510,7 +515,12 @@ function syncCompletedTasksLog() {
       if (lastRow <= 1) {
         const headers = getExportHeaders();
         completedSheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight("bold");
-        completedSheet.hideColumns(14, 3);
+        const idColStartIndex = headers.indexOf("Task ID") + 1;
+        if (idColStartIndex > 0) {
+          completedSheet.hideColumns(idColStartIndex, 3);
+        } else {
+          completedSheet.hideColumns(16, 3);
+        }
         completedSheet.getRange(2, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
       } else {
         completedSheet.getRange(lastRow + 1, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
@@ -563,11 +573,16 @@ function purgeToBeDeletedTasks() {
       if (existingData.length > 1 && existingData[0].findIndex(h => h.toString().trim().toLowerCase() === "link") === -1) {
         headerRowIdx = 1;
       }
+      const headers = getExportHeaders();
+      const taskIdIdx = headers.indexOf("Task ID") !== -1 ? headers.indexOf("Task ID") : 15;
+      const statusIdx = headers.indexOf("Status") !== -1 ? headers.indexOf("Status") : 7;
+      
       for (let i = headerRowIdx + 1; i < existingData.length; i++) {
         const row = existingData[i];
-        const tid = row.length >= 15 ? row[14] : row[0];
-        const status = row.length >= 7 ? row[6] : "";
-        if (tid && (status === "Completed" || status === "Deleted")) {
+        const tid = row.length > taskIdIdx ? row[taskIdIdx] : row[0];
+        const status = row.length > statusIdx ? row[statusIdx] : "";
+        const statusLower = status ? status.toString().trim().toLowerCase() : "";
+        if (tid && (statusLower === "completed" || statusLower === "deleted")) {
           existingIds.add(tid);
         }
       }
@@ -682,12 +697,17 @@ function purgeToBeDeletedTasks() {
          try {
              const lastRow = completedSheet.getLastRow();
              if (lastRow <= 1) {
-                const headers = getExportHeaders();
-                completedSheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight("bold");
-                completedSheet.hideColumns(14, 3);
-                completedSheet.getRange(2, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
+                 const headers = getExportHeaders();
+                 completedSheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight("bold");
+                 const idColStartIndex = headers.indexOf("Task ID") + 1;
+                 if (idColStartIndex > 0) {
+                    completedSheet.hideColumns(idColStartIndex, 3);
+                 } else {
+                    completedSheet.hideColumns(16, 3);
+                 }
+                 completedSheet.getRange(2, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
              } else {
-                completedSheet.getRange(lastRow + 1, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
+                 completedSheet.getRange(lastRow + 1, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
              }
              spreadsheetSuccess = true;
          } catch (e) {
