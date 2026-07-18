@@ -78,6 +78,12 @@ From TASK_LIST, select the current top priority: the highest-priority task
 (P0 before P1 before P2/P3) that is (a) not yet DONE, (b) has all its dependencies
 DONE, and (c) sits in a phase whose gate is already met (or is itself a gate /
 containment task). If the top candidate is blocked, take the next eligible one.
+
+CRITICAL PARALLELISM CHECK: To avoid duplicating work, you MUST check the conversation 
+transcripts from the last 15 minutes (or use a search tool across recent agent logs) 
+to see if another agent has already picked your chosen task. If another agent is 
+currently working on it, skip it and pick the next eligible task.
+
 State which task you picked, why, and what you skipped. If nothing is eligible
 (all done, or the frontier is blocked on a human gate), say so and stop.
 
