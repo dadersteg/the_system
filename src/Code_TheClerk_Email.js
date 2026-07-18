@@ -552,7 +552,11 @@ function callLLMWithSourceContext(subject, from, body, docInstructions, taxonomy
         return null; // Fatal failure
       }
       
-      const rawText = JSON.parse(response.getContentText()).candidates[0].content.parts[0].text;
+      const json = JSON.parse(response.getContentText());
+      if (!json.candidates || json.candidates.length === 0 || !json.candidates[0].content || !json.candidates[0].content.parts || json.candidates[0].content.parts.length === 0) {
+        throw new Error("Empty candidates returned from Gemini API");
+      }
+      const rawText = json.candidates[0].content.parts[0].text;
       
       // Fix: Use greedy regex to match the full JSON object, or just strip markdown and parse.
       let cleanText = rawText.replace(/```json/gi, '').replace(/```/gi, '').trim();
