@@ -212,7 +212,7 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
     try:
         res = sheet_api.values().get(
             spreadsheetId=spreadsheet_id,
-            range=f"'{sheet_title}'!A2:R5000"
+            range=f"'{sheet_title}'!A2:R"
         ).execute()
         existing_rows = res.get("values", [])
 
@@ -246,7 +246,8 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
                 completed_rows.append(r)
         print(f"Loaded existing sheet: {len(existing_rows)} rows total, preserved {len(completed_rows)} completed/deleted tasks.")
     except Exception as e:
-        print(f"No existing log rows read or error: {e}. Presuming 0 completed tasks.")
+        print(f"CRITICAL ERROR: Failed to read existing log rows. Error: {e}")
+        raise RuntimeError(f"Aborting sync to prevent data loss due to read failure on '{sheet_title}'.")
 
     # 2. Get active list mappings
     list_map, task_lists = get_task_lists(tasks_service)
@@ -618,7 +619,7 @@ def sync_and_maintain_account(sheets_service, token_path, spreadsheet_id, label)
         print(f"Clearing spreadsheet '{sheet_title}' for {label}...")
         sheet_api.values().clear(
             spreadsheetId=spreadsheet_id,
-            range=f"'{sheet_title}'!A1:R5000"
+            range=f"'{sheet_title}'!A1:R"
         ).execute()
         
         write_range = f"'{sheet_title}'!A1:R{len(payload)}"
