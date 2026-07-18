@@ -25,14 +25,10 @@ function runMonthlyReview() {
   [importerListId, todoListId, recurringListId].forEach(listId => {
     let pageToken;
     do {
-      try {
-        const response = Tasks.Tasks.list(listId, { showCompleted: false, showHidden: false, showAssigned: true, maxResults: 100, pageToken: pageToken });
-        const items = response.items || [];
-        items.forEach(t => rawTasks.push({ id: t.id, title: t.title, due: t.due, updated: t.updated || "", notes: t.notes || "", status: t.status }));
-        pageToken = response.nextPageToken;
-      } catch (e) {
-        pageToken = undefined;
-      }
+      const response = executeWithRetry(() => Tasks.Tasks.list(listId, { showCompleted: false, showHidden: false, showAssigned: true, maxResults: 100, pageToken: pageToken }));
+      const items = response.items || [];
+      items.forEach(t => rawTasks.push({ id: t.id, title: t.title, due: t.due, updated: t.updated || "", notes: t.notes || "", status: t.status }));
+      pageToken = response.nextPageToken;
     } while (pageToken);
   });
 
@@ -97,8 +93,9 @@ function runMonthlyReview() {
   }
 
   if (!result || result.error) {
-      console.error("28-Day Review failed after all attempts.");
-      return;
+      const errMsg = "28-Day Review failed after all attempts.";
+      console.error(errMsg);
+      throw new Error(errMsg);
   }
   
   let markdownReport = result.text;
@@ -152,13 +149,26 @@ function monthlyReviewTriggerWrapper() {
   const diffTimeMs = nowUtc.getTime() - baseDate.getTime();
   const diffDays = Math.round(diffTimeMs / (1000 * 60 * 60 * 24));
   
-  // Execute every 28 days (diffDays % 28 === 0) at 9:00
-  if (diffDays >= 0 && diffDays % 28 === 0 && [9].includes(currentHour)) {
-    console.log("Executing 28-Day Strategic Review...");
-    try {
-      runTaskMasterEngine(); // Pre-clean
-    } catch(e) {}
-    runMonthlyReview();
+  const scriptProps = PropertiesService.getScriptProperties();
+  const lastRunKey = "LAST_RUN_28_DAY";
+  const todayStr = Utilities.formatDate(nowUtc, "UTC", "yyyy-MM-dd");
+  
+  if (diffDays >= 0 && diffDays % 28 === 0) {
+    const lastRunStr = scriptProps.getProperty(lastRunKey);
+    if (lastRunStr !== todayStr) {
+      if (currentHour >= 9) {
+        console.log("Executing 28-Day Strategic Review...");
+        try {
+          runTaskMasterEngine(); // Pre-clean
+        } catch(e) {}
+        runMonthlyReview();
+        scriptProps.setProperty(lastRunKey, todayStr);
+      } else {
+        console.log(`Waiting for 09:00 to run 28-Day review. Current hour: ${currentHour}.`);
+      }
+    } else {
+      console.log(`28-Day review already ran successfully today (${todayStr}).`);
+    }
   } else {
     console.log(`Skipping 28-Day review. Days since base (May 10): ${diffDays}, Hour: ${currentHour}.`);
   }

@@ -12,14 +12,10 @@ function runQuarterlyReview() {
   [importerListId, todoListId, recurringListId].forEach(listId => {
     let pageToken;
     do {
-      try {
-        const response = Tasks.Tasks.list(listId, { showCompleted: false, showHidden: false, showAssigned: true, maxResults: 100, pageToken: pageToken });
-        const items = response.items || [];
-        items.forEach(t => rawTasks.push({ id: t.id, title: t.title, due: t.due, notes: t.notes || "", status: t.status }));
-        pageToken = response.nextPageToken;
-      } catch (e) {
-        pageToken = undefined;
-      }
+      const response = executeWithRetry(() => Tasks.Tasks.list(listId, { showCompleted: false, showHidden: false, showAssigned: true, maxResults: 100, pageToken: pageToken }));
+      const items = response.items || [];
+      items.forEach(t => rawTasks.push({ id: t.id, title: t.title, due: t.due, notes: t.notes || "", status: t.status }));
+      pageToken = response.nextPageToken;
     } while (pageToken);
   });
 
@@ -83,8 +79,9 @@ function runQuarterlyReview() {
   }
 
   if (!result || result.error) {
-      console.error("84-Day Review failed after all attempts.");
-      return;
+      const errMsg = "84-Day Review failed after all attempts.";
+      console.error(errMsg);
+      throw new Error(errMsg);
   }
   
   let markdownReport = result.text;
@@ -126,13 +123,26 @@ function quarterlyReviewTriggerWrapper() {
   const diffTime = nowUtc.getTime() - baseDate.getTime();
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
   
-  // Execute every 84 days (diffDays % 84 === 0) at 9:00
-  if (diffDays >= 0 && diffDays % 84 === 0 && [9].includes(currentHour)) {
-    console.log("Executing 84-Day Strategic Review...");
-    try {
-      runTaskMasterEngine(); // Pre-clean
-    } catch(e) {}
-    runQuarterlyReview();
+  const scriptProps = PropertiesService.getScriptProperties();
+  const lastRunKey = "LAST_RUN_84_DAY";
+  const todayStr = Utilities.formatDate(nowUtc, "UTC", "yyyy-MM-dd");
+  
+  if (diffDays >= 0 && diffDays % 84 === 0) {
+    const lastRunStr = scriptProps.getProperty(lastRunKey);
+    if (lastRunStr !== todayStr) {
+      if (currentHour >= 9) {
+        console.log("Executing 84-Day Strategic Review...");
+        try {
+          runTaskMasterEngine(); // Pre-clean
+        } catch(e) {}
+        runQuarterlyReview();
+        scriptProps.setProperty(lastRunKey, todayStr);
+      } else {
+        console.log(`Waiting for 09:00 to run 84-Day review. Current hour: ${currentHour}.`);
+      }
+    } else {
+      console.log(`84-Day review already ran successfully today (${todayStr}).`);
+    }
   } else {
     console.log(`Skipping 84-Day review. Days since base (May 10): ${diffDays}, Hour: ${currentHour}.`);
   }
