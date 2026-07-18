@@ -28,7 +28,9 @@ def get_full_doc_text(doc_id):
     return text
 
 def test_gemini(text, filename):
-    api_key = os.environ.get('WORK_GEMINI_API_KEY', 'AIzaSyBwAeZtFxURKlyQZsiOHofmYrHBxB5RWYA')
+    api_key = os.environ.get('WORK_GEMINI_API_KEY')
+    if not api_key:
+        raise ValueError("WORK_GEMINI_API_KEY environment variable is not set")
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
     
     prompt = """
