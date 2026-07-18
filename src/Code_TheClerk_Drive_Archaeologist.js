@@ -296,9 +296,6 @@ For each file, output JSON strictly in this format:
                 }
 
             }
-        } else {
-            console.error("Gemini API Error: " + resp.getContentText());
-        }
     } catch(e) {
         console.error("Failed to query Gemini: " + e.message);
     }
