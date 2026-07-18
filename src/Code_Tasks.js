@@ -1338,6 +1338,9 @@ Respond STRICTLY in valid JSON format as an array of objects matching the input 
       
       if (statusCode === 200) {
         const json = JSON.parse(response.getContentText());
+        if (!json.candidates || json.candidates.length === 0 || !json.candidates[0].content || !json.candidates[0].content.parts || json.candidates[0].content.parts.length === 0) {
+          throw new Error("Empty candidates returned from Gemini API");
+        }
         const resultText = json.candidates[0].content.parts[0].text;
         
         let parsedResults = [];
