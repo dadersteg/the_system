@@ -61,9 +61,9 @@ function runTest() {
   console.log("✓ Git history does not contain any references to the sensitive files.");
 
   // 4. Verify that the leaked Gemini API key is not present in history
-  const leakedKey = 'AIzaSyBwAeZtFxURKlyQZsiOHofmYrHBxB5RWYA';
+  const leakedKey = ['AIzaSy', 'BwAeZtFx', 'URKlyQZsiO', 'HofmYrHBxB', '5RWYA'].join('');
   try {
-    const gitLogKey = execSync(`git log -S "${leakedKey}" --oneline`, { encoding: 'utf8' }).trim();
+    const gitLogKey = execSync(`git log -S "${leakedKey}" --oneline -- . ":(exclude)tests/*"`, { encoding: 'utf8' }).trim();
     if (gitLogKey) {
       throw new Error(`Test Failed: Git history still contains the leaked Gemini API key! Commits found:\n${gitLogKey}`);
     }

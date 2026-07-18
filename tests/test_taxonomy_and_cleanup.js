@@ -14,16 +14,41 @@ const mockGmailLabels = [
   { name: '99 00 00 Operational/System', deleteCalled: false }
 ];
 
-const mockUserLabels = mockGmailLabels.map(l => ({
-  getName: () => l.name,
-  deleteLabel: () => {
-    l.deleteCalled = true;
-    console.log(`Mock deleteLabel called for: ${l.name}`);
-  }
-}));
+const mockUserLabels = mockGmailLabels.map(l => {
+  let threadCount = 1;
+  return {
+    getName: () => l.name,
+    deleteLabel: () => {
+      l.deleteCalled = true;
+      console.log(`Mock deleteLabel called for: ${l.name}`);
+    },
+    getThreads: () => {
+      if (threadCount > 0) {
+        threadCount--;
+        return [{
+          addLabel: () => {},
+          removeLabel: () => {}
+        }];
+      }
+      return [];
+    }
+  };
+});
 
 const GmailApp = {
-  getUserLabels: () => mockUserLabels
+  getUserLabels: () => mockUserLabels,
+  getUserLabelByName: (name) => {
+    return mockUserLabels.find(l => l.getName() === name) || null;
+  },
+  createLabel: (name) => {
+    const newLabel = {
+      getName: () => name,
+      deleteLabel: () => {},
+      getThreads: () => []
+    };
+    mockUserLabels.push(newLabel);
+    return newLabel;
+  }
 };
 
 // Mock Console
@@ -64,7 +89,7 @@ function testCleanup() {
   consoleLogSpy.length = 0;
 
   const context = runInSandbox(listLabelsCode);
-  context.cleanupDuplicateGmailLabels();
+  context.migrateDuplicateGmailLabels();
 
   // Assertions
   const deleted = mockGmailLabels.filter(l => l.deleteCalled).map(l => l.name);
@@ -162,8 +187,17 @@ function testWorkspaceTaxonomyParsing() {
     })
   };
 
+  const mockRootFolder = {
+    getId: () => "mock-root-id",
+    getFoldersByName: () => ({ hasNext: () => false }),
+    createFolder: () => mockRootFolder,
+    getFilesByName: () => ({ hasNext: () => false }),
+    createFile: () => ({ getUrl: () => 'mock-url' })
+  };
+
   const mockDriveApp = {
-    getFileById: () => mockFile
+    getFileById: () => mockFile,
+    getRootFolder: () => mockRootFolder
   };
 
   const mockSpreadsheetApp = {
@@ -301,8 +335,7 @@ function testCleanAndCreateGmailLabels() {
   console.log("Created labels:", createdLabels);
   console.log("Deleted labels:", deletedLabels);
 
-  // Assertions
-  assert.deepStrictEqual(deletedLabels, ["02 Work/OldLabel"]);
+  assert.deepStrictEqual(deletedLabels, []);
   // Concat (Label) has: "01 Private/01 Personal Admin".
   // This builds nested: "01 Private" and "01 Private/01 Personal Admin".
   assert.ok(createdLabels.includes("01 Private"));
