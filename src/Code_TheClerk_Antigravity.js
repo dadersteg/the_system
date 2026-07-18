@@ -18,10 +18,7 @@ function runAntigravitySync() {
   try {
     const SPREADSHEET_ID = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
     const BRAIN_FOLDER_ID = "19Yq7j6eyV3hmw83RPbBv2Ro0eJMnlTUM";
-    const API_KEY = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
     const MODEL = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE || "gemini-2.5-flash";
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
-    
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const logSheet = ss.getSheetByName("5 Import - Antigravity Log");
     if (!logSheet) {
@@ -121,33 +118,10 @@ ${compressed}`;
       }
       
       // Call Gemini API
-      const payload = {
-        "contents": [{
-          "parts": [{"text": prompt}]
-        }],
-        "generationConfig": {
-          "responseMimeType": "application/json"
-        }
-      };
-      
       try {
-        const response = UrlFetchApp.fetch(API_URL, {
-          method: "post",
-          contentType: "application/json",
-          payload: JSON.stringify(payload),
-          muteHttpExceptions: true
-        });
+        const parsed = callGemini(prompt, MODEL, "You are an expert project manager.", null);
         
-        const responseCode = response.getResponseCode();
-        const json = JSON.parse(response.getContentText());
-        
-        if (responseCode === 200 && json.candidates && json.candidates.length > 0) {
-          let text = json.candidates[0].content.parts[0].text;
-          
-          // Clean possible markdown formatting from Gemini
-          text = text.replace(/^```json/m, '').replace(/^```/m, '').replace(/```$/m, '').trim();
-          
-          const parsed = JSON.parse(text);
+        if (parsed && !parsed.error) {
           const currentDate = Utilities.formatDate(new Date(), "GMT", "yyyy-MM-dd");
           
           if (existingRow) {
@@ -180,7 +154,7 @@ ${compressed}`;
             ]);
           }
         } else {
-          console.error(`Gemini Error on ${convoId}: ${response.getContentText()}`);
+          console.error(`Gemini Error on ${convoId}: ${parsed ? parsed.error : "Unknown Error"}`);
         }
       } catch (e) {
         console.error(`Failed to process ${convoId}: ${e.message}`);
