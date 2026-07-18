@@ -1,58 +1,68 @@
 # 1 Day Execution Plan
 *Auto-generated based on today's capacity and system goals.*
 
-**BLUF:** It is currently 16:07 on Friday, leaving a tight window of execution before your 20:00 dinner with Nadia & Flo. Per the Private Environment override, all PMT tasks have been omitted to focus entirely on critical personal operations, specifically time-sensitive medical appointments and Carina's birthday preparations.
+**BLUF:** Today is Saturday, July 18th, and operations are strictly restricted to the Private Environment with a hard scheduling boundary of 10:00 to 18:00. Immediate focus is on clearing time-sensitive personal admin (Carina's birthday gift and tax status) while executing the physical space decluttering frog.
 
 ## "EAT THE FROG" (The Apex Tasks)
 *(Identify ONE for PMT and ONE for Personal. Both must include the 🐸 emoji and reasoning linked to goals.)*
 
+**💼 Other Work:**
+*(No tasks - Private Environment Override Active)*
+
 **🏠 Personal:**
-- [ ] [19:00 - 19:30] 🐸 [THE FROG] [Q2] Review Carry's Tax Status (High-leverage administrative task ensuring financial compliance and peace of mind for your partner) {ID: STV0SHFhMktJVVdEamFCMA}
+- [ ] [13:15 - 14:15] 🐸 [THE FROG] [Q2] Declutter Physical Space (Directly advances the goal to Cultivate a Minimalist Lifestyle and clear physical/mental overhead) {ID: OGRRYTdiT0lmZk1HZjdlaA}
 
 ## TODAY'S TOP 3
 *(The top 3 priority tasks scheduled for today, excluding the frogs and excluding Q3 tasks. Split by PMT, Other Work, and Personal.)*
 
+**💼 Other Work:**
+*(No tasks - Private Environment Override Active)*
+
 **🏠 Personal:**
-- [ ] [16:45 - 17:15] [Q1] Attend remote progesterone consultation {ID: R2JaWjFxQnBkM1dZV0xneA}
-- [ ] [17:15 - 17:30] [Q1] Schedule obstetric ultrasound appointment {ID: SXo2ZVpraWZjMGlqZV8zcg}
-- [ ] [18:30 - 19:00] [Q1] Research and select birthday gift for Carina {ID: MGRkbC1QY1dfMDBFRWFuYg}
+- [ ] [11:45 - 12:45] [Q1] Research and select birthday gift for Carina {ID: MGRkbC1QY1dfMDBFRWFuYg}
+- [ ] [12:45 - 13:15] [Q1] Review Carry's Tax Status {ID: STV0SHFhMktJVVdEamFCMA}
+- [ ] [14:30 - 15:00] [Q2] Daily screen-free time with Carry {ID: LVduOXBybjlfNjJaai1mYw}
 
 ## THE REST OF TODAY
 *(Other tasks that must be done today, including Q3 mandatory chores, but lower priority.)*
 
+**💼 Other Work:**
+*(No tasks - Private Environment Override Active)*
+
 **🏠 Personal:**
-- [ ] [15:45 - 16:45] [Q2] Complete daily workout {ID: LVlOMHM0Y0t0T0hBam5MRA}
-- [ ] [17:30 - 17:45] [Q2] Perform 2-day reflection {ID: WmtqOG9CTTlELW5tX3R2bw}
-- [ ] [17:45 - 18:00] [Q3] Review 'User Guidelines' tab for outdated references {ID: RW1QMVZRQVQ3R2d0R2dHSQ}
-- [ ] [18:00 - 18:30] [Q2] Perform 1-day planning (End of day) {ID: aVhDd3EyOUs4X0hfcUVRXw}
-- [ ] [19:30 - 20:00] [Q3] Daily Walking {ID: VWRKbXNGTDhGY05vY0JzeA}
-- [ ] [21:00 - 21:30] [Q2] Daily screen-free time with Carry {ID: bFREd04wSnZRajlHQ1ZhbA}
-- [ ] [21:45 - 22:00] [Q3] Daily 4-7-8 Breathing Protocol {ID: N3RiUUJEaEN1aTZ5UGZ0aw}
+- [ ] [14:15 - 14:30] [Q3] Daily Walking {ID: Y0loTEw1VlExMnBRTDFXWQ}
+- [ ] [15:00 - 15:05] [Q3] Daily 4-7-8 Breathing Protocol {ID: QXVxcVNoZDBzd0VNZWdmaQ}
+- [ ] [15:05 - 15:20] [Q2] Perform 2-day reflection {ID: Q3B1eHI1ZmtnUk9mY0dQRg}
+- [ ] [15:20 - 15:50] [Q2] Perform 1-day planning (End of day) {ID: c3NtRjZQRnAtdkxBLU9zYQ}
 
 ## 🗓️ THIS WEEK
-- [ ] [Q1] Attend EMS session at Vive Fitness Westminster
-- [ ] [Q1] Purchase LoveShackFancy x Hunter gift for Carry
-- [ ] [Q2] Apply for British Passport (Name Change)
-- [ ] [Q2] Confirm name registration with Skatteverket
-- [ ] [Q2] Find and book new dentist
+- [ ] [Q2] Perform 14-day reflection
+- [ ] [Q2] Perform 28-day reflection
+- [ ] [Q2] Perform 84-day reflection
+- [ ] [Q2] Monthly Budget Setup & Review
+- [ ] [Q2] Perform 7-day planning
 - [ ] [Q2] Attend Therapy Session
 - [ ] [Q2] Plan weekly date with Carry
-
-## 🎯 THIS MONTH (Radar)
-- [ ] [Q2] Analyze shared video material
+- [ ] [Q2] Find and book new dentist
 - [ ] [Q2] Fix/glue the closet door
 - [ ] [Q2] Update Wedding Project Plan
+
+## 🎯 THIS MONTH (Radar)
+- [ ] [Q2] Decide on AXA Health Insurance Plan
 - [ ] [Q2] Track Liverpool FC ballot outcome
+- [ ] [Q2] Confirm name registration with Skatteverket
 - [ ] [Q2] Monthly Date with Carry
-- [ ] [Q2] Declutter Physical Space
 
 ## BOTTLENECKS & SYS ALERTS
 *(Identify any bottlenecks, overloaded days, or systemic warnings. Write actionable advice.)*
-- **Time Constraint Alert:** With the current time at 16:07 and a hard block for dinner at 20:00, your evening execution window is highly fragmented. You must transition immediately from your workout into the medical consultations (Progesterone & Ultrasound) to ensure they are completed before the end of standard business hours.
+- **Reflection Overload Warning:** Tomorrow (July 19) has a heavy reflection load with 14-day, 28-day, and 84-day reflections all due simultaneously. **Action:** Batch these into a single, comprehensive 90-minute deep-dive session tomorrow morning rather than treating them as separate tasks.
+- **Weekend Boundary Enforcement:** All tasks today have been successfully scheduled strictly between 10:00 and 18:00, ensuring adequate evening recovery time.
 
 ## 🗑️ QUARANTINE & TRIAGE CLEARANCE
 *(Brief summary of tasks proposed for deletion or moved to backlog, and items processed from the Importer.)*
-- **Backlogged/Deferred:** Google Photos Takeout, Temple of the Jedi Order engagement, AXA Health Insurance decision, digital signature recreation, and Swedish passport collection have all been successfully routed to the backlog or deferred to Autumn per system instructions.
+- **Backlogged:** "Apply for British Passport (Name Change)" (future-dated to Nov 2026) and "Manual recreation of digital signature" (blocked by AI generation limitations; requires manual design capacity).
+- **Deferred:** "Download Google Photos Takeout" has been pushed to Autumn as per user constraints.
+- **Milestone Containers:** All structural milestone tasks (e.g., [Milestone] General Flat Maintenance) have been bypassed for daily scheduling to keep the execution plan actionable.
 
 ---
 *Report dynamically generated by gemini-pro-latest*
