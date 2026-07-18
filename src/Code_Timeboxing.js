@@ -227,11 +227,22 @@ function scheduleTasksToCalendar(tasks, targetDate) {
     }
   }
 
+  const isPmt = (typeof IS_PMT_ENV !== 'undefined') ? IS_PMT_ENV : false;
+
   calendarsToClean.forEach(cal => {
     try {
+      const isCrossCal = cal.getId() !== calendar.getId();
       const existingEvents = cal.getEvents(startOfDay, endOfDay);
       existingEvents.forEach(e => {
         if (e.getTitle().startsWith("[TS] ")) {
+          // If it's the cross cal, only delete our own
+          if (isCrossCal) {
+              const desc = e.getDescription() || "";
+              const envTag = isPmt ? "[ENV:PMT]" : "[ENV:PRIVATE]";
+              if (!desc.includes(envTag) && desc.includes("[ENV:")) {
+                  return; // Belongs to the other env, skip
+              }
+          }
           // Only delete future blocks. Keep blocks that have already started as a historical diary record.
           if (e.getStartTime() > now) {
              e.deleteEvent();
@@ -242,8 +253,6 @@ function scheduleTasksToCalendar(tasks, targetDate) {
       console.warn(`Could not clean events for calendar: ${e.message}`);
     }
   });
-  
-  const isPmt = (typeof IS_PMT_ENV !== 'undefined') ? IS_PMT_ENV : false;
 
   for (const task of tasks) {
     if (task.startTime && task.endTime) {
@@ -256,12 +265,9 @@ function scheduleTasksToCalendar(tasks, targetDate) {
         let endH = parseInt(endParts[0], 10);
         const endM = parseInt(endParts[1], 10);
         
-        // Auto-correct 12-hour format mistakes and midnight wraparounds
-        if (startH >= 1 && startH <= 6) startH += 12;
-        if (endH >= 1 && endH <= 6) endH += 12;
-        
+        // Handle midnight wraparounds
         if (endH < startH || (endH === startH && endM < startM)) {
-           endH += 12;
+           endH += 24; // Use +24 instead of +12 to roll exactly into the next day
         }
         
         const proposedStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startH, startM, 0);
@@ -346,6 +352,10 @@ function scheduleTasksToCalendar(tasks, targetDate) {
                const newEvent = targetCal.createEvent("[TS] " + task.title, proposedStart, proposedEnd);
                newEvent.setVisibility(CalendarApp.Visibility.PRIVATE);
                newEvent.setColor(CalendarApp.EventColor.ORANGE);
+               if (targetCal.getId() !== calendar.getId()) {
+                   const envTag = isPmt ? "[ENV:PMT]" : "[ENV:PRIVATE]";
+                   newEvent.setDescription(envTag);
+               }
            }
         } else {
            console.log(`Skipping ${task.title} because ${task.startTime} is in the past.`);
