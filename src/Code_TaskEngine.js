@@ -226,7 +226,7 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
                cleanNotes += `\n[SYSTEM DIRECTIVE - STRICT USER CONSTRAINT: ${userConstraint}]`;
             }
             
-            const needsReview = (listId === importerListId) || !aiHashMatch;
+            const needsReview = !aiHashMatch;
             
             rawTasks.push({
                id: t.id,
