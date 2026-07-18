@@ -765,18 +765,24 @@ function exportTasksToMarkdownDrive(results) {
   mdContent += `*Last Updated: ${new Date().toUTCString()}*\n\n`;
 
   let currentList = null;
+  const headers = getExportHeaders();
+  const listIdx = headers.indexOf("Task List") !== -1 ? headers.indexOf("Task List") : 1;
+  const catIdx = headers.indexOf("Category") !== -1 ? headers.indexOf("Category") : 2;
+  const subCatIdx = headers.indexOf("Sub-Category") !== -1 ? headers.indexOf("Sub-Category") : 3;
+  const titleIdx = headers.indexOf("Task Title") !== -1 ? headers.indexOf("Task Title") : 5;
+  const notesIdx = headers.indexOf("Notes") !== -1 ? headers.indexOf("Notes") : 6;
+  const statusIdx = headers.indexOf("Status") !== -1 ? headers.indexOf("Status") : 7;
+  const dueIdx = headers.indexOf("Due Date") !== -1 ? headers.indexOf("Due Date") : 8;
 
   results.forEach(row => {
-    // Schema Indices based on getExportHeaders():
-    // 0: URN, 1: Task List, 2: Category, 3: Sub-Category, 4: Task Title, 5: Notes, 6: Status, 7: Date
-    const listName = row[1];
-    const parentCategory = row[2];
-    const subCategory = row[3];
+    const listName = row[listIdx];
+    const parentCategory = row[catIdx];
+    const subCategory = row[subCatIdx];
     const category = subCategory ? `${parentCategory} > ${subCategory}` : parentCategory;
-    const title = row[4];
-    let notes = row[5];
-    const status = row[6];
-    const date = row[7];
+    const title = row[titleIdx];
+    let notes = row[notesIdx];
+    const status = row[statusIdx];
+    const date = row[dueIdx];
 
     // Clean up the JSON metadata block for the Markdown output
     let metadataStr = "";
