@@ -64,7 +64,9 @@ const sandbox = {
 };
 
 vm.createContext(sandbox);
-const code = fs.readFileSync(path.join(__dirname, '../src/Code_TaskEngine.js'), 'utf8');
+const codeSystemCore = fs.readFileSync(path.join(__dirname, '../src/Code_SystemCore.js'), 'utf8');
+const codeTaskEngine = fs.readFileSync(path.join(__dirname, '../src/Code_TaskEngine.js'), 'utf8');
+const code = codeSystemCore + "\n" + codeTaskEngine;
 vm.runInContext(code, sandbox);
 
 function runStressTest() {

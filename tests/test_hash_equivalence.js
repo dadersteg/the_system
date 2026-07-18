@@ -16,12 +16,13 @@ const Utilities = {
 
 // Load getStandardizedTaskHash function from src/Code_TaskEngine.js
 const codeTaskEngine = fs.readFileSync(path.join(__dirname, '../src/Code_TaskEngine.js'), 'utf8');
+const codeSystemCore = fs.readFileSync(path.join(__dirname, '../src/Code_SystemCore.js'), 'utf8');
 
 // Use VM to load the function
 const vm = require('vm');
 const sandbox = { Utilities };
 vm.createContext(sandbox);
-vm.runInContext(codeTaskEngine, sandbox);
+vm.runInContext(codeSystemCore + "\n" + codeTaskEngine, sandbox);
 const getStandardizedTaskHash = sandbox.getStandardizedTaskHash;
 
 if (typeof getStandardizedTaskHash !== 'function') {

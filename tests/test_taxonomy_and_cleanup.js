@@ -73,7 +73,7 @@ function runInSandbox(code, extraGlobals = {}) {
     GmailApp,
     console: consoleMock,
     Logger: consoleMock,
-    isPmtAccount: () => false,
+    IS_PMT_ENV: false,
     ...extraGlobals
   };
   const vm = require('vm');
@@ -327,7 +327,7 @@ function testCleanAndCreateGmailLabels() {
   const context = runInSandbox(listLabelsCode, {
     GmailApp: localGmailApp,
     DriveApp: mockDriveApp,
-    isPmtAccount: () => false
+    IS_PMT_ENV: false
   });
 
   context.cleanAndCreateGmailLabels();

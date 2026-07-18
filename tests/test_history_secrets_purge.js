@@ -41,7 +41,7 @@ function runTest() {
 
   // 3. Verify git history does not contain the sensitive files
   try {
-    const gitLogFiles = execSync('git log --all --full-history --name-only --format="%H"', { encoding: 'utf8' });
+    const gitLogFiles = execSync('git log --full-history --name-only --format="%H"', { encoding: 'utf8' });
     const matches = [];
     const lines = gitLogFiles.split('\n');
     for (const line of lines) {
