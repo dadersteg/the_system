@@ -190,8 +190,12 @@ function callGemini(promptText, modelName, systemInstruction, schema) {
       if (statusCode === 200) {
         const json = JSON.parse(response.getContentText());
         if (json.candidates && json.candidates.length > 0 && json.candidates[0].content && json.candidates[0].content.parts && json.candidates[0].content.parts.length > 0) {
-          const resultText = json.candidates[0].content.parts[0].text;
+          let resultText = json.candidates[0].content.parts[0].text;
           try {
+            resultText = resultText.replace(/^```[a-z]*\n?/im, "").replace(/\n?```$/im, "").trim();
+            const match = resultText.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
+            if (match) resultText = match[0];
+            resultText = resultText.replace(/,\s*([\}\]])/g, "$1");
             return JSON.parse(resultText);
           } catch (parseErr) {
             console.error(`callGemini failed to parse JSON response: ${parseErr.message}`);
