@@ -21,19 +21,28 @@ const BRIDGE_SECRET = "MOW_BRIDGE_SECRET_2026";
 // }
 
 function doPost(e) {
+  let isAction = false;
   if (e && e.parameter && e.parameter.action) {
-    return doGet(e);
-  }
-  if (e && e.postData && e.postData.type === "application/json") {
+    isAction = true;
+  } else if (e && e.postData && e.postData.type === "application/json") {
     try {
       const payload = JSON.parse(e.postData.contents);
       if (payload && payload.action) {
-        return doGet(e);
+        isAction = true;
       }
     } catch (err) {
       console.error("Failed to parse POST payload: " + err.message);
     }
   }
+
+  if (isAction) {
+    if (!isAuthorized(e)) {
+      return ContentService.createTextOutput(JSON.stringify({ status: 401, error: "Unauthorized" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    return doGet(e);
+  }
+
   return processWebhook(e);
 }
 

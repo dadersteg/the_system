@@ -95,6 +95,7 @@ function loadSourceFile(filename) {
 loadSourceFile('Code_Config.js');
 loadSourceFile('Code_SystemCore.js');
 loadSourceFile('Code_Dashboard.js');
+loadSourceFile('Code_IngestionBridge.js');
 
 function runTest() {
   console.log("Running Web App Auth test...");
@@ -146,6 +147,58 @@ function runTest() {
   content = JSON.parse(response.getContent());
   assert.strictEqual(content.status, 401, "Stranger must be rejected with 401");
   console.log("✓ Unauthorized active user rejected with 401.");
+
+  // Test 6: doPost with action and NO secret should fail (401)
+  activeUserEmail = "";
+  effectiveUserEmail = "";
+  response = sandbox.doPost({
+    parameter: { action: 'runTaskMaster' },
+    postData: {}
+  });
+  if (!response || typeof response.getContent !== 'function') {
+    throw new Error("Test Failed: doPost action without secret was not rejected with a ContentService text output!");
+  }
+  content = JSON.parse(response.getContent());
+  assert.strictEqual(content.status, 401, "doPost action without secret must be rejected with 401");
+  console.log("✓ doPost action without secret rejected with 401.");
+
+  // Test 7: doPost with action and VALID secret in parameter should succeed
+  response = sandbox.doPost({
+    parameter: { action: 'runTaskMaster', secret: 'super-secret-token' },
+    postData: {}
+  });
+  if (response && typeof response.getContent === 'function' && response.getContent().includes('"status":401')) {
+    throw new Error("Test Failed: doPost with action and valid secret in parameter was rejected!");
+  }
+  console.log("✓ doPost with action and valid secret in parameter accepted.");
+
+  // Test 8: doPost with action and VALID secret in JSON body should succeed
+  response = sandbox.doPost({
+    parameter: {},
+    postData: {
+      type: "application/json",
+      contents: JSON.stringify({ action: 'runTaskMaster', secret: 'super-secret-token' })
+    }
+  });
+  if (response && typeof response.getContent === 'function' && response.getContent().includes('"status":401')) {
+    throw new Error("Test Failed: doPost with action and valid secret in JSON body was rejected!");
+  }
+  console.log("✓ doPost with action and valid secret in JSON body accepted.");
+
+  // Test 9: doPost with action and INVALID secret in JSON body should fail (401)
+  response = sandbox.doPost({
+    parameter: {},
+    postData: {
+      type: "application/json",
+      contents: JSON.stringify({ action: 'runTaskMaster', secret: 'wrong-token' })
+    }
+  });
+  if (!response || typeof response.getContent !== 'function') {
+    throw new Error("Test Failed: doPost with action and invalid secret in JSON body was not rejected with a ContentService text output!");
+  }
+  content = JSON.parse(response.getContent());
+  assert.strictEqual(content.status, 401, "doPost with action and invalid secret in JSON body must be rejected with 401");
+  console.log("✓ doPost with action and invalid secret in JSON body rejected with 401.");
 
   console.log("PASS: Web App Auth test passed successfully.");
 }

@@ -35,6 +35,17 @@ function isAuthorized(e) {
     if (e && e.parameter && e.parameter.secret === secret) {
       return true;
     }
+    // Also check postData JSON payload for secret parameter
+    if (e && e.postData && e.postData.type === "application/json" && e.postData.contents) {
+      try {
+        const payload = JSON.parse(e.postData.contents);
+        if (payload && payload.secret === secret) {
+          return true;
+        }
+      } catch (err) {
+        // ignore JSON parse errors for non-JSON payloads
+      }
+    }
   }
 
   const allowedEmails = [
