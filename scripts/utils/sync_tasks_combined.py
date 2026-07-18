@@ -52,9 +52,9 @@ def get_credentials(token_path, creds_path, account_name):
                 print(f"Please place your OAuth client ID credentials in '{creds_path}'.")
                 return None
             
-            print(f"Please authenticate in the browser for {account_name}...")
-            flow = InstalledAppFlow.from_client_secrets_file(creds_path, SCOPES)
-            creds = flow.run_local_server(port=0, open_browser=True)
+            print(f"Error: Credentials missing or expired for {account_name}. Cannot authenticate interactively in cron.")
+            import sys
+            sys.exit(1)
             
         with open(token_path, 'w') as token:
             token.write(creds.to_json())
