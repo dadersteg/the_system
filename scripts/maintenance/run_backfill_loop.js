@@ -34,10 +34,10 @@ if (state.status === 'WAITING_FOR_PR') {
         console.log(`[Backfill Loop] Found Jules PR #${pr.number}: ${pr.title}`);
         
         try {
-          console.log(`[Backfill Loop] Auto-merging PR #${pr.number}...`);
-          execSync(`gh pr merge ${pr.number} --squash --admin`, { cwd: REPO_DIR, stdio: 'inherit' });
-          mergedAny = true;
-          break; // Stop after merging one successfully to avoid conflicting with duplicates
+          console.log(`[Backfill Loop] Auto-merging PR #${pr.number} is DISABLED during remediation. Manual approval is required.`);
+          // execSync(`gh pr merge ${pr.number} --squash --admin`, { cwd: REPO_DIR, stdio: 'inherit' });
+          mergedAny = false;
+          break; // Stop after finding one to prevent duplicate processing
         } catch (mergeErr) {
           console.error(`[Backfill Loop] Failed to merge PR #${pr.number}. It likely has conflicts. Closing it...`);
           try {
