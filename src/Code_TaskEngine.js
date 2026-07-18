@@ -398,7 +398,7 @@ function calculateAvailableTimeSlots(dayName, isPMTEnv, todayEvents) {
      let overlap = false;
      for (let i = 0; i < todayEvents.length; i++) {
         let ev = todayEvents[i];
-        if (ev.isAllDay) { overlap = true; break; }
+        if (ev.isAllDay) { continue; }
         if (slot.start < ev.end && slot.end > ev.start) {
            overlap = true;
            break;
