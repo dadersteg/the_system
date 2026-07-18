@@ -79,14 +79,19 @@ const callGeminiMock = (payloadStr, modelName, systemInstruction, schema) => {
 
 const sandbox = {
   SYSTEM_CONFIG: {
-    TASKS: { IMPORTER_LIST_ID: 'importer-list', TODO_LIST_ID: 'todo-list', TO_BE_DELETED_LIST_ID: 'to-be-deleted-list' },
+    TASKS: { IMPORTER_LIST_ID: 'importer', TODO_LIST_ID: 'todo' },
     DOCS: { TASK_MASTER_PROMPT_ID: '1', TAXONOMY_JSON_ID: '1', PERSONAL_GOALS_FILE_ID: '1', WORK_GOALS_FILE_ID: '1' },
-    ROOTS: {}, SECRETS: {}
+    SHEETS: { MASTER_SHEET_ID: '1' },
+    SECRETS: {}
   },
-  Tasks, Utilities,
+  LockService: { getScriptLock: () => ({ tryLock: () => true, releaseLock: () => {} }) },
+  Tasks,
+  Utilities,
   DriveApp: { getFileById: () => ({ getBlob: () => ({ getDataAsString: () => 'text' }) }) },
   CalendarApp: { getDefaultCalendar: () => ({ getEvents: () => [] }) },
   CacheService: { getScriptCache: () => ({ get: () => null, put: () => {} }) },
+  SpreadsheetApp: { getActiveSpreadsheet: () => null },
+  IS_PMT_ENV: false,
   console: consoleMock,
   callGemini: callGeminiMock,
   selectModelForPayload: () => 'gemini',

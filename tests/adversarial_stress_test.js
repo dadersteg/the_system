@@ -53,6 +53,7 @@ const sandbox = {
     ROOTS: {}, SECRETS: {}
   },
   Tasks, Utilities,
+  LockService: { getScriptLock: () => ({ tryLock: () => true, releaseLock: () => {} }) },
   DriveApp: { getFileById: () => ({ getBlob: () => ({ getDataAsString: () => 'text' }) }) },
   CalendarApp: { getDefaultCalendar: () => ({ getEvents: () => [] }) },
   CacheService: { getScriptCache: () => ({ get: () => null, put: () => {} }) },
