@@ -109,7 +109,8 @@ function getCalendarCapacity7Days() {
     const capacityMap = {};
     for (let i = 0; i < 7; i++) {
       const d = new Date(now.getTime() + (i * 24 * 60 * 60 * 1000));
-      capacityMap[d.toISOString().split('T')[0]] = { busyHours: 0, availableHours: 12 };
+      const dateKey = Utilities.formatDate(d, "Europe/London", "yyyy-MM-dd");
+      capacityMap[dateKey] = { busyHours: 0, availableHours: 12 };
     }
     
     let pageToken;
@@ -131,7 +132,7 @@ function getCalendarCapacity7Days() {
         const startTime = new Date(e.start.dateTime);
         const endTime = new Date(e.end.dateTime);
         const durationHours = (endTime - startTime) / (1000 * 60 * 60);
-        const dateKey = startTime.toISOString().split('T')[0];
+        const dateKey = Utilities.formatDate(startTime, "Europe/London", "yyyy-MM-dd");
         
         if (capacityMap[dateKey]) {
           capacityMap[dateKey].busyHours += durationHours;
