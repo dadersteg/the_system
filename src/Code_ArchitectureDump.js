@@ -17,7 +17,7 @@
  * @returns {void}
  */
 function printTrueIds() {
-  const isPmt = isPmtAccount();
+  const isPmt = IS_PMT_ENV;
   const profileName = isPmt ? "PMT" : "PRIVATE";
   
   const trueConfig = {

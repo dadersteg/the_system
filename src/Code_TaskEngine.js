@@ -86,13 +86,6 @@ function runTaskMasterEngine() {
  * 
  * @returns {string} Output log string.
  */
-function runTaskMasterDailyPlan() {
-  console.log("Starting Task Master Engine (1 Day 'Today' Operations)...");
-  const prompt = getTaskMasterDailyPrompt();
-  const res = _executeTaskMasterPipeline(prompt, true);
-  try { if (typeof purgeToBeDeletedTasks === "function") purgeToBeDeletedTasks(); } catch(e) { console.error(e); }
-  return res;
-}
 
 /**
  * Standardizes a task's title, notes, due date, and status to compute its MD5-Base64 hash.
@@ -603,9 +596,8 @@ function executeTaskMasterGemini(payloadObj, systemInstruction) {
         "items": {
           "type": "OBJECT",
           "properties": {
-            "taskId": { "type": "STRING" },
             "taskId": { "type": "STRING", "description": "The exact ID of the task being updated." },
-            "routingTarget": { "type": "STRING", "description": "One of: SCHEDULE, BACKLOG, DELETE, COMPLETE, RETAIN_IMPORTER, SPLIT." },
+            "routingTarget": { "type": "STRING", "description": "The single best routing target. Must be one of: RETAIN_IMPORTER, TO_DO, BACKLOG, SPLIT, DELETE." },
             "estimatedDuration": { "type": "STRING", "description": "Time required. Example: '5m', '30m', '1h', '2h'." },
             "alignedGoal": { "type": "STRING", "description": "The URN of the System Goal this task serves. Example: 'urn:goal:system:2'" },
             "category_path": { "type": "STRING", "description": "The exact valid System Taxonomy category path." },
@@ -726,9 +718,6 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
         }
       } else if (u.routingTarget === "BACKLOG") {
         finalDue = new Date("2099-12-31T00:00:00Z").toISOString();
-      } else if (u.routingTarget === "TODAY") {
-        const todayStr = Utilities.formatDate(new Date(), "Europe/London", "yyyy-MM-dd");
-        finalDue = todayStr + "T00:00:00.000Z";
       } else if (u.recommendedDeadline !== undefined) {
         if (u.recommendedDeadline === "None") {
           finalDue = null;
@@ -845,9 +834,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       
       let targetListId = listId;
       if (u.routingTarget === "DELETE") {
-          targetListId = getOrCreateTriageQuarantineListId();
-      } else if (u.routingTarget === "REVIEW") {
-          targetListId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID;
+          targetListId = SYSTEM_CONFIG.TASKS.TO_BE_DELETED_LIST_ID;
       } else if (listId === importerListId && u.routingTarget !== "RETAIN_IMPORTER") {
           targetListId = todoListId;
       }

@@ -31,6 +31,14 @@ const ss = getMasterSpreadsheet();
   // Sort alphabetically
   labels.sort((a, b) => a.getName().localeCompare(b.getName()));
 
+  let labelMap = {};
+  try {
+    const apiLabels = Gmail.Users.Labels.list('me').labels || [];
+    apiLabels.forEach(al => labelMap[al.name] = al.id);
+  } catch (e) {
+    console.warn("Could not fetch label list from advanced API: " + e.message);
+  }
+
   const tableData = [["Label Name", "Label Content", "Unread Count", "Total Threads"]];
   
   // ES6 Refactoring: Map over labels to build the JSON and Table Data cleanly
@@ -39,7 +47,20 @@ const ss = getMasterSpreadsheet();
     const parts = name.split("/");
     const leaf = parts[parts.length - 1];
     const unreadCount = l.getUnreadCount();
-    const threadCount = l.getThreads().length;
+    
+    let threadCount = 0;
+    const labelId = labelMap[name];
+    if (labelId) {
+       try {
+         const labelDetails = Gmail.Users.Labels.get('me', labelId);
+         threadCount = labelDetails.threadsTotal || 0;
+       } catch (e) {
+         console.warn(`Could not fetch thread count for ${name}: ${e.message}`);
+         threadCount = l.getThreads(0, 1).length > 0 ? "1+" : 0;
+       }
+    } else {
+       threadCount = l.getThreads(0, 1).length > 0 ? "1+" : 0;
+    }
 
     tableData.push([name, leaf, unreadCount, threadCount]);
 
@@ -90,7 +111,7 @@ const ss = getMasterSpreadsheet();
  * @returns {void}
  */
 function cleanAndCreateGmailLabels() {
-  const isPmt = isPmtAccount();
+  const isPmt = IS_PMT_ENV;
   
   console.log(`Starting Gmail Labels cleanup and alignment for ${isPmt ? "PMT" : "Private"} profile...`);
   const labels = GmailApp.getUserLabels();
@@ -162,7 +183,7 @@ function cleanAndCreateGmailLabels() {
  * @returns {void}
  */
 function migrateDuplicateGmailLabels() {
-  const isPmt = typeof isPmtAccount === 'function' ? isPmtAccount() : false;
+  const isPmt = typeof IS_PMT_ENV !== 'undefined' ? IS_PMT_ENV : false;
   console.log(`Starting migration of duplicate Gmail labels for ${isPmt ? "PMT" : "Private"} profile...`);
   
   const labels = GmailApp.getUserLabels();

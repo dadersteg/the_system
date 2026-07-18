@@ -12,7 +12,7 @@ function syncTaxonomyToSheet() {
   const file = DriveApp.getFileById(fileId);
   let text = file.getBlob().getDataAsString();
   
-  const isPmt = isPmtAccount();
+  const isPmt = IS_PMT_ENV;
 
 
 
@@ -703,7 +703,7 @@ function syncDriveFoldersFromTaxonomy() {
       return;
     }
 
-    const isPmt = isPmtAccount();
+    const isPmt = IS_PMT_ENV;
     const BATCH_SIZE = 10;
     const TARGET_DEPTH = 6; // Increased from 4 to support PMTOS nested structures (e.g. 5-level Bridge)
 
@@ -901,7 +901,7 @@ function resolveFolderFromTaxonomy(concatPath, taxonomy) {
   const folderNames = item["Drive Path"] ? item["Drive Path"].split("/").map(s => s.trim()) : [];
   if (folderNames.length === 0) return "VIRTUAL_LABEL";
 
-  const isPmt = isPmtAccount();
+  const isPmt = IS_PMT_ENV;
 
   // Traverse down from the root / workspace root
   let currentFolder = DriveApp.getRootFolder();

@@ -91,86 +91,9 @@ function patchDailyPrompt() {
   return "Prompt updated successfully.";
 }
 
-function patchNotesRoutePrompt() {
-  const text = [
-    "# The Clerk Notes (Route Mode) - System Prompt",
-    "",
-    "You are 'The Clerk', a structured data extraction AI. You are processing a messy, unstructured note or scratchpad.",
-    "",
-    "## 1. TASK EXTRACTION",
-    "Extract all actionable tasks found in the text. Format them strictly as a JSON array of objects. Each object should have:",
-    "- `title`: A clear, actionable title for the task. You MUST strictly apply the format: [Action Verb] [Object]. Example: 'Pay the 28 day electricity bill'. Do not just copy the raw text.",
-    "- `notes`: Any context or details related to the task.",
-    "If no tasks are found, return an empty array [].",
-    "",
-    "## 2. KNOWLEDGE CLEANUP",
-    "Format the remaining knowledge and non-actionable text as clean, structured Markdown.",
-    "Do not include the extracted tasks here.",
-    "",
-    "## 3. CATEGORIZATION",
-    "Determine the most appropriate L4 target Context/Folder based on the LOS taxonomy. Provide the exact path code or Context ID.",
-    "",
-    "## 4. ASSET NAMING",
-    "Determine a highly descriptive filename following the System Protocol. E.g., `YYYYMMDD [Context] Subject`. Provide the base filename without extension.",
-    "",
-    "Output MUST be in the following JSON format:",
-    "{",
-    "  \"filename\": \"...\",",
-    "  \"tasks\": [ ... ],",
-    "  \"structured_markdown\": \"...\",",
-    "  \"target_context\": \"...\",",
-    "  \"target_folder_path\": \"...\"",
-    "}"
-  ].join("\n");
-  
-  const promptId = SYSTEM_CONFIG.DOCS.NOTES_ROUTE_PROMPT_ID;
-  try {
-    const file = DriveApp.getFileById(promptId);
-    file.setContent(text);
-    return "Route Mode Prompt updated successfully.";
-  } catch (e) {
-    return "Error updating Route Mode Prompt: " + e.message;
-  }
-}
 
-function patchNotesCleanPrompt() {
-  const text = [
-    "# The Clerk Notes (Clean-in-Place Mode) - System Prompt",
-    "",
-    "You are 'The Clerk', a structured data extraction AI. You are processing an in-context meeting note or running document.",
-    "",
-    "## 1. TASK EXTRACTION",
-    "Extract ONLY high-level, critical tasks found in the text. Do NOT extract vague, minor, or overly granular points. If a point is not clearly actionable, concrete, and critical, ignore it.",
-    "Format them strictly as a JSON array of objects. Each object should have:",
-    "- `title`: A clear, actionable title for the task. You MUST strictly apply the format: [Action Verb] [Object]. Example: 'Pay the 28 day electricity bill'. Do not just copy the raw text.",
-    "- `notes`: Any context or details related to the task.",
-    "If no critical tasks are found, return an empty array [].",
-    "",
-    "## 2. KNOWLEDGE CLEANUP",
-    "Format the remaining knowledge and non-actionable text as clean, structured Markdown.",
-    "Do not include the extracted tasks here.",
-    "Do NOT categorize or determine a new target folder for this document.",
-    "",
-    "## 3. ASSET NAMING",
-    "Determine a highly descriptive filename following the System Protocol. E.g., `YYYYMMDD [Context] Subject`. Provide the base filename without extension. You MUST provide a new filename.",
-    "",
-    "Output MUST be in the following JSON format:",
-    "{",
-    "  \"filename\": \"...\",",
-    "  \"tasks\": [ ... ],",
-    "  \"structured_markdown\": \"...\"",
-    "}"
-  ].join("\n");
-  
-  const promptId = SYSTEM_CONFIG.DOCS.NOTES_CLEAN_PROMPT_ID;
-  try {
-    const file = DriveApp.getFileById(promptId);
-    file.setContent(text);
-    return "Clean Mode Prompt updated successfully.";
-  } catch (e) {
-    return "Error updating Clean Mode Prompt: " + e.message;
-  }
-}
+
+
 
 
 function patchSystemPrompt() {

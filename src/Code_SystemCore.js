@@ -253,54 +253,7 @@ function getMyTaskListIds() {
  * Runs a safe dry-run for Task Master, extracting data and hitting Gemini without modifying real Google Tasks.
  * @returns {void}
  */
-function testTaskMasterDryRun() {
-  try {
-    console.log("Starting DRY RUN of Task Master...");
-    const now = new Date();
 
-    if (typeof extractCalendarCapacity !== 'function' ||
-        typeof extractTasksBacklog !== 'function' ||
-        typeof getSystemGoals !== 'function' ||
-        typeof callTaskMasterAI !== 'function' ||
-        typeof updateOnePagerMarkdown !== 'function') {
-      console.error("testTaskMasterDryRun failed: Required global functions are not defined.");
-      return;
-    }
-
-    const capacityData = extractCalendarCapacity(now);
-    const taskData = extractTasksBacklog();
-    const goalsData = getSystemGoals();
-
-    const payload = {
-      currentTime: now.toISOString(),
-      goals: goalsData,
-      capacity: capacityData,
-      tasks: taskData
-    };
-
-    console.log("Fetching AI recommendations...");
-    const aiResponse = callTaskMasterAI(payload);
-    if (!aiResponse) {
-      console.error("testTaskMasterDryRun: AI response is empty.");
-      return;
-    }
-
-    console.log("=== AI RECOMMENDED TASK UPDATES (SKIPPED) ===");
-    console.log(JSON.stringify(aiResponse.taskUpdates || {}, null, 2));
-
-    console.log("=== ONE-PAGER PRIORITY OUTPUT ===");
-    console.log(aiResponse.onePagerMarkdown || "");
-
-    if (aiResponse.onePagerMarkdown) {
-      updateOnePagerMarkdown(aiResponse.onePagerMarkdown);
-      console.log("Dry run complete. Check Google Drive for the One-Pager.");
-    } else {
-      console.error("testTaskMasterDryRun: onePagerMarkdown is missing from the response.");
-    }
-  } catch (e) {
-    console.error(`testTaskMasterDryRun failed: ${e.message}`);
-  }
-}
 
 let _cachedActiveThreadTaskMap = null;
 
@@ -542,3 +495,7 @@ function parseTaskNotes(rawNotes) {
   };
 }
 
+if (typeof globalThis !== "undefined") {
+  globalThis.parseTaskNotes = parseTaskNotes;
+  globalThis.buildTaskNotes = buildTaskNotes;
+}

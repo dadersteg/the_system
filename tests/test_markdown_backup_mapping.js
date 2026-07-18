@@ -39,13 +39,19 @@ function runTest() {
     Utilities,
     console: console,
     globalThis: {},
-    isPmtAccount: () => false
+    IS_PMT_ENV: false,
+    parseTaskNotes: (notes) => ({ cleanNotes: notes || '' })
   };
   sandbox.globalThis = sandbox;
+
+  const coreCodePath = path.join(__dirname, '../src/Code_SystemCore.js');
+  let coreCode = fs.readFileSync(coreCodePath, 'utf8');
 
   // Load Code_Tasks.js
   const tasksCodePath = path.join(__dirname, '../src/Code_Tasks.js');
   let tasksCode = fs.readFileSync(tasksCodePath, 'utf8');
+
+  tasksCode = coreCode + "\n" + tasksCode;
   
   // Inject helper export
   tasksCode += `\n

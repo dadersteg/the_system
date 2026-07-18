@@ -105,7 +105,7 @@ function runTest() {
     extractExternalLinkFromText: () => '',
     resolveCategoryAndTitle: (title, category) => ({ title, category }),
     extractMilestone: () => '',
-    isPmtAccount: () => false
+    IS_PMT_ENV: false
   };
   sandbox.globalThis = sandbox;
 
