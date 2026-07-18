@@ -1,6 +1,9 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from lib.google_auth import get_service, get_credentials
 import os
 from googleapiclient.discovery import build
-from google.oauth2.credentials import Credentials
 from sync_tasks_combined import get_credentials
 
 def main():

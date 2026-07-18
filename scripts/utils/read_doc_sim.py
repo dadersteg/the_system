@@ -1,17 +1,12 @@
 import json
-from google.oauth2.credentials import Credentials
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from lib.google_auth import get_service, get_credentials
 from googleapiclient.discovery import build
 
 def get_creds():
-    with open('auth/token.json', 'r') as f:
-        creds_data = json.load(f)
-    return Credentials(
-        token=creds_data['token'],
-        refresh_token=creds_data['refresh_token'],
-        token_uri=creds_data['token_uri'],
-        client_id=creds_data['client_id'],
-        client_secret=creds_data['client_secret']
-    )
+    return get_credentials('auth/token.json')
 
 def read_doc(creds, document_id):
     service = build('docs', 'v1', credentials=creds)

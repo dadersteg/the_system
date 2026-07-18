@@ -2,8 +2,11 @@
 import os
 import sys
 import json
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from lib.google_auth import get_service, get_credentials
 import argparse
-from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
 def get_service(token_path):

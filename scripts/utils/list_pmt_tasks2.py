@@ -1,18 +1,11 @@
 import json
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from lib.google_auth import get_service, get_credentials
 
 def list_tasks():
-    with open('auth/token_tasks_work.json', 'r') as f:
-        creds_data = json.load(f)
-    creds = Credentials(
-        token=creds_data['token'],
-        refresh_token=creds_data['refresh_token'],
-        token_uri=creds_data['token_uri'],
-        client_id=creds_data['client_id'],
-        client_secret=creds_data['client_secret']
-    )
-    service = build('tasks', 'v1', credentials=creds)
+    service = get_service('tasks', 'v1', 'auth/token_tasks_work.json')
     
     # Check PMT TODO list
     results = service.tasks().list(tasklist='M05Gb0c1dG91bXlkQUJpVQ', showHidden=True, maxResults=100).execute()
