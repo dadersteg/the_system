@@ -3143,3 +3143,8 @@ Date,Convo ID,Type,Name of Convo,Convo Created Date,Purpose of Convo,Summary of 
 - Reviewed the Playmetech Work Organisation System (WOS) taxonomy to extract relevant categories and project labels.
 - Formulated a step-by-step integration guide, advising the user to insert a Gemini action into the workflow to process meeting summaries against the provided taxonomy.
 - Advised on the necessity of hardcoding the taxonomy into the workflow prompt due to cloud-based execution limitations regarding local file access."
+2026-07-18,e3cf9a05-cc2f-43ff-ba45-7bec4d6cfae1,Sterling (UK Chartered Tax Adviser),Carina Adersteg UK Capital Gains Tax Computation and Accountant Correspondence,2026-07-18 11:21:17,To calculate Carina Adersteg's UK Capital Gains Tax for the 2025/2026 tax year and prepare the necessary documentation and correspondence for her accountant.,"- Analysed crypto transaction data to determine taxable gains for the 2025/2026 tax year.
+- Calculated the total taxable gain of £23,908.81 after applying the £3,000 Annual Exempt Amount.
+- Identified that ETH staking activities fall into the 2026/2027 tax year, requiring no immediate action.
+- Generated a formal 'Carina Adersteg - UK Capital Gains Tax Computation' document and saved it to the specified Google Drive folder.
+- Drafted a concise email for the user's accountant explaining the correction regarding the Solana gift transfer and attaching the updated tax report."
