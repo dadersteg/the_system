@@ -1,42 +1,51 @@
 # 1 Day Execution Plan
 *Auto-generated based on today's capacity and system goals.*
 
-**BLUF:** Today is Saturday, and the focus is entirely on personal well-being, relationship milestones, and household maintenance. The calendar is heavily structured with timeboxed routines until 15:50, leaving a brief window in the late afternoon to execute high-priority health and administrative tasks before the strict 18:00 weekend cutoff.
+**BLUF:** Today is Saturday, July 18th, and operations are strictly restricted to the Private Environment with a hard scheduling boundary of 10:00 to 18:00. Immediate focus is on clearing time-sensitive personal admin (Carina's birthday gift and tax status) while executing the physical space decluttering frog.
 
 ## "EAT THE FROG" (The Apex Tasks)
+*(Identify ONE for PMT and ONE for Personal. Both must include the 🐸 emoji and reasoning linked to goals.)*
+
+**💼 Other Work:**
+*(No tasks - Private Environment Override Active)*
+
 **🏠 Personal:**
-- [ ] [15:50 - 16:20] 🐸 [THE FROG] [Q2] Schedule obstetric ultrasound appointment (Critical proactive step for maternal health and pregnancy monitoring) {ID: SXo2ZVpraWZjMGlqZV8zcg}
+- [ ] [13:15 - 14:15] 🐸 [THE FROG] [Q2] Declutter Physical Space (Directly advances the goal to Cultivate a Minimalist Lifestyle and clear physical/mental overhead) {ID: OGRRYTdiT0lmZk1HZjdlaA}
 
 ## TODAY'S TOP 3
+*(The top 3 priority tasks scheduled for today, excluding the frogs and excluding Q3 tasks. Split by PMT, Other Work, and Personal.)*
+
+**💼 Other Work:**
+*(No tasks - Private Environment Override Active)*
+
 **🏠 Personal:**
-- [ ] [10:45 - 11:45] [Q2] Declutter Physical Space {ID: OGRRYTdiT0lmZk1HZjdlaA}
 - [ ] [11:45 - 12:45] [Q1] Research and select birthday gift for Carina {ID: MGRkbC1QY1dfMDBFRWFuYg}
 - [ ] [12:45 - 13:15] [Q1] Review Carry's Tax Status {ID: STV0SHFhMktJVVdEamFCMA}
+- [ ] [14:30 - 15:00] [Q2] Daily screen-free time with Carry {ID: LVduOXBybjlfNjJaai1mYw}
 
 ## THE REST OF TODAY
+*(Other tasks that must be done today, including Q3 mandatory chores, but lower priority.)*
+
+**💼 Other Work:**
+*(No tasks - Private Environment Override Active)*
+
 **🏠 Personal:**
-- [ ] [10:20 - 10:35] [Q3] Perform 1-day planning (Start of day) {ID: bDZSbzFLbzNUSHBwX2lkeQ}
-- [ ] [10:35 - 10:45] [Q2] Attend EMS session at Vive Fitness Westminster {ID: WFVfdkc5WVh3dEZKTnZtYw}
-- [ ] [13:15 - 14:15] [Q2] Complete daily workout {ID: QzNRN3JpVnNlaUVNUTB3SA}
-- [ ] [14:15 - 14:30] [Q2] Daily Walking {ID: Y0loTEw1VlExMnBRTDFXWQ}
-- [ ] [14:30 - 15:00] [Q2] Daily screen-free time with Carry {ID: LVduOXBybjlfNjJaai1mYw}
-- [ ] [15:00 - 15:05] [Q2] Daily 4-7-8 Breathing Protocol {ID: QXVxcVNoZDBzd0VNZWdmaQ}
+- [ ] [14:15 - 14:30] [Q3] Daily Walking {ID: Y0loTEw1VlExMnBRTDFXWQ}
+- [ ] [15:00 - 15:05] [Q3] Daily 4-7-8 Breathing Protocol {ID: QXVxcVNoZDBzd0VNZWdmaQ}
 - [ ] [15:05 - 15:20] [Q2] Perform 2-day reflection {ID: Q3B1eHI1ZmtnUk9mY0dQRg}
-- [ ] [15:20 - 15:50] [Q3] Perform 1-day planning (End of day) {ID: c3NtRjZQRnAtdkxBLU9zYQ}
-- [ ] [16:20 - 16:50] [Q2] Find and book new dentist {ID: dlF4OVR2T2VvZ3NtQUFJaw}
-- [ ] [16:50 - 17:20] [Q3] Review 'User Guidelines' tab for outdated references {ID: RW1QMVZRQVQ3R2d0R2dHSQ}
+- [ ] [15:20 - 15:50] [Q2] Perform 1-day planning (End of day) {ID: c3NtRjZQRnAtdkxBLU9zYQ}
 
 ## 🗓️ THIS WEEK
-- [ ] [Q2] Perform 84-day reflection
-- [ ] [Q2] Perform 28-day reflection
 - [ ] [Q2] Perform 14-day reflection
+- [ ] [Q2] Perform 28-day reflection
+- [ ] [Q2] Perform 84-day reflection
 - [ ] [Q2] Monthly Budget Setup & Review
 - [ ] [Q2] Perform 7-day planning
 - [ ] [Q2] Attend Therapy Session
 - [ ] [Q2] Plan weekly date with Carry
+- [ ] [Q2] Find and book new dentist
 - [ ] [Q2] Fix/glue the closet door
 - [ ] [Q2] Update Wedding Project Plan
-- [ ] [Q2] Analyze shared video material
 
 ## 🎯 THIS MONTH (Radar)
 - [ ] [Q2] Decide on AXA Health Insurance Plan
@@ -45,14 +54,15 @@
 - [ ] [Q2] Monthly Date with Carry
 
 ## BOTTLENECKS & SYS ALERTS
-- **Reflection Overload Warning:** Tomorrow (Sunday, July 19th) contains a massive cluster of reflection tasks (14-day, 28-day, 84-day) alongside the monthly budget setup. Recommend consolidating these reflection sessions into a single deep-dive block to avoid context-switching fatigue.
-- **Weekend Protocol Active:** The strict weekend scheduling boundary (10:00 - 18:00) is in effect. Ensure digital shutdown protocols are respected immediately after 18:00 to protect cognitive recovery.
+*(Identify any bottlenecks, overloaded days, or systemic warnings. Write actionable advice.)*
+- **Reflection Overload Warning:** Tomorrow (July 19) has a heavy reflection load with 14-day, 28-day, and 84-day reflections all due simultaneously. **Action:** Batch these into a single, comprehensive 90-minute deep-dive session tomorrow morning rather than treating them as separate tasks.
+- **Weekend Boundary Enforcement:** All tasks today have been successfully scheduled strictly between 10:00 and 18:00, ensuring adequate evening recovery time.
 
 ## 🗑️ QUARANTINE & TRIAGE CLEARANCE
-- *Apply for British Passport (Name Change)* moved to backlog (future-dated to Nov 2026).
-- *Engage with Temple of the Jedi Order* moved to backlog per user instruction.
-- *Manual recreation of digital signature* moved to backlog pending manual design capacity.
-- *Acquire Swedish Passport* structural container moved to backlog.
+*(Brief summary of tasks proposed for deletion or moved to backlog, and items processed from the Importer.)*
+- **Backlogged:** "Apply for British Passport (Name Change)" (future-dated to Nov 2026) and "Manual recreation of digital signature" (blocked by AI generation limitations; requires manual design capacity).
+- **Deferred:** "Download Google Photos Takeout" has been pushed to Autumn as per user constraints.
+- **Milestone Containers:** All structural milestone tasks (e.g., [Milestone] General Flat Maintenance) have been bypassed for daily scheduling to keep the execution plan actionable.
 
 ---
 *Report dynamically generated by gemini-pro-latest*
