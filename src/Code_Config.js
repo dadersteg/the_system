@@ -61,10 +61,14 @@ const SYSTEM_CONFIG = {
   },
   
   API: {
-    REFLECTION_WEBHOOK: IS_PMT_ENV 
-      ? "https://script.google.com/macros/s/AKfycbzpnXdu6dXin-iGsGJrQxL8-Hy3OEdtfN78TpM6TcFG2Rb8lQ_WBTXx02uDKlXMI7JZKQ/exec" 
-      : "https://script.google.com/macros/s/AKfycbzJnRuZRGRJYYTJpnKL3qxiBIDuSb_zKee1GIneGclittUF7nor-xyXKvM2BwJ7Y3yK/exec",
-    REFLECTION_SECRET: "REFLECTION_SECURE_TRIGGER_123"
+    get REFLECTION_WEBHOOK() {
+      const url = getEnvProp("REFLECTION_WEBHOOK");
+      return (url && typeof url === 'string') ? url.trim() : "";
+    },
+    get REFLECTION_SECRET() {
+      const secret = getEnvProp("REFLECTION_SECRET");
+      return (secret && typeof secret === 'string') ? secret.trim() : "";
+    }
   },
   
   DRIVE_RETRO_ROOT_ID: IS_PMT_ENV ? "" : "",

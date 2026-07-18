@@ -41,7 +41,7 @@
     "access": "MYSELF"
   },
   "webapp": {
-    "access": "ANYONE",
+    "access": "MYSELF",
     "executeAs": "USER_DEPLOYING"
   },
   "exceptionLogging": "STACKDRIVER",

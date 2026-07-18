@@ -527,8 +527,7 @@ function doGet(e) {
 
   return HtmlService.createHtmlOutputFromFile('WebApp_Dashboard')
       .setTitle('The System Dashboard')
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
 // Ensure the UI functions are accessible
@@ -603,8 +602,14 @@ function createIndex() {
     }
     
     const sheets = ss.getSheets();
+    let dashboardUrl = "";
+    try {
+      dashboardUrl = ScriptApp.getService().getUrl();
+    } catch (e) {
+      dashboardUrl = getEnvProp("DASHBOARD_WEBAPP_URL") || "https://script.google.com/macros/s/AKfycbxHAmhD0Bv5pD1akLaBm26xM1BDXpuUfEI2y8MpbiHF1v5cZuJs_hkAoyOZxTsY0lr7/exec";
+    }
     const indexData = [
-      ['System Dashboard', '=HYPERLINK("https://script.google.com/macros/s/AKfycbxHAmhD0Bv5pD1akLaBm26xM1BDXpuUfEI2y8MpbiHF1v5cZuJs_hkAoyOZxTsY0lr7/exec", "🚀 Open Dashboard")', 'WEB_APP'],
+      ['System Dashboard', `=HYPERLINK("${dashboardUrl}", "🚀 Open Dashboard")`, 'WEB_APP'],
       ['Sheet Name', 'Link', 'Tab ID']
     ];
     

@@ -7,7 +7,8 @@ const assert = require('assert');
 const mockScriptProperties = {
   properties: {
     ENV: 'WORK',
-    WEBAPP_SECRET: 'super-secret-token'
+    WEBAPP_SECRET: 'super-secret-token',
+    BRIDGE_SECRET: 'bridge-secret-token'
   },
   getProperty(key) {
     return this.properties[key] || null;
@@ -37,6 +38,34 @@ const Session = {
   getEffectiveUser: () => ({
     getEmail: () => effectiveUserEmail
   })
+};
+
+const GmailApp = {
+  search: () => []
+};
+
+const Gmail = {
+  Users: {
+    Messages: {
+      send: () => ({ id: 'mock-msg-id' })
+    }
+  }
+};
+
+const Logger = {
+  log: () => {}
+};
+
+const Utilities = {
+  base64Encode: (str) => Buffer.from(str || "").toString('base64'),
+  base64Decode: (b64) => Buffer.from(b64 || "", 'base64').toString(),
+  base64EncodeWebSafe: (str) => Buffer.from(str || "").toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
+  newBlob: (bytes) => ({
+    getDataAsString: () => typeof bytes === 'string' ? bytes : Buffer.from(bytes).toString()
+  }),
+  Charset: {
+    UTF_8: 'UTF_8'
+  }
 };
 
 const ContentService = {
@@ -73,6 +102,10 @@ const sandbox = {
   Session,
   ContentService,
   HtmlService,
+  GmailApp,
+  Gmail,
+  Logger,
+  Utilities,
   console: {
     log: (...args) => {},
     warn: (...args) => {},
@@ -199,6 +232,53 @@ function runTest() {
   content = JSON.parse(response.getContent());
   assert.strictEqual(content.status, 401, "doPost with action and invalid secret in JSON body must be rejected with 401");
   console.log("✓ doPost with action and invalid secret in JSON body rejected with 401.");
+
+  // Test 10: Ingestion doPost (isAction = false) with NO secret should fail (Unauthorized)
+  response = sandbox.doPost({
+    parameter: {},
+    postData: {
+      type: "application/json",
+      contents: JSON.stringify({ to: 'daniel@example.com', subject: 'hello' })
+    }
+  });
+  if (!response || typeof response.getContent !== 'function') {
+    throw new Error("Test Failed: Ingestion doPost without secret did not return ContentService output!");
+  }
+  content = JSON.parse(response.getContent());
+  assert.strictEqual(content.success, false, "Ingestion doPost without secret must fail");
+  assert.strictEqual(content.error, "Unauthorized", "Ingestion doPost error must be Unauthorized");
+  console.log("✓ Ingestion doPost without secret rejected with Unauthorized.");
+
+  // Test 11: Ingestion doPost (isAction = false) with INVALID secret should fail
+  response = sandbox.doPost({
+    parameter: {},
+    postData: {
+      type: "application/json",
+      contents: JSON.stringify({ secret: 'wrong-bridge-secret', to: 'daniel@example.com' })
+    }
+  });
+  if (!response || typeof response.getContent !== 'function') {
+    throw new Error("Test Failed: Ingestion doPost with invalid secret did not return ContentService output!");
+  }
+  content = JSON.parse(response.getContent());
+  assert.strictEqual(content.success, false, "Ingestion doPost with invalid secret must fail");
+  assert.strictEqual(content.error, "Unauthorized", "Ingestion doPost error must be Unauthorized");
+  console.log("✓ Ingestion doPost with invalid secret rejected with Unauthorized.");
+
+  // Test 12: Ingestion doPost (isAction = false) with VALID secret should succeed
+  response = sandbox.doPost({
+    parameter: {},
+    postData: {
+      type: "application/json",
+      contents: JSON.stringify({ secret: 'bridge-secret-token', to: 'daniel@example.com', subject: 'aGVsbG8=', body: 'd29ybGQ=', name: 'YW50aWdyYXZpdHk=', b64: true })
+    }
+  });
+  if (!response || typeof response.getContent !== 'function') {
+    throw new Error("Test Failed: Ingestion doPost with valid secret did not return ContentService output!");
+  }
+  content = JSON.parse(response.getContent());
+  assert.strictEqual(content.success, true, "Ingestion doPost with valid secret must succeed");
+  console.log("✓ Ingestion doPost with valid secret accepted.");
 
   console.log("PASS: Web App Auth test passed successfully.");
 }

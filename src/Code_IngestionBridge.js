@@ -10,7 +10,7 @@
  * - 1.0.0: Added standardized documentation header and improved error logging for empty catch blocks.
  */
 
-const BRIDGE_SECRET = "MOW_BRIDGE_SECRET_2026";
+// BRIDGE_SECRET is retrieved dynamically from Script Properties to prevent exposure
 
 /**
  * Handles GET requests (e.g. MacroDroid query-parameter style).
@@ -76,7 +76,8 @@ function processWebhook(e) {
     }
     
     // Verify secret to prevent unauthorized email sending
-    if (payload.secret !== BRIDGE_SECRET) {
+    const bridgeSecret = getEnvProp("BRIDGE_SECRET");
+    if (!bridgeSecret || typeof bridgeSecret !== 'string' || bridgeSecret.trim() === "" || payload.secret !== bridgeSecret) {
       return ContentService.createTextOutput(JSON.stringify({success: false, error: "Unauthorized"}))
         .setMimeType(ContentService.MimeType.JSON);
     }
