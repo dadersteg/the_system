@@ -359,56 +359,7 @@ function getDrivePromptStr() {
   return getSafeDocText(SYSTEM_CONFIG.DOCS.CLERK_DRIVE_INSTRUCTIONS);
 }
 
-let _cachedIsWorkAccount = null;
 
-/**
- * Checks if the executing account is the PMT account (daniel@playmetech.net).
- * Memoized to prevent redundant PropertiesService and Session API calls.
- * @returns {boolean} True if PMT account, false otherwise.
- */
-function isPmtAccount() {
-  if (_cachedIsWorkAccount !== null) {
-    return _cachedIsWorkAccount;
-  }
-  
-  try {
-    const props = typeof PropertiesService !== 'undefined' ? PropertiesService.getUserProperties() : null;
-    if (props) {
-      if (props.getProperty("IS_WORK_ACCOUNT") === "true") {
-        _cachedIsWorkAccount = true;
-        return true;
-      }
-      const folderId = props.getProperty("WORKSPACE_FOLDER_ID");
-      if (folderId === "1Jb5PhZnrqsP3uoUE20Lv75eO4zySPyTr" || folderId === "1W1VyU1ANNNgoq3KrIq1spT_DOpDFyq3A") {
-        _cachedIsWorkAccount = true;
-        return true;
-      }
-    }
-  } catch(e) {
-    console.warn(`isPmtAccount: Failed to fetch user properties - ${e.message}`);
-  }
-  try {
-    const scriptProps = typeof PropertiesService !== 'undefined' ? PropertiesService.getScriptProperties() : null;
-    if (scriptProps) {
-      const folderId = scriptProps.getProperty("WORKSPACE_FOLDER_ID");
-      if (folderId === "1Jb5PhZnrqsP3uoUE20Lv75eO4zySPyTr" || folderId === "1W1VyU1ANNNgoq3KrIq1spT_DOpDFyq3A") {
-        _cachedIsWorkAccount = true;
-        return true;
-      }
-    }
-  } catch(e) {
-    console.warn(`isPmtAccount: Failed to fetch script properties - ${e.message}`);
-  }
-  try {
-    var email = Session.getEffectiveUser().getEmail();
-    const result = !!(email && (email.indexOf("playmetech.net") !== -1 || email.indexOf("playmetech.com") !== -1 || email.indexOf("work") !== -1));
-    _cachedIsWorkAccount = result;
-    return result;
-  } catch(e) {
-    _cachedIsWorkAccount = false;
-    return false;
-  }
-}
 
 /**
  * Dynamically translates LOS references to PMTOS references when running on the PMT account.
@@ -418,7 +369,7 @@ function isPmtAccount() {
  */
 function processPromptText(textStr) {
   if (!textStr) return "";
-  if (typeof isPmtAccount === 'function' && isPmtAccount()) {
+  if (IS_PMT_ENV) {
     let pmtStr = textStr
       .replace(/\bLife Organisation System \(LOS\)/g, "Playmetech Organisation System (PMTOS)")
       .replace(/\bLife Organisation System\b/g, "Playmetech Organisation System")

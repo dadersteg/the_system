@@ -198,7 +198,7 @@ function buildTaskExportRow(task, taskList, emailInfo, exportTs, rowCounter, val
   if (!isLOSValid) {
     const titleParts = (task.title || "").split(" > ");
     if (titleParts.length >= 2) {
-      systemComment = `Invalid ${isPmtAccount() ? "PMTOS" : "LOS"} Path: Not found in taxonomy.`;
+      systemComment = `Invalid ${IS_PMT_ENV ? "PMTOS" : "LOS"} Path: Not found in taxonomy.`;
     } else {
       const hasLOSPrefix = /^\d{2}\s\d{2}\s\d{2}/.test(task.title || "");
       if (hasLOSPrefix) {
@@ -307,7 +307,7 @@ function getExportHeaders() {
  * @returns {string[]} Column sub-header description strings.
  */
 function getExportDescriptions() {
-  const tax = isPmtAccount() ? "PMTOS" : "LOS";
+  const tax = IS_PMT_ENV ? "PMTOS" : "LOS";
   return [
     "System-generated Tracking URN", 
     "Current List", 
@@ -950,7 +950,7 @@ function purgeQuarantineTasks() {
  */
 function exportTasksToMarkdownDrive(results) {
   const TARGET_FOLDER_ID = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
-  const fileName = isPmtAccount() ? "Google Tasks (PMT).md" : "Google Tasks (Private).md";
+  const fileName = IS_PMT_ENV ? "Google Tasks (PMT).md" : "Google Tasks (Private).md";
   
   let mdContent = `# Google Tasks\n\n`;
   mdContent += `*Last Updated: ${new Date().toUTCString()}*\n\n`;

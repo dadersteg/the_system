@@ -49,11 +49,16 @@ class MockEvent {
   }
   setVisibility(v) { this.visibility = v; }
   setColor(c) { this.color = c; }
+  setDescription(d) { this.description = d; }
+  getDescription() { return this.description || ""; }
 }
 
 class MockCalendar {
   constructor(id) {
     this.id = id;
+  }
+  getId() {
+    return this.id;
   }
   getEvents(start, end) {
     apiCalls.push({ action: 'getEvents', calId: this.id, start, end });

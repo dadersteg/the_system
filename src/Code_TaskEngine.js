@@ -1258,7 +1258,7 @@ function writeOnePager(markdownStr, isDailyPlan) {
      const folderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
      const folder = DriveApp.getFolderById(folderId);
      
-     const suffix = isPmtAccount() ? " (PMT)" : " (Private)";
+     const suffix = IS_PMT_ENV ? " (PMT)" : " (Private)";
      const baseName = isDailyPlan ? "TS - Task Master > 1 Day Execution Plan" : "TS - Task Master > Global Priority Review";
      const fileName = baseName + suffix + ".md";
      
