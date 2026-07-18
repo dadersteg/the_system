@@ -163,7 +163,7 @@ function callGemini(promptText, modelName, systemInstruction, schema) {
 
   const payload = {
     systemInstruction: { parts: [{ text: systemInstruction }] },
-    contents: [{ parts: [{ text: promptText }] }],
+    contents: [{ parts: Array.isArray(promptText) ? promptText : [{ text: promptText }] }],
     generationConfig: {
       responseMimeType: "application/json",
       temperature: 0.1
@@ -196,7 +196,11 @@ function callGemini(promptText, modelName, systemInstruction, schema) {
             const match = resultText.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
             if (match) resultText = match[0];
             resultText = resultText.replace(/,\s*([\}\]])/g, "$1");
-            return JSON.parse(resultText);
+            const parsed = JSON.parse(resultText);
+            if (typeof parsed === 'object' && parsed !== null) {
+              parsed._raw_tokens = json.usageMetadata ? json.usageMetadata.totalTokenCount : 0;
+            }
+            return parsed;
           } catch (parseErr) {
             console.error(`callGemini failed to parse JSON response: ${parseErr.message}`);
             return { error: `callGemini failed to parse JSON response: ${parseErr.message}` };
@@ -483,5 +487,58 @@ function processPromptText(textStr) {
  */
 function getExecutionPlanId() {
   return SYSTEM_CONFIG.GENERATED_OUTPUTS.DAY_1_EXECUTION_PLAN;
+}
+
+/**
+ * Unifies the grammar and generation of task notes across The Clerk suite.
+ * 
+ * @param {string} sourceUrl The source URL.
+ * @param {string} sourceName The display name or category path of the source.
+ * @param {string} existingNotes Any existing task notes.
+ * @param {Object} metadata The system metadata to append.
+ * @param {string} [sysComment="SYS: Pending initial review."] System routing comments.
+ * @param {string} [daComment="DA:"] User directives or comments.
+ * @param {string} [contextPrefix="[Source: "] The prefix for the source name (e.g. "Context: " or "[Source: ").
+ * @param {string} [contextSuffix="]"] The suffix for the source name.
+ * @returns {string} The fully serialized task notes.
+ */
+function buildTaskNotes(sourceUrl, sourceName, existingNotes, metadata, sysComment = "SYS: Pending initial review.", daComment = "DA:", contextPrefix = "[Source: ", contextSuffix = "]") {
+  const baseNotes = `${sourceUrl}\n${contextPrefix}${sourceName}${contextSuffix}\n\n${existingNotes || ""}\n\n${sysComment}\n${daComment}\n\n`;
+  return `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+}
+
+/**
+ * Parses a standard task notes string into its components.
+ * 
+ * @param {string} rawNotes The full task notes string.
+ * @returns {Object} Parsed components: { cleanNotes, metadata, sysComment, daComment, baseNotes }
+ */
+function parseTaskNotes(rawNotes) {
+  rawNotes = rawNotes || "";
+  let metadata = {};
+  
+  const metaSplit = rawNotes.split('---SYSTEM_METADATA---');
+  const baseNotes = metaSplit[0];
+  let cleanNotes = baseNotes;
+  
+  if (metaSplit.length > 1) {
+    try {
+       metadata = JSON.parse(metaSplit[1].trim());
+    } catch(e) {}
+  }
+  
+  const sysMatch = cleanNotes.match(/^SYS:\s*(.*)$/m);
+  const sysComment = sysMatch ? sysMatch[1].trim() : "";
+  
+  const daMatch = cleanNotes.match(/^DA:\s*(.*)$/m);
+  const daComment = daMatch ? daMatch[1].trim() : "";
+  
+  return {
+    baseNotes: baseNotes,
+    cleanNotes: cleanNotes.trim(),
+    metadata: metadata,
+    sysComment: sysComment,
+    daComment: daComment
+  };
 }
 

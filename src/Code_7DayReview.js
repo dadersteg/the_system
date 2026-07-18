@@ -34,15 +34,9 @@ function runWeeklyReview() {
     capacity7Days: getCalendarCapacity7Days(),
     goals: getSystemGoals(),
     allTasksContext: rawTasks.map(t => {
-       let cleanNotes = t.notes;
-       let metadata = {};
-       const metaSplit = cleanNotes.split('---SYSTEM_METADATA---');
-       if (metaSplit.length > 1) {
-          try {
-             metadata = JSON.parse(metaSplit[1].trim());
-          } catch(e) {}
-       }
-       cleanNotes = metaSplit[0].replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
+       const parsed = parseTaskNotes(t.notes);
+       let metadata = parsed.metadata || {};
+       let cleanNotes = parsed.baseNotes.replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
        cleanNotes = cleanNotes.replace(/\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
        return { 
          id: t.id,

@@ -73,15 +73,15 @@ discipline is the inversion of those three. If a step would ship unreviewed, ski
 verification, or do something irreversible without a backup — you are doing it
 wrong. Halt.
 
-# STEP 1 — PICK THE ONE TASK
-From TASK_LIST, select the current top priority: the highest-priority task
-(P0 before P1 before P2/P3) that is (a) not yet DONE, (b) has all its dependencies
-DONE, and (c) sits in a phase whose gate is already met (or is itself a gate /
-containment task). If the top candidate is blocked, take the next eligible one.
+### 1. Pick One Task
+Identify the highest-priority task in `TASK_LIST_2026-07-18.md` that:
+1. Is NOT done.
+2. Has its dependencies met.
+3. Belongs to the phase currently unlocked by the user.
 
+**Claim the Task:** Immediately edit `TASK_LIST_2026-07-18.md` and change the checkbox for your chosen task from `[ ]` to `[/]` so other agents know it is in progress.
 
-State which task you picked, why, and what you skipped. If nothing is eligible
-(all done, or the frontier is blocked on a human gate), say so and stop.
+State what you picked and why. If nothing is eligible, say so and stop.
 
 # PRIME DIRECTIVES — never violate
 1. SHIP ON APPROVAL, NOT UNILATERALLY. You may write code, open a PR, run tests,

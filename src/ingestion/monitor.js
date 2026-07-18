@@ -152,13 +152,14 @@ async function checkBridges() {
 
     // Check Cron Scripts and Daemons based on output/heartbeat files
     const cronChecks = [
-        { name: 'telegram-bridge (heartbeat)', file: '/Users/daniel/Documents/AGY/the_system/logs/telegram_bridge_heartbeat.txt', maxAgeMs: 5 * 60 * 1000 },
+        { name: 'telegram-bridge (heartbeat)', file: path.join(__dirname, '../../logs/telegram_bridge_heartbeat.txt'), maxAgeMs: 5 * 60 * 1000 },
         { name: 'task-sync', file: path.join(__dirname, '../../auth/Google Tasks (Combined).md'), maxAgeMs: 30 * 60 * 1000 },
-        { name: 'github-sync', file: '/Users/daniel/Documents/AGY/the_system/logs/github_sync_out.log', maxAgeMs: 24 * 60 * 60 * 1000 },
-        { name: 'sheet-sync-maintenance', file: '/Users/daniel/Documents/AGY/the_system/logs/sheet_sync_maintenance_out.log', maxAgeMs: 2 * 60 * 60 * 1000 },
-        { name: 'check-bridges-daily', file: '/Users/daniel/Documents/AGY/the_system/logs/check_bridges_daily_out.log', maxAgeMs: 25 * 60 * 60 * 1000 },
-        { name: 'antigravity-cloud-backfill', file: '/Users/daniel/Documents/AGY/the_system/logs/antigravity_cloud_backfill_out.log', maxAgeMs: 25 * 60 * 60 * 1000 },
-        { name: 'local-gemini-weekly-sync', file: '/Users/daniel/Documents/AGY/the_system/logs/local_gemini_weekly_sync_out.log', maxAgeMs: 8 * 24 * 60 * 60 * 1000 }
+        // { name: 'beeper-bridge (heartbeat)', file: path.join(__dirname, '../../logs/beeper_bridge_heartbeat.txt'), maxAgeMs: 5 * 60 * 1000 },
+        { name: 'github-sync', file: path.join(__dirname, '../../logs/github_sync_out.log'), maxAgeMs: 24 * 60 * 60 * 1000 },
+        { name: 'sheet-sync-maintenance', file: path.join(__dirname, '../../logs/sheet_sync_maintenance_out.log'), maxAgeMs: 2 * 60 * 60 * 1000 },
+        { name: 'check-bridges-daily', file: path.join(__dirname, '../../logs/check_bridges_daily_out.log'), maxAgeMs: 25 * 60 * 60 * 1000 },
+        { name: 'antigravity-cloud-backfill', file: path.join(__dirname, '../../logs/antigravity_cloud_backfill_out.log'), maxAgeMs: 25 * 60 * 60 * 1000 },
+        { name: 'local-gemini-weekly-sync', file: path.join(__dirname, '../../logs/local_gemini_weekly_sync_out.log'), maxAgeMs: 8 * 24 * 60 * 60 * 1000 }
     ];
 
     for (const check of cronChecks) {

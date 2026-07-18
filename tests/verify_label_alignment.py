@@ -2,9 +2,12 @@ import json
 import re
 import sys
 
-taxonomy_path = "/Users/daniel/Documents/AGY/the_system/docs/LOS_Taxonomy.json"
-actual_labels_path = "/Users/daniel/Documents/AGY/the_system/exports/Actual_Gmail_Labels.json"
-report_path = "/Users/daniel/Documents/AGY/the_system/label_alignment_report.md"
+import os
+
+base_dir = os.path.dirname(os.path.dirname(__file__))
+taxonomy_path = os.path.join(base_dir, "docs", "LOS_Taxonomy.json")
+actual_labels_path = os.path.join(base_dir, "exports", "Actual_Gmail_Labels.json")
+report_path = os.path.join(base_dir, "label_alignment_report.md")
 
 # 1. Load Taxonomy and Actual Labels
 with open(taxonomy_path, "r", encoding="utf-8") as f:

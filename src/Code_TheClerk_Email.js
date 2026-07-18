@@ -224,12 +224,12 @@ function _syncTasksForThread(validActions, primaryCategoryLabel, labelToPathMap,
             metadata.deadline = deadlineVal;
         }
 
-        const baseNotes = `${threadUrl}\nContext: ${finalCategoryPath}\n\n${actionTitle}\n\nSYS: Pending initial review.\nDA:\n\n`;
         const dueVal = (deadlineVal !== "None") ? deadlineVal + "T00:00:00.000Z" : "";
-        const initialHash = getStandardizedTaskHash(cleanTitle, baseNotes, dueVal, "needsAction", true);
+        const tempNotesForHash = buildTaskNotes(threadUrl, finalCategoryPath, actionTitle, {}, undefined, undefined, "Context: ", "");
+        const initialHash = getStandardizedTaskHash(cleanTitle, tempNotesForHash, dueVal, "needsAction", true);
         metadata.ai_hash = initialHash;
 
-        const notes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+        const notes = buildTaskNotes(threadUrl, finalCategoryPath, actionTitle, metadata, undefined, undefined, "Context: ", "");
 
         try {
            const taskPayload = {

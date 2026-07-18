@@ -425,16 +425,16 @@ function processAndLog(batch, rules, logSheet, mode, currentModel, driveRules, f
                 data.tasks.forEach(t => {
                     if (t.title) {
                         try {
-                             const baseNotes = `${targetFileUrl}\n[Source: ${file.getName()}]\n\n${t.notes || ""}\n\nSYS: Pending initial review.\nDA:\n\n`;
+                             const tempNotesForHash = buildTaskNotes(targetFileUrl, file.getName(), t.notes, {});
                              const metadata = {
                                 duration: "15m",
                                 goal: "Maintenance",
                                 category_path: "Inbox",
                                 created_at: new Date().toISOString()
                              };
-                             const initialHash = getStandardizedTaskHash(t.title, baseNotes, "", "needsAction", true);
+                             const initialHash = getStandardizedTaskHash(t.title, tempNotesForHash, "", "needsAction", true);
                              metadata.ai_hash = initialHash;
-                             const taskNotes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+                             const taskNotes = buildTaskNotes(targetFileUrl, file.getName(), t.notes, metadata);
                              const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
                              Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
                             tasksCreated++;
@@ -745,8 +745,6 @@ function checkDeterministicRules(f, driveRules) {
 // --- 6. STABLE API CALL ---
 
 function askGeminiStable(rules, batch, currentModel) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${DRIVE_KEY}`;
-    
     // Add instruction to extract tasks
     const taskInstruction = `
 ## ACTION EXTRACTION & CONFIRMATION MAPPING
@@ -778,47 +776,12 @@ Output schema for each file object must include:
         parts.push(f.parts); 
     });
 
-    const options = { 
-        method: "post", 
-        contentType: "application/json", 
-        payload: JSON.stringify({ 
-            contents: [{ role: "user", parts: parts }], 
-            generationConfig: { response_mime_type: "application/json", temperature: 0.1 } 
-        }), 
-        muteHttpExceptions: true 
-    };
-
-    let retries = 3; 
-    let wait = 2000;
-    while (retries > 0) {
-        try {
-            const resp = UrlFetchApp.fetch(url, options);
-            const code = resp.getResponseCode();
-            if (code === 200) {
-                const res = JSON.parse(resp.getContentText());
-                const raw = res.candidates[0].content.parts[0].text;
-                const match = raw.match(/\[[\s\S]*\]/);
-                if (!match) throw new Error("No JSON array found in response");
-                return { status: "SUCCESS", data: JSON.parse(match[0]), tokens: res.usageMetadata.totalTokenCount };
-            }
-            if (code === 503 || code === 429) { 
-                Utilities.sleep(wait); 
-                wait *= 2; 
-                retries--; 
-                continue; 
-            }
-            return { status: "ERROR", message: `HTTP ${code} - ${resp.getContentText()}` };
-        } catch (e) { 
-            if (retries > 1) {
-                Utilities.sleep(wait);
-                wait *= 2;
-                retries--;
-                continue;
-            }
-            return { status: "ERROR", message: e.message }; 
-        }
+    const result = callGemini(parts, currentModel, rules + taskInstruction, null, false);
+    if (result && !result.error) {
+        if (!Array.isArray(result)) return { status: "ERROR", message: "No JSON array found in response" };
+        return { status: "SUCCESS", data: result, tokens: result._raw_tokens || 0 };
     }
-    return { status: "ERROR", message: "Timeout/Rate Limit Exhausted" };
+    return { status: "ERROR", message: result ? result.error : "Unknown error" };
 }
 
 
@@ -1430,16 +1393,16 @@ function retroactivelyProcessTodayNotes() {
                         if (t.title) {
                             try {
                                 const targetFileUrl = `https://drive.google.com/open?id=${f.id}`;
-                                const baseNotes = `${targetFileUrl}\n[Source: ${f.name}]\n\n${t.notes || ""}\n\nSYS: Pending initial review.\nDA:\n\n`;
+                                const tempNotesForHash = buildTaskNotes(targetFileUrl, f.name, t.notes, {});
                                 const metadata = {
                                    duration: "15m",
                                    goal: "Maintenance",
                                    category_path: "Inbox",
                                    created_at: new Date().toISOString()
                                 };
-                                const initialHash = getStandardizedTaskHash(t.title, baseNotes, "", "needsAction", true);
+                                const initialHash = getStandardizedTaskHash(t.title, tempNotesForHash, "", "needsAction", true);
                                 metadata.ai_hash = initialHash;
-                                const taskNotes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+                                const taskNotes = buildTaskNotes(targetFileUrl, f.name, t.notes, metadata);
                                 Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
                                 tasksCreated++;
                             } catch (e) {

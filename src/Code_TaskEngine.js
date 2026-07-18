@@ -117,8 +117,8 @@ function getStandardizedTaskHash(title, notes, due, status, stripTitleTags) {
   }
   normTitle = normTitle.replace(/\s+/g, " ").trim();
 
-  const parts = normNotes.split('---SYSTEM_METADATA---');
-  const baseNotes = parts[0];
+  const parsed = parseTaskNotes(normNotes);
+  const baseNotes = parsed.baseNotes;
   const lines = baseNotes.split(/\r?\n/);
   const filteredLines = [];
 
@@ -182,9 +182,11 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
             let aiHashMatch = false;
             
             if (cleanNotes) {
-              const metaSplit = cleanNotes.split('---SYSTEM_METADATA---');
-              cleanNotes = metaSplit[0];
-              if (metaSplit.length > 1) metadataStr = metaSplit[1].trim();
+              const parsed = parseTaskNotes(cleanNotes);
+              cleanNotes = parsed.baseNotes;
+              if (parsed.metadata && Object.keys(parsed.metadata).length > 0) {
+                 metadataStr = JSON.stringify(parsed.metadata);
+              }
               
               cleanNotes = cleanNotes.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
               cleanNotes = cleanNotes.trim();
@@ -458,15 +460,9 @@ function runHourlyReview(targetDate) {
     goals: getSystemGoals(),
     activeMilestones: activeMilestones,
     allTasksContext: rawTasks.map(t => {
-       let cleanNotes = t.notes;
-       let metadata = {};
-       const metaSplit = cleanNotes.split('---SYSTEM_METADATA---');
-       if (metaSplit.length > 1) {
-          try {
-             metadata = JSON.parse(metaSplit[1].trim());
-          } catch(e) {}
-       }
-       cleanNotes = metaSplit[0].replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
+       const parsed = parseTaskNotes(t.notes);
+       let metadata = parsed.metadata || {};
+       let cleanNotes = parsed.baseNotes.replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
        cleanNotes = cleanNotes.replace(/\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
        return { 
          id: t.id,
@@ -696,8 +692,8 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       // Resolve due date (finalDue) early
       const originalDate = task.due;
       const rawNotes = task.notes || "";
-      const daMatch = rawNotes.match(/^DA:\s*(.*)$/m);
-      const daCommentText = daMatch ? daMatch[1].trim() : "";
+      const parsedNotes = parseTaskNotes(rawNotes);
+      const daCommentText = parsedNotes.daComment || "";
 
       let isFutureDate = false;
       if (originalDate && !originalDate.includes("2099-12-31")) {
@@ -804,7 +800,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
                 const subMeta = Object.assign({}, baseMetadata);
                 subMeta.duration = sub.estimatedDuration || "N/A";
                 
-                let cleanOriginalNotes = (task.notes || "").split('---SYSTEM_METADATA---')[0].trim();
+                let cleanOriginalNotes = parseTaskNotes(task.notes).cleanNotes;
                 
                 if (task.links && Array.isArray(task.links)) {
                    const emailLinkObj = task.links.find(l => l.type === "email");
@@ -869,15 +865,9 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       let milestoneLine = "";
       const otherNotes = [];
       
-      const parts = rawNotes.split('---SYSTEM_METADATA---');
-      const textBlock = parts[0];
-      
-      let existingMetadata = {};
-      if (parts.length > 1) {
-         try {
-           existingMetadata = JSON.parse(parts[1].trim());
-         } catch(e) {}
-      }
+      const parsedNoteData = parseTaskNotes(rawNotes);
+      const textBlock = parsedNoteData.baseNotes;
+      let existingMetadata = parsedNoteData.metadata || {};
       
       const isValidWebView = task.webViewLink && !task.webViewLink.toLowerCase().includes("tasks.google.com") && !task.webViewLink.toLowerCase().includes("/tasks") && !task.webViewLink.toLowerCase().includes("googleapis.com/tasks");
       let topLink = (isValidWebView ? task.webViewLink : "") || (task.links && task.links.length > 0 && task.links.find(l => {

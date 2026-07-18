@@ -57,7 +57,7 @@ async function getAccessToken() {
     return cachedToken;
 }
 
-const PRIVATE_TOKEN_PATH = '/Users/daniel/Documents/AGY/the_system/auth/token.json';
+const PRIVATE_TOKEN_PATH = path.join(__dirname, '../../auth/token.json');
 let cachedPrivateToken = null;
 let privateTokenExpiry = 0;
 
