@@ -158,25 +158,31 @@ function write84DayReport(markdownStr) {
 }
 
 function quarterlyReviewTriggerWrapper() {
-  const now = new Date();
-  const currentHour = now.getHours();
-  
-  // Set reference to May 10, 2026 (which is a Sunday)
-  const baseDate = new Date(Date.UTC(2026, 4, 10)); // Month is 0-indexed, 4 = May
-  
-  // Calculate days difference (ignoring hours/minutes to avoid DST drift)
-  const nowUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-  const diffTime = nowUtc.getTime() - baseDate.getTime();
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-  
-  // Execute every 84 days (diffDays % 84 === 0) at 9:00
-  if (diffDays >= 0 && diffDays % 84 === 0 && [9].includes(currentHour)) {
-    console.log("Executing 84-Day Strategic Review...");
-    try {
-      runTaskMasterEngine(); // Pre-clean
-    } catch(e) {}
-    runQuarterlyReview();
-  } else {
-    console.log(`Skipping 84-Day review. Days since base (May 10): ${diffDays}, Hour: ${currentHour}.`);
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    console.warn("Could not acquire script lock. Quarterly review is likely running.");
+    return;
+  }
+  try {
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    // Set reference to May 10, 2026 (which is a Sunday)
+    const baseDate = new Date(Date.UTC(2026, 4, 10)); // Month is 0-indexed, 4 = May
+    
+    // Calculate days difference (ignoring hours/minutes to avoid DST drift)
+    const nowUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    const diffTime = nowUtc.getTime() - baseDate.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Execute every 84 days (diffDays % 84 === 0) at 9:00
+    if (diffDays >= 0 && diffDays % 84 === 0 && [9].includes(currentHour)) {
+      console.log("Executing 84-Day Strategic Review...");
+      runQuarterlyReview();
+    } else {
+      console.log(`Skipping 84-Day review. Days since base (May 10): ${diffDays}, Hour: ${currentHour}.`);
+    }
+  } finally {
+    lock.releaseLock();
   }
 }

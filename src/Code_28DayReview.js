@@ -184,25 +184,31 @@ function write28DayReport(markdownStr) {
  * @returns {void}
  */
 function monthlyReviewTriggerWrapper() {
-  const now = new Date();
-  const currentHour = now.getHours();
-  
-  // Set reference to May 10, 2026 (which is a Sunday)
-  const baseDate = new Date(Date.UTC(2026, 4, 10)); // Month is 0-indexed, 4 = May
-  
-  // Calculate days difference (ignoring hours/minutes to avoid DST drift)
-  const nowUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-  const diffTimeMs = nowUtc.getTime() - baseDate.getTime();
-  const diffDays = Math.round(diffTimeMs / (1000 * 60 * 60 * 24));
-  
-  // Execute every 28 days (diffDays % 28 === 0) at 9:00
-  if (diffDays >= 0 && diffDays % 28 === 0 && [9].includes(currentHour)) {
-    console.log("Executing 28-Day Strategic Review...");
-    try {
-      runTaskMasterEngine(); // Pre-clean
-    } catch(e) {}
-    runMonthlyReview();
-  } else {
-    console.log(`Skipping 28-Day review. Days since base (May 10): ${diffDays}, Hour: ${currentHour}.`);
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    console.warn("Could not acquire script lock. Monthly review is likely running.");
+    return;
+  }
+  try {
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    // Set reference to May 10, 2026 (which is a Sunday)
+    const baseDate = new Date(Date.UTC(2026, 4, 10)); // Month is 0-indexed, 4 = May
+    
+    // Calculate days difference (ignoring hours/minutes to avoid DST drift)
+    const nowUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    const diffTimeMs = nowUtc.getTime() - baseDate.getTime();
+    const diffDays = Math.round(diffTimeMs / (1000 * 60 * 60 * 24));
+    
+    // Execute every 28 days (diffDays % 28 === 0) at 9:00
+    if (diffDays >= 0 && diffDays % 28 === 0 && [9].includes(currentHour)) {
+      console.log("Executing 28-Day Strategic Review...");
+      runMonthlyReview();
+    } else {
+      console.log(`Skipping 28-Day review. Days since base (May 10): ${diffDays}, Hour: ${currentHour}.`);
+    }
+  } finally {
+    lock.releaseLock();
   }
 }

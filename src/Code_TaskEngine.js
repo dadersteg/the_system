@@ -73,12 +73,21 @@ function getTaskMasterDailyPrompt() {
  * @returns {string} Output log string.
  */
 function runTaskMasterEngine() {
-  console.log("Starting Task Master Engine (Global Sweep)...");
-  const prompt = getTaskMasterSystemPrompt();
-  const res = _executeTaskMasterPipeline(prompt, false);
-  try { if (typeof purgeToBeDeletedTasks === "function") purgeToBeDeletedTasks(); } catch(e) { console.error(e); }
-  logSystemHeartbeat("TaskMasterEngine", "SUCCESS");
-  return res;
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    console.warn("Could not acquire script lock. TaskMasterEngine is already running.");
+    return "LOCKED";
+  }
+  try {
+    console.log("Starting Task Master Engine (Global Sweep)...");
+    const prompt = getTaskMasterSystemPrompt();
+    const res = _executeTaskMasterPipeline(prompt, false);
+    try { if (typeof purgeToBeDeletedTasks === "function") purgeToBeDeletedTasks(); } catch(e) { console.error(e); }
+    logSystemHeartbeat("TaskMasterEngine", "SUCCESS");
+    return res;
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /**
@@ -604,23 +613,24 @@ function runHourlyReview(targetDate) {
  * strictly at 6:00, 8:00, 12:00, 16:00, and 20:00.
  */
 function hourlyReviewTriggerWrapper() {
-  const currentHourStr = Utilities.formatDate(new Date(), "Europe/London", "H");
-  const currentHour = parseInt(currentHourStr, 10); 
-  
-  // Only execute during these specific hours
-  if ([6, 8, 12, 16, 20].includes(currentHour)) {
-    console.log(`Current hour is ${currentHour}. Cleaning tasks and then executing scheduled review.`);
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    console.warn("Could not acquire script lock. Hourly review is likely running.");
+    return;
+  }
+  try {
+    const currentHourStr = Utilities.formatDate(new Date(), "Europe/London", "H");
+    const currentHour = parseInt(currentHourStr, 10); 
     
-    // Ensure tasks are cleaned/categorized before generating the report
-    try {
-      runTaskMasterEngine(); 
-    } catch (e) {
-      console.warn("TaskMasterEngine failed during hourly pre-clean:", e.message);
+    // Only execute during these specific hours
+    if ([6, 8, 12, 16, 20].includes(currentHour)) {
+      console.log(`Current hour is ${currentHour}. Executing scheduled review.`);
+      runHourlyReview();
+    } else {
+      console.log(`Current hour is ${currentHour}. Skipping review (only runs at 6, 8, 12, 16, 20).`);
     }
-    
-    runHourlyReview();
-  } else {
-    console.log(`Current hour is ${currentHour}. Skipping review (only runs at 8, 12, 16, 20).`);
+  } finally {
+    lock.releaseLock();
   }
 }
 
@@ -810,13 +820,17 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
                      status: task.status
                  };
                  const movedParent = Tasks.Tasks.insert(newParentResource, todoListId);
-                 actualParentId = movedParent.id;
-                 actualParentListId = todoListId;
-                 
-                 if (isAssignedTask) {
-                     Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
+                 if (movedParent && movedParent.id) {
+                     actualParentId = movedParent.id;
+                     actualParentListId = todoListId;
+                     
+                     if (isAssignedTask) {
+                         Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
+                     } else {
+                         Tasks.Tasks.remove(listId, u.taskId);
+                     }
                  } else {
-                     Tasks.Tasks.remove(listId, u.taskId);
+                     throw new Error("Failed to insert parent task");
                  }
              } catch (e) {
                  console.error(`Failed to move parent task: ${e.message}`);
@@ -1081,21 +1095,25 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
           };
           
           const createdTask = Tasks.Tasks.insert(newTask, targetListId);
-          activeTaskId = createdTask.id;
-          
-          if (isAssignedTask) {
-             console.log(`Assigned task identified. Marking original task ${u.taskId} as completed.`);
-             Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
-             PropertiesService.getScriptProperties().deleteProperty("ai_hash_" + u.taskId);
-             PropertiesService.getScriptProperties().setProperty("ai_hash_" + createdTask.id, currentHash);
+          if (createdTask && createdTask.id) {
+              activeTaskId = createdTask.id;
+              
+              if (isAssignedTask) {
+                 console.log(`Assigned task identified. Marking original task ${u.taskId} as completed.`);
+                 Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
+                 PropertiesService.getScriptProperties().deleteProperty("ai_hash_" + u.taskId);
+                 PropertiesService.getScriptProperties().setProperty("ai_hash_" + createdTask.id, currentHash);
+              } else {
+                 console.log(`Standard task identified. Removing original task ${u.taskId}.`);
+                 try {
+                    Tasks.Tasks.remove(listId, u.taskId);
+                 } catch (e) {
+                    console.warn(`Failed to remove task ${u.taskId}, marking completed: ${e.message}`);
+                    Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
+                 }
+              }
           } else {
-             console.log(`Standard task identified. Removing original task ${u.taskId}.`);
-             try {
-                Tasks.Tasks.remove(listId, u.taskId);
-             } catch (e) {
-                console.warn(`Failed to remove task ${u.taskId}, marking completed: ${e.message}`);
-                Tasks.Tasks.patch({ status: "completed" }, listId, u.taskId);
-             }
+              throw new Error("Failed to insert standard task");
           }
       } else {
           if (isAssignedTask) {

@@ -78,6 +78,13 @@ const Tasks = {
   }
 };
 
+global.LockService = {
+  getScriptLock: () => ({
+    tryLock: (ms) => true,
+    releaseLock: () => {}
+  })
+};
+
 const Utilities = {
   sleep: () => {},
   formatDate: (date, tz, fmt) => '2026-06-02',
@@ -185,6 +192,7 @@ const sandbox = {
   MimeType,
   SpreadsheetApp,
   PropertiesService,
+  LockService,
   console: consoleMock,
   callGemini: callGeminiMock,
   selectModelForPayload: () => 'gemini-1.5-pro',

@@ -207,17 +207,23 @@ function write7DayRoadmap(markdownStr) {
 }
 
 function weeklyReviewTriggerWrapper() {
-  const currentDay = new Date().getDay(); // 0 is Sunday, 5 is Friday
-  // Execute only on Sunday at 9:00
-  const currentHour = new Date().getHours();
-  
-  if (currentDay === 0 && [9].includes(currentHour)) {
-    console.log("Executing weekly 7-Day Review...");
-    try {
-      runTaskMasterEngine(); // Pre-clean
-    } catch(e) {}
-    runWeeklyReview();
-  } else {
-    console.log(`Skipping weekly review (Day: ${currentDay}, Hour: ${currentHour}).`);
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    console.warn("Could not acquire script lock. Weekly review is likely running.");
+    return;
+  }
+  try {
+    const currentDay = new Date().getDay(); // 0 is Sunday, 5 is Friday
+    // Execute only on Sunday at 9:00
+    const currentHour = new Date().getHours();
+    
+    if (currentDay === 0 && [9].includes(currentHour)) {
+      console.log("Executing weekly 7-Day Review...");
+      runWeeklyReview();
+    } else {
+      console.log(`Skipping weekly review (Day: ${currentDay}, Hour: ${currentHour}).`);
+    }
+  } finally {
+    lock.releaseLock();
   }
 }
