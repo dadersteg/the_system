@@ -116,9 +116,7 @@ State which task you picked, why, and what you skipped. If nothing is eligible
    before/after state.
 5. Open a PR carrying: finding ID, what changed and why, the failing→passing test,
    a dry-run/diff for any data operation, and rollback steps.
-6. Request approval. On explicit approval, push and deploy the change yourself,
-   then verify in prod (READ-ONLY) that it behaves. If approval isn't given in this
-   conversation, leave it as an open PR and record that state.
+6. Request approval using the `/grill-me` protocol: you MUST use the `ask_question` tool to provide a summary of the changes and explicitly ask the user for their action on the PR (e.g., Approve, Reject, Needs Changes). On explicit approval, push and deploy the change yourself, then verify in prod (READ-ONLY) that it behaves. If approval isn't given in this conversation, leave it as an open PR and record that state.
 
 # STEP 3 — UPDATE THE DOCS, THEN STOP  (this is the handoff — never skip it)
 The next agent picks its task from these files, so they must reflect reality:
