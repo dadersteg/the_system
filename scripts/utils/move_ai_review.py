@@ -1,22 +1,13 @@
 import json
-from google.oauth2.credentials import Credentials
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from lib.google_auth import get_service, get_credentials
 from googleapiclient.discovery import build
 
-def get_service(token_file):
-    with open(token_file, 'r') as f:
-        creds_data = json.load(f)
-    creds = Credentials(
-        token=creds_data['token'],
-        refresh_token=creds_data['refresh_token'],
-        token_uri=creds_data['token_uri'],
-        client_id=creds_data['client_id'],
-        client_secret=creds_data['client_secret']
-    )
-    return build('tasks', 'v1', credentials=creds)
-
 def main():
-    service_priv = get_service('auth/token.json')
-    service_pmt = get_service('auth/token_tasks_work.json')
+    service_priv = get_service('tasks', 'v1', 'auth/token.json')
+    service_pmt = get_service('tasks', 'v1', 'auth/token_tasks_work.json')
     
     priv_ai_review_id = 'ZzZ0aHpMNDJzNEJmMnJhUw'
     

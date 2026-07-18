@@ -1,8 +1,11 @@
 import os
 import json
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from lib.google_auth import get_service, get_credentials
 from collections import defaultdict
 from email.utils import parsedate_to_datetime
-from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
 BASE_DIR = "/Users/daniel/Documents/AGY/the_system"

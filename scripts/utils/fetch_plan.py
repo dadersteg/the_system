@@ -1,21 +1,13 @@
 import json
 import sys
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from lib.google_auth import get_service, get_credentials
+import sys
 
 def get_file(token_file, file_id, out_name):
-    with open(token_file, 'r') as f:
-        creds_data = json.load(f)
     
-    creds = Credentials(
-        token=creds_data['token'],
-        refresh_token=creds_data['refresh_token'],
-        token_uri=creds_data['token_uri'],
-        client_id=creds_data['client_id'],
-        client_secret=creds_data['client_secret']
-    )
-    
-    service = build('drive', 'v3', credentials=creds)
+    service = get_service('drive', 'v3', token_file)
     content = service.files().get_media(fileId=file_id).execute().decode('utf-8')
     with open(out_name, 'w') as f:
         f.write(content)
