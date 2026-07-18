@@ -83,7 +83,13 @@ function runTaskMasterEngine() {
     const prompt = getTaskMasterSystemPrompt();
     const res = _executeTaskMasterPipeline(prompt, false);
     try { if (typeof purgeToBeDeletedTasks === "function") purgeToBeDeletedTasks(); } catch(e) { console.error(e); }
-    logSystemHeartbeat("TaskMasterEngine", "SUCCESS");
+    try { if (typeof purgeQuarantineTasks === "function") purgeQuarantineTasks(); } catch(e) { console.error(e); }
+    
+    if (res === undefined || (typeof res === "string" && res.startsWith("PARTIAL_FAILURE"))) {
+       logSystemHeartbeat("TaskMasterEngine", "FAILURE");
+    } else {
+       logSystemHeartbeat("TaskMasterEngine", "SUCCESS");
+    }
     return res;
   } finally {
     lock.releaseLock();
@@ -100,6 +106,13 @@ function runTaskMasterDailyPlan() {
   const prompt = getTaskMasterDailyPrompt();
   const res = _executeTaskMasterPipeline(prompt, true);
   try { if (typeof purgeToBeDeletedTasks === "function") purgeToBeDeletedTasks(); } catch(e) { console.error(e); }
+  try { if (typeof purgeQuarantineTasks === "function") purgeQuarantineTasks(); } catch(e) { console.error(e); }
+  
+  if (res === undefined || (typeof res === "string" && res.startsWith("PARTIAL_FAILURE"))) {
+     logSystemHeartbeat("TaskMasterDailyPlan", "FAILURE");
+  } else {
+     logSystemHeartbeat("TaskMasterDailyPlan", "SUCCESS");
+  }
   return res;
 }
 
@@ -333,7 +346,11 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
       
       aiResult.taskUpdates = aiResult.taskUpdates.filter(u => u && typeof u === 'object' && u.taskId);
       console.log(`Applying updates to ${aiResult.taskUpdates.length} tasks...`);
-      processTaskUpdates(aiResult.taskUpdates, taskIdMap, importerListId, todoListId);
+      const success = processTaskUpdates(aiResult.taskUpdates, taskIdMap, importerListId, todoListId);
+      if (!success) {
+          console.error("Finished applying task updates with errors.");
+          return "PARTIAL_FAILURE: Processed tasks with some errors.";
+      }
       console.log(`Successfully finished applying task updates.`);
   } else {
      console.warn("No task updates returned from Gemini.");
@@ -664,15 +681,17 @@ function executeTaskMasterGemini(payloadObj, systemInstruction) {
  * @param {string} todoListId Destination ToDo list ID key.
  */
 function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
-  if (!updates || updates.length === 0) return;
+  if (!updates || updates.length === 0) return true;
   
   console.log("=== AI ROUTING DECISIONS ===");
   console.log(JSON.stringify(updates, null, 2));
   console.log("============================");
   
+  let hasErrors = false;
   updates.forEach(u => {
     if (!u || typeof u !== 'object') {
        console.warn("Invalid task update object: ", JSON.stringify(u));
+       hasErrors = true;
        return;
     }
     try {
@@ -1121,8 +1140,10 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       Utilities.sleep(100);
     } catch (e) {
       console.error("Failed to update task: " + u.taskId, e.message);
+      hasErrors = true;
     }
   });
+  return !hasErrors;
 }
 
 

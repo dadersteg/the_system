@@ -3,10 +3,12 @@ import re
 import datetime
 import json
 import time
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+from lib.config import (
+    PRIVATE_TOKEN_PATH,
+    WORK_TOKEN_PATH,
+    AUTH_DIR
+)
+from lib.google_auth import get_service
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
 
@@ -31,36 +33,6 @@ REDACTION_PATTERNS = [
     # Specific sensitive project/client names can be added here
 ]
 
-def get_credentials(token_path, creds_path, account_name):
-    """Authenticate and return credentials for a given account."""
-    creds = None
-    if os.path.exists(token_path):
-        creds = Credentials.from_authorized_user_file(token_path)
-    
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            print(f"Refreshing expired token for {account_name}...")
-            try:
-                creds.refresh(Request())
-            except Exception as e:
-                print(f"Failed to refresh token: {e}. Re-authenticating...")
-                creds = None
-        
-        if not creds:
-            if not os.path.exists(creds_path):
-                print(f"Error: Client secrets file '{creds_path}' not found for {account_name}.")
-                print(f"Please place your OAuth client ID credentials in '{creds_path}'.")
-                return None
-            
-            print(f"Error: Credentials missing or expired for {account_name}. Cannot authenticate interactively in cron.")
-            import sys
-            sys.exit(1)
-            
-        with open(token_path, 'w') as token:
-            token.write(creds.to_json())
-            print(f"Token saved to {token_path}")
-            
-    return creds
 
 def fetch_all_pages(request_method, **kwargs):
     """Fetches all pages from a paginated Google API list method, with retry and backoff."""
@@ -481,35 +453,22 @@ def main():
     print("====================================================")
 
     # 1. Setup paths
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    auth_dir = os.path.realpath(os.path.join(script_dir, '../../auth'))
-
-    private_token = os.path.join(auth_dir, 'token_tasks_private.json' if os.path.exists(os.path.join(auth_dir, 'token_tasks_private.json')) else 'token_tasks.json')
-    private_creds = os.path.join(auth_dir, 'creds_private.json' if os.path.exists(os.path.join(auth_dir, 'creds_private.json')) else 'creds.json')
-    
-    work_token = os.path.join(auth_dir, 'token_tasks_work.json')
-    work_creds = os.path.join(auth_dir, 'creds_work.json')
-    
-    output_md = os.path.join(auth_dir, 'Google Tasks (Combined).md')
-    output_private_md = os.path.join(auth_dir, 'Google Tasks (Private).md')
-    output_work_md = os.path.join(auth_dir, 'Google Tasks (Work).md')
+    output_md = os.path.join(AUTH_DIR, 'Google Tasks (Combined).md')
+    output_private_md = os.path.join(AUTH_DIR, 'Google Tasks (Private).md')
+    output_work_md = os.path.join(AUTH_DIR, 'Google Tasks (Work).md')
 
     # 2. Get Private API Service
     print("\n[Auth] Fetching credentials for Private Account...")
-    private_auth = get_credentials(private_token, private_creds, "Private Account")
-    private_service = None
-    if private_auth:
-        private_service = build('tasks', 'v1', credentials=private_auth)
+    private_service = get_service('tasks', 'v1', PRIVATE_TOKEN_PATH, None, "Private Account")
+    if private_service:
         print("Private Google Tasks API Connected.")
     else:
         print("Warning: Private Tasks API could not be connected. Skipping private sync.")
 
     # 3. Get Work API Service
     print("\n[Auth] Fetching credentials for Work Account (Playmetech / Playmetech)...")
-    work_auth = get_credentials(work_token, work_creds, "Work Account")
-    work_service = None
-    if work_auth:
-        work_service = build('tasks', 'v1', credentials=work_auth)
+    work_service = get_service('tasks', 'v1', WORK_TOKEN_PATH, None, "Work Account")
+    if work_service:
         print("Work Google Tasks API Connected.")
     else:
         print("Warning: Work Tasks API could not be connected. Skipping work sync.")

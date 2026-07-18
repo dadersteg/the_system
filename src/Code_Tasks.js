@@ -729,6 +729,214 @@ function purgeToBeDeletedTasks() {
   console.log(`Successfully purged ${deletedCount} tasks from the To Be Deleted list.`);
 }
 
+/**
+ * Hard purges tasks in the 'Triage Quarantine' list that are older than 14 days.
+ */
+function purgeQuarantineTasks() {
+  console.log("Purging old tasks from 'Triage Quarantine' list...");
+  let quarantineListId = null;
+  try {
+     const response = Tasks.Tasklists.list();
+     const items = response.items || [];
+     const quarantineList = items.find(list => (list.title || "") === "Triage Quarantine");
+     if (quarantineList) quarantineListId = quarantineList.id;
+  } catch (e) {
+     console.error("Failed to find quarantine list: " + e.message);
+     return;
+  }
+  
+  if (!quarantineListId) {
+     console.log("No Triage Quarantine list found. Skipping purge.");
+     return;
+  }
+  
+  const ss = getMasterSpreadsheet();
+  const validPaths = loadValidTaxonomyPaths(ss);
+  const COMPLETED_LOG_GID = SYSTEM_CONFIG.SHEETS.COMPLETED_TASKS_LOG;
+  let completedSheet = ss.getSheets().find(s => s.getSheetId().toString() === COMPLETED_LOG_GID);
+  
+  let existingIds = new Set();
+  if (completedSheet) {
+    try {
+      const existingData = completedSheet.getDataRange().getValues();
+      let headerRowIdx = 0;
+      if (existingData.length > 1 && existingData[0].findIndex(h => h.toString().trim().toLowerCase() === "link") === -1) {
+        headerRowIdx = 1;
+      }
+      const headers = getExportHeaders();
+      const taskIdIdx = headers.indexOf("Task ID") !== -1 ? headers.indexOf("Task ID") : 15;
+      
+      for (let i = headerRowIdx + 1; i < existingData.length; i++) {
+        const row = existingData[i];
+        const tid = row.length > taskIdIdx ? row[taskIdIdx] : row[0];
+        if (tid) {
+          existingIds.add(tid);
+        }
+      }
+    } catch (e) {
+      console.warn("Could not read existing data from completed log: " + e.message);
+    }
+  }
+  
+  let pageToken;
+  let deletedCount = 0;
+  const PURGE_THRESHOLD_MS = 14 * 24 * 60 * 60 * 1000;
+  const nowMs = Date.now();
+  
+  do {
+    try {
+      const response = executeWithRetry(() => Tasks.Tasks.list(quarantineListId, {
+        showCompleted: true,
+        showHidden: true, showAssigned: true,
+        maxResults: 100,
+        pageToken: pageToken
+      }));
+      
+      const items = response.items || [];
+      const rowsToAdd = [];
+      const idsToDelete = [];
+      
+      for (const t of items) {
+         try {
+           const taskUpdatedMs = new Date(t.updated || t.completed || new Date().toISOString()).getTime();
+           if (nowMs - taskUpdatedMs < PURGE_THRESHOLD_MS) {
+               continue; // Keep it if younger than 14 days
+           }
+           
+           idsToDelete.push(t.id);
+           PropertiesService.getScriptProperties().deleteProperty("ai_hash_" + t.id);
+           
+           if (completedSheet && !existingIds.has(t.id)) {
+              let link = "";
+              if (t.links) {
+                const emailLinkObj = t.links.find(l => l.type === "email");
+                if (emailLinkObj) link = emailLinkObj.link;
+              }
+              if (!link && t.webViewLink) {
+                const wl = t.webViewLink.toLowerCase();
+                if (!wl.includes("tasks.google.com") && !wl.includes("/tasks") && !wl.includes("googleapis.com/tasks")) {
+                  link = t.webViewLink;
+                }
+              }
+              let duration = "N/A", goal = "TBD", category = "N/A", deadline = "";
+              const parsed = typeof parseTaskNotes === "function" ? parseTaskNotes(t.notes || "") : { baseNotes: t.notes || "", metadata: {} };
+              if (parsed.metadata && Object.keys(parsed.metadata).length > 0) {
+                   duration = parsed.metadata.duration || "N/A";
+                   goal = parsed.metadata.goal || "TBD";
+                   category = parsed.metadata.category_path || "N/A";
+                   deadline = parsed.metadata.deadline || (t.due ? Utilities.formatDate(new Date(t.due), "Europe/London", "yyyy-MM-dd") : "");
+              }
+              let cleanNotes = parsed.baseNotes.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
+              cleanNotes = cleanNotes.trim();
+              if (cleanNotes.length > 49000) {
+                 cleanNotes = cleanNotes.substring(0, 49000) + "\n...[TRUNCATED TO FIT GOOGLE SHEETS LIMIT]";
+              }
+              
+              const notesLink = extractExternalLinkFromText(cleanNotes) || "";
+              if (notesLink) {
+                cleanNotes = cleanNotes.replace(notesLink, "").trim();
+              }
+              const finalLink = link || notesLink;
+
+              const resolved = resolveCategoryAndTitle(t.title, category, validPaths);
+              let computedCategory = resolved.category;
+              let computedTitle = resolved.title;
+
+              const compDate = new Date(t.updated || t.completed || new Date().toISOString());
+              const compTimeStr = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd HH:mm:ss");
+              const cleanCompTime = Utilities.formatDate(compDate, "Europe/London", "yyyy-MM-dd");
+              const urn = `urn:task:completed-${t.id}`;
+
+              let parentCategory = computedCategory;
+              let subCategory = "";
+              if (computedCategory.indexOf(">") !== -1) {
+                const catParts = computedCategory.split(">");
+                parentCategory = catParts[0].trim();
+                subCategory = catParts.slice(1).join(">").trim();
+              }
+
+              const milestoneVal = extractMilestone(t.title, t.notes);
+
+              rowsToAdd.push([
+                urn,
+                "Triage Quarantine",
+                parentCategory,
+                subCategory,
+                milestoneVal,
+                computedTitle,
+                cleanNotes,
+                "Quarantine Purged",
+                deadline,
+                compTimeStr,
+                duration,
+                goal,
+                finalLink,
+                "",
+                "",
+                t.id,
+                quarantineListId,
+                "deleted"
+              ]);
+              existingIds.add(t.id);
+           }
+         } catch (e) {
+           console.error(`Failed to process quarantine task ${t.id}: ${e.message}`);
+         }
+      }
+      
+      // Step 1: Write to spreadsheet FIRST to prevent data loss
+      let spreadsheetSuccess = false;
+      if (completedSheet && rowsToAdd.length > 0) {
+         try {
+             const lastRow = completedSheet.getLastRow();
+             if (lastRow <= 1) {
+                 const headers = getExportHeaders();
+                 completedSheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight("bold");
+                 const idColStartIndex = headers.indexOf("Task ID") + 1;
+                 if (idColStartIndex > 0) {
+                    completedSheet.hideColumns(idColStartIndex, 3);
+                 } else {
+                    completedSheet.hideColumns(16, 3);
+                 }
+                 completedSheet.getRange(2, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
+             } else {
+                 completedSheet.getRange(lastRow + 1, 1, rowsToAdd.length, rowsToAdd[0].length).setValues(rowsToAdd);
+             }
+             spreadsheetSuccess = true;
+         } catch (e) {
+             console.error("CRITICAL ERROR: Failed to write quarantine tasks to spreadsheet. Aborting deletion to prevent data loss. Error: " + e.message);
+             spreadsheetSuccess = false;
+         }
+      } else if (!completedSheet) {
+         spreadsheetSuccess = false; 
+         console.warn("No completedSheet found. Quarantine tasks will not be purged.");
+      } else {
+         spreadsheetSuccess = true;
+      }
+      
+      // Step 2: Only delete if spreadsheet write succeeded
+      if (spreadsheetSuccess) {
+          for (const tid of idsToDelete) {
+             try {
+                 executeWithRetry(() => Tasks.Tasks.remove(quarantineListId, tid));
+                 deletedCount++;
+                 Utilities.sleep(500); // Rate-limit protection
+             } catch (e) {
+                 console.error(`Failed to delete quarantine task ${tid}: ${e.message}`);
+             }
+          }
+      }
+      
+      pageToken = response.nextPageToken;
+    } catch (e) {
+      console.error(`Failed to fetch tasks from Quarantine list: ${e.message}`);
+      break;
+    }
+  } while (pageToken);
+  
+  console.log(`Successfully purged ${deletedCount} tasks from Triage Quarantine (older than 14 days).`);
+}
+
 
 // ============================================================================
 // SECTION 5: MARKDOWN BACKUP & GOOGLE DRIVE EXPORT
