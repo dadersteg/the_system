@@ -72,7 +72,7 @@
   {
     "name": "01 Private/02 Health/01 Physical Health/Medical Appointments & Tests",
     "leaf": "Medical Appointments & Tests",
-    "unread_count": 1
+    "unread_count": 0
   },
   {
     "name": "01 Private/02 Health/02 Mental Health",
@@ -267,7 +267,7 @@
   {
     "name": "01 Private/05 Other/01 Projects/AI",
     "leaf": "AI",
-    "unread_count": 21
+    "unread_count": 22
   },
   {
     "name": "01 Private/05 Other/01 Projects/Clothes",
@@ -362,7 +362,7 @@
   {
     "name": "01 Private/05 Other/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 35
+    "unread_count": 36
   },
   {
     "name": "01 Private/05 Other/03 Collections/Star Wars",
@@ -535,11 +535,6 @@
     "unread_count": 0
   },
   {
-    "name": "02 Work/01 Employment/01 Quantum 21",
-    "leaf": "01 Quantum 21",
-    "unread_count": 1
-  },
-  {
     "name": "02 Work/01 Employment/99 Archive",
     "leaf": "99 Archive",
     "unread_count": 0
@@ -627,7 +622,7 @@
   {
     "name": "02 Work/03 Collections/Newsletters",
     "leaf": "Newsletters",
-    "unread_count": 12
+    "unread_count": 13
   },
   {
     "name": "03 Studies",
@@ -722,7 +717,7 @@
   {
     "name": "99 To be deleted",
     "leaf": "99 To be deleted",
-    "unread_count": 5
+    "unread_count": 4
   },
   {
     "name": "99 WhatsApp",
