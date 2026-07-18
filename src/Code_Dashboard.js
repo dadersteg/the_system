@@ -22,9 +22,59 @@ function debugGetHeaders() {
    });
 }
 
+/**
+ * Verifies if the request is authorized by either having a valid webapp secret
+ * in query parameters or if the user is in the allowed email list.
+ * 
+ * @param {Object} e - The Apps Script doGet event object.
+ * @returns {boolean} True if authorized, false otherwise.
+ */
+function isAuthorized(e) {
+  const secret = getEnvProp("WEBAPP_SECRET");
+  if (secret && typeof secret === 'string' && secret.trim() !== "") {
+    if (e && e.parameter && e.parameter.secret === secret) {
+      return true;
+    }
+  }
+
+  const allowedEmails = [
+    "adersteg.daniel@gmail.com",
+    "daniel@playmetech.net",
+    "daniel@playmetech.com"
+  ];
+
+  try {
+    const activeEmail = Session.getActiveUser().getEmail();
+    const effectiveEmail = Session.getEffectiveUser().getEmail();
+
+    if (e) {
+      // In a web app request context, we can only trust the active user's identity.
+      // If activeEmail is in the allowlist, they are authorized.
+      if (activeEmail && allowedEmails.indexOf(activeEmail.toLowerCase()) !== -1) {
+        return true;
+      }
+    } else {
+      // In a non-web request context (triggers, editor runs), we trust getEffectiveUser().
+      if (effectiveEmail && allowedEmails.indexOf(effectiveEmail.toLowerCase()) !== -1) {
+        return true;
+      }
+    }
+  } catch (err) {
+    console.warn("isAuthorized: check failed: " + err.message);
+  }
+
+  return false;
+}
+
 function doGet(e) {
+  if (!isAuthorized(e)) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 401, error: "Unauthorized" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   const healthRes = processHealthRequest(e);
   if (healthRes) return healthRes;
+
 
   if (e && e.parameter && e.parameter.action === "readDocBypass") {
      return readDocBypass(e.parameter.fileId);
