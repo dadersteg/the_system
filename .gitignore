@@ -34,3 +34,10 @@ venv/
 
 # Sync duplicates/conflict folders
 _archive/sync_duplicates/
+
+# Security and Local database backups/configs
+Fca_Database/
+*.sqlite
+.clasp-*backup.json
+tasks_private.json
+tasks_pmt.json
