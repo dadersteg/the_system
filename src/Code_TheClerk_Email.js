@@ -224,12 +224,12 @@ function _syncTasksForThread(validActions, primaryCategoryLabel, labelToPathMap,
             metadata.deadline = deadlineVal;
         }
 
-        const baseNotes = `${threadUrl}\nContext: ${finalCategoryPath}\n\n${actionTitle}\n\nSYS: Pending initial review.\nDA:\n\n`;
         const dueVal = (deadlineVal !== "None") ? deadlineVal + "T00:00:00.000Z" : "";
-        const initialHash = getStandardizedTaskHash(cleanTitle, baseNotes, dueVal, "needsAction", true);
+        const tempNotesForHash = buildTaskNotes(threadUrl, finalCategoryPath, actionTitle, {}, undefined, undefined, "Context: ", "");
+        const initialHash = getStandardizedTaskHash(cleanTitle, tempNotesForHash, dueVal, "needsAction", true);
         metadata.ai_hash = initialHash;
 
-        const notes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+        const notes = buildTaskNotes(threadUrl, finalCategoryPath, actionTitle, metadata, undefined, undefined, "Context: ", "");
 
         try {
            const taskPayload = {
@@ -552,7 +552,11 @@ function callLLMWithSourceContext(subject, from, body, docInstructions, taxonomy
         return null; // Fatal failure
       }
       
-      const rawText = JSON.parse(response.getContentText()).candidates[0].content.parts[0].text;
+      const json = JSON.parse(response.getContentText());
+      if (!json.candidates || json.candidates.length === 0 || !json.candidates[0].content || !json.candidates[0].content.parts || json.candidates[0].content.parts.length === 0) {
+        throw new Error("Empty candidates returned from Gemini API");
+      }
+      const rawText = json.candidates[0].content.parts[0].text;
       
       // Fix: Use greedy regex to match the full JSON object, or just strip markdown and parse.
       let cleanText = rawText.replace(/```json/gi, '').replace(/```/gi, '').trim();

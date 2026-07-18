@@ -143,16 +143,16 @@ function processRunningNoteById(fileId, batchLogs, recentContext = "") {
                 data.tasks.forEach(t => {
                     if (t.title) {
                         try {
-                             const baseNotes = `${file.getUrl()}\n[Source: ${file.getName()}]\n\n${t.notes || ""}\n\nSYS: Pending initial review.\nDA:\n\n`;
+                             const tempNotesForHash = buildTaskNotes(file.getUrl(), file.getName(), t.notes, {});
                              const metadata = {
                                 duration: "15m",
                                 goal: "Maintenance",
                                 category_path: "Inbox",
                                 created_at: new Date().toISOString()
                              };
-                             const initialHash = getStandardizedTaskHash(t.title, baseNotes, "", "needsAction", true);
+                             const initialHash = getStandardizedTaskHash(t.title, tempNotesForHash, "", "needsAction", true);
                              metadata.ai_hash = initialHash;
-                             const taskNotes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+                             const taskNotes = buildTaskNotes(file.getUrl(), file.getName(), t.notes, metadata);
                              const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
                              Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
                             tasksCreated++;
@@ -268,16 +268,16 @@ function processNotesFolder(folderId, mode, systemPrompt, taxonomyJson, batchLog
                         data.tasks.forEach(t => {
                             if (t.title) {
                                 try {
-                                     const baseNotes = `${file.getUrl()}\n[Source: ${file.getName()}]\n\n${t.notes || ""}\n\nSYS: Pending initial review.\nDA:\n\n`;
+                                     const tempNotesForHash = buildTaskNotes(file.getUrl(), file.getName(), t.notes, {});
                                      const metadata = {
                                         duration: "15m",
                                         goal: "Maintenance",
                                         category_path: "Inbox",
                                         created_at: new Date().toISOString()
                                      };
-                                     const initialHash = getStandardizedTaskHash(t.title, baseNotes, "", "needsAction", true);
+                                     const initialHash = getStandardizedTaskHash(t.title, tempNotesForHash, "", "needsAction", true);
                                      metadata.ai_hash = initialHash;
-                                     const taskNotes = `${baseNotes}---SYSTEM_METADATA---\n${JSON.stringify(metadata)}`;
+                                     const taskNotes = buildTaskNotes(file.getUrl(), file.getName(), t.notes, metadata);
                                      const listId = SYSTEM_CONFIG.TASKS.AI_REVIEW_LIST_ID || SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
                                      Tasks.Tasks.insert({ title: t.title, notes: taskNotes.trim() }, listId);
                                     tasksCreated++;
@@ -372,8 +372,6 @@ function processNotesFolder(folderId, mode, systemPrompt, taxonomyJson, batchLog
 }
 
 function askGeminiNotes(mode, text, systemPrompt, taxonomyJson, recentContext = "") {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${NOTES_MODEL}:generateContent?key=${NOTES_KEY}`;
-    
     const currentDate = Utilities.formatDate(new Date(), "GMT", "yyyy-MM-dd");
     let parts = [
         { text: `[SYSTEM TIME CONTEXT: The current date is ${currentDate}]\n\n` + systemPrompt }
@@ -389,33 +387,11 @@ function askGeminiNotes(mode, text, systemPrompt, taxonomyJson, recentContext = 
     
     parts.push({ text: "--- RAW NOTE TEXT ---\n" + text });
     
-    const options = {
-        method: "post",
-        contentType: "application/json",
-        payload: JSON.stringify({
-            contents: [{ role: "user", parts: parts }],
-            generationConfig: { response_mime_type: "application/json", temperature: 0.1 }
-        }),
-        muteHttpExceptions: true
-    };
-    
-    try {
-        const resp = UrlFetchApp.fetch(url, options);
-        if (resp.getResponseCode() === 200) {
-            const res = JSON.parse(resp.getContentText());
-            let raw = res.candidates[0].content.parts[0].text;
-            
-            raw = raw.replace(/^```json/m, "").replace(/```$/m, "").trim();
-            const match = raw.match(/\{[\s\S]*\}/);
-            if (!match) throw new Error("No JSON object found in response");
-            
-            return { status: "SUCCESS", data: JSON.parse(match[0]) };
-        } else {
-            return { status: "ERROR", message: `HTTP ${resp.getResponseCode()} - ${resp.getContentText()}` };
-        }
-    } catch (e) {
-        return { status: "ERROR", message: e.message };
+    const result = callGemini(parts, "gemini-1.5-flash", "You are an assistant.", null, false);
+    if (result && !result.error) {
+        return { status: "SUCCESS", data: result };
     }
+    return { status: "ERROR", message: result ? result.error : "Unknown error" };
 }
 
 function getPromptText(promptId, fallback) {

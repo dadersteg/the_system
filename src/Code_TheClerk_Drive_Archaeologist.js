@@ -233,33 +233,18 @@ For each file, output JSON strictly in this format:
 
     // Process each individually or as a small batch
     const model = SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE;
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY}`;
-
     const parts = [{ text: systemPrompt }];
     candidates.forEach((c, i) => {
         parts.push({ text: `--- FILE [${i}] ---\nName: ${c.name}\nPath: ${c.folderPath}\nDesc: ${c.desc}` });
     });
 
-    const payload = {
-        contents: [{ role: "user", parts: parts }],
-        generationConfig: { response_mime_type: "application/json", temperature: 0.1 }
-    };
-
-    const options = {
-        method: "post",
-        contentType: "application/json",
-        payload: JSON.stringify(payload),
-        muteHttpExceptions: true
-    };
-
     try {
-        const resp = UrlFetchApp.fetch(url, options);
-        if (resp.getResponseCode() === 200) {
-            const resData = JSON.parse(resp.getContentText());
-            const rawText = resData.candidates[0].content.parts[0].text;
-            const match = rawText.match(/\[[\s\S]*\]/);
-            if (match) {
-                const aiDecisions = JSON.parse(match[0]);
+        const aiDecisions = callGemini(parts, model, systemPrompt, null, false);
+        if (!aiDecisions || aiDecisions.error) {
+             console.error("Gemini Archeology Error:", aiDecisions ? aiDecisions.error : "Unknown");
+             return;
+        }
+        if (Array.isArray(aiDecisions)) {
                 const newRows = [];
                 aiDecisions.forEach((dec, i) => {
                     if (dec.decision === "ARCHIVE") {

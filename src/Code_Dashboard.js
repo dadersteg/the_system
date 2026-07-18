@@ -1626,15 +1626,10 @@ function getDashboardClerkLogs() { const startT = Date.now();
             let hasCreatedAt = false;
             
             if (t.notes) {
-              const metaSplit = t.notes.split('---SYSTEM_METADATA---');
-              if (metaSplit.length > 1) {
-                try {
-                  const meta = JSON.parse(metaSplit[1].trim());
-                  if (meta.created_at) {
-                    dateVal = new Date(meta.created_at).toISOString();
+              const parsed = parseTaskNotes(t.notes);
+              if (parsed.metadata && parsed.metadata.created_at) {
+                    dateVal = new Date(parsed.metadata.created_at).toISOString();
                     hasCreatedAt = true;
-                  }
-                } catch(e) {}
               }
             }
             

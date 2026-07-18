@@ -126,8 +126,8 @@ function getStandardizedTaskHash(title, notes, due, status, stripTitleTags) {
   }
   normTitle = normTitle.replace(/\s+/g, " ").trim();
 
-  const parts = normNotes.split('---SYSTEM_METADATA---');
-  const baseNotes = parts[0];
+  const parsed = parseTaskNotes(normNotes);
+  const baseNotes = parsed.baseNotes;
   const lines = baseNotes.split(/\r?\n/);
   const filteredLines = [];
 
@@ -191,9 +191,11 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
             let aiHashMatch = false;
             
             if (cleanNotes) {
-              const metaSplit = cleanNotes.split('---SYSTEM_METADATA---');
-              cleanNotes = metaSplit[0];
-              if (metaSplit.length > 1) metadataStr = metaSplit[1].trim();
+              const parsed = parseTaskNotes(cleanNotes);
+              cleanNotes = parsed.baseNotes;
+              if (parsed.metadata && Object.keys(parsed.metadata).length > 0) {
+                 metadataStr = JSON.stringify(parsed.metadata);
+              }
               
               cleanNotes = cleanNotes.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
               cleanNotes = cleanNotes.trim();
@@ -407,7 +409,7 @@ function calculateAvailableTimeSlots(dayName, isPMTEnv, todayEvents) {
      let overlap = false;
      for (let i = 0; i < todayEvents.length; i++) {
         let ev = todayEvents[i];
-        if (ev.isAllDay) { overlap = true; break; }
+        if (ev.isAllDay) { continue; }
         if (slot.start < ev.end && slot.end > ev.start) {
            overlap = true;
            break;
@@ -467,15 +469,9 @@ function runHourlyReview(targetDate) {
     goals: getSystemGoals(),
     activeMilestones: activeMilestones,
     allTasksContext: rawTasks.map(t => {
-       let cleanNotes = t.notes;
-       let metadata = {};
-       const metaSplit = cleanNotes.split('---SYSTEM_METADATA---');
-       if (metaSplit.length > 1) {
-          try {
-             metadata = JSON.parse(metaSplit[1].trim());
-          } catch(e) {}
-       }
-       cleanNotes = metaSplit[0].replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
+       const parsed = parseTaskNotes(t.notes);
+       let metadata = parsed.metadata || {};
+       let cleanNotes = parsed.baseNotes.replace(/\[DEADLINE:[^\]]*\]\s*\|\s*\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
        cleanNotes = cleanNotes.replace(/\[DURATION:[^\]]*\]\s*\|\s*\[GOAL:[^\]]*\]/g, "");
        return { 
          id: t.id,
@@ -534,77 +530,37 @@ function runHourlyReview(targetDate) {
   // Use the smartest model available for full-context reasoning, with fallback to 2M context if needed
   const MODEL_NAME = selectModelForPayload(payloadStr, SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_PRO);
   
-  const apiKey = SYSTEM_CONFIG.SECRETS.GEMINI_API_KEY;
-  const requestPayload = {
-    "systemInstruction": { "parts": [{ "text": systemPrompt }] },
-    "contents": [{ "role": "user", "parts": [{ "text": payloadStr }] }],
-    "generationConfig": configOverrides
-  };
-  
-  const options = {
-    "method": "post",
-    "contentType": "application/json",
-    "payload": JSON.stringify(requestPayload),
-    "muteHttpExceptions": true
-  };
-
-  let responseText = null;
-  let success = false;
+  let result = null;
   let finalModelUsed = MODEL_NAME;
-  const maxRetries = 2; // Try each model up to 2 times
   const modelsToTry = [MODEL_NAME, SYSTEM_CONFIG.SECRETS.GEMINI_MODEL_FLASH_LITE];
   
   for (const currentModel of modelsToTry) {
-    if (success) break;
     if (!currentModel) continue;
-    
     finalModelUsed = currentModel;
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+    console.log(`Executing Hourly Review via ${currentModel}...`);
     
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      console.log(`Executing Hourly Review via ${currentModel} (Attempt ${attempt}/${maxRetries})...`);
-      
-      const response = UrlFetchApp.fetch(url, options);
-      responseText = response.getContentText();
-      
-      if (response.getResponseCode() === 200) {
-        success = true;
-        break; // Break the inner retry loop
-      } else {
-        console.warn(`Hourly Review failed with ${currentModel} on attempt ${attempt}:`, responseText);
-        if (responseText.includes("503") || responseText.includes("429")) {
-          if (attempt < maxRetries) {
-            const backoff = Math.pow(2, attempt) * 5000;
-            console.log(`Waiting ${backoff/1000} seconds before retrying...`);
-            Utilities.sleep(backoff);
-          }
-        } else {
-          break; // Do not retry on 400 Bad Request, fall to next model
-        }
-      }
+    result = callGemini(payloadStr, currentModel, systemPrompt, null, true);
+    if (!result.error) {
+      break;
     }
+    console.warn(`Hourly Review failed with ${currentModel}:`, result.error);
   }
 
-  if (!success) {
+  if (!result || result.error) {
       console.error("Hourly Review completely failed after all attempts.");
       return;
   }
   
-  const json = JSON.parse(responseText);
-  if (json.candidates && json.candidates[0].content && json.candidates[0].content.parts) {
-      let markdownReport = json.candidates[0].content.parts[0].text;
-      markdownReport += `\n\n---\n*Report dynamically generated by ${finalModelUsed}*`;
-      
-      writeOnePager(markdownReport, true);
-      console.log("Hourly Review Complete. Report generated.");
-      
-      try {
-         executeTimeboxing(targetDate);
-      } catch (e) {
-         console.error("Timeboxing execution failed:", e.message);
-      }
-  } else {
-      console.error("Hourly Review failed to parse AI response:", responseText);
+  let markdownReport = result.text;
+  markdownReport += `\n\n---\n*Report dynamically generated by ${finalModelUsed}*`;
+  
+  writeOnePager(markdownReport, true);
+  console.log("Hourly Review Complete. Report generated.");
+  
+  try {
+     executeTimeboxing(targetDate);
+  } catch (e) {
+     console.error("Timeboxing execution failed:", e.message);
   }
 }
 
@@ -746,8 +702,8 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       // Resolve due date (finalDue) early
       const originalDate = task.due;
       const rawNotes = task.notes || "";
-      const daMatch = rawNotes.match(/^DA:\s*(.*)$/m);
-      const daCommentText = daMatch ? daMatch[1].trim() : "";
+      const parsedNotes = parseTaskNotes(rawNotes);
+      const daCommentText = parsedNotes.daComment || "";
 
       let isFutureDate = false;
       if (originalDate && !originalDate.includes("2099-12-31")) {
@@ -858,7 +814,7 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
                 const subMeta = Object.assign({}, baseMetadata);
                 subMeta.duration = sub.estimatedDuration || "N/A";
                 
-                let cleanOriginalNotes = (task.notes || "").split('---SYSTEM_METADATA---')[0].trim();
+                let cleanOriginalNotes = parseTaskNotes(task.notes).cleanNotes;
                 
                 if (task.links && Array.isArray(task.links)) {
                    const emailLinkObj = task.links.find(l => l.type === "email");
@@ -923,15 +879,9 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       let milestoneLine = "";
       const otherNotes = [];
       
-      const parts = rawNotes.split('---SYSTEM_METADATA---');
-      const textBlock = parts[0];
-      
-      let existingMetadata = {};
-      if (parts.length > 1) {
-         try {
-           existingMetadata = JSON.parse(parts[1].trim());
-         } catch(e) {}
-      }
+      const parsedNoteData = parseTaskNotes(rawNotes);
+      const textBlock = parsedNoteData.baseNotes;
+      let existingMetadata = parsedNoteData.metadata || {};
       
       const isValidWebView = task.webViewLink && !task.webViewLink.toLowerCase().includes("tasks.google.com") && !task.webViewLink.toLowerCase().includes("/tasks") && !task.webViewLink.toLowerCase().includes("googleapis.com/tasks");
       let topLink = (isValidWebView ? task.webViewLink : "") || (task.links && task.links.length > 0 && task.links.find(l => {

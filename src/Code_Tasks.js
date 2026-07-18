@@ -173,17 +173,14 @@ function buildTaskExportRow(task, taskList, emailInfo, exportTs, rowCounter, val
   let duration = "N/A";
   let goal = "TBD";
   let category = "N/A";
-  const parts = (task.notes || "").split('---SYSTEM_METADATA---');
-  if (parts.length > 1) {
-     try {
-       const metadata = JSON.parse(parts[1].trim());
-       duration = metadata.duration || "N/A";
-       goal = metadata.goal || "TBD";
-       category = metadata.category_path || "N/A";
-     } catch(e) {}
+  const parsed = parseTaskNotes(task.notes);
+  if (parsed.metadata && Object.keys(parsed.metadata).length > 0) {
+       duration = parsed.metadata.duration || "N/A";
+       goal = parsed.metadata.goal || "TBD";
+       category = parsed.metadata.category_path || "N/A";
   }
   
-  let currentNotes = parts[0].replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
+  let currentNotes = parsed.baseNotes.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
   currentNotes = currentNotes.trim();
 
   const notesLink = extractExternalLinkFromText(currentNotes) || "";
@@ -210,15 +207,9 @@ function buildTaskExportRow(task, taskList, emailInfo, exportTs, rowCounter, val
     }
   }
 
-  let sysCommentParsed = "";
-  let daCommentParsed = "";
-  const rawNotes = task.notes || "";
-  
-  const sysMatch = rawNotes.match(/^SYS:\s*(.*)$/m);
-  if (sysMatch) sysCommentParsed = sysMatch[1];
-  
-  const daMatch = rawNotes.match(/^DA:\s*(.*)$/m);
-  if (daMatch) daCommentParsed = daMatch[1];
+  const parsedNotes = parseTaskNotes(task.notes);
+  let sysCommentParsed = parsedNotes.sysComment;
+  let daCommentParsed = parsedNotes.daComment;
   
   if (systemComment !== "") {
     systemComment += sysCommentParsed ? ` | AI: ${sysCommentParsed}` : "";
@@ -431,19 +422,15 @@ function syncCompletedTasksLog() {
                   }
                 }
                 
-                let cleanNotes = task.notes || "";
                 let duration = "N/A", goal = "TBD", category = "N/A", deadline = "";
-                const parts = cleanNotes.split('---SYSTEM_METADATA---');
-                if (parts.length > 1) {
-                   try {
-                     const metadata = JSON.parse(parts[1].trim());
-                     duration = metadata.duration || "N/A";
-                     goal = metadata.goal || "TBD";
-                     category = metadata.category_path || "N/A";
-                     deadline = metadata.deadline || (task.due ? Utilities.formatDate(new Date(task.due), "Europe/London", "yyyy-MM-dd") : "");
-                   } catch(e) {}
+                const parsed = parseTaskNotes(task.notes);
+                if (parsed.metadata && Object.keys(parsed.metadata).length > 0) {
+                     duration = parsed.metadata.duration || "N/A";
+                     goal = parsed.metadata.goal || "TBD";
+                     category = parsed.metadata.category_path || "N/A";
+                     deadline = parsed.metadata.deadline || (task.due ? Utilities.formatDate(new Date(task.due), "Europe/London", "yyyy-MM-dd") : "");
                 }
-                cleanNotes = parts[0].replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
+                let cleanNotes = parsed.baseNotes.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
                 cleanNotes = cleanNotes.trim();
                 
                 const notesLink = extractExternalLinkFromText(cleanNotes) || "";
@@ -621,19 +608,15 @@ function purgeToBeDeletedTasks() {
                   link = t.webViewLink;
                 }
               }
-              let cleanNotes = t.notes || "";
               let duration = "N/A", goal = "TBD", category = "N/A", deadline = "";
-              const parts = cleanNotes.split('---SYSTEM_METADATA---');
-              if (parts.length > 1) {
-                 try {
-                   const metadata = JSON.parse(parts[1].trim());
-                   duration = metadata.duration || "N/A";
-                   goal = metadata.goal || "TBD";
-                   category = metadata.category_path || "N/A";
-                   deadline = metadata.deadline || (t.due ? Utilities.formatDate(new Date(t.due), "Europe/London", "yyyy-MM-dd") : "");
-                 } catch(e) {}
+              const parsed = parseTaskNotes(t.notes);
+              if (parsed.metadata && Object.keys(parsed.metadata).length > 0) {
+                   duration = parsed.metadata.duration || "N/A";
+                   goal = parsed.metadata.goal || "TBD";
+                   category = parsed.metadata.category_path || "N/A";
+                   deadline = parsed.metadata.deadline || (t.due ? Utilities.formatDate(new Date(t.due), "Europe/London", "yyyy-MM-dd") : "");
               }
-              cleanNotes = parts[0].replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
+              let cleanNotes = parsed.baseNotes.replace(/(?:\[(?:DEADLINE|DURATION|GOAL):[^\]]*\]\s*\|?\s*)+/g, "").replace(/^[ \t|]+$/gm, "");
               cleanNotes = cleanNotes.trim();
               if (cleanNotes.length > 49000) {
                  cleanNotes = cleanNotes.substring(0, 49000) + "\n...[TRUNCATED TO FIT GOOGLE SHEETS LIMIT]";
@@ -787,16 +770,13 @@ function exportTasksToMarkdownDrive(results) {
     // Clean up the JSON metadata block for the Markdown output
     let metadataStr = "";
     if (notes) {
-      const parts = notes.split('---SYSTEM_METADATA---');
-      if (parts.length > 1) {
-        notes = parts[0].trim();
-        try {
-          const metadata = JSON.parse(parts[1].trim());
-          const dl = metadata.deadline || "None";
-          const dur = metadata.duration || "N/A";
-          const goal = metadata.goal || "TBD";
-          metadataStr = `  [DEADLINE: ${dl}] | [DURATION: ${dur}] | [GOAL: ${goal}]`;
-        } catch(e) {}
+      const parsed = parseTaskNotes(notes);
+      notes = parsed.baseNotes.trim();
+      if (parsed.metadata && Object.keys(parsed.metadata).length > 0) {
+        const dl = parsed.metadata.deadline || "None";
+        const dur = parsed.metadata.duration || "N/A";
+        const goal = parsed.metadata.goal || "TBD";
+        metadataStr = `  [DEADLINE: ${dl}] | [DURATION: ${dur}] | [GOAL: ${goal}]`;
       }
     }
 
@@ -1299,54 +1279,29 @@ Respond STRICTLY in valid JSON format as an array of objects matching the input 
   }
 ]`;
   // ==========================================
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
-  const payload = {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: { 
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: "ARRAY",
-        items: {
-          type: "OBJECT",
-          properties: {
-            id: { type: "STRING" },
-            emailSummary: { type: "STRING" },
-            proposedCategory: { type: "STRING" },
-            proposedActionTitle: { type: "STRING" },
-            proposedTitle: { type: "STRING" }
-          },
-          required: ["id", "emailSummary", "proposedCategory", "proposedActionTitle"]
-        }
-      }
+  const schema = {
+    type: "ARRAY",
+    items: {
+      type: "OBJECT",
+      properties: {
+        id: { type: "STRING" },
+        emailSummary: { type: "STRING" },
+        proposedCategory: { type: "STRING" },
+        proposedActionTitle: { type: "STRING" },
+        proposedTitle: { type: "STRING" }
+      },
+      required: ["id", "emailSummary", "proposedCategory", "proposedActionTitle"]
     }
   };
-  
-  const options = {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
 
-  let maxRetries = 4;
-  let delay = 2000;
-
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const response = UrlFetchApp.fetch(url, options);
-      const statusCode = response.getResponseCode();
-      
-      if (statusCode === 200) {
-        const json = JSON.parse(response.getContentText());
-        const resultText = json.candidates[0].content.parts[0].text;
-        
-        let parsedResults = [];
-        try {
-          parsedResults = JSON.parse(resultText);
-        } catch (e) {
-          const match = resultText.match(/\[[\s\S]*\]/);
-          if (match) parsedResults = JSON.parse(match[0]);
-        }
+  let parsedResults = callGemini(prompt, modelId, "You are a task management assistant.", schema);
+  if (parsedResults && parsedResults.error) {
+      console.warn("Gemini batch processing failed:", parsedResults.error);
+      parsedResults = [];
+  } else if (!Array.isArray(parsedResults)) {
+      console.warn("Gemini returned non-array result:", parsedResults);
+      parsedResults = [];
+  }
 
         const resultMap = {};
         
@@ -1378,23 +1333,6 @@ Respond STRICTLY in valid JSON format as an array of objects matching the input 
         }
         return resultMap;
 
-      } else if (statusCode === 429 || statusCode >= 500) {
-        Utilities.sleep(delay);
-        delay *= 2;
-      } else {
-        console.error(`Gemini API Error: ${statusCode} - ${response.getContentText()}`);
-        return {};
-      }
-    } catch (e) {
-      if (i === maxRetries - 1) {
-        console.error("Gemini batch call failed after retries:", e.message);
-        return {};
-      }
-      Utilities.sleep(delay);
-      delay *= 2;
-    }
-  }
-  return {};
 }
 
 

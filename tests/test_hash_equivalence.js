@@ -15,7 +15,7 @@ const Utilities = {
 };
 
 // Load getStandardizedTaskHash function from src/Code_TaskEngine.js
-const codeTaskEngine = fs.readFileSync('/Users/daniel/Documents/AGY/the_system/src/Code_TaskEngine.js', 'utf8');
+const codeTaskEngine = fs.readFileSync(path.join(__dirname, '../src/Code_TaskEngine.js'), 'utf8');
 
 // Use VM to load the function
 const vm = require('vm');

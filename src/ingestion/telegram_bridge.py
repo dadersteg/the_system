@@ -280,7 +280,7 @@ async def handler(event):
     print(f"Buffered message for [{thread_name}] (Sending to Gmail in 5 mins...)")
 
 async def _heartbeat():
-    heartbeat_path = '/Users/daniel/Documents/AGY/the_system/logs/telegram_bridge_heartbeat.txt'
+    heartbeat_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs', 'telegram_bridge_heartbeat.txt')
     while True:
         try:
             with open(heartbeat_path, 'w') as f:

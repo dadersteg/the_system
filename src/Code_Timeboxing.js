@@ -72,29 +72,25 @@ function verifyTasksAreStillActive(parsedTasks, targetDate) {
   listsToFetch.forEach(listId => {
     let pageToken;
     do {
-      try {
-        const response = Tasks.Tasks.list(listId, { showCompleted: false, showHidden: false,  maxResults: 100, pageToken: pageToken });
-        if (response.items) {
-           response.items.forEach(t => {
-               if (t.status !== 'completed' && t.title) {
-                  let isDueTodayOrBefore = true;
-                  if (t.due) {
-                     const dueDate = new Date(t.due).getTime();
-                     if (dueDate > endOfToday) {
-                        isDueTodayOrBefore = false;
-                     }
-                  }
-                  
-                  if (isDueTodayOrBefore) {
-                     activeTasksForToday.set(t.id, t.title.trim());
-                  }
-               }
-           });
-        }
-        pageToken = response.nextPageToken;
-      } catch (e) {
-        pageToken = undefined;
+      const response = executeWithRetry(() => Tasks.Tasks.list(listId, { showCompleted: false, showHidden: false,  maxResults: 100, pageToken: pageToken }));
+      if (response.items) {
+         response.items.forEach(t => {
+             if (t.status !== 'completed' && t.title) {
+                let isDueTodayOrBefore = true;
+                if (t.due) {
+                   const dueDate = new Date(t.due).getTime();
+                   if (dueDate > endOfToday) {
+                      isDueTodayOrBefore = false;
+                   }
+                }
+                
+                if (isDueTodayOrBefore) {
+                   activeTasksForToday.set(t.id, t.title.trim());
+                }
+             }
+         });
       }
+      pageToken = response.nextPageToken;
     } while (pageToken);
   });
   

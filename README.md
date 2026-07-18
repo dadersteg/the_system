@@ -60,3 +60,8 @@ The Personas draw their intelligence and context from a centralized, living Know
 
 ## 5. Future Project Roadmap
 *   **Workspace Studios Integration:** Investigate deprecating paid custom API scripts for email/calendar routing and migrating "The Clerk" and "Relational Tally" engines entirely into Google Workspace Studios. This leverages native event-driven triggers and conserves API quota.
+
+---
+
+## 6. Development Setup
+The `node_modules` directory for this project is typically located externally in a cache directory (e.g., `~/Developer/AGY_caches/the_system/node_modules`) to avoid syncing heavy module folders. Scripts and the process manager are configured to look for dependencies via the `NODE_PATH` environment variable. Python dependencies are managed similarly via a virtual environment whose path can be overridden with `VENV_PATH`.
