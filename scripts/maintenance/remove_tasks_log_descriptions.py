@@ -58,7 +58,7 @@ def clean_sheet_headers_and_pivots(service, spreadsheet_id, label):
         sheet_gids = {s['properties']['sheetId']: s['properties']['title'] for s in sheets}
     
     # 2. Process tasks logs to delete helper description row
-    log_targets = [1580572397] # GID 1580572397 is always common
+    log_targets = [1580572397, 1580572400] # GID 1580572397 (Active) and 1580572400 (Completed) are common
     if label == "Work" and 275991319 in sheet_gids:
         log_targets.append(275991319)
         

@@ -27,6 +27,8 @@ EXPECTED_GIDS_COMMON = {
     "5 Import - Gmail Labels": 1007497112,
     "5 Import - Email Triage Log": 2131515996,
     "5 Import - Google Tasks Log": 1580572397,
+    "5 Import - Completed Tasks Log": 1580572400,
+    "3 Config - Email Rules Receiver": 1799689203,
     "2 Input - File Naming Rules": 938516466,
     "2 Input - File Folder Rules": 1297520241
 }
@@ -43,6 +45,7 @@ HIDDEN_TABS = {
     938516466,   # File Naming Rules
     1297520241,  # File Folder Rules
     1799689202,  # Email Aliases
+    1799689203,  # Email Rules Receiver
     1704335578,  # Gemini Models
     1007497112,  # Gmail Labels
     1287896098,  # Workspace Taxonomy

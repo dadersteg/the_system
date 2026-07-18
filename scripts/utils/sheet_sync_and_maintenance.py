@@ -14,7 +14,7 @@ import time
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-TASK_REVIEW_GID = 1580572397
+TASK_REVIEW_GID = 1580572400  # Target Completed Tasks Log GID to prevent collision with active tasks
 PRIVATE_SPREADSHEET_ID = "13bU68Lg4l0qV6-iSoZRrwSgHHS6jfA7yrrx9YLuXNNY"
 WORK_SPREADSHEET_ID = "1FO-iNKasPpen9MpG2Urt7IFFgw4psrm6sArxjuAWDxY"
 
