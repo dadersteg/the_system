@@ -209,16 +209,19 @@
     .nav-item:active {
       background: rgba(99, 102, 241, 0.08);
       border-color: rgba(99, 102, 241, 0.2);
+      transition: background 0.1s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .nav-item:active span {
       transform: translateX(2px);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @media (prefers-color-scheme: dark) {
       .nav-item:active {
         background: rgba(129, 140, 248, 0.12);
         border-color: rgba(129, 140, 248, 0.25);
+        transition: background 0.1s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.1s cubic-bezier(0.16, 1, 0.3, 1);
       }
     }
 
@@ -276,15 +279,18 @@
 
     .nav-item.active:active {
       background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.03) 100%);
+      transition: background 0.1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .nav-item.active:active span {
       transform: translateX(5px);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @media (prefers-color-scheme: dark) {
       .nav-item.active:active {
         background: linear-gradient(90deg, rgba(129, 140, 248, 0.15) 0%, rgba(129, 140, 248, 0.05) 100%);
+        transition: background 0.1s cubic-bezier(0.16, 1, 0.3, 1);
       }
     }
 
@@ -867,6 +873,7 @@
       }
       .btn-primary:active {
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(129, 140, 248, 0.15), inset 0 1px 0 rgba(0, 0, 0, 0.3);
+        transition: box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1), transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
       }
       .btn-secondary {
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -876,6 +883,7 @@
       }
       .btn-secondary:active {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(129, 140, 248, 0.1);
+        transition: box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1), transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
       }
       .btn-outline {
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
@@ -885,6 +893,7 @@
       }
       .btn-outline:active {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(129, 140, 248, 0.1);
+        transition: box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1), transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
       }
     }
 
@@ -1169,6 +1178,7 @@
     .btn-breathe:active {
       transform: translateY(1px) scale(0.98);
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
     }
     
     .btn-breathe:focus-visible {
@@ -1184,6 +1194,7 @@
       }
       .btn-breathe:active {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
       }
     }
 
