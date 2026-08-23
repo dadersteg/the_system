@@ -25,8 +25,8 @@ function getTaskMasterSystemPrompt() {
      const docId = SYSTEM_CONFIG.DOCS.TASK_MASTER_PROMPT_ID;
      if (!docId) return "SYSTEM PROMPT MISSING";
      
-     const file = DriveApp.getFileById(docId);
-     const text = processPromptText(file.getBlob().getDataAsString());
+     const text = getSafeDocText(docId);
+     if (!text) throw new Error("System prompt is empty or could not be loaded.");
      
      cache.put("TASK_MASTER_PROMPT_V2", text.substring(0, 100000), 21600); // 6 hours
      return text;
@@ -50,8 +50,8 @@ function getTaskMasterDailyPrompt() {
      const docId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
      if (!docId) return "SYSTEM PROMPT MISSING";
      
-     const file = DriveApp.getFileById(docId);
-     const text = processPromptText(file.getBlob().getDataAsString());
+     const text = getSafeDocText(docId);
+     if (!text) throw new Error("System prompt is empty or could not be loaded.");
      
      cache.put("TASK_MASTER_DAILY_PROMPT", text.substring(0, 100000), 21600); // 6 hours
      return text;
@@ -491,11 +491,10 @@ function runHourlyReview(targetDate) {
   let systemPrompt = "";
   const promptId = SYSTEM_CONFIG.DOCS.TASK_MASTER_DAILY_PROMPT_ID;
   if (promptId) {
-     systemPrompt = DriveApp.getFileById(promptId).getBlob().getDataAsString();
+     systemPrompt = getSafeDocText(promptId);
   } else {
      console.warn("TASK_MASTER_DAILY_PROMPT_ID is not set in SYSTEM_CONFIG.");
   }
-  systemPrompt = processPromptText(systemPrompt);
   
   let configOverrides = { "temperature": 0.2 };
   const configMatch = systemPrompt.match(/^\s*```(?:json)?\s*([\s\S]*?)\s*```/i);

@@ -54,8 +54,8 @@ function runWeeklyReview() {
   try {
      const fileId = SYSTEM_CONFIG.DOCS.TASK_MASTER_WEEKLY_PROMPT_ID;
      if (!fileId) throw new Error("TASK_MASTER_WEEKLY_PROMPT_ID is not configured in SYSTEM_CONFIG.");
-     const file = DriveApp.getFileById(fileId);
-     systemPrompt = processPromptText(file.getBlob().getDataAsString());
+     systemPrompt = getSafeDocText(fileId);
+     if (!systemPrompt) throw new Error("System prompt is empty or could not be loaded.");
   } catch(e) {
      console.error("Failed to load 7-Day prompt from Drive:", e.message);
      return;
