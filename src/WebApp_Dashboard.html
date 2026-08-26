@@ -126,7 +126,7 @@
       position: relative;
       padding: 12px 20px;
       padding-left: 28px; /* Extra padding to make room for the floating capsule */
-      min-height: 44px;
+      min-height: clamp(44px, 6vh, 48px);
       border-radius: 12px;
       cursor: pointer;
       display: flex;
@@ -147,7 +147,6 @@
 
     @media (max-width: 768px) {
       .nav-item {
-        min-height: 48px;
         font-size: 16px;
       }
     }
@@ -209,10 +208,12 @@
     .nav-item:active {
       background: rgba(99, 102, 241, 0.08);
       border-color: rgba(99, 102, 241, 0.2);
+      transition: background-color 0.1s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .nav-item:active span {
       transform: translateX(2px);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -280,6 +281,7 @@
 
     .nav-item.active:active span {
       transform: translateX(5px);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @media (prefers-color-scheme: dark) {
