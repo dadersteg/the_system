@@ -27,7 +27,9 @@ client.on('ready', async () => {
                     count++;
                 }
             }
-        } catch(e) {}
+        } catch (e) {
+            console.warn(`Failed to process messages for chat: ${e.message}`);
+        }
     }
     console.log(`Total messages in the last 48 hours: ${count}`);
     process.exit(0);

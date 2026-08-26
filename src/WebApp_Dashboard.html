@@ -2408,7 +2408,9 @@
         
         oscillator.start();
         oscillator.stop(audioCtx.currentTime + 2);
-      } catch(e) {}
+      } catch (e) {
+        console.warn('AudioContext failed to play gong:', e);
+      }
     }
     function playTick() {
       try {
@@ -2424,7 +2426,9 @@
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
         oscillator.start();
         oscillator.stop(audioCtx.currentTime + 0.1);
-      } catch(e) {}
+      } catch (e) {
+        console.warn('AudioContext failed to play tick:', e);
+      }
     }
     function renderLotus() {
       const container = document.getElementById('breathe-lotus');

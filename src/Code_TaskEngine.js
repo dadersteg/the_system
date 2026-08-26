@@ -218,7 +218,9 @@ function _executeTaskMasterPipeline(systemPrompt, isDailyPlan) {
                  if (existingMetadata.ai_hash === currentHash) {
                     aiHashMatch = true;
                  }
-               } catch(e) {}
+               } catch (e) {
+                 console.warn(`Failed to parse metadata in parseActionZones: ${e.message}`);
+               }
             }
             
             if (userConstraint) {
