@@ -56,7 +56,9 @@ function executeApprovals(sheet) {
     }
     let parsedTaxonomy = [];
     if (taxonomyJson) {
-        try { parsedTaxonomy = JSON.parse(taxonomyJson); } catch(e){}
+        try { parsedTaxonomy = JSON.parse(taxonomyJson); } catch(e){
+            console.warn("Failed to parse taxonomy JSON: " + e.message);
+        }
     }
 
     const todayStr = Utilities.formatDate(new Date(), "GMT", "yyyyMMdd");

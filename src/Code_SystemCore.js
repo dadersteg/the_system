@@ -433,7 +433,9 @@ function parseTaskNotes(rawNotes) {
   if (metaSplit.length > 1) {
     try {
        metadata = JSON.parse(metaSplit[1].trim());
-    } catch(e) {}
+    } catch(e) {
+       console.warn("Failed to parse metadata: " + e.message);
+    }
   }
   
   const sysMatch = cleanNotes.match(/^SYS:\s*(.*)$/m);

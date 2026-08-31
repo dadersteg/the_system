@@ -83,7 +83,9 @@ function runCleanRunningNotes() {
     try {
         const ss = getMasterSpreadsheet();
         recentContext = typeof fetchRecentContext === 'function' ? fetchRecentContext(ss) : "";
-    } catch(e) {}
+    } catch(e) {
+        console.warn("fetchRecentContext failed: " + e.message);
+    }
 
     runningDocs.forEach(fileId => {
         if (fileId && fileId.trim() !== "") {

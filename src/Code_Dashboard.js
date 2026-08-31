@@ -593,7 +593,9 @@ function bulkRenameTabs(findStr, replaceStr) {
             sheet.setName(newName);
             count++;
           }
-        } catch (e) { }
+        } catch (e) {
+          console.warn("Failed to rename tab: " + e.message);
+        }
       }
     });
     

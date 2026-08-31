@@ -141,7 +141,9 @@ ${compressed}`;
               if (firstStep.created_at) {
                 createdDate = firstStep.created_at.replace("T", " ").replace("Z", "");
               }
-            } catch(e) {}
+            } catch(e) {
+              console.warn("Failed to parse created_at: " + e.message);
+            }
             
             logSheet.appendRow([
               currentDate,
