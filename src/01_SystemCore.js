@@ -52,10 +52,10 @@ function getMasterSpreadsheet() {
  * @returns {boolean} True if local engine lease is active (cloud should skip); False otherwise.
  */
 function isLocalEngineActive(pipelineName = 'ALL', leaseMinutes = 30) {
-  // In CE environment, local Mac mini daemon does not operate; Cloud Apps Script runs primary.
-  if (IS_CE_ENV) {
-    return false;
-  }
+  // Both environments have a local primary layer: the Mac mini (Antigravity) for PRIVATE and the work laptop
+  // (the_system_ce, Claude) for CE. Each writes its own pipeline row in 'System_Status'; the cloud engine is
+  // the safety net in both and must honour the lease. Row 2 ('ALL') stays the legacy Mac-mini-only lease.
+  // Until 2026-09 this returned false for IS_CE_ENV, which made the CE cloud engine run alongside the laptop.
 
   try {
     const ss = getMasterSpreadsheet();
