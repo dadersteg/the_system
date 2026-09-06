@@ -1,0 +1,2594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Breathe | The System</title>
+  
+  <!-- Cache Control (Prevent stale App Script caching) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <!-- Mobile & PWA Optimization -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Breathe">
+  <meta name="theme-color" content="#080b11">
+  <meta name="description" content="Standalone mindfulness breathwork companion connected to The System">
+  
+  <!-- Serene App Icon (SVG Data URI) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23080b11'/%3E%3Ccircle cx='50' cy='50' r='32' fill='none' stroke='%2338bdf8' stroke-width='4' opacity='0.8'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%230ea5e9' opacity='0.4'/%3E%3Cpath d='M50 25 Q58 40 50 55 Q42 40 50 25 Z' fill='%23ec4899' opacity='0.9'/%3E%3Cpath d='M50 55 Q65 48 75 55 Q65 62 50 55 Z' fill='%23ec4899' opacity='0.7'/%3E%3Cpath d='M50 55 Q35 48 25 55 Q35 62 50 55 Z' fill='%23ec4899' opacity='0.7'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23080b11'/%3E%3Ccircle cx='90' cy='90' r='60' fill='none' stroke='%2338bdf8' stroke-width='6' opacity='0.8'/%3E%3Ccircle cx='90' cy='90' r='38' fill='%230ea5e9' opacity='0.4'/%3E%3Cpath d='M90 45 Q104 72 90 98 Q76 72 90 45 Z' fill='%23ec4899' opacity='0.9'/%3E%3Cpath d='M90 98 Q118 86 136 98 Q118 110 90 98 Z' fill='%23ec4899' opacity='0.7'/%3E%3Cpath d='M90 98 Q62 86 44 98 Q62 110 90 98 Z' fill='%23ec4899' opacity='0.7'/%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --bg-canvas: #090c12;
+      --bg-surface: rgba(255, 255, 255, 0.035);
+      --bg-card: rgba(255, 255, 255, 0.045);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-focus: rgba(255, 255, 255, 0.25);
+      
+      --color-text: #f8fafc;
+      --color-text-muted: rgba(255, 255, 255, 0.55);
+      --color-text-faint: rgba(255, 255, 255, 0.25);
+      
+      --accent-primary: #ffffff;
+      --accent-soft: rgba(255, 255, 255, 0.85);
+      
+      --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      --glass-blur: blur(24px);
+      --ease-zen: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-stack);
+      background-color: var(--bg-canvas);
+      color: var(--color-text);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+      padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 20px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 20px);
+      transition: background-color 1.5s var(--ease-zen);
+    }
+
+    /* Ambient Background Aura Lights (Gentle, organic, non-neon) */
+    .ambient-aura {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.06;
+      pointer-events: none;
+      z-index: 0;
+      transition: all 2s var(--ease-zen);
+    }
+    .aura-1 {
+      top: -15%;
+      left: 20%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent 70%);
+    }
+    .aura-2 {
+      bottom: -15%;
+      right: 20%;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(200, 220, 255, 0.1), transparent 70%);
+    }
+    .aura-3 {
+      top: 40%;
+      left: 35%;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(255, 240, 220, 0.06), transparent 70%);
+      opacity: 0.04;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 20;
+      padding: 12px 16px;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      transition: opacity 0.5s var(--ease-zen), transform 0.5s var(--ease-zen);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      text-transform: none;
+      color: var(--color-text);
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #34d399;
+      opacity: 0.85;
+      display: inline-block;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .streak-badge {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .streak-badge::after {
+      content: '';
+      position: absolute;
+      inset: -7px;
+    }
+    .streak-badge:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .streak-badge:active {
+      transform: scale(0.97);
+    }
+
+    .lotus-badge {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      background: rgba(236, 72, 153, 0.15);
+      color: #f472b6;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .icon-btn {
+      position: relative;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--color-text-muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .icon-btn::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+    }
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--color-text);
+      border-color: var(--border-subtle);
+    }
+    .icon-btn:active {
+      transform: scale(0.93);
+    }
+    .icon-btn.active {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+    .streak-badge:focus-visible,
+    .protocol-chip:focus-visible,
+    .icon-btn:focus-visible,
+    .btn-start:focus-visible,
+    .rounds-select:focus-visible,
+    .btn-modal-close:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.4);
+      outline-offset: 2px;
+    }
+
+    /* Main Breathing Center Stage */
+    main {
+      width: 100%;
+      max-width: 580px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 10;
+      padding: 20px 0;
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0 20px 0;
+      cursor: pointer;
+    }
+
+    /* Visualizer Base Wrappers */
+    .visualizer-wrapper {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      transition: opacity 0.4s var(--ease-zen);
+    }
+
+    .visualizer-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.04));
+    }
+
+    /* 7-Petal Sacred Lotus (4-7-8 Relax) */
+    .lotus-petals-group {
+      transform-origin: 150px 150px;
+      transform: scale(0.55) rotate(0deg);
+      transition: transform 0.8s var(--ease-zen), opacity 0.8s ease;
+      opacity: 0.82;
+    }
+    .lotus-petal {
+      transition: fill 0.4s ease, stroke 0.4s ease;
+    }
+    .lotus-node {
+      transition: fill 0.3s ease, r 0.3s var(--ease-zen), filter 0.3s ease;
+    }
+
+    /* Concentric Zen Mandala (Coherence 5.5s) */
+    .mandala-group {
+      transform-origin: 150px 150px;
+      transform: scale(0.55);
+      transition: transform 0.8s var(--ease-zen), opacity 0.8s ease;
+      opacity: 0.85;
+    }
+    .mandala-petal {
+      transition: stroke 0.3s ease, opacity 0.3s ease;
+    }
+    .mandala-node {
+      transition: fill 0.3s ease, r 0.3s var(--ease-zen), filter 0.3s ease;
+    }
+
+    /* Diamond Calming Cross (Quick Calm 4-2-4) */
+    .calm-cross-group {
+      transform-origin: 150px 150px;
+      transform: scale(0.58);
+      transition: transform 0.8s var(--ease-zen), opacity 0.8s ease;
+      opacity: 0.85;
+    }
+    .calm-lobe {
+      transition: fill 0.4s ease, stroke 0.4s ease;
+    }
+    .calm-node {
+      transition: fill 0.3s ease, r 0.3s var(--ease-zen), filter 0.3s ease;
+    }
+
+    /* Hardware-Accelerated Glow Classes (Zero Filter Invalidation) */
+    .node-glow-amber {
+      fill: #f59e0b !important;
+      r: 6px !important;
+      filter: drop-shadow(0 0 7px rgba(245, 158, 11, 0.95)) !important;
+    }
+    .node-glow-sapphire {
+      fill: #38bdf8 !important;
+      r: 6px !important;
+      filter: drop-shadow(0 0 7px rgba(56, 189, 248, 0.95)) !important;
+    }
+    .node-glow-emerald {
+      fill: #34d399 !important;
+      r: 6px !important;
+      filter: drop-shadow(0 0 7px rgba(52, 211, 153, 0.95)) !important;
+    }
+
+    /* 3D Isometric Origami Box Visualizer */
+    .origami-wrapper {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      pointer-events: none;
+      transition: opacity 0.5s var(--ease-zen);
+    }
+    .origami-base {
+      position: relative;
+      width: 104px;
+      height: 104px;
+      box-sizing: border-box;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(56, 189, 248, 0.04) 50%, rgba(99, 102, 241, 0.08) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      border-radius: 8px;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transform: scale(0.68) rotateX(60deg) rotateZ(45deg);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55), inset 0 0 25px rgba(56, 189, 248, 0.1);
+      transition: transform 0.9s var(--ease-zen), border-color 0.5s ease;
+    }
+    /* Ethereal glowing inner core gem resting inside origami box */
+    .origami-core-gem {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      margin-top: -12px;
+      margin-left: -12px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff 15%, #38bdf8 65%, rgba(99, 102, 241, 0) 100%);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.85);
+      transform: translateZ(8px) scale(0.6);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    /* Subtle geometric crease guides */
+    .origami-crease {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      transform: translateZ(1px);
+    }
+    .origami-flap {
+      position: absolute;
+      width: 104px;
+      height: 104px;
+      box-sizing: border-box;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(56, 189, 248, 0.05) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.36);
+      border-radius: 6px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      backface-visibility: visible;
+      -webkit-backface-visibility: visible;
+      box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.06);
+      transition: transform 0.85s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .origami-top { top: -104px; left: -1px; transform-origin: bottom; transform: rotateX(-90deg); }
+    .origami-bottom { bottom: -104px; left: -1px; transform-origin: top; transform: rotateX(90deg); }
+    .origami-left { top: -1px; left: -104px; transform-origin: right; transform: rotateY(90deg); }
+    .origami-right { top: -1px; right: -104px; transform-origin: left; transform: rotateY(-90deg); }
+
+    /* Flap Sequential Illumination for 1-4 Count in Hold Phases */
+    .origami-flap.flap-lit-sapphire {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.45) 0%, rgba(99, 102, 241, 0.30) 100%) !important;
+      border: 1.5px solid rgba(56, 189, 248, 0.95) !important;
+      box-shadow: 0 0 28px rgba(56, 189, 248, 0.65), inset 0 0 20px rgba(56, 189, 248, 0.45) !important;
+    }
+    .origami-flap.flap-lit-amber {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.45) 0%, rgba(217, 70, 239, 0.28) 100%) !important;
+      border: 1.5px solid rgba(245, 158, 11, 0.95) !important;
+      box-shadow: 0 0 28px rgba(245, 158, 11, 0.65), inset 0 0 20px rgba(245, 158, 11, 0.45) !important;
+    }
+
+    /* Visual Cycle Progress Track & Pips (No Raw Numbers) */
+    .cycle-track-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 18px;
+      margin: 6px 0 14px 0;
+      transition: opacity 0.4s ease;
+    }
+    .cycle-pips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cycle-pip {
+      width: 22px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.12);
+      transition: all 0.4s var(--ease-zen);
+    }
+    .cycle-pip.active {
+      background: #ffffff;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+      transform: scaleY(1.3);
+    }
+    .cycle-pip.completed {
+      background: #34d399;
+      box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
+    }
+    .cycle-progress-bar {
+      width: 140px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+    .cycle-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #34d399;
+      transition: width 1s linear;
+    }
+
+    /* Decoupled Guidance Stage (Clean Art Below Canvas) */
+    .guidance-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 62px;
+      transition: opacity 0.4s var(--ease-zen), transform 0.4s var(--ease-zen);
+    }
+    body.text-hidden .guidance-stage {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+    }
+
+    .phase-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+    .phase-icon {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.85);
+      transition: transform 0.3s ease, color 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+    }
+    .phase-label {
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+      color: #ffffff;
+      transition: color 0.4s ease;
+    }
+    .timer-badge {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
+      padding: 3px 9px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+    }
+    .timer-badge .countdown-digits {
+      font-weight: 600;
+      color: #ffffff;
+    }
+    .timer-badge .timer-unit {
+      font-size: 11px;
+      opacity: 0.6;
+    }
+    .sub-phase-text {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      font-weight: 400;
+      letter-spacing: 0.1px;
+      line-height: 1.4;
+      max-width: 260px;
+      min-height: 17px;
+      transition: color 0.4s ease, opacity 0.3s ease;
+    }
+
+    /* Control Dock (Bottom) */
+    footer {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 20;
+      transition: opacity 0.5s var(--ease-zen), transform 0.5s var(--ease-zen);
+    }
+
+    .protocol-dock {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px;
+      scrollbar-width: none;
+    }
+    .protocol-dock::-webkit-scrollbar {
+      display: none;
+    }
+
+    .protocol-chip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--color-text-muted);
+      padding: 9px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+    }
+    .protocol-chip:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--color-text);
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .protocol-chip:active {
+      transform: scale(0.97);
+    }
+    .protocol-chip.active {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      box-shadow: none;
+    }
+    .protocol-chip .chip-cadence {
+      font-size: 11px;
+      opacity: 0.5;
+      font-weight: 400;
+    }
+
+    .primary-action-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-start {
+      flex: 1;
+      height: 52px;
+      border-radius: 16px;
+      border: none;
+      background: #ffffff;
+      color: #090c12;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+      transition: all 0.2s var(--ease-zen);
+      outline: none;
+    }
+    .btn-start:hover {
+      background: #f1f5f9;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.3);
+    }
+    .btn-start:active {
+      transform: scale(0.98);
+      background: #e2e8f0;
+    }
+    .btn-start.running {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: none;
+    }
+    .btn-start.completed {
+      background: #34d399;
+      color: #090c12;
+      box-shadow: 0 4px 16px rgba(52, 211, 153, 0.25);
+    }
+
+    .rounds-select-wrap {
+      position: relative;
+    }
+    .rounds-select {
+      height: 52px;
+      padding: 0 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      color: var(--color-text);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      backdrop-filter: var(--glass-blur);
+      transition: all 0.2s ease;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 34px;
+    }
+    .rounds-select:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .rounds-select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    /* Zen Fullscreen Mode (HUD Fade) */
+    body.zen-mode header,
+    body.zen-mode footer,
+    body.zen-mode .rounds-pill {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(15px);
+    }
+    body.zen-mode header {
+      transform: translateY(-15px);
+    }
+
+    /* Modal / Drawer for Lotus Mandala & Insights */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 12, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+    .modal-card {
+      width: 100%;
+      max-width: 480px;
+      background: #0c1017;
+      border: 1px solid var(--border-subtle);
+      border-radius: 28px;
+      padding: 32px 24px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform: scale(0.95);
+      transition: transform 0.3s var(--ease-zen);
+    }
+    .modal-overlay.open .modal-card {
+      transform: scale(1);
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 6px;
+    }
+    .modal-subtitle {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-bottom: 24px;
+    }
+    .btn-modal-close {
+      margin-top: 24px;
+      padding: 12px 28px;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--color-text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-modal-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .btn-modal-close:active {
+      transform: scale(0.97);
+    }
+
+    /* Notification Toast */
+    .toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-30px);
+      padding: 12px 20px;
+      background: rgba(12, 16, 23, 0.95);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-focus);
+      color: var(--color-text);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 200;
+      transition: all 0.4s var(--ease-zen);
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .canvas-container {
+        width: 290px;
+        height: 290px;
+      }
+      .countdown-timer {
+        font-size: 46px;
+      }
+      .protocol-chip {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+      .btn-start {
+        height: 52px;
+        font-size: 15px;
+      }
+      .rounds-select {
+        height: 52px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Light Backdrops -->
+  <div class="ambient-aura aura-1" id="aura1"></div>
+  <div class="ambient-aura aura-2" id="aura2"></div>
+  <div class="ambient-aura aura-3" id="aura3"></div>
+
+  <!-- Top Navigation Bar -->
+  <header id="app-header">
+    <div class="brand-group">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 6v6l4 2"></path>
+        </svg>
+      </div>
+      <span class="brand-title">Breathe <span style="font-size: 11px; opacity: 0.45; font-weight: 500; letter-spacing: 0.2px; margin-left: 4px;">v3.0</span></span>
+      <span class="status-dot" id="sync-dot" title="Connected to The System"></span>
+    </div>
+
+    <div class="header-actions">
+      <!-- Streak Pill -->
+      <div class="streak-badge" role="button" tabindex="0" onclick="openLotusModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLotusModal();}" title="View 28-Day Lotus Matrix">
+        <span>🔥</span>
+        <span id="streak-days">0</span>
+        <span class="lotus-badge" id="header-lotus-badge">🌸 x<span id="header-lotus-count">0</span></span>
+      </div>
+
+      <!-- Sound Toggle -->
+      <button class="icon-btn active" id="sound-btn" onclick="toggleSound()" title="Sound On/Off">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="sound-icon-svg">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+      </button>
+
+      <!-- Haptics Toggle -->
+      <button class="icon-btn active" id="haptic-btn" onclick="toggleHaptics()" title="Haptic Pulses On/Off">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Text Guidance Toggle (Minimalist Mode) -->
+      <button class="icon-btn active" id="text-toggle-btn" onclick="toggleTextGuidance()" title="Toggle Text Guidance (Minimalist Mode)">
+        <span style="font-size: 13px; font-weight: 700; letter-spacing: -0.5px;">Aa</span>
+      </button>
+
+      <!-- Zen Fullscreen Toggle -->
+      <button class="icon-btn" id="zen-btn" onclick="toggleZenMode()" title="Zen Immersion Mode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Center Stage: Breathing Experience -->
+  <main>
+    <div class="canvas-container" onclick="handleCanvasTap()" title="Tap to enter/exit Zen Mode">
+      <!-- 1. 7-Petal Sacred Lotus Visualizer (4-7-8 Relax) -->
+      <div class="visualizer-wrapper" id="visualizer-lotus">
+        <svg class="visualizer-svg" viewBox="0 0 300 300" id="lotus-svg">
+          <defs>
+            <linearGradient id="lotusPetalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.38" />
+              <stop offset="50%" stop-color="#a7f3d0" stop-opacity="0.22" />
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.10" />
+            </linearGradient>
+            <linearGradient id="lotusAmberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fef3c7" stop-opacity="0.65" />
+              <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.45" />
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0.25" />
+            </linearGradient>
+            <radialGradient id="lotusCoreAura" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08" />
+              <stop offset="80%" stop-color="#ffffff" stop-opacity="0.0" />
+            </radialGradient>
+          </defs>
+          <circle cx="150" cy="150" r="135" fill="url(#lotusCoreAura)" />
+          <circle cx="150" cy="150" r="138" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1" />
+          <circle cx="150" cy="150" r="106" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" stroke-dasharray="3 4" />
+
+          <!-- 7 Sacred Lotus Petals & Nodes Group -->
+          <g class="lotus-petals-group" id="lotus-petals-group">
+            <circle id="lotus-petal-0" class="lotus-petal" cx="150" cy="98" r="60" fill="url(#lotusPetalGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+            <circle id="lotus-petal-1" class="lotus-petal" cx="191" cy="118" r="60" fill="url(#lotusPetalGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+            <circle id="lotus-petal-2" class="lotus-petal" cx="201" cy="162" r="60" fill="url(#lotusPetalGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+            <circle id="lotus-petal-3" class="lotus-petal" cx="173" cy="197" r="60" fill="url(#lotusPetalGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+            <circle id="lotus-petal-4" class="lotus-petal" cx="127" cy="197" r="60" fill="url(#lotusPetalGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+            <circle id="lotus-petal-5" class="lotus-petal" cx="99" cy="162" r="60" fill="url(#lotusPetalGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+            <circle id="lotus-petal-6" class="lotus-petal" cx="109" cy="118" r="60" fill="url(#lotusPetalGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+
+            <!-- 7 Hold Nodes (1 per second of the 7-second hold) -->
+            <circle id="lotus-node-0" class="lotus-node" cx="150" cy="44" r="4.5" fill="rgba(255,255,255,0.35)" />
+            <circle id="lotus-node-1" class="lotus-node" cx="233" cy="84" r="4.5" fill="rgba(255,255,255,0.35)" />
+            <circle id="lotus-node-2" class="lotus-node" cx="253" cy="174" r="4.5" fill="rgba(255,255,255,0.35)" />
+            <circle id="lotus-node-3" class="lotus-node" cx="196" cy="246" r="4.5" fill="rgba(255,255,255,0.35)" />
+            <circle id="lotus-node-4" class="lotus-node" cx="104" cy="246" r="4.5" fill="rgba(255,255,255,0.35)" />
+            <circle id="lotus-node-5" class="lotus-node" cx="47" cy="174" r="4.5" fill="rgba(255,255,255,0.35)" />
+            <circle id="lotus-node-6" class="lotus-node" cx="67" cy="84" r="4.5" fill="rgba(255,255,255,0.35)" />
+          </g>
+        </svg>
+      </div>
+
+      <!-- 2. Concentric Zen Mandala Visualizer (Coherence 5.5s) -->
+      <div class="visualizer-wrapper" id="visualizer-mandala" style="display: none;">
+        <svg class="visualizer-svg" viewBox="0 0 300 300" id="mandala-svg">
+          <circle cx="150" cy="150" r="135" fill="url(#lotusCoreAura)" />
+          <g class="mandala-group" id="mandala-group">
+            <circle cx="150" cy="150" r="46" fill="none" stroke="rgba(167, 243, 208, 0.35)" stroke-width="1.2" />
+            <circle cx="150" cy="150" r="86" fill="none" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" stroke-dasharray="4 4" />
+            <circle cx="150" cy="150" r="124" fill="none" stroke="rgba(129, 140, 248, 0.22)" stroke-width="1" />
+
+            <!-- 8 Interlocking Resonance Arcs -->
+            <circle id="mandala-petal-0" class="mandala-petal" cx="150" cy="104" r="46" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+            <circle id="mandala-petal-1" class="mandala-petal" cx="182" cy="118" r="46" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+            <circle id="mandala-petal-2" class="mandala-petal" cx="196" cy="150" r="46" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+            <circle id="mandala-petal-3" class="mandala-petal" cx="182" cy="182" r="46" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+            <circle id="mandala-petal-4" class="mandala-petal" cx="150" cy="196" r="46" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+            <circle id="mandala-petal-5" class="mandala-petal" cx="118" cy="182" r="46" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+            <circle id="mandala-petal-6" class="mandala-petal" cx="104" cy="150" r="46" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+            <circle id="mandala-petal-7" class="mandala-petal" cx="118" cy="118" r="46" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+
+            <!-- 8 Harmonic Traveling Wave Nodes -->
+            <circle id="mandala-node-0" class="mandala-node" cx="150" cy="64" r="4.5" fill="rgba(255,255,255,0.5)" />
+            <circle id="mandala-node-1" class="mandala-node" cx="211" cy="89" r="4.5" fill="rgba(255,255,255,0.5)" />
+            <circle id="mandala-node-2" class="mandala-node" cx="236" cy="150" r="4.5" fill="rgba(255,255,255,0.5)" />
+            <circle id="mandala-node-3" class="mandala-node" cx="211" cy="211" r="4.5" fill="rgba(255,255,255,0.5)" />
+            <circle id="mandala-node-4" class="mandala-node" cx="150" cy="236" r="4.5" fill="rgba(255,255,255,0.5)" />
+            <circle id="mandala-node-5" class="mandala-node" cx="89" cy="211" r="4.5" fill="rgba(255,255,255,0.5)" />
+            <circle id="mandala-node-6" class="mandala-node" cx="64" cy="150" r="4.5" fill="rgba(255,255,255,0.5)" />
+            <circle id="mandala-node-7" class="mandala-node" cx="89" cy="89" r="4.5" fill="rgba(255,255,255,0.5)" />
+
+            <circle cx="150" cy="150" r="6" fill="rgba(255,255,255,0.85)" />
+          </g>
+        </svg>
+      </div>
+
+      <!-- 3. Diamond Calming Cross Visualizer (Quick Calm 4-2-4) -->
+      <div class="visualizer-wrapper" id="visualizer-calm" style="display: none;">
+        <svg class="visualizer-svg" viewBox="0 0 300 300" id="calm-svg">
+          <defs>
+            <linearGradient id="calmLobeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.34" />
+              <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.22" />
+              <stop offset="100%" stop-color="#818cf8" stop-opacity="0.10" />
+            </linearGradient>
+            <linearGradient id="calmAmberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fef3c7" stop-opacity="0.65" />
+              <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.45" />
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0.25" />
+            </linearGradient>
+          </defs>
+          <circle cx="150" cy="150" r="135" fill="url(#lotusCoreAura)" />
+          <circle cx="150" cy="150" r="138" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1" />
+
+          <!-- Diamond Calming Cross Group -->
+          <g class="calm-cross-group" id="calm-cross-group">
+            <polygon points="150 46, 254 150, 150 254, 46 150" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1" stroke-dasharray="3 3" />
+            <polygon points="150 82, 218 150, 150 218, 82 150" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+
+            <!-- 4 Calming Diamond Leaf Lobes -->
+            <ellipse id="calm-lobe-0" class="calm-lobe" cx="150" cy="108" rx="38" ry="54" fill="url(#calmLobeGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+            <ellipse id="calm-lobe-1" class="calm-lobe" cx="192" cy="150" rx="54" ry="38" fill="url(#calmLobeGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+            <ellipse id="calm-lobe-2" class="calm-lobe" cx="150" cy="192" rx="38" ry="54" fill="url(#calmLobeGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+            <ellipse id="calm-lobe-3" class="calm-lobe" cx="108" cy="150" rx="54" ry="38" fill="url(#calmLobeGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+
+            <!-- 4 Diamond Apex Nodes (Hold Sec 1 = North/South, Hold Sec 2 = East/West) -->
+            <circle id="calm-node-0" class="calm-node" cx="150" cy="46" r="4.5" fill="rgba(255,255,255,0.4)" />
+            <circle id="calm-node-1" class="calm-node" cx="254" cy="150" r="4.5" fill="rgba(255,255,255,0.4)" />
+            <circle id="calm-node-2" class="calm-node" cx="150" cy="254" r="4.5" fill="rgba(255,255,255,0.4)" />
+            <circle id="calm-node-3" class="calm-node" cx="46" cy="150" r="4.5" fill="rgba(255,255,255,0.4)" />
+
+            <circle id="calm-center-jewel" cx="150" cy="150" r="7" fill="rgba(255,255,255,0.7)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" />
+          </g>
+        </svg>
+      </div>
+
+      <!-- 4. 3D Isometric Origami Folding Box (Box Breathing) -->
+      <div class="origami-wrapper" id="origami-box" style="display: none;">
+        <div class="origami-base" id="origami-base">
+          <div class="origami-crease"></div>
+          <div class="origami-core-gem" id="origami-core-gem"></div>
+          <div id="flap-top" class="origami-flap origami-top"></div>
+          <div id="flap-right" class="origami-flap origami-right"></div>
+          <div id="flap-bottom" class="origami-flap origami-bottom"></div>
+          <div id="flap-left" class="origami-flap origami-left"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual Cycle Progress Track & Pips (No Raw Numbers) -->
+    <div class="cycle-track-wrap" id="cycle-track-wrap" role="progressbar" aria-label="Session cycle progress">
+      <div class="cycle-pips" id="cycle-pips"></div>
+      <div class="cycle-progress-bar" id="cycle-progress-bar" style="display: none;">
+        <div class="cycle-progress-fill" id="cycle-progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Decoupled Guidance Stage (Clean Art Below Canvas) -->
+    <div class="guidance-stage" id="guidance-stage" aria-live="polite" aria-atomic="true">
+      <div class="phase-row">
+        <span class="phase-icon" id="phase-icon">◇</span>
+        <span class="phase-label" id="phase-text">Breathe</span>
+        <span class="timer-badge" id="timer-badge">
+          <span class="countdown-digits" id="timer-text">4</span>
+          <span class="timer-unit">s</span>
+        </span>
+      </div>
+      <div class="sub-phase-text" id="sub-phase-text">Tap Begin to start</div>
+    </div>
+  </main>
+
+  <!-- Bottom Control Dock -->
+  <footer id="app-footer">
+    <!-- Protocol Chip Selector -->
+    <div class="protocol-dock" role="tablist" aria-label="Breathing protocols">
+      <div class="protocol-chip active" role="tab" aria-selected="true" tabindex="0" id="chip-478" onclick="setProtocol('478')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setProtocol('478');}">
+        <span>4-7-8 Relax</span>
+        <span class="chip-cadence">4 • 7 • 8</span>
+      </div>
+      <div class="protocol-chip" role="tab" aria-selected="false" tabindex="0" id="chip-box" onclick="setProtocol('box')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setProtocol('box');}">
+        <span>Box Focus</span>
+        <span class="chip-cadence">4 • 4 • 4 • 4</span>
+      </div>
+      <div class="protocol-chip" role="tab" aria-selected="false" tabindex="0" id="chip-coherence" onclick="setProtocol('coherence')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setProtocol('coherence');}">
+        <span>Coherence</span>
+        <span class="chip-cadence">5.5 • 5.5</span>
+      </div>
+      <div class="protocol-chip" role="tab" aria-selected="false" tabindex="0" id="chip-calm" onclick="setProtocol('calm')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setProtocol('calm');}">
+        <span>Quick Calm</span>
+        <span class="chip-cadence">4 • 2 • 4</span>
+      </div>
+    </div>
+
+    <!-- Primary Action Bar -->
+    <div class="primary-action-bar">
+      <button class="btn-start" id="start-btn" onclick="toggleBreathing()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" id="start-icon">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        <span id="start-btn-label">Begin Session</span>
+      </button>
+
+      <div class="rounds-select-wrap">
+        <select class="rounds-select" id="rounds-select" onchange="handleRoundsChange()">
+          <option value="4" selected>4 Cycles</option>
+          <option value="8">8 Cycles</option>
+          <option value="12">12 Cycles</option>
+          <option value="timed-3">3 Minutes</option>
+          <option value="timed-5">5 Minutes</option>
+        </select>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 28-Day Lotus Matrix Modal -->
+  <div class="modal-overlay" id="lotus-modal" aria-hidden="true" inert onclick="handleModalOverlayClick(event)">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-lotus-title" onclick="event.stopPropagation()">
+      <div class="modal-title" id="modal-lotus-title">28-Day Blooming Lotus</div>
+      <div class="modal-subtitle">Each 28 consecutive daily sessions blooms a full sacred lotus (aligning with The System's 28-day strategic cycle).</div>
+      
+      <div style="position: relative; width: 280px; height: 180px; display: flex; align-items: center; justify-content: center; margin: 10px 0 20px 0;">
+        <div id="modal-lotus-grid" style="width: 260px; height: 165px; display: grid; grid-template-columns: repeat(11, 1fr); grid-template-rows: repeat(7, 1fr); gap: 3px;">
+          <!-- Pixels generated dynamically -->
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; justify-content: center;">
+        <div style="font-size: 14px; color: var(--color-text-muted);">
+          Current Streak: <strong style="color: var(--color-text);" id="modal-streak-days">0</strong> Days
+        </div>
+        <div style="font-size: 14px; color: #f472b6;">
+          Total Lotuses: <strong id="modal-lotus-count">0</strong> 🌸
+        </div>
+      </div>
+
+      <button class="btn-modal-close" onclick="closeLotusModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="toast" id="app-toast">
+    <span id="toast-icon">✓</span>
+    <span id="toast-msg">Session Complete</span>
+  </div>
+
+  <script>
+    // ============================================================
+    // APPLICATION STATE & PROTOCOLS
+    // ============================================================
+    const PROTOCOLS = {
+      '478': {
+        name: '4-7-8 Breathing',
+        habitName: '4-7-8 Breathing',
+        visualizer: 'lotus',
+        phases: [
+          { name: 'Inhale', duration: 4, action: 'inhale', subtext: 'Inhale gently through nose', freq: 329.63, auraColor: '#38bdf8' },
+          { name: 'Hold', duration: 7, action: 'hold', subtext: 'Rest breath effortlessly', freq: 440.00, auraColor: '#f59e0b' },
+          { name: 'Exhale', duration: 8, action: 'exhale', subtext: 'Exhale slowly through mouth', freq: 261.63, auraColor: '#818cf8' }
+        ]
+      },
+      'box': {
+        name: 'Box Breathing',
+        habitName: 'Box Breathing',
+        visualizer: 'box',
+        phases: [
+          { name: 'Inhale', duration: 4, action: 'box-inhale', subtext: 'Inhale smoothly through nose', freq: 329.63, auraColor: '#38bdf8' },
+          { name: 'Hold', duration: 4, action: 'box-hold-1', subtext: 'Hold with full lungs', freq: 440.00, auraColor: '#f59e0b' },
+          { name: 'Exhale', duration: 4, action: 'box-exhale', subtext: 'Exhale steadily through mouth', freq: 261.63, auraColor: '#818cf8' },
+          { name: 'Hold', duration: 4, action: 'box-hold-2', subtext: 'Hold empty and clear', freq: 440.00, auraColor: '#10b981' }
+        ]
+      },
+      'coherence': {
+        name: 'Coherence 5.5s',
+        habitName: '4-7-8 Breathing',
+        visualizer: 'mandala',
+        phases: [
+          { name: 'Inhale', duration: 5.5, action: 'inhale', subtext: 'Flowing continuous inhale', freq: 329.63, auraColor: '#10b981' },
+          { name: 'Exhale', duration: 5.5, action: 'exhale', subtext: 'Smooth effortless exhale', freq: 261.63, auraColor: '#38bdf8' }
+        ]
+      },
+      'calm': {
+        name: 'Quick Calm 4-2-4',
+        habitName: '4-7-8 Breathing',
+        visualizer: 'calm',
+        phases: [
+          { name: 'Inhale', duration: 4, action: 'inhale', subtext: 'Deep slow inhale', freq: 329.63, auraColor: '#38bdf8' },
+          { name: 'Hold', duration: 2, action: 'hold', subtext: 'Brief pause', freq: 440.00, auraColor: '#f59e0b' },
+          { name: 'Exhale', duration: 4, action: 'exhale', subtext: 'Long calming exhale', freq: 261.63, auraColor: '#818cf8' }
+        ]
+      }
+    };
+
+    let currentProtocolKey = '478';
+    let targetCycles = 4;
+    let isTimedSession = false;
+    let targetTimedSeconds = 0;
+    let elapsedTimedSeconds = 0;
+
+    let isRunning = false;
+    let currentPhaseIndex = 0;
+    let phaseSecondsRemaining = 0;
+    let cyclesCompleted = 0;
+    let rafId = null;
+    let phaseStartTime = 0;
+    let phaseDurationMs = 0;
+    let lastTickSecond = 0;
+    let hiddenAt = null;
+
+    let soundEnabled = true;
+    let hapticsEnabled = true;
+    let isZen = false;
+
+    let liveStreak = {
+      '4-7-8 Breathing': 0,
+      'Box Breathing': 0
+    };
+
+    let textVisible = true;
+    let phaseTicksElapsed = 0;
+
+    const PHASE_ICONS = {
+      'inhale': '↑',
+      'box-inhale': '↑',
+      'hold': '◇',
+      'box-hold-1': '◇',
+      'exhale': '↓',
+      'box-exhale': '↓',
+      'box-hold-2': '◇'
+    };
+
+    // Web Audio Engine
+    let audioCtx = null;
+
+    // Lotus Matrix Definition (28 cells for 28-day habit cycle, 11 columns x 7 rows)
+    const LOTUS_MAP = [
+      [ 0,  0,  0,  0,  0, 28,  0,  0,  0,  0,  0],
+      [ 0,  0,  0,  0, 26, 25, 27,  0,  0,  0,  0],
+      [ 0,  0,  0, 23,  0, 22,  0, 24,  0,  0,  0],
+      [ 0,  0, 20, 16, 17, 15, 18, 19, 21,  0,  0],
+      [ 0, 13, 11,  0,  9,  8, 10,  0, 12, 14,  0],
+      [ 0,  0,  0,  6,  4,  0,  5,  7,  0,  0,  0],
+      [ 0,  0,  0,  0,  2,  1,  3,  0,  0,  0,  0]
+    ];
+
+    // Safe storage helpers for sandboxed iframe resilience
+    function safeStorageGet(key, fallback = null) {
+      try {
+        const val = localStorage.getItem(key);
+        return val !== null ? val : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function safeStorageSet(key, val) {
+      try {
+        localStorage.setItem(key, val);
+      } catch (e) {}
+    }
+
+    // ============================================================
+    // INITIALIZATION & HARDWARE AUDIO / HAPTICS
+    // ============================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      // Load saved preferences
+      const savedSound = safeStorageGet('breathe_sound');
+      if (savedSound !== null) {
+        soundEnabled = savedSound === 'true';
+        updateSoundButtonUI();
+      }
+      const savedHaptics = safeStorageGet('breathe_haptics');
+      if (savedHaptics !== null) {
+        hapticsEnabled = savedHaptics === 'true';
+        updateHapticsButtonUI();
+      }
+      const savedTextVis = safeStorageGet('breathe_text_visible');
+      if (savedTextVis !== null) {
+        textVisible = savedTextVis === 'true';
+        updateTextToggleButtonUI();
+      }
+      const savedProto = safeStorageGet('breathe_protocol');
+      if (savedProto && PROTOCOLS[savedProto]) {
+        setProtocol(savedProto);
+      }
+
+      // Check URL parameters (e.g. ?mode=box or ?protocol=coherence)
+      const urlParams = new URLSearchParams(window.location.search);
+      const modeParam = urlParams.get('mode') || urlParams.get('protocol');
+      if (modeParam && PROTOCOLS[modeParam]) {
+        setProtocol(modeParam);
+      }
+
+      fetchInitialAppData();
+      syncPendingLocalHabits();
+    });
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Harmonic Temple Bell Chime (Rich Sine + Harmonic Overtone with Soft Decay)
+    function playHarmonicBell(fundamentalFreq, durationSec = 3.5) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const now = audioCtx.currentTime;
+
+        const partials = [
+          { ratio: 1.0, gain: 0.12 },
+          { ratio: 2.01, gain: 0.05 },
+          { ratio: 3.02, gain: 0.02 }
+        ];
+
+        partials.forEach(p => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(fundamentalFreq * p.ratio, now);
+
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.linearRampToValueAtTime(p.gain, now + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0005, now + durationSec);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now);
+          osc.stop(now + durationSec);
+        });
+      } catch (e) {
+        console.warn('Audio play error:', e);
+      }
+    }
+
+    // Soft Pulse Tick for Rhythm
+    function playSoftTick() {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(520, now);
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.012, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.06);
+      } catch (e) {}
+    }
+
+    // Victory Triad Chime on Completion
+    function playVictoryChime() {
+      if (!soundEnabled) return;
+      const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+      notes.forEach((freq, idx) => {
+        setTimeout(() => playHarmonicBell(freq, 4.0), idx * 220);
+      });
+    }
+
+    // Haptic Feedback
+    function triggerHaptic(pattern) {
+      if (!hapticsEnabled || !navigator.vibrate) return;
+      try {
+        navigator.vibrate(pattern);
+      } catch (e) {}
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      safeStorageSet('breathe_sound', soundEnabled);
+      updateSoundButtonUI();
+      showToast(soundEnabled ? 'Harmonic Chimes: On' : 'Harmonic Chimes: Muted', '🔊');
+    }
+
+    function updateSoundButtonUI() {
+      const btn = document.getElementById('sound-btn');
+      if (soundEnabled) {
+        btn.classList.add('active');
+        btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+      } else {
+        btn.classList.remove('active');
+        btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>`;
+      }
+    }
+
+    function toggleHaptics() {
+      hapticsEnabled = !hapticsEnabled;
+      safeStorageSet('breathe_haptics', hapticsEnabled);
+      updateHapticsButtonUI();
+      if (hapticsEnabled) triggerHaptic([60]);
+      showToast(hapticsEnabled ? 'Haptic Pulses: On' : 'Haptic Pulses: Off', '📳');
+    }
+
+    function updateHapticsButtonUI() {
+      const btn = document.getElementById('haptic-btn');
+      if (hapticsEnabled) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    }
+
+    function toggleZenMode() {
+      isZen = !isZen;
+      document.body.classList.toggle('zen-mode', isZen);
+      const btn = document.getElementById('zen-btn');
+      btn.classList.toggle('active', isZen);
+      if (isZen) {
+        showToast('Zen Mode Active — Tap center to restore controls', '🧘');
+      }
+    }
+
+    function handleCanvasTap() {
+      if (isRunning) {
+        toggleZenMode();
+      }
+    }
+
+    function toggleTextGuidance() {
+      textVisible = !textVisible;
+      safeStorageSet('breathe_text_visible', textVisible);
+      updateTextToggleButtonUI();
+      showToast(textVisible ? 'Text Guidance: Visible' : 'Minimalist Mode: Text Hidden', textVisible ? '👁️' : '🧘');
+    }
+
+    function updateTextToggleButtonUI() {
+      const btn = document.getElementById('text-toggle-btn');
+      if (btn) {
+        btn.classList.toggle('active', textVisible);
+      }
+      document.body.classList.toggle('text-hidden', !textVisible);
+    }
+
+    // ============================================================
+    // VISUAL CYCLE PROGRESS (NO RAW NUMBERS)
+    // ============================================================
+    function renderCyclePips() {
+      const pipsContainer = document.getElementById('cycle-pips');
+      const progressBar = document.getElementById('cycle-progress-bar');
+      const progressFill = document.getElementById('cycle-progress-fill');
+      if (!pipsContainer || !progressBar) return;
+
+      if (isTimedSession) {
+        pipsContainer.style.display = 'none';
+        progressBar.style.display = 'block';
+        const pct = targetTimedSeconds > 0 ? Math.min(100, (elapsedTimedSeconds / targetTimedSeconds) * 100) : 0;
+        if (progressFill) progressFill.style.width = `${pct}%`;
+      } else {
+        progressBar.style.display = 'none';
+        pipsContainer.style.display = 'flex';
+        pipsContainer.innerHTML = '';
+        for (let i = 0; i < targetCycles; i++) {
+          const pip = document.createElement('div');
+          pip.className = 'cycle-pip';
+          if (i < cyclesCompleted) {
+            pip.classList.add('completed');
+          } else if (i === cyclesCompleted && isRunning) {
+            pip.classList.add('active');
+          }
+          pipsContainer.appendChild(pip);
+        }
+      }
+    }
+
+    // ============================================================
+    // PROTOCOL SELECTION & VISUALIZER SETUP
+    // ============================================================
+    function setProtocol(key) {
+      if (!PROTOCOLS[key]) return;
+      if (isRunning) stopSession();
+
+      currentProtocolKey = key;
+      safeStorageSet('breathe_protocol', key);
+
+      document.querySelectorAll('.protocol-chip').forEach(el => {
+        el.classList.remove('active');
+        el.setAttribute('aria-selected', 'false');
+      });
+      const activeChip = document.getElementById(`chip-${key}`);
+      if (activeChip) {
+        activeChip.classList.add('active');
+        activeChip.setAttribute('aria-selected', 'true');
+      }
+
+      const visMap = {
+        'lotus': document.getElementById('visualizer-lotus'),
+        'box': document.getElementById('origami-box'),
+        'mandala': document.getElementById('visualizer-mandala'),
+        'calm': document.getElementById('visualizer-calm')
+      };
+      const activeVis = PROTOCOLS[key].visualizer;
+      Object.keys(visMap).forEach(vKey => {
+        if (visMap[vKey]) {
+          visMap[vKey].style.display = (vKey === activeVis) ? 'flex' : 'none';
+        }
+      });
+
+      resetVisualizers();
+      resetDisplayHUD();
+      renderCyclePips();
+      updateStreakDisplay();
+    }
+
+    function resetVisualizers() {
+      resetLotusVisualizer();
+      resetMandalaVisualizer();
+      resetCalmVisualizer();
+      resetOrigamiVisualizer();
+    }
+
+    function resetLotusVisualizer() {
+      const group = document.getElementById('lotus-petals-group');
+      if (group) {
+        group.style.transition = 'transform 0.8s var(--ease-zen), opacity 0.8s ease';
+        group.style.transform = 'scale(0.55) rotate(0deg)';
+        group.style.opacity = '0.82';
+      }
+      for (let i = 0; i < 7; i++) {
+        const p = document.getElementById(`lotus-petal-${i}`);
+        const n = document.getElementById(`lotus-node-${i}`);
+        if (p) {
+          p.setAttribute('fill', 'url(#lotusPetalGrad)');
+          p.setAttribute('stroke', 'rgba(255,255,255,0.22)');
+        }
+        if (n) {
+          n.setAttribute('fill', 'rgba(255,255,255,0.35)');
+          n.setAttribute('r', '4.5');
+          n.style.filter = 'none';
+        }
+      }
+    }
+
+    function resetMandalaVisualizer() {
+      const group = document.getElementById('mandala-group');
+      if (group) {
+        group.style.transition = 'transform 0.8s var(--ease-zen), opacity 0.8s ease';
+        group.style.transform = 'scale(0.55) rotate(0deg)';
+        group.style.opacity = '0.85';
+      }
+      for (let i = 0; i < 8; i++) {
+        const n = document.getElementById(`mandala-node-${i}`);
+        const p = document.getElementById(`mandala-petal-${i}`);
+        if (n) {
+          n.setAttribute('fill', 'rgba(255,255,255,0.5)');
+          n.setAttribute('r', '4.5');
+          n.style.filter = 'none';
+        }
+        if (p) {
+          p.setAttribute('stroke', 'rgba(255,255,255,0.18)');
+        }
+      }
+      const core = document.getElementById('mandala-core-jewel');
+      if (core) core.setAttribute('fill', 'rgba(255,255,255,0.85)');
+    }
+
+    function resetCalmVisualizer() {
+      const group = document.getElementById('calm-cross-group');
+      if (group) {
+        group.style.transition = 'transform 0.8s var(--ease-zen), opacity 0.8s ease';
+        group.style.transform = 'scale(0.58)';
+        group.style.opacity = '0.85';
+      }
+      for (let i = 0; i < 4; i++) {
+        const lobe = document.getElementById(`calm-lobe-${i}`);
+        const node = document.getElementById(`calm-node-${i}`);
+        if (lobe) {
+          lobe.setAttribute('fill', 'url(#calmLobeGrad)');
+          lobe.setAttribute('stroke', 'rgba(255,255,255,0.22)');
+        }
+        if (node) {
+          node.setAttribute('fill', 'rgba(255,255,255,0.4)');
+          node.setAttribute('r', '4.5');
+          node.style.filter = 'none';
+        }
+      }
+      const centerJewel = document.getElementById('calm-center-jewel');
+      if (centerJewel) {
+        centerJewel.setAttribute('fill', 'rgba(255,255,255,0.7)');
+        centerJewel.style.filter = 'none';
+      }
+    }
+
+    function resetOrigamiVisualizer() {
+      const base = document.getElementById('origami-base');
+      if (base) {
+        base.style.transform = 'scale(0.68) rotateX(60deg) rotateZ(45deg)';
+      }
+      const core = document.getElementById('origami-core-gem');
+      if (core) {
+        core.style.transform = 'translateZ(8px) scale(0.6)';
+        core.style.opacity = '0.35';
+      }
+      setOrigamiFlaps('closed', '0.6s');
+      resetOrigamiFlapGlows();
+    }
+
+    function setOrigamiFlaps(stateStr, dur = '0.7s') {
+      const t = document.getElementById('flap-top');
+      const b = document.getElementById('flap-bottom');
+      const l = document.getElementById('flap-left');
+      const r = document.getElementById('flap-right');
+      if (!t || !b || !l || !r) return;
+
+      const ease = 'cubic-bezier(0.25, 1, 0.5, 1)';
+      t.style.transition = `transform ${dur} ${ease}`;
+      b.style.transition = `transform ${dur} ${ease}`;
+      l.style.transition = `transform ${dur} ${ease}`;
+      r.style.transition = `transform ${dur} ${ease}`;
+
+      if (stateStr === 'open') {
+        t.style.transform = 'rotateX(0deg)';
+        b.style.transform = 'rotateX(0deg)';
+        l.style.transform = 'rotateY(0deg)';
+        r.style.transform = 'rotateY(0deg)';
+      } else {
+        t.style.transform = 'rotateX(-90deg)';
+        b.style.transform = 'rotateX(90deg)';
+        l.style.transform = 'rotateY(90deg)';
+        r.style.transform = 'rotateY(-90deg)';
+      }
+    }
+
+    function resetOrigamiFlapGlows() {
+      if (domCache && domCache.box && domCache.box.flapList) {
+        domCache.box.flapList.forEach(flap => {
+          if (flap) flap.classList.remove('flap-lit-sapphire', 'flap-lit-amber');
+        });
+      } else {
+        const flaps = ['flap-top', 'flap-right', 'flap-bottom', 'flap-left'];
+        flaps.forEach(id => {
+          const f = document.getElementById(id);
+          if (f) f.classList.remove('flap-lit-sapphire', 'flap-lit-amber');
+        });
+      }
+    }
+
+    function handleRoundsChange() {
+      const val = document.getElementById('rounds-select').value;
+      if (val.startsWith('timed-')) {
+        isTimedSession = true;
+        const mins = parseInt(val.split('-')[1], 10);
+        targetTimedSeconds = mins * 60;
+        elapsedTimedSeconds = 0;
+      } else {
+        isTimedSession = false;
+        targetCycles = parseInt(val, 10);
+      }
+      if (isRunning) stopSession();
+      else resetDisplayHUD();
+    }
+
+    function resetDisplayHUD() {
+      const proto = PROTOCOLS[currentProtocolKey];
+      const phaseIcon = document.getElementById('phase-icon');
+      const phaseText = document.getElementById('phase-text');
+      const timerText = document.getElementById('timer-text');
+      const subPhaseText = document.getElementById('sub-phase-text');
+
+      if (phaseIcon) phaseIcon.innerText = '◇';
+      if (phaseText) {
+        phaseText.innerText = 'Breathe';
+        phaseText.style.color = '#ffffff';
+      }
+      if (timerText) {
+        timerText.innerText = proto.phases[0].duration;
+      }
+      if (subPhaseText) {
+        subPhaseText.innerText = 'Tap Begin to start';
+        subPhaseText.style.color = 'rgba(255, 255, 255, 0.45)';
+      }
+      renderCyclePips();
+    }
+
+    // ============================================================
+    // BREATHING ENGINE CORE
+    // ============================================================
+    function toggleBreathing() {
+      if (isRunning) {
+        stopSession();
+      } else {
+        startSession();
+      }
+    }
+
+    function startSession() {
+      initAudio();
+      isRunning = true;
+      currentPhaseIndex = 0;
+      cyclesCompleted = 0;
+      elapsedTimedSeconds = 0;
+
+      const btn = document.getElementById('start-btn');
+      btn.classList.remove('completed');
+      btn.classList.add('running');
+      document.getElementById('start-btn-label').innerText = 'Stop Practice';
+      document.getElementById('start-icon').innerHTML = `<rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"></rect>`;
+
+      // Prime and start continuous linear breathing engine
+      executePhaseStart();
+    }
+
+    function stopSession() {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      isRunning = false;
+
+      const btn = document.getElementById('start-btn');
+      btn.classList.remove('running', 'completed');
+      document.getElementById('start-btn-label').innerText = 'Begin Session';
+      document.getElementById('start-icon').innerHTML = `<polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>`;
+
+      resetVisualizers();
+      resetDisplayHUD();
+
+      if (isZen) toggleZenMode();
+    }
+
+    function executePhaseStart() {
+      const proto = PROTOCOLS[currentProtocolKey];
+      const phase = proto.phases[currentPhaseIndex];
+      phaseDurationMs = phase.duration * 1000;
+      phaseStartTime = performance.now();
+      lastTickSecond = 0;
+      lastActiveAction = null;
+      lastActiveIndex = -1;
+
+      const phaseIcon = document.getElementById('phase-icon');
+      const phaseText = document.getElementById('phase-text');
+      const timerText = document.getElementById('timer-text');
+      const subPhaseEl = document.getElementById('sub-phase-text');
+
+      if (phaseIcon) phaseIcon.innerText = PHASE_ICONS[phase.action] || '◇';
+      if (phaseText) {
+        phaseText.innerText = phase.name;
+        phaseText.style.color = '#ffffff';
+      }
+      if (timerText) {
+        timerText.innerText = Math.ceil(phase.duration);
+      }
+      if (subPhaseEl) {
+        subPhaseEl.innerText = phase.subtext;
+      }
+
+      renderCyclePips();
+
+      // Disable CSS transitions during active rAF driving
+      prepareVisualizersForAnimation(proto.visualizer);
+
+      // Audio & Haptics
+      playHarmonicBell(phase.freq, phase.duration);
+      triggerHaptic([70, 40, 70]);
+
+      // Launch continuous render loop
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(renderBreathFrame);
+    }
+
+    function prepareVisualizersForAnimation(visualizerType) {
+      if (visualizerType === 'box') {
+        const base = document.getElementById('origami-base');
+        const t = document.getElementById('flap-top');
+        const r = document.getElementById('flap-right');
+        const b = document.getElementById('flap-bottom');
+        const l = document.getElementById('flap-left');
+        const core = document.getElementById('origami-core-gem');
+        if (base) base.style.transition = 'none';
+        if (t) t.style.transition = 'none';
+        if (r) r.style.transition = 'none';
+        if (b) b.style.transition = 'none';
+        if (l) l.style.transition = 'none';
+        if (core) core.style.transition = 'none';
+      } else if (visualizerType === 'lotus') {
+        const group = document.getElementById('lotus-petals-group');
+        if (group) group.style.transition = 'none';
+      } else if (visualizerType === 'mandala') {
+        const group = document.getElementById('mandala-group');
+        if (group) group.style.transition = 'none';
+      } else if (visualizerType === 'calm') {
+        const group = document.getElementById('calm-cross-group');
+        if (group) group.style.transition = 'none';
+      }
+    }
+
+    // High-performance DOM node cache to prevent 60fps getElementById thrashing
+    const domCache = {
+      lotus: { group: null, petals: [], nodes: [] },
+      mandala: { group: null, petals: [], nodes: [], core: null },
+      calm: { group: null, lobes: [], nodes: [], centerJewel: null },
+      box: { base: null, flaps: {}, flapList: [], core: null },
+      initialized: false
+    };
+
+    function ensureDomCache() {
+      if (domCache.initialized) return;
+      domCache.lotus.group = document.getElementById('lotus-petals-group');
+      for (let i = 0; i < 7; i++) {
+        domCache.lotus.petals[i] = document.getElementById(`lotus-petal-${i}`);
+        domCache.lotus.nodes[i] = document.getElementById(`lotus-node-${i}`);
+      }
+      domCache.mandala.group = document.getElementById('mandala-group');
+      for (let i = 0; i < 8; i++) {
+        domCache.mandala.petals[i] = document.getElementById(`mandala-petal-${i}`);
+        domCache.mandala.nodes[i] = document.getElementById(`mandala-node-${i}`);
+      }
+      domCache.mandala.core = document.getElementById('mandala-core-jewel');
+
+      domCache.calm.group = document.getElementById('calm-cross-group');
+      for (let i = 0; i < 4; i++) {
+        domCache.calm.lobes[i] = document.getElementById(`calm-lobe-${i}`);
+        domCache.calm.nodes[i] = document.getElementById(`calm-node-${i}`);
+      }
+      domCache.calm.centerJewel = document.getElementById('calm-center-jewel');
+
+      domCache.box.base = document.getElementById('origami-base');
+      domCache.box.flaps = {
+        top: document.getElementById('flap-top'),
+        right: document.getElementById('flap-right'),
+        bottom: document.getElementById('flap-bottom'),
+        left: document.getElementById('flap-left')
+      };
+      domCache.box.flapList = [
+        domCache.box.flaps.top,
+        domCache.box.flaps.right,
+        domCache.box.flaps.bottom,
+        domCache.box.flaps.left
+      ];
+      domCache.box.core = document.getElementById('origami-core-gem');
+      domCache.initialized = true;
+    }
+
+    let lastActiveAction = null;
+    let lastActiveIndex = -1;
+
+    function renderBreathFrame(now) {
+      if (!isRunning) return;
+
+      ensureDomCache();
+
+      const elapsedMs = now - phaseStartTime;
+      const proto = PROTOCOLS[currentProtocolKey];
+      const phase = proto.phases[currentPhaseIndex];
+
+      // Linear progress across full duration: 0.0 to 1.0 (dr/dt constant across duration)
+      const progress = Math.min(1.0, elapsedMs / phaseDurationMs);
+
+      // Smooth cosine harmonic easing: natural organic onset & settle physics (no sudden stops)
+      const harmonic = 0.5 - 0.5 * Math.cos(Math.PI * progress);
+
+      // Synchronized countdown timer digits
+      const remainingSec = Math.max(0, Math.ceil(phase.duration - (elapsedMs / 1000)));
+      const timerTextEl = document.getElementById('timer-text');
+      if (timerTextEl && timerTextEl.innerText !== String(remainingSec)) {
+        timerTextEl.innerText = remainingSec;
+      }
+
+      // Discrete rhythmic second tick events (audio & haptics)
+      const currentSec = Math.floor(elapsedMs / 1000);
+      if (currentSec > lastTickSecond && currentSec < phase.duration) {
+        lastTickSecond = currentSec;
+        elapsedTimedSeconds++;
+        playSoftTick();
+        triggerHaptic([25]);
+        if (isTimedSession) renderCyclePips();
+      }
+
+      // Render active visualizer with sub-millisecond cached rAF execution
+      if (proto.visualizer === 'box') {
+        renderOrigamiFrame(phase.action, progress, harmonic);
+      } else if (proto.visualizer === 'lotus') {
+        renderLotusFrame(phase.action, progress, harmonic);
+      } else if (proto.visualizer === 'mandala') {
+        renderMandalaFrame(phase.action, progress, harmonic);
+      } else if (proto.visualizer === 'calm') {
+        renderCalmFrame(phase.action, progress, harmonic);
+      }
+
+      // Phase boundary: transition at exact millisecond
+      if (elapsedMs >= phaseDurationMs) {
+        advanceToNextPhase();
+        return;
+      }
+
+      rafId = requestAnimationFrame(renderBreathFrame);
+    }
+
+    // 1. 7-PETAL SACRED LOTUS FRAME (4-7-8 Relax: Inhale 4s, Hold 7s, Exhale 8s)
+    function renderLotusFrame(action, progress, harmonic) {
+      const group = domCache.lotus.group;
+      if (!group) return;
+
+      const SCALE_MIN = 0.55;
+      const SCALE_MAX = 1.22;
+      const ROTATE_MAX = 28;
+      const OPACITY_MIN = 0.65;
+      const OPACITY_MAX = 0.98;
+
+      let currentScale, currentRotate, currentOpacity;
+
+      if (action.includes('inhale')) {
+        currentScale = SCALE_MIN + (SCALE_MAX - SCALE_MIN) * harmonic;
+        currentRotate = ROTATE_MAX * harmonic;
+        currentOpacity = OPACITY_MIN + (OPACITY_MAX - OPACITY_MIN) * harmonic;
+
+        // Reset nodes strictly ONCE when entering inhale
+        if (lastActiveAction !== action) {
+          lastActiveAction = action;
+          lastActiveIndex = -1;
+          for (let i = 0; i < 7; i++) {
+            const p = domCache.lotus.petals[i];
+            const n = domCache.lotus.nodes[i];
+            if (p) {
+              p.setAttribute('fill', 'url(#lotusPetalGrad)');
+              p.setAttribute('stroke', 'rgba(255,255,255,0.22)');
+            }
+            if (n) {
+              n.classList.remove('node-glow-amber');
+              n.setAttribute('fill', 'rgba(255,255,255,0.35)');
+              n.setAttribute('r', '4.5');
+            }
+          }
+        }
+      } else if (action === 'hold') {
+        currentScale = SCALE_MAX;
+        currentRotate = ROTATE_MAX;
+        currentOpacity = OPACITY_MAX;
+
+        // SEQUENTIAL 7-SECOND HOLD PROGRESSION:
+        // Illuminates petals & nodes 0 through 6 clockwise one second at a time
+        const activeIndex = Math.min(6, Math.floor(progress * 7));
+
+        if (lastActiveIndex !== activeIndex || lastActiveAction !== 'hold') {
+          lastActiveAction = 'hold';
+          lastActiveIndex = activeIndex;
+
+          for (let i = 0; i < 7; i++) {
+            const p = domCache.lotus.petals[i];
+            const n = domCache.lotus.nodes[i];
+            if (i <= activeIndex) {
+              if (p) {
+                p.setAttribute('fill', 'url(#lotusAmberGrad)');
+                p.setAttribute('stroke', 'rgba(245, 158, 11, 0.7)');
+              }
+              if (n) {
+                n.classList.add('node-glow-amber');
+              }
+            } else {
+              if (p) {
+                p.setAttribute('fill', 'url(#lotusPetalGrad)');
+                p.setAttribute('stroke', 'rgba(255,255,255,0.22)');
+              }
+              if (n) {
+                n.classList.remove('node-glow-amber');
+                n.setAttribute('fill', 'rgba(255,255,255,0.35)');
+                n.setAttribute('r', '4.5');
+              }
+            }
+          }
+        }
+      } else if (action.includes('exhale')) {
+        currentScale = SCALE_MAX - (SCALE_MAX - SCALE_MIN) * harmonic;
+        currentRotate = ROTATE_MAX * (1.0 - harmonic);
+        currentOpacity = OPACITY_MAX - (OPACITY_MAX - OPACITY_MIN) * harmonic;
+
+        // Reset to tranquil lavender strictly ONCE when entering exhale
+        if (lastActiveAction !== action) {
+          lastActiveAction = action;
+          lastActiveIndex = -1;
+          for (let i = 0; i < 7; i++) {
+            const p = domCache.lotus.petals[i];
+            const n = domCache.lotus.nodes[i];
+            if (p) {
+              p.setAttribute('fill', 'url(#lotusPetalGrad)');
+              p.setAttribute('stroke', 'rgba(129, 140, 248, 0.28)');
+            }
+            if (n) {
+              n.classList.remove('node-glow-amber');
+              n.setAttribute('fill', 'rgba(129, 140, 248, 0.4)');
+              n.setAttribute('r', '4.5');
+            }
+          }
+        }
+      }
+
+      group.style.transform = `scale(${currentScale.toFixed(4)}) rotate(${currentRotate.toFixed(2)}deg)`;
+      group.style.opacity = currentOpacity.toFixed(3);
+    }
+
+    // 2. CONCENTRIC ZEN MANDALA FRAME (Coherence 5.5s: Inhale 5.5s, Exhale 5.5s, pure HRV flow)
+    function renderMandalaFrame(action, progress, harmonic) {
+      const group = domCache.mandala.group;
+      if (!group) return;
+
+      const SCALE_MIN = 0.55;
+      const SCALE_MAX = 1.22;
+      const OPACITY_MIN = 0.65;
+      const OPACITY_MAX = 0.98;
+
+      let currentScale, currentOpacity;
+
+      if (action.includes('inhale')) {
+        currentScale = SCALE_MIN + (SCALE_MAX - SCALE_MIN) * harmonic;
+        currentOpacity = OPACITY_MIN + (OPACITY_MAX - OPACITY_MIN) * harmonic;
+      } else {
+        currentScale = SCALE_MAX - (SCALE_MAX - SCALE_MIN) * harmonic;
+        currentOpacity = OPACITY_MAX - (OPACITY_MAX - OPACITY_MIN) * harmonic;
+      }
+
+      // CONTINUOUS CIRCULAR WAVE:
+      // Propagates smoothly around the 8 harmonic nodes at 0.1 Hz coherence resonance
+      const wavePhase = (action.includes('inhale') ? progress : (1.0 - progress)) * Math.PI * 4;
+
+      for (let i = 0; i < 8; i++) {
+        const node = domCache.mandala.nodes[i];
+        const petal = domCache.mandala.petals[i];
+        const nodeAngle = i * (Math.PI / 4);
+        const intensity = Math.max(0, Math.sin(wavePhase - nodeAngle));
+        const glowPct = 0.25 + 0.75 * Math.pow(intensity, 2);
+
+        if (node) {
+          if (action.includes('inhale')) {
+            node.classList.toggle('node-glow-emerald', glowPct > 0.68);
+            node.classList.remove('node-glow-sapphire');
+            if (glowPct <= 0.68) {
+              node.setAttribute('fill', `rgba(52, 211, 153, ${glowPct.toFixed(2)})`);
+              node.setAttribute('r', (3.5 + 2.5 * glowPct).toFixed(1));
+            }
+          } else {
+            node.classList.toggle('node-glow-sapphire', glowPct > 0.68);
+            node.classList.remove('node-glow-emerald');
+            if (glowPct <= 0.68) {
+              node.setAttribute('fill', `rgba(56, 189, 248, ${glowPct.toFixed(2)})`);
+              node.setAttribute('r', (3.5 + 2.5 * glowPct).toFixed(1));
+            }
+          }
+        }
+        if (petal) {
+          petal.setAttribute('stroke', action.includes('inhale') ? `rgba(167, 243, 208, ${(0.15 + 0.35 * glowPct).toFixed(2)})` : `rgba(129, 140, 248, ${(0.15 + 0.35 * glowPct).toFixed(2)})`);
+        }
+      }
+
+      const core = domCache.mandala.core;
+      if (core && lastActiveAction !== action) {
+        lastActiveAction = action;
+        core.setAttribute('fill', action.includes('inhale') ? '#34d399' : '#38bdf8');
+      }
+
+      group.style.transform = `scale(${currentScale.toFixed(4)}) rotate(${(progress * 15).toFixed(2)}deg)`;
+      group.style.opacity = currentOpacity.toFixed(3);
+    }
+
+    // 3. DIAMOND CALMING CROSS FRAME (Quick Calm 4-2-4: Inhale 4s, Hold 2s, Exhale 4s)
+    function renderCalmFrame(action, progress, harmonic) {
+      const group = domCache.calm.group;
+      if (!group) return;
+
+      const SCALE_MIN = 0.58;
+      const SCALE_MAX = 1.22;
+      const OPACITY_MIN = 0.65;
+      const OPACITY_MAX = 0.98;
+
+      let currentScale, currentOpacity;
+
+      if (action.includes('inhale')) {
+        currentScale = SCALE_MIN + (SCALE_MAX - SCALE_MIN) * harmonic;
+        currentOpacity = OPACITY_MIN + (OPACITY_MAX - OPACITY_MIN) * harmonic;
+
+        if (lastActiveAction !== action) {
+          lastActiveAction = action;
+          lastActiveIndex = -1;
+          for (let i = 0; i < 4; i++) {
+            const lobe = domCache.calm.lobes[i];
+            const node = domCache.calm.nodes[i];
+            if (lobe) {
+              lobe.setAttribute('fill', 'url(#calmLobeGrad)');
+              lobe.setAttribute('stroke', 'rgba(255,255,255,0.22)');
+            }
+            if (node) {
+              node.classList.remove('node-glow-amber');
+              node.setAttribute('fill', 'rgba(255,255,255,0.4)');
+              node.setAttribute('r', '4.5');
+            }
+          }
+          if (domCache.calm.centerJewel) {
+            domCache.calm.centerJewel.classList.remove('node-glow-amber');
+            domCache.calm.centerJewel.setAttribute('fill', 'rgba(255,255,255,0.7)');
+          }
+        }
+      } else if (action === 'hold') {
+        currentScale = SCALE_MAX;
+        currentOpacity = OPACITY_MAX;
+
+        // 2-SECOND HOLD PROGRESSION:
+        // Step 0 (0..1s) -> North & South lobes & nodes illuminate
+        // Step 1 (1..2s) -> East & West lobes & nodes + Center Jewel illuminate
+        const holdStep = Math.min(1, Math.floor(progress * 2));
+
+        if (lastActiveIndex !== holdStep || lastActiveAction !== 'hold') {
+          lastActiveAction = 'hold';
+          lastActiveIndex = holdStep;
+
+          const nodeNorth = domCache.calm.nodes[0];
+          const nodeSouth = domCache.calm.nodes[2];
+          const lobeNorth = domCache.calm.lobes[0];
+          const lobeSouth = domCache.calm.lobes[2];
+
+          if (nodeNorth) nodeNorth.classList.add('node-glow-amber');
+          if (nodeSouth) nodeSouth.classList.add('node-glow-amber');
+          if (lobeNorth) {
+            lobeNorth.setAttribute('fill', 'url(#calmAmberGrad)');
+            lobeNorth.setAttribute('stroke', 'rgba(245, 158, 11, 0.7)');
+          }
+          if (lobeSouth) {
+            lobeSouth.setAttribute('fill', 'url(#calmAmberGrad)');
+            lobeSouth.setAttribute('stroke', 'rgba(245, 158, 11, 0.7)');
+          }
+
+          const nodeEast = domCache.calm.nodes[1];
+          const nodeWest = domCache.calm.nodes[3];
+          const lobeEast = domCache.calm.lobes[1];
+          const lobeWest = domCache.calm.lobes[3];
+          const centerJewel = domCache.calm.centerJewel;
+
+          if (holdStep >= 1) {
+            if (nodeEast) nodeEast.classList.add('node-glow-amber');
+            if (nodeWest) nodeWest.classList.add('node-glow-amber');
+            if (lobeEast) {
+              lobeEast.setAttribute('fill', 'url(#calmAmberGrad)');
+              lobeEast.setAttribute('stroke', 'rgba(245, 158, 11, 0.7)');
+            }
+            if (lobeWest) {
+              lobeWest.setAttribute('fill', 'url(#calmAmberGrad)');
+              lobeWest.setAttribute('stroke', 'rgba(245, 158, 11, 0.7)');
+            }
+            if (centerJewel) centerJewel.classList.add('node-glow-amber');
+          }
+        }
+      } else if (action.includes('exhale')) {
+        currentScale = SCALE_MAX - (SCALE_MAX - SCALE_MIN) * harmonic;
+        currentOpacity = OPACITY_MAX - (OPACITY_MAX - OPACITY_MIN) * harmonic;
+
+        if (lastActiveAction !== action) {
+          lastActiveAction = action;
+          lastActiveIndex = -1;
+          for (let i = 0; i < 4; i++) {
+            const lobe = domCache.calm.lobes[i];
+            const node = domCache.calm.nodes[i];
+            if (lobe) {
+              lobe.setAttribute('fill', 'url(#calmLobeGrad)');
+              lobe.setAttribute('stroke', 'rgba(129, 140, 248, 0.28)');
+            }
+            if (node) {
+              node.classList.remove('node-glow-amber');
+              node.setAttribute('fill', 'rgba(129, 140, 248, 0.45)');
+              node.setAttribute('r', '4.5');
+            }
+          }
+          if (domCache.calm.centerJewel) {
+            domCache.calm.centerJewel.classList.remove('node-glow-amber');
+            domCache.calm.centerJewel.setAttribute('fill', 'rgba(255,255,255,0.7)');
+          }
+        }
+      }
+
+      group.style.transform = `scale(${currentScale.toFixed(4)})`;
+      group.style.opacity = currentOpacity.toFixed(3);
+    }
+
+    function smoothstep(min, max, value) {
+      const x = Math.max(0, Math.min(1, (value - min) / (max - min)));
+      return x * x * (3 - 2 * x);
+    }
+
+    function renderOrigamiFrame(action, progress, harmonic) {
+      const base = domCache.box.base;
+      const t = domCache.box.flaps.top;
+      const r = domCache.box.flaps.right;
+      const b = domCache.box.flaps.bottom;
+      const l = domCache.box.flaps.left;
+      const flapList = domCache.box.flapList || [t, r, b, l];
+      const core = domCache.box.core;
+      if (!base || !t || !r || !b || !l) return;
+
+      const BASE_SCALE_MIN = 0.68;
+      const BASE_SCALE_MAX = 0.88;
+
+      let baseScale;
+
+      if (action.includes('inhale')) {
+        baseScale = BASE_SCALE_MIN + (BASE_SCALE_MAX - BASE_SCALE_MIN) * harmonic;
+        base.style.transform = `scale(${baseScale.toFixed(4)}) rotateX(60deg) rotateZ(45deg)`;
+
+        if (core) {
+          const coreScale = (0.5 + 0.6 * harmonic).toFixed(2);
+          const coreOpacity = (0.3 + 0.7 * harmonic).toFixed(2);
+          core.style.transform = `translateZ(8px) scale(${coreScale})`;
+          core.style.opacity = coreOpacity;
+        }
+
+        if (lastActiveAction !== action) {
+          lastActiveAction = action;
+          lastActiveIndex = -1;
+          resetOrigamiFlapGlows();
+        }
+
+        const pTop = smoothstep(0.00, 0.40, progress);
+        t.style.transform = `rotateX(${(-90 + 90 * pTop).toFixed(2)}deg)`;
+
+        const pRight = smoothstep(0.20, 0.60, progress);
+        r.style.transform = `rotateY(${(-90 + 90 * pRight).toFixed(2)}deg)`;
+
+        const pBottom = smoothstep(0.40, 0.80, progress);
+        b.style.transform = `rotateX(${(90 - 90 * pBottom).toFixed(2)}deg)`;
+
+        const pLeft = smoothstep(0.60, 1.00, progress);
+        l.style.transform = `rotateY(${(90 - 90 * pLeft).toFixed(2)}deg)`;
+
+      } else if (action === 'box-hold-1') {
+        base.style.transform = `scale(${BASE_SCALE_MAX}) rotateX(60deg) rotateZ(45deg)`;
+        t.style.transform = 'rotateX(0deg)';
+        r.style.transform = 'rotateY(0deg)';
+        b.style.transform = 'rotateX(0deg)';
+        l.style.transform = 'rotateY(0deg)';
+        if (core) {
+          const pulse = 1.1 + 0.08 * Math.sin(progress * Math.PI * 2);
+          core.style.transform = `translateZ(8px) scale(${pulse.toFixed(2)})`;
+          core.style.opacity = '1';
+        }
+
+        const activeHoldIndex = Math.min(3, Math.floor(progress * 4));
+        if (lastActiveIndex !== activeHoldIndex || lastActiveAction !== 'box-hold-1') {
+          lastActiveAction = 'box-hold-1';
+          lastActiveIndex = activeHoldIndex;
+
+          flapList.forEach((flap, idx) => {
+            if (!flap) return;
+            if (idx <= activeHoldIndex) {
+              flap.classList.add('flap-lit-sapphire');
+              flap.classList.remove('flap-lit-amber');
+            } else {
+              flap.classList.remove('flap-lit-sapphire', 'flap-lit-amber');
+            }
+          });
+        }
+
+      } else if (action.includes('exhale')) {
+        baseScale = BASE_SCALE_MAX - (BASE_SCALE_MAX - BASE_SCALE_MIN) * harmonic;
+        base.style.transform = `scale(${baseScale.toFixed(4)}) rotateX(60deg) rotateZ(45deg)`;
+
+        if (core) {
+          const coreScale = (1.1 - 0.6 * harmonic).toFixed(2);
+          const coreOpacity = (1.0 - 0.7 * harmonic).toFixed(2);
+          core.style.transform = `translateZ(8px) scale(${coreScale})`;
+          core.style.opacity = coreOpacity;
+        }
+
+        if (lastActiveAction !== action) {
+          lastActiveAction = action;
+          lastActiveIndex = -1;
+          resetOrigamiFlapGlows();
+        }
+
+        const pTop = smoothstep(0.00, 0.40, progress);
+        t.style.transform = `rotateX(${(0 - 90 * pTop).toFixed(2)}deg)`;
+
+        const pRight = smoothstep(0.20, 0.60, progress);
+        r.style.transform = `rotateY(${(0 - 90 * pRight).toFixed(2)}deg)`;
+
+        const pBottom = smoothstep(0.40, 0.80, progress);
+        b.style.transform = `rotateX(${(0 + 90 * pBottom).toFixed(2)}deg)`;
+
+        const pLeft = smoothstep(0.60, 1.00, progress);
+        l.style.transform = `rotateY(${(0 + 90 * pLeft).toFixed(2)}deg)`;
+
+      } else if (action === 'box-hold-2') {
+        base.style.transform = `scale(${BASE_SCALE_MIN}) rotateX(60deg) rotateZ(45deg)`;
+        t.style.transform = 'rotateX(-90deg)';
+        r.style.transform = 'rotateY(-90deg)';
+        b.style.transform = 'rotateX(90deg)';
+        l.style.transform = 'rotateY(90deg)';
+        if (core) {
+          core.style.transform = 'translateZ(8px) scale(0.5)';
+          core.style.opacity = '0.2';
+        }
+
+        const activeHoldIndex = Math.min(3, Math.floor(progress * 4));
+        if (lastActiveIndex !== activeHoldIndex || lastActiveAction !== 'box-hold-2') {
+          lastActiveAction = 'box-hold-2';
+          lastActiveIndex = activeHoldIndex;
+
+          flapList.forEach((flap, idx) => {
+            if (!flap) return;
+            if (idx <= activeHoldIndex) {
+              flap.classList.add('flap-lit-amber');
+              flap.classList.remove('flap-lit-sapphire');
+            } else {
+              flap.classList.remove('flap-lit-sapphire', 'flap-lit-amber');
+            }
+          });
+        }
+      }
+    }
+
+    function advanceToNextPhase() {
+      const proto = PROTOCOLS[currentProtocolKey];
+      currentPhaseIndex++;
+
+      if (currentPhaseIndex >= proto.phases.length) {
+        currentPhaseIndex = 0;
+        cyclesCompleted++;
+        renderCyclePips();
+
+        if (!isTimedSession && cyclesCompleted >= targetCycles) {
+          completeSessionSuccess();
+          return;
+        }
+      }
+
+      if (isTimedSession && elapsedTimedSeconds >= targetTimedSeconds) {
+        completeSessionSuccess();
+        return;
+      }
+
+      executePhaseStart();
+    }
+
+    function completeSessionSuccess() {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      isRunning = false;
+
+      const btn = document.getElementById('start-btn');
+      btn.classList.remove('running');
+      btn.classList.add('completed');
+      document.getElementById('start-btn-label').innerText = 'Session Complete ✓';
+      document.getElementById('start-icon').innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+      const phaseIcon = document.getElementById('phase-icon');
+      if (phaseIcon) phaseIcon.innerText = '✓';
+
+      const phaseText = document.getElementById('phase-text');
+      if (phaseText) {
+        phaseText.innerText = 'Namaste';
+        phaseText.style.color = '#34d399';
+      }
+
+      document.getElementById('timer-text').innerText = '✓';
+      document.getElementById('sub-phase-text').innerText = 'Habit logged to The System';
+
+      renderCyclePips();
+      playVictoryChime();
+      triggerHaptic([100, 50, 100, 50, 200]);
+
+      resetVisualizers();
+
+      // Log habit to backend & Google Tasks
+      logSessionCompletion();
+
+      setTimeout(() => {
+        if (isZen) toggleZenMode();
+      }, 2500);
+    }
+
+    // Tab switching / backgrounding pause & resume
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        hiddenAt = performance.now();
+      } else if (isRunning && hiddenAt) {
+        const delta = performance.now() - hiddenAt;
+        phaseStartTime += delta;
+        hiddenAt = null;
+      }
+    });
+
+
+    // ============================================================
+    // BACKEND HABIT & GOOGLE TASKS SYNCHRONIZATION
+    // ============================================================
+    function fetchInitialAppData() {
+      // 1. If running inside Google Apps Script iframe
+      if (window.google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(res => {
+            if (res && res.success) {
+              liveStreak['4-7-8 Breathing'] = res.streak478 || 0;
+              liveStreak['Box Breathing'] = res.streakBox || 0;
+              updateStreakDisplay();
+              renderLotusGrid();
+              setSyncStatus(true);
+            }
+          })
+          .withFailureHandler(err => {
+            console.warn('Failed to load initial habit streak:', err);
+            setSyncStatus(false);
+          })
+          .getBreatheAppData();
+      } else {
+        // Fallback: load cached streak from localStorage
+        const cached = safeStorageGet('breathe_streak_cache');
+        if (cached) {
+          try {
+            liveStreak = JSON.parse(cached);
+            updateStreakDisplay();
+            renderLotusGrid();
+          } catch(e) {}
+        }
+      }
+    }
+
+    function logSessionCompletion() {
+      const proto = PROTOCOLS[currentProtocolKey];
+      const habitName = proto.habitName;
+
+      // Optimistically increment streak
+      liveStreak[habitName] = (liveStreak[habitName] || 0) + 1;
+      safeStorageSet('breathe_streak_cache', JSON.stringify(liveStreak));
+      updateStreakDisplay();
+      renderLotusGrid();
+
+      showToast(`Logged habit: ${habitName} (+1 Day 🔥)`, '🌸');
+
+      // Sync via Apps Script native bridge
+      if (window.google && google.script && google.script.run) {
+        // 1. Log habit in Google Sheets
+        google.script.run
+          .withSuccessHandler(res => {
+            console.log('Habit logged successfully to Google Sheets:', res);
+            setSyncStatus(true);
+          })
+          .withFailureHandler(err => {
+            console.error('Failed to log habit:', err);
+            bufferOfflineHabit(habitName);
+            setSyncStatus(false);
+          })
+          .logHabit(habitName);
+
+        // 2. Complete matching Google Task
+        google.script.run
+          .withSuccessHandler(res => {
+            if (res && res.taskId) {
+              showToast(`Completed task: "${res.title}" ✓`, '✅');
+            }
+          })
+          .withFailureHandler(err => {
+            console.warn('Failed to complete breathing task:', err);
+          })
+          .completeBreathingTask(habitName);
+
+      } else {
+        // Running as standalone PWA / local web page outside iframe
+        bufferOfflineHabit(habitName);
+      }
+    }
+
+    function bufferOfflineHabit(habitName) {
+      try {
+        const pending = JSON.parse(safeStorageGet('breathe_pending_habits', '[]') || '[]');
+        pending.push({ habit: habitName, timestamp: Date.now() });
+        safeStorageSet('breathe_pending_habits', JSON.stringify(pending));
+        setSyncStatus(false);
+      } catch (e) {}
+    }
+
+    function syncPendingLocalHabits() {
+      if (!window.google || !google.script || !google.script.run) return;
+      const pending = JSON.parse(safeStorageGet('breathe_pending_habits', '[]') || '[]');
+      if (pending.length === 0) return;
+
+      pending.forEach((item, index) => {
+        google.script.run
+          .withSuccessHandler(() => {
+            const updated = JSON.parse(safeStorageGet('breathe_pending_habits', '[]') || '[]');
+            const remaining = updated.filter(p => p.timestamp !== item.timestamp);
+            safeStorageSet('breathe_pending_habits', JSON.stringify(remaining));
+            if (remaining.length === 0) setSyncStatus(true);
+          })
+          .logHabit(item.habit);
+      });
+    }
+
+    function setSyncStatus(isLive) {
+      const dot = document.getElementById('sync-dot');
+      if (dot) {
+        dot.style.backgroundColor = isLive ? '#34d399' : '#f59e0b';
+        dot.style.boxShadow = 'none';
+        dot.title = isLive ? 'Connected & Synced with The System' : 'Offline / Buffered locally';
+      }
+    }
+
+    function updateStreakDisplay() {
+      const proto = PROTOCOLS[currentProtocolKey];
+      const streak = liveStreak[proto.habitName] || 0;
+
+      document.getElementById('streak-days').innerText = streak;
+      const modalStreak = document.getElementById('modal-streak-days');
+      if (modalStreak) modalStreak.innerText = streak;
+
+      const lotusCount = Math.floor(streak / 28);
+      const headerBadge = document.getElementById('header-lotus-badge');
+      const headerCount = document.getElementById('header-lotus-count');
+      const modalLotusCount = document.getElementById('modal-lotus-count');
+
+      if (lotusCount > 0) {
+        headerBadge.style.display = 'inline-flex';
+        headerCount.innerText = lotusCount;
+      } else {
+        headerBadge.style.display = 'none';
+      }
+      if (modalLotusCount) modalLotusCount.innerText = lotusCount;
+    }
+
+    // ============================================================
+    // 28-DAY LOTUS MATRIX MODAL & RENDERING
+    // ============================================================
+    function renderLotusGrid() {
+      const proto = PROTOCOLS[currentProtocolKey];
+      const rawStreak = liveStreak[proto.habitName] || 0;
+      const streak = rawStreak % 28;
+      const lotusCount = Math.floor(rawStreak / 28);
+      const displayStreak = (rawStreak > 0 && streak === 0) ? 28 : streak;
+
+      const container = document.getElementById('modal-lotus-grid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      for (let r = 0; r < LOTUS_MAP.length; r++) {
+        for (let c = 0; c < LOTUS_MAP[r].length; c++) {
+          const val = LOTUS_MAP[r][c];
+          const div = document.createElement('div');
+          div.className = 'lotus-pixel';
+
+          if (val === 0) {
+            div.style.background = 'transparent';
+          } else {
+            const isActive = displayStreak >= val || lotusCount > 0;
+            if (isActive) {
+              let color = '#f472b6';
+              if (r === 6) color = '#10b981'; // Green stem (Week 1 foundation)
+              else if (r === 5) color = '#059669'; // Base leaves (Week 1)
+              else if (r === 4) color = '#d946ef'; // Fuchsia outer petals (Week 2 momentum)
+              else if (r === 3) color = '#f472b6'; // Pink inner petals (Week 3 habit groove)
+              else color = '#fbcfe8'; // Light pink crown / apex (Week 4 full bloom)
+
+              div.style.background = color;
+              if (displayStreak === 28 || lotusCount > 0) {
+                div.style.boxShadow = `0 0 6px ${color}`;
+              } else {
+                div.style.boxShadow = `0 0 3px ${color}`;
+              }
+            } else {
+              div.style.background = 'rgba(255, 255, 255, 0.08)';
+              div.style.opacity = '0.35';
+            }
+          }
+          container.appendChild(div);
+        }
+      }
+    }
+
+    function openLotusModal() {
+      renderLotusGrid();
+      const modal = document.getElementById('lotus-modal');
+      if (modal) {
+        modal.removeAttribute('inert');
+        modal.setAttribute('aria-hidden', 'false');
+        modal.classList.add('open');
+      }
+    }
+
+    function handleModalOverlayClick(event) {
+      if (event && event.target === document.getElementById('lotus-modal')) {
+        closeLotusModal();
+      }
+    }
+
+    function closeLotusModal() {
+      const modal = document.getElementById('lotus-modal');
+      if (modal) {
+        if (document.activeElement && modal.contains(document.activeElement)) {
+          document.activeElement.blur();
+        }
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        modal.setAttribute('inert', '');
+      }
+    }
+
+    // Dismiss modal on Escape key (F5 Overlay without Escape)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('lotus-modal');
+        if (modal && modal.classList.contains('open')) {
+          closeLotusModal();
+        }
+      }
+    });
+
+    // Dismiss Zen Immersion Mode on Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isZen) {
+        toggleZenMode();
+      }
+    });
+
+    // ============================================================
+    // TOAST NOTIFICATIONS
+    // ============================================================
+    let toastTimeout = null;
+    function showToast(msg, icon = '✓') {
+      const toast = document.getElementById('app-toast');
+      document.getElementById('toast-msg').innerText = msg;
+      document.getElementById('toast-icon').innerText = icon;
+
+      toast.classList.add('show');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+  </script>
+</body>
+</html>

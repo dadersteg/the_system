@@ -1,0 +1,4275 @@
+<!--
+/**
+ * @file WebApp_Dashboard.html
+ * @description Premium web dashboard UI providing a central hub for tasks, health, and system management.
+ * 
+ * @version 1.1.3
+ * @last_modified 2026-06-21
+ * @modified_by Jules
+ * 
+ * @changelog
+ * - 1.1.0: Premium UI/UX refactoring, glassmorphism design, and layout enhancements.
+ * - 1.1.1: Polished .log-clear UI element with premium micro-design properties.
+ * - 1.1.2: Modernized #breathe-mode-select with premium micro-design properties and 44px touch target.
+ * - 1.1.3: Modernized intel cards in Reflection section with premium micro-design properties and 44px touch target.
+ * - 1.1.4: Modernized .page-btn with premium micro-design properties and fluid 44px touch target.
+ */
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The System - Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Google+Sans:wght@400;500;600;700&display=swap');
+    
+    :root {
+      /* Premium Zinc/Slate Theme - Light */
+      --color-primary: #0f172a; /* deep zinc */
+      --color-primary-on: #ffffff;
+      --color-bg: #f8fafc;
+      --color-surface: rgba(255, 255, 255, 0.85); /* stronger glass */
+      --color-text: #1e293b;
+      --color-text-muted: #64748b;
+      --color-border: rgba(226, 232, 240, 0.9);
+      --color-hover: rgba(241, 245, 249, 0.9);
+      --color-icon-bg: #f1f5f9;
+      --color-accent: #6366f1; /* Premium desaturated Indigo */
+      
+      --sidebar-width: 260px;
+      --glass-blur: blur(16px);
+      --card-shadow: 0 8px 32px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.02);
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* Premium Zinc/Slate Theme - Dark */
+        --color-primary: #f8fafc;
+        --color-primary-on: #0f172a;
+        --color-bg: #020617; /* Slate 950 */
+        --color-surface: rgba(15, 23, 42, 0.65); /* Slate 900 glass */
+        --color-text: #f8fafc;
+        --color-text-muted: #94a3b8;
+        --color-border: rgba(30, 41, 59, 0.8);
+        --color-hover: rgba(30, 41, 59, 0.7);
+        --color-icon-bg: #1e293b;
+        --color-accent: #818cf8; /* Premium desaturated Indigo in dark mode */
+        --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--color-bg);
+      background-image: radial-gradient(circle at 100% 0%, rgba(15, 23, 42, 0.02) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(15, 23, 42, 0.02) 0%, transparent 50%);
+      color: var(--color-text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-image: radial-gradient(circle at 100% 0%, rgba(226, 232, 240, 0.03) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(226, 232, 240, 0.03) 0%, transparent 50%);
+      }
+    }
+
+    h1, h2, h3, h4, .font-display { font-family: 'Google Sans', sans-serif; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--color-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      gap: 12px;
+      z-index: 10;
+    }
+    
+    .logo-container {
+      padding: 0 16px 24px 16px;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary-on);
+      font-weight: bold;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+
+    .nav-item {
+      position: relative;
+      padding: 12px 20px;
+      padding-left: 28px; /* Extra padding to make room for the floating capsule */
+      min-height: 44px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      font-size: 15px;
+      background: transparent;
+      border: 1px solid transparent;
+      letter-spacing: -0.1px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+      }
+      
+      .sidebar {
+        position: sticky;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        padding: 8px 10px;
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        flex-shrink: 0;
+        background: var(--color-surface);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+        z-index: 1000;
+        scrollbar-width: none;
+      }
+      
+      .sidebar::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .logo-container {
+        display: none;
+      }
+      
+      .nav-item {
+        flex-shrink: 0;
+        padding: 8px 14px;
+        padding-left: 14px;
+        min-height: 38px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 999px;
+        background: rgba(100, 116, 139, 0.08);
+        color: var(--color-text-muted);
+        border: 1px solid transparent;
+        gap: 6px;
+      }
+      
+      .nav-item::before {
+        display: none;
+      }
+      
+      .nav-item.active {
+        background: var(--color-accent);
+        color: #ffffff;
+        border-color: var(--color-accent);
+        box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
+      }
+      
+      .nav-item.active span {
+        transform: none;
+        color: #ffffff;
+      }
+      
+      .nav-item:hover span {
+        transform: none;
+      }
+
+      .main-content {
+        padding: 16px 14px 48px 14px;
+        width: 100%;
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .log-wrapper {
+        left: 0;
+        padding: 6px 12px;
+      }
+      
+      .log-container {
+        height: 90px;
+        padding: 8px;
+        font-size: 11px;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      
+      .header-area {
+        margin-bottom: 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      
+      .header-area h1 {
+        font-size: 22px;
+        letter-spacing: -0.3px;
+      }
+
+      .dash-card {
+        border-radius: 14px;
+      }
+
+      .dash-card-header {
+        padding: 12px 14px;
+      }
+
+      .dash-card-body {
+        padding: 12px 14px;
+      }
+
+      /* Mobile Mental Health breathing fit */
+      #sec-breathe .dash-card {
+        padding: 20px 14px !important;
+        gap: 16px !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+      }
+
+      #sec-breathe .breathe-circle,
+      #sec-breathe .origami-box,
+      #sec-breathe #breathe-lotus {
+        width: 170px !important;
+        height: 170px !important;
+      }
+
+      #sec-breathe #breathe-circle {
+        width: 170px !important;
+        height: 170px !important;
+      }
+
+      #sec-breathe #breathe-text {
+        font-size: 40px !important;
+      }
+
+      #sec-breathe .btn-breathe {
+        padding: 12px 36px !important;
+        font-size: 14px !important;
+      }
+    }
+
+    .nav-item span {
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-block;
+    }
+
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      left: 12px; /* Floating capsule spacing aligned */
+      top: 50%;
+      transform: translateY(-50%) scaleY(0.1);
+      width: 3px;
+      height: 16px;
+      background: linear-gradient(180deg, var(--color-accent), #a5b4fc);
+      border-radius: 99px; /* Rounded pill shape */
+      opacity: 0;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+                  opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .nav-item::before {
+        background: linear-gradient(180deg, var(--color-accent), #c7d2fe);
+        box-shadow: 0 0 12px rgba(129, 140, 248, 0.6);
+      }
+    }
+    
+    .nav-item:hover { 
+      background: rgba(71, 85, 105, 0.08);
+      border-color: rgba(71, 85, 105, 0.12);
+      color: var(--color-text);
+      box-shadow: 0 4px 12px rgba(71, 85, 105, 0.02);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .nav-item:hover {
+        background: rgba(148, 163, 184, 0.1);
+        border-color: rgba(148, 163, 184, 0.18);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    .nav-item:hover::before {
+      opacity: 0.7;
+      transform: translateY(-50%) scaleY(1.0);
+      height: 18px;
+    }
+
+    .nav-item:hover span {
+      transform: translateX(4px);
+    }
+
+    .nav-item:active {
+      background: rgba(99, 102, 241, 0.08);
+      border-color: rgba(99, 102, 241, 0.2);
+    }
+
+    .nav-item:active span {
+      transform: translateX(2px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .nav-item:active {
+        background: rgba(129, 140, 248, 0.12);
+        border-color: rgba(129, 140, 248, 0.25);
+      }
+    }
+
+    .nav-item.active { 
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.06) 0%, rgba(99, 102, 241, 0.01) 100%);
+      border-color: rgba(99, 102, 241, 0.2);
+      color: var(--color-accent); 
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      text-shadow: 0 0 8px rgba(99, 102, 241, 0.12);
+      font-weight: 600;
+    }
+
+    .nav-item.active span {
+      transform: translateX(6px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .nav-item.active {
+        background: linear-gradient(90deg, rgba(129, 140, 248, 0.1) 0%, rgba(129, 140, 248, 0.02) 100%);
+        border-color: rgba(129, 140, 248, 0.25);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        text-shadow: 0 0 12px rgba(129, 140, 248, 0.2);
+      }
+    }
+
+    .nav-item.active::before {
+      transform: translateY(-50%) scaleY(1.0);
+      opacity: 1;
+      height: 22px;
+    }
+    
+    .nav-item.active:hover {
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.02) 100%);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .nav-item.active:hover {
+        box-shadow: 0 6px 28px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        background: linear-gradient(90deg, rgba(129, 140, 248, 0.14) 0%, rgba(129, 140, 248, 0.04) 100%);
+        border-color: rgba(129, 140, 248, 0.35);
+      }
+    }
+
+    .nav-item.active:hover::before {
+      opacity: 1;
+      transform: translateY(-50%) scaleY(1.0);
+      height: 24px;
+    }
+
+    .nav-item.active:hover span {
+      transform: translateX(8px);
+    }
+
+    .nav-item.active:active {
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.03) 100%);
+    }
+
+    .nav-item.active:active span {
+      transform: translateX(5px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .nav-item.active:active {
+        background: linear-gradient(90deg, rgba(129, 140, 248, 0.15) 0%, rgba(129, 140, 248, 0.05) 100%);
+      }
+    }
+
+    .nav-item:focus-visible {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 40px 56px;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+
+    .section { display: none; opacity: 0; }
+    .section.active { display: block; animation: fadeUpIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    
+    @keyframes fadeUpIn { 
+      0% { opacity: 0; transform: translateY(15px); } 
+      100% { opacity: 1; transform: translateY(0); } 
+    }
+
+    /* Dashboard Layout */
+    .header-area { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .header-area h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
+    
+    .quick-links {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    
+    .quick-link-chip {
+      position: relative;
+      overflow: hidden;
+      background: var(--color-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--color-border);
+      padding: 10px 18px;
+      min-height: 44px; /* Touch target accessibility */
+      min-width: 44px; /* Touch target width accessibility */
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      text-decoration: none;
+      color: var(--color-text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: color 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  background-color 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  border-color 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .quick-link-chip {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    .quick-link-chip::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(100, 116, 139, 0.05), transparent);
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .quick-link-chip::after {
+        background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.08), transparent);
+      }
+    }
+    
+    .quick-link-chip:hover {
+      background: rgba(100, 116, 139, 0.05); /* Premium desaturated slate */
+      border-color: rgba(100, 116, 139, 0.2);
+      color: var(--color-text);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .quick-link-chip:hover::after {
+      transform: translateX(200%);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .quick-link-chip:hover {
+        background: rgba(148, 163, 184, 0.08); /* Dark mode premium desaturated slate */
+        border-color: rgba(148, 163, 184, 0.2);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(148, 163, 184, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+    
+    .quick-link-chip:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(0, 0, 0, 0.05);
+      transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    
+    .quick-link-chip:focus-visible {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+    }
+
+    .section-title {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin: 40px 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+      letter-spacing: -0.3px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 28px;
+    }
+
+    .dash-card {
+      background: var(--color-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: 16px;
+      border: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      animation: fadeUpIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    }
+    
+    .dash-card:nth-child(1) { animation-delay: 0.05s; }
+    .dash-card:nth-child(2) { animation-delay: 0.1s; }
+    .dash-card:nth-child(3) { animation-delay: 0.15s; }
+    .dash-card:nth-child(4) { animation-delay: 0.2s; }
+    .dash-card:nth-child(5) { animation-delay: 0.25s; }
+    
+    .dash-card:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+      transform: translateY(-4px);
+    }
+    
+    .dash-card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--color-border);
+      background: rgba(0,0,0,0.015);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    @media (prefers-color-scheme: dark) {
+      .dash-card-header { background: rgba(255,255,255,0.015); }
+    }
+    
+    .dash-card-header h2 {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--color-text);
+    }
+    
+    .dash-card-header a {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-accent);
+      text-decoration: none;
+      background: rgba(99, 102, 241, 0.05); /* Desaturated indigo */
+      border: 1px solid rgba(99, 102, 241, 0.1);
+      border-radius: 8px;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    @media (prefers-color-scheme: dark) {
+      .dash-card-header a {
+        background: rgba(129, 140, 248, 0.08);
+        border-color: rgba(129, 140, 248, 0.15);
+      }
+    }
+    .dash-card-header a:hover {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: rgba(99, 102, 241, 0.25);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    @media (prefers-color-scheme: dark) {
+      .dash-card-header a:hover {
+        background: rgba(129, 140, 248, 0.15);
+        border-color: rgba(129, 140, 248, 0.3);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+    }
+    .dash-card-header a:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dash-card-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    /* Markdown Task Lists Styling */
+    .md-parsed-content ul { list-style-type: none; padding-left: 0; }
+    .md-parsed-content li {
+      margin-bottom: 14px;
+      line-height: 1.6;
+      display: flex;
+      align-items: flex-start;
+      color: var(--color-text);
+    }
+    .md-parsed-content li input[type="checkbox"] {
+      margin-top: 5px;
+      margin-right: 14px;
+      accent-color: var(--color-primary);
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+    }
+
+    /* List Items */
+    .list-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      min-height: 48px; /* Mobile touch target accessibility */
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--color-text);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+      background: transparent;
+    }
+    
+    .list-item:hover {
+      background: rgba(241, 245, 249, 0.6); /* Desaturated slate */
+      border-color: rgba(99, 102, 241, 0.15); /* Hint of primary accent */
+      transform: translateX(4px) scale(1.005);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+    @media (prefers-color-scheme: dark) {
+      .list-item:hover {
+        background: rgba(30, 41, 59, 0.4);
+        border-color: rgba(129, 140, 248, 0.2);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    .list-item:active {
+      transform: translateX(2px) scale(0.99);
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.02);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .list-item-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 10px;
+      background: rgba(241, 245, 249, 0.4);
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 600;
+      flex-shrink: 0;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .list-item-icon {
+        background: rgba(30, 41, 59, 0.4);
+      }
+    }
+
+    .list-item:hover .list-item-icon {
+      transform: scale(1.05);
+      color: var(--color-accent);
+      background: var(--color-surface);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .list-item:hover .list-item-icon {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+    }
+    
+    .list-item-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .list-item-title { font-weight: 500; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--color-text); font-family: 'Google Sans', sans-serif; }
+    .list-item-subtitle { font-size: 13px; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Google Sans', sans-serif; }
+
+    /* Pagination */
+    .pagination-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-top: 1px solid var(--color-border);
+      background: rgba(0,0,0,0.01);
+    }
+    @media (prefers-color-scheme: dark) {
+      .pagination-footer { background: rgba(255,255,255,0.01); }
+    }
+    
+    .page-info { font-size: 13px; color: var(--color-text-muted); font-weight: 500; }
+    
+    .page-btn {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 0 16px;
+      min-height: clamp(44px, 10vw, 48px);
+      min-width: clamp(44px, 10vw, 48px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+      transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .page-btn {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+    
+    .page-btn:hover:not(:disabled) {
+      background: rgba(99, 102, 241, 0.05);
+      color: var(--color-accent);
+      border-color: rgba(99, 102, 241, 0.15);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .page-btn:hover:not(:disabled) {
+        background: rgba(129, 140, 248, 0.08);
+        border-color: rgba(129, 140, 248, 0.25);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+    
+    .page-btn:active:not(:disabled) {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .page-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    
+    .page-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+    }
+
+    /* Legacy Cards (Pipelines/Admin) */
+    .legacy-card {
+      background: var(--color-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+    }
+    .legacy-card-title { font-family: 'Google Sans', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.3px; }
+    .legacy-card-desc { font-size: 14px; color: var(--color-text-muted); margin-bottom: 20px; line-height: 1.6; }
+    
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      min-height: 44px; /* Touch target accessibility */
+      min-width: 44px;
+      border-radius: 12px; /* Slightly more rounded for premium modern look */
+      border: 1px solid var(--color-border);
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: 0.3px;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .btn-primary { 
+      background: var(--color-primary); 
+      color: var(--color-primary-on); 
+      border-color: var(--color-primary); 
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+    
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-primary:hover { 
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.15), 0 4px 8px rgba(99, 102, 241, 0.12), 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-color: var(--color-accent);
+    }
+
+    .btn-primary:hover::after {
+      transform: translateX(200%);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 0 0 2px rgba(99, 102, 241, 0.1), inset 0 1px 0 rgba(0, 0, 0, 0.1);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .btn-secondary {
+      background: var(--color-surface);
+      color: var(--color-text);
+      border-color: var(--color-border);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+    
+    .btn-secondary::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.04), transparent);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-hover);
+      border-color: var(--color-accent);
+      color: var(--color-text);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06), 0 0 0 4px rgba(99, 102, 241, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    
+    .btn-secondary:hover::after {
+      transform: translateX(200%);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), 0 0 0 2px rgba(99, 102, 241, 0.05);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .btn-outline { 
+      background: transparent; 
+      color: var(--color-text); 
+      border-color: var(--color-border);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+    }
+    
+    .btn-outline::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.04), transparent);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-outline:hover { 
+      background: var(--color-hover); 
+      border-color: var(--color-accent);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06), 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+    
+    .btn-outline:hover::after {
+      transform: translateX(200%);
+    }
+
+    .btn-outline:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), 0 0 0 2px rgba(99, 102, 241, 0.05);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 6px var(--color-accent);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .btn-primary { 
+        background: var(--color-primary); 
+        color: var(--color-primary-on); 
+        border-color: var(--color-primary); 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15); 
+      }
+      .btn-primary:hover { 
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(129, 140, 248, 0.2), 0 0 0 4px rgba(129, 140, 248, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25); 
+      }
+      .btn-primary:active {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(129, 140, 248, 0.15), inset 0 1px 0 rgba(0, 0, 0, 0.3);
+      }
+      .btn-secondary {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+      .btn-secondary:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(129, 140, 248, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      }
+      .btn-secondary:active {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(129, 140, 248, 0.1);
+      }
+      .btn-outline {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+      .btn-outline:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(129, 140, 248, 0.15);
+      }
+      .btn-outline:active {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(129, 140, 248, 0.1);
+      }
+    }
+
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+    /* Inputs */
+    input, select, textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 12px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      background: var(--color-surface);
+      color: var(--color-text);
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 500;
+      margin-bottom: 16px;
+      font-size: 14px;
+      transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      input, select, textarea {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    input:hover, select:hover, textarea:hover {
+      background: rgba(99, 102, 241, 0.02);
+      border-color: rgba(99, 102, 241, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      input:hover, select:hover, textarea:hover {
+        background: rgba(129, 140, 248, 0.04);
+        border-color: rgba(129, 140, 248, 0.25);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    input:focus, select:focus, textarea:focus { 
+      outline: none; 
+      border-color: var(--color-accent);
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+    }
+    @media (prefers-color-scheme: dark) {
+      input:focus, select:focus, textarea:focus {
+        box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+      }
+    }
+
+    /* Breathe Mode Select */
+    .breathe-select {
+      padding: 8px 36px 8px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      font-family: 'Google Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      min-height: 44px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      width: auto;
+      margin-bottom: 0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .breathe-select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    .breathe-select:hover {
+      background-color: rgba(99, 102, 241, 0.04);
+      border-color: rgba(99, 102, 241, 0.2);
+      color: var(--color-accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .breathe-select:hover {
+        background-color: rgba(129, 140, 248, 0.06);
+        border-color: rgba(129, 140, 248, 0.25);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23818cf8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      }
+    }
+
+    .breathe-select:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .breathe-select:focus-visible {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+    }
+
+    /* Fixed / Collapsible Log */
+    .log-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      background: var(--color-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--color-border);
+      padding: 12px 24px;
+      z-index: 100;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    .log-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .log-header span {
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Google Sans', sans-serif;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+    .log-toggle-icon {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      transition: transform 0.3s ease;
+      display: inline-block;
+    }
+    .log-toggle-btn {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      background: rgba(241, 245, 249, 0.4);
+      border: 1px solid var(--color-border);
+      padding: 0 12px;
+      min-height: 36px;
+      border-radius: 8px;
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .log-toggle-btn:hover {
+      color: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+    @media (prefers-color-scheme: dark) {
+      .log-toggle-btn {
+        background: rgba(30, 41, 59, 0.4);
+      }
+    }
+    .log-clear {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      background: rgba(241, 245, 249, 0.4);
+      border: 1px solid var(--color-border);
+      font-weight: 600;
+      font-family: 'Google Sans', sans-serif;
+      min-height: 36px;
+      min-width: 44px;
+      padding: 0 14px;
+      border-radius: 8px;
+      transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (prefers-color-scheme: dark) {
+      .log-clear {
+        background: rgba(30, 41, 59, 0.4);
+      }
+    }
+    .log-clear:hover {
+      color: var(--color-accent);
+      background: rgba(99, 102, 241, 0.08);
+      border-color: rgba(99, 102, 241, 0.25);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    @media (prefers-color-scheme: dark) {
+      .log-clear:hover {
+        background: rgba(129, 140, 248, 0.12);
+        border-color: rgba(129, 140, 248, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      }
+    }
+    .log-clear:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .log-container {
+      background: var(--color-bg);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'SFMono-Regular', Consolas, 'Courier New', monospace;
+      font-size: 12px;
+      height: 110px;
+      overflow-y: auto;
+      border: 1px solid var(--color-border);
+      margin-top: 8px;
+      transition: all 0.3s ease;
+    }
+    .log-wrapper.collapsed .log-container {
+      display: none;
+    }
+    .log-wrapper.collapsed .log-toggle-icon {
+      transform: rotate(180deg);
+    }
+    .log-wrapper.collapsed {
+      padding: 8px 24px;
+    }
+    .log-entry { margin-bottom: 8px; border-bottom: 1px dashed var(--color-border); padding-bottom: 6px; line-height: 1.5; }
+    .log-entry:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .log-time { color: var(--color-text-muted); margin-right: 12px; font-weight: 500; }
+    .log-error { color: #ef4444; }
+    .log-success { color: #10b981; }
+
+    /* Skeleton Loaders */
+    .skeleton {
+      background: linear-gradient(90deg, var(--color-hover) 25%, var(--color-border) 50%, var(--color-hover) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite ease-in-out;
+      border-radius: 6px;
+    }
+    .sk-title { height: 16px; width: 60%; margin-bottom: 10px; }
+    .sk-sub { height: 12px; width: 40%; }
+    .sk-icon { width: 36px; height: 36px; border-radius: 8px; }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Breathing App */
+    .breathe-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 40px auto;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.2);
+    }
+    @media (prefers-color-scheme: dark) {
+      .breathe-circle { box-shadow: 0 8px 32px rgba(226, 232, 240, 0.15); }
+    }
+    
+    .breathe-text {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--color-primary-on);
+      z-index: 10;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    .btn-breathe {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 14px 44px;
+      border: 1px solid transparent;
+      border-radius: 50px;
+      background: var(--color-primary);
+      color: var(--color-primary-on);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .btn-breathe::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.12);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .btn-breathe:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.25);
+    }
+    
+    .btn-breathe:hover::before {
+      opacity: 1;
+    }
+
+    .btn-breathe:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+    }
+    
+    .btn-breathe:focus-visible {
+      box-shadow: 0 0 0 3px var(--color-border), 0 0 0 6px var(--color-primary);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .btn-breathe {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      }
+      .btn-breathe:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      }
+      .btn-breathe:active {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    /* Origami Box */
+    .origami-box {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1200px;
+    }
+    .origami-base {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      box-sizing: border-box;
+      background: rgba(79, 70, 229, 0.7);
+      border: 1.5px solid rgba(255, 255, 255, 0.5);
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transform: scale(0.5) rotateX(60deg) rotateZ(45deg);
+      box-shadow: 0 0 30px rgba(79, 70, 229, 0.4);
+      transition: transform 4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      -webkit-transition: -webkit-transform 4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .origami-flap {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      box-sizing: border-box;
+      background: rgba(99, 102, 241, 0.85);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+      backface-visibility: visible;
+      -webkit-backface-visibility: visible;
+    }
+    .origami-top { top: -90px; left: -1.5px; transform-origin: bottom; transform: rotateX(-90deg); }
+    .origami-bottom { bottom: -90px; left: -1.5px; transform-origin: top; transform: rotateX(90deg); }
+    .origami-left { top: -1.5px; left: -90px; transform-origin: right; transform: rotateY(90deg); }
+    .origami-right { top: -1.5px; right: -90px; transform-origin: left; transform: rotateY(-90deg); }
+    
+    @media (prefers-color-scheme: dark) {
+      .origami-base { background: rgba(99, 102, 241, 0.6); border-color: rgba(255,255,255,0.3); }
+      .origami-flap { background: rgba(129, 140, 248, 0.75); border-color: rgba(255,255,255,0.4); }
+    }
+
+    .breathe-text {
+      position: absolute;
+      font-size: clamp(3rem, 8vw, 4.5rem);
+      font-weight: 700;
+      color: var(--color-text);
+      z-index: 10;
+      font-family: 'Google Sans', sans-serif;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -2px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: color 0.3s ease;
+    }
+
+
+    /* Intelligence Tabs */
+    .intel-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .intel-tab {
+      padding: 0 24px;
+      height: 44px;
+      min-height: 44px;
+      min-width: 44px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      font-family: 'Google Sans', sans-serif;
+      color: var(--color-text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .intel-tab:hover {
+      background: rgba(99, 102, 241, 0.04);
+      border-color: rgba(99, 102, 241, 0.1);
+      color: var(--color-text);
+      transform: translateY(-2px) scale(1.02);
+    }
+    @media (prefers-color-scheme: dark) {
+      .intel-tab:hover {
+        background: rgba(129, 140, 248, 0.06);
+        border-color: rgba(129, 140, 248, 0.15);
+      }
+    }
+    .intel-tab:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 2px 4px rgba(99, 102, 241, 0.04);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .intel-tab.active {
+      background: var(--color-accent);
+      color: var(--color-primary-on);
+      border-color: var(--color-accent);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    @media (prefers-color-scheme: dark) {
+      .intel-tab.active {
+        box-shadow: 0 6px 22px rgba(129, 140, 248, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+    }
+    .intel-tab.active:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+    @media (prefers-color-scheme: dark) {
+      .intel-tab.active:hover {
+        box-shadow: 0 8px 26px rgba(129, 140, 248, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      }
+    }
+    .intel-tab:focus-visible {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+    }
+    
+    .intel-card-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: 24px;
+      border-radius: 12px;
+      color: var(--color-text);
+      text-decoration: none;
+      transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+      min-height: 44px;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    .intel-card-link:hover {
+      background: rgba(99, 102, 241, 0.04);
+      border-color: rgba(99, 102, 241, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .intel-card-link {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      .intel-card-link:hover {
+        background: rgba(129, 140, 248, 0.08);
+        border-color: rgba(129, 140, 248, 0.25);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    .intel-card-link:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .intel-card-link:focus-visible {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+    }
+
+    .article-container {
+      max-width: 850px;
+      margin: 0 auto;
+      background: var(--color-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 48px;
+      min-height: 400px;
+      box-shadow: var(--card-shadow);
+    }
+
+    /* Markdown Content styling */
+    .md-content { font-size: 16px; line-height: 1.7; color: var(--color-text); }
+    .md-content h1 { font-size: 32px; margin-top: 40px; margin-bottom: 24px; padding-bottom: 12px; color: var(--color-text); font-weight: 700; letter-spacing: -0.5px; border-bottom: 1px solid var(--color-border); }
+    .md-content h1:first-child { margin-top: 0; }
+    .md-content h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: var(--color-text); font-weight: 600; letter-spacing: -0.3px; }
+    .md-content h3 { font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .md-content p { margin-bottom: 20px; }
+    .md-content ul, .md-content ol { margin-bottom: 20px; padding-left: 24px; }
+    .md-content li { margin-bottom: 8px; }
+    .md-content code { background: var(--color-hover); padding: 4px 8px; border-radius: 6px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 14px; font-weight: 500; }
+    .md-content pre { background: #0f172a; color: #f8fafc; border: 1px solid var(--color-border); padding: 24px; border-radius: 12px; overflow-x: auto; margin-bottom: 24px; font-size: 14px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+    .md-content pre code { background: transparent; padding: 0; color: inherit; font-weight: 400; }
+    .md-content a { color: #3b82f6; text-decoration: none; font-weight: 500; transition: var(--transition); }
+    .md-content a:hover { color: #2563eb; text-decoration: underline; }
+    .md-content blockquote { background: var(--color-hover); border-left: 4px solid var(--color-primary); padding: 16px 24px; margin: 0 0 24px 0; color: var(--color-text-muted); font-style: italic; border-radius: 0 8px 8px 0; }
+    .md-content strong { font-weight: 700; color: var(--color-text); }
+    .md-content table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 24px; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; }
+    .md-content th, .md-content td { padding: 14px 16px; border-bottom: 1px solid var(--color-border); text-align: left; }
+    .md-content th { background: rgba(0,0,0,0.02); font-weight: 600; color: var(--color-text); }
+    @media (prefers-color-scheme: dark) { .md-content th { background: rgba(255,255,255,0.02); } }
+    .md-content tr:last-child td { border-bottom: none; }
+
+    /* ============================================================
+       TASK GROOMING & HARMONIZATION MODULE STYLES
+       ============================================================ */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--color-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .kpi-num {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'Google Sans', sans-serif;
+      letter-spacing: -0.5px;
+    }
+    .kpi-label {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Google Sans', sans-serif;
+      letter-spacing: 0.2px;
+    }
+    .badge-amber { background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .badge-red { background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25); }
+    .badge-blue { background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.25); }
+    .badge-purple { background: rgba(147, 51, 234, 0.12); color: #7c3aed; border: 1px solid rgba(147, 51, 234, 0.25); }
+    .badge-green { background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); }
+
+    .batch-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .batch-nav-btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-muted);
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .batch-nav-btn:hover {
+      background: var(--color-hover);
+      color: var(--color-text);
+    }
+    .batch-nav-btn.active {
+      background: var(--color-primary);
+      color: var(--color-primary-on);
+      border-color: var(--color-primary);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+    }
+
+    .audit-card {
+      background: var(--color-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1.5px solid var(--color-border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--card-shadow);
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      opacity: 0.6;
+    }
+    .audit-card:hover {
+      border-color: var(--color-accent);
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    .audit-card.selected {
+      border: 2px solid var(--color-accent) !important;
+      background: rgba(99, 102, 241, 0.08) !important;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.12);
+      opacity: 1 !important;
+    }
+    @media (prefers-color-scheme: dark) {
+      .audit-card.selected {
+        background: rgba(99, 102, 241, 0.18) !important;
+        box-shadow: 0 6px 24px rgba(129, 140, 248, 0.22);
+      }
+    }
+
+    .custom-checkbox {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border-radius: 7px;
+      border: 2px solid var(--color-border);
+      background: var(--color-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-top: 2px;
+    }
+    .audit-card.selected .custom-checkbox {
+      background: #10b981;
+      border-color: #10b981;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+    .custom-checkbox svg {
+      width: 14px;
+      height: 14px;
+      stroke: #ffffff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      display: none;
+    }
+    .audit-card.selected .custom-checkbox svg {
+      display: block;
+    }
+
+    .select-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'Google Sans', sans-serif;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .pill-approved {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .pill-excluded {
+      background: var(--color-hover);
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+    }
+
+    .diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    .diff-table td {
+      padding: 6px 10px;
+      vertical-align: top;
+      border-top: 1px solid var(--color-border);
+    }
+    .diff-label {
+      width: 120px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      font-family: 'Google Sans', sans-serif;
+    }
+    .diff-old {
+      color: #ef4444;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .diff-new {
+      color: #10b981;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    /* Custom App Modal */
+    .app-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s;
+    }
+    .app-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .app-modal-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      max-width: 460px;
+      width: 90%;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      transform: scale(0.92) translateY(10px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .app-modal-overlay.active .app-modal-box {
+      transform: scale(1) translateY(0);
+    }
+    .app-modal-icon {
+      font-size: 38px;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .app-modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'Google Sans', sans-serif;
+      color: var(--color-text);
+      margin-bottom: 10px;
+    }
+    .app-modal-body {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-text-muted);
+      margin-bottom: 24px;
+      text-align: center;
+      width: 100%;
+    }
+    .app-modal-actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      justify-content: center;
+    }
+    .app-modal-actions button {
+      flex: 1;
+      min-height: 44px;
+      font-weight: 600;
+      border-radius: 12px;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 10001;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast-item {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text);
+      pointer-events: auto;
+      animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .toast-success { border-left: 4px solid #10b981; }
+    .toast-error { border-left: 4px solid #ef4444; }
+    .toast-info { border-left: 4px solid var(--color-accent); }
+
+    @keyframes slideInToast {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeOutToast {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+    .diff-label {
+      width: 120px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      font-family: 'Google Sans', sans-serif;
+    }
+    .diff-old {
+      color: #dc2626;
+      background: rgba(239, 68, 68, 0.05);
+      border-radius: 4px;
+      padding: 2px 6px;
+      word-break: break-word;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+    }
+    .diff-new {
+      color: #059669;
+      background: rgba(16, 185, 129, 0.05);
+      border-radius: 4px;
+      padding: 2px 6px;
+      word-break: break-word;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+    }
+    .audit-reason {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-style: italic;
+      background: var(--color-hover);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border-left: 3px solid var(--color-accent);
+    }
+
+    .exec-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--color-border);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .exec-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--color-accent), #10b981);
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="logo-container">
+      The System
+    </div>
+    <div class="nav-item active" role="button" tabindex="0" onclick="switchTab('dashboard', this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); switchTab('dashboard', this); }">
+      <span>Overview</span>
+    </div>
+    <div class="nav-item" role="button" tabindex="0" onclick="switchTab('tasks', this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); switchTab('tasks', this); }">
+      <span>Daily Tasks</span>
+    </div>
+    <div class="nav-item" role="button" tabindex="0" onclick="switchTab('harmonize', this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); switchTab('harmonize', this); }">
+      <span>Groom & Harmonize</span>
+    </div>
+    <div class="nav-item" role="button" tabindex="0" onclick="switchTab('breathe', this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); switchTab('breathe', this); }">
+      <span>Mental Health</span>
+    </div>
+    <div class="nav-item" role="button" tabindex="0" onclick="switchTab('physical', this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); switchTab('physical', this); }">
+      <span>Physical Health</span>
+    </div>
+    <div class="nav-item" role="button" tabindex="0" onclick="switchTab('intel', this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); switchTab('intel', this); }">
+      <span>Reflection</span>
+    </div>
+    <div class="nav-item" role="button" tabindex="0" onclick="switchTab('messages', this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); switchTab('messages', this); }">
+      <span>Messages</span>
+    </div>
+    <div class="nav-item" role="button" tabindex="0" onclick="switchTab('admin', this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); switchTab('admin', this); }">
+      <span>Admin</span>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    
+    <!-- 1. OVERVIEW SECTION -->
+    <div id="sec-dashboard" class="section active" style="padding-bottom: 100px;">
+      <div class="header-area" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <h1 id="greeting" style="margin: 0;">Welcome to The System</h1>
+      </div>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;">
+        <div id="quick-links-container" style="display: inline-flex; gap: 12px; flex-wrap: wrap;"></div>
+      </div>
+      
+      <h2 class="section-title">Immediate Reality</h2>
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <!-- Calendar Card -->
+        <div class="dash-card">
+          <div class="dash-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Today's Calendar</h2>
+            <a href="https://calendar.google.com/" target="_blank">Open Calendar ↗</a>
+          </div>
+          <div class="dash-card-body" id="calendar-container">
+            <!-- skeletons -->
+            <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton" style="border-radius: 4px;"></div><div class="sk-sub skeleton" style="border-radius: 4px;"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="calendar-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="calendar-prev" onclick="changePage('calendar', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="calendar-next" onclick="changePage('calendar', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tasks Card -->
+        <div class="dash-card">
+          <div class="dash-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Open Tasks</h2>
+            <a href="https://calendar.google.com/calendar/u/0/r/tasks" target="_blank">Open Google Tasks ↗</a>
+          </div>
+          <div class="dash-card-body" id="tasks-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton" style="border-radius: 4px;"></div><div class="sk-sub skeleton" style="border-radius: 4px;"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="tasks-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="tasks-prev" onclick="changePage('tasks', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="tasks-next" onclick="changePage('tasks', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emails Card -->
+        <div class="dash-card">
+          <div class="dash-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Inbox</h2>
+            <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank">Open Inbox ↗</a>
+          </div>
+          <div class="dash-card-body" id="emails-container">
+            <!-- skeletons -->
+            <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton" style="border-radius: 4px;"></div><div class="sk-sub skeleton" style="border-radius: 4px;"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="emails-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="emails-prev" onclick="changePage('emails', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="emails-next" onclick="changePage('emails', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2. DAILY TASKS SECTION -->
+    <div id="sec-tasks" class="section" style="padding-bottom: 100px;">
+      <div class="header-area"><h1>Daily Tasks</h1></div>
+      
+      <div class="legacy-card" style="margin-bottom: 32px; background: linear-gradient(145deg, var(--color-surface), rgba(255,255,255,0.4)); backdrop-filter: var(--glass-blur);">
+        <div class="legacy-card-title">Execution Gems</div>
+        <div class="quick-links">
+          <a href="https://gemini.google.com/gem/f982f396b0e5" target="_blank" class="quick-link-chip" title="Task Orchestrator">Task Master</a>
+          <a href="https://gemini.google.com/gem/b664322551c4" target="_blank" class="quick-link-chip" title="Task Executor">MacGyver</a>
+          <a href="https://gemini.google.com/gem/497094160865" target="_blank" class="quick-link-chip" title="Problem Solver">James</a>
+          <a href="https://gemini.google.com/gem/fb62ecefe421" target="_blank" class="quick-link-chip" title="Copywriter">Penny</a>
+          <a href="https://gemini.google.com/gem/7bbb01c5b0d5" target="_blank" class="quick-link-chip" title="Decision Matrix">Prism</a>
+        </div>
+      </div>
+      
+      <div id="daily-plan-container">
+        <div class="article-container">
+          <div class="md-content">
+            <div class="skeleton sk-title"></div>
+            <div class="skeleton sk-title" style="width: 80%"></div>
+            <div class="skeleton sk-sub"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 2.5 TASK GROOMING & HARMONIZATION SECTION -->
+    <div id="sec-harmonize" class="section" style="padding-bottom: 280px;">
+      <div class="header-area">
+        <div>
+          <h1>Task Grooming & Harmonization</h1>
+          <div style="font-size: 14px; color: var(--color-text-muted); margin-top: 4px;">
+            AI-Powered Operations Auditor · Replicating <code>/task_prune_and_harmonize</code> with Gemini 3.7 Flash
+          </div>
+        </div>
+      </div>
+
+      <!-- Scope & Audit Trigger Card -->
+      <div class="dash-card" style="margin-bottom: 28px; padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">Configure Audit Scope & Engine</h2>
+            <div style="font-size: 13px; color: var(--color-text-muted);">Select instant Rule-Based scan (No AI for rapid 99/quarantine triage) or Deep Gemini 3.7 Flash audit.</div>
+          </div>
+          <button id="btn-run-harmonize-audit" class="btn btn-primary" onclick="runHarmonizeAudit()">
+            <span id="btn-audit-icon">⚡</span> <span id="btn-audit-text">Run Instant Scan (No AI)</span>
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;">
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-text);">Audit Engine</label>
+            <select id="harmonize-engine-select" class="form-control" onchange="onAuditEngineChange()" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); font-family: inherit; font-size: 14px;">
+              <option value="rule_based" selected>⚡ Instant Rule-Based (No AI / Fast Triage)</option>
+              <option value="gemini">🤖 Deep AI Analysis (Gemini 3.7 Flash)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-text);">Audit Scope</label>
+            <select id="harmonize-scope-select" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); font-family: inherit; font-size: 14px;">
+              <option value="full" selected>Full Ecosystem (Active Tasks + 2099 Backlog)</option>
+              <option value="active">Active Queue Only (Due within 28 days)</option>
+              <option value="backlog">Stale & Backlog Focus (Overdue >30d & 2099s)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-text);">Task List Filter</label>
+            <select id="harmonize-list-select" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); font-family: inherit; font-size: 14px;">
+              <option value="">All Active Task Lists</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit Status & Progress Area (Initially Hidden or Idle) -->
+      <div id="harmonize-status-card" class="dash-card" style="display: none; padding: 24px; margin-bottom: 28px; text-align: center;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+          <div style="font-size: 24px; animation: spin 1.5s linear infinite;">⏳</div>
+          <div id="harmonize-status-text" style="font-size: 15px; font-weight: 600;">Ingesting Google Tasks and analyzing with Gemini 3.7 Flash...</div>
+          <div style="font-size: 13px; color: var(--color-text-muted);">Evaluating 3-tier hierarchy, preserving system metadata, and synthesizing Batches A-D.</div>
+        </div>
+      </div>
+
+      <!-- Audit Results Container -->
+      <div id="harmonize-results-container" style="display: none;">
+        
+        <!-- Summary KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card" style="cursor: pointer;" onclick="switchHarmonizeBatchTab('all')">
+            <div class="kpi-label">📋 All Proposed Actions</div>
+            <div class="kpi-num" id="kpi-total-issues" style="color: var(--color-accent);">0</div>
+          </div>
+          <div class="kpi-card" style="cursor: pointer;" onclick="switchHarmonizeBatchTab('batchA')">
+            <div class="kpi-label">Batch A: Duplicates</div>
+            <div class="kpi-num" id="kpi-batch-a" style="color: #d97706;">0</div>
+          </div>
+          <div class="kpi-card" style="cursor: pointer;" onclick="switchHarmonizeBatchTab('batchB')">
+            <div class="kpi-label">Batch B: Zombies / Stale</div>
+            <div class="kpi-num" id="kpi-batch-b" style="color: #dc2626;">0</div>
+          </div>
+          <div class="kpi-card" style="cursor: pointer;" onclick="switchHarmonizeBatchTab('batchC')">
+            <div class="kpi-label">Batch C: Taxonomy & Epics</div>
+            <div class="kpi-num" id="kpi-batch-c" style="color: #2563eb;">0</div>
+          </div>
+          <div class="kpi-card" style="cursor: pointer;" onclick="switchHarmonizeBatchTab('batchD')">
+            <div class="kpi-label">Batch D: Metadata & Notes</div>
+            <div class="kpi-num" id="kpi-batch-d" style="color: #7c3aed;">0</div>
+          </div>
+        </div>
+
+        <!-- Executive Summary BLUF -->
+        <div class="dash-card" style="margin-bottom: 24px; padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 18px;">📋</span>
+            <h3 style="font-size: 15px; font-weight: 600; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Auditor BLUF Summary</h3>
+          </div>
+          <div id="harmonize-bluf-text" style="font-size: 14px; line-height: 1.6; color: var(--color-text);"></div>
+        </div>
+
+        <!-- Batch Navigation Tabs -->
+        <div class="batch-nav">
+          <button class="batch-nav-btn active" id="tab-btn-all" onclick="switchHarmonizeBatchTab('all')">
+            <span>📋 All Batches (Combined)</span>
+            <span class="badge badge-primary" id="badge-count-all" style="background: var(--color-accent); color: #fff;">0</span>
+          </button>
+          <button class="batch-nav-btn" id="tab-btn-batchA" onclick="switchHarmonizeBatchTab('batchA')">
+            <span>Batch A: Deduplication</span>
+            <span class="badge badge-amber" id="badge-count-batchA">0</span>
+          </button>
+          <button class="batch-nav-btn" id="tab-btn-batchB" onclick="switchHarmonizeBatchTab('batchB')">
+            <span>Batch B: Zombie Pruning</span>
+            <span class="badge badge-red" id="badge-count-batchB">0</span>
+          </button>
+          <button class="batch-nav-btn" id="tab-btn-batchC" onclick="switchHarmonizeBatchTab('batchC')">
+            <span>Batch C: Taxonomy Realignment</span>
+            <span class="badge badge-blue" id="badge-count-batchC">0</span>
+          </button>
+          <button class="batch-nav-btn" id="tab-btn-batchD" onclick="switchHarmonizeBatchTab('batchD')">
+            <span>Batch D: Metadata Format</span>
+            <span class="badge badge-purple" id="badge-count-batchD">0</span>
+          </button>
+        </div>
+
+        <!-- Batch Content Panels -->
+        <div id="panel-all" class="harmonize-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <div style="font-size: 13px; color: var(--color-text-muted);">
+              Consolidated audit view of all proposed actions across Batches A, B, C, and D. Click any card to approve or exclude.
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('all', true)">Select All</button>
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('all', false)">Deselect All</button>
+            </div>
+          </div>
+          <div id="list-all-items"></div>
+        </div>
+
+        <div id="panel-batchA" class="harmonize-panel" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="font-size: 13px; color: var(--color-text-muted);">
+              Identified duplicate tasks across lists and redundant recurring schedules. (Milestone child tasks protected).
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('batchA', true)">Select All</button>
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('batchA', false)">Deselect All</button>
+            </div>
+          </div>
+          <div id="list-batchA-items"></div>
+        </div>
+
+        <div id="panel-batchB" class="harmonize-panel" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="font-size: 13px; color: var(--color-text-muted);">
+              Tasks overdue >30d, unexecuted Q4 tasks >60d, and dead 2099 backlog items.
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('batchB', true)">Select All</button>
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('batchB', false)">Deselect All</button>
+            </div>
+          </div>
+          <div id="list-batchB-items"></div>
+        </div>
+
+        <div id="panel-batchC" class="harmonize-panel" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="font-size: 13px; color: var(--color-text-muted);">
+              Missing [Milestone] prefixes on epic containers, broken L3 taxonomy codes, and orphaned subtasks.
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('batchC', true)">Select All</button>
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('batchC', false)">Deselect All</button>
+            </div>
+          </div>
+          <div id="list-batchC-items"></div>
+        </div>
+
+        <div id="panel-batchD" class="harmonize-panel" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="font-size: 13px; color: var(--color-text-muted);">
+              Standardizing SYS/Milestone/DA tags, due dates, and preserving ---SYSTEM_METADATA--- footers.
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('batchD', true)">Select All</button>
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; min-height: 32px;" onclick="toggleBatchSelection('batchD', false)">Deselect All</button>
+            </div>
+          </div>
+          <div id="list-batchD-items"></div>
+        </div>
+
+        <!-- Sticky Execution Action Bar -->
+        <div class="dash-card" style="margin-top: 32px; padding: 20px; border: 1px solid var(--color-accent); background: linear-gradient(145deg, var(--color-surface), rgba(99, 102, 241, 0.04));">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <div style="font-weight: 700; font-size: 16px;">Ready for Execution</div>
+              <div id="harmonize-selected-count-text" style="font-size: 13px; color: var(--color-text-muted);">0 actions approved across 4 batches</div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <button id="btn-execute-harmonize" class="btn btn-primary" onclick="executeHarmonizeActions()">
+                <span id="btn-exec-icon">🚀</span> <span id="btn-exec-text">Execute Approved Actions (0)</span>
+              </button>
+            </div>
+          </div>
+          <div id="harmonize-exec-progress-container" style="display: none; margin-top: 16px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+              <span id="harmonize-exec-progress-label">Processing mutations in chunks...</span>
+              <span id="harmonize-exec-progress-pct">0%</span>
+            </div>
+            <div class="exec-progress-bar">
+              <div class="exec-progress-fill" id="harmonize-exec-progress-fill"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 3. MENTAL HEALTH (BREATHE) -->
+    <div id="sec-breathe" class="section" style="padding-bottom: 100px; text-align: center;">
+      <div class="header-area" style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+        <div>
+          <h1>Mental Health</h1>
+          <p style="color: var(--color-text-muted); font-size: 13px; margin-top: 4px;">Mindfulness breathwork companion & 28-day habit tracking</p>
+        </div>
+        <a id="btn-launch-breathe-top" href="https://script.google.com/macros/s/AKfycbylmNwunCsEZtYYLUA603-fr5MhioAfddmqcJkQraNv7OsI2p9ph0DsqF18LrlUmS4guA/exec?page=breathe" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 14px; color: #38bdf8; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s ease;">
+          <span>Launch Full Screen App</span>
+          <span style="font-size: 14px;">↗</span>
+        </a>
+      </div>
+      
+      <div class="dashboard-grid" style="display: flex; justify-content: center; align-items: center; min-height: 500px; margin-top: 24px;">
+        <div class="dash-card" style="width: 100%; max-width: 560px; padding: 40px 28px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; border: 1px solid var(--color-border); border-radius: 28px; box-shadow: var(--card-shadow); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); background: rgba(255, 255, 255, 0.03);">
+          
+          <!-- Lotus Bloom Icon Preview -->
+          <div style="width: 140px; height: 140px; position: relative; display: flex; align-items: center; justify-content: center;">
+            <svg viewBox="0 0 300 300" style="width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 24px rgba(56, 189, 248, 0.2));">
+              <defs>
+                <linearGradient id="dashPetalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4" />
+                  <stop offset="50%" stop-color="#a7f3d0" stop-opacity="0.25" />
+                  <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.12" />
+                </linearGradient>
+              </defs>
+              <g transform-origin="150px 150px" style="transform: scale(0.9);">
+                <circle cx="150" cy="92" r="68" fill="url(#dashPetalGrad)" stroke="rgba(255,255,255,0.25)" stroke-width="1" />
+                <circle cx="200" cy="121" r="68" fill="url(#dashPetalGrad)" stroke="rgba(255,255,255,0.25)" stroke-width="1" />
+                <circle cx="200" cy="179" r="68" fill="url(#dashPetalGrad)" stroke="rgba(255,255,255,0.25)" stroke-width="1" />
+                <circle cx="150" cy="208" r="68" fill="url(#dashPetalGrad)" stroke="rgba(255,255,255,0.25)" stroke-width="1" />
+                <circle cx="100" cy="179" r="68" fill="url(#dashPetalGrad)" stroke="rgba(255,255,255,0.25)" stroke-width="1" />
+                <circle cx="100" cy="121" r="68" fill="url(#dashPetalGrad)" stroke="rgba(255,255,255,0.25)" stroke-width="1" />
+              </g>
+            </svg>
+          </div>
+
+          <div>
+            <div style="font-size: 22px; font-weight: 700; color: var(--color-text); margin-bottom: 6px;">Breathe Mindfulness Companion <span style="font-size: 12px; opacity: 0.5; font-weight: 500; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 6px;">v2.5</span></div>
+            <div style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5; max-width: 440px; margin: 0 auto;">
+              Sub-millisecond linear radius progression engine, 3D Isometric Origami Box, Minimalist Text Toggle, and harmonic Tibetan bell audio.
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+            <span style="padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); border-radius: 10px; font-size: 12px; color: var(--color-text-muted);">4-7-8 Relax</span>
+            <span style="padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); border-radius: 10px; font-size: 12px; color: var(--color-text-muted);">3D Box Focus</span>
+            <span style="padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); border-radius: 10px; font-size: 12px; color: var(--color-text-muted);">Coherence 5.5s</span>
+            <span style="padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); border-radius: 10px; font-size: 12px; color: var(--color-text-muted);">Quick Calm 4-2-4</span>
+          </div>
+
+          <a id="btn-launch-breathe-hero" href="https://script.google.com/macros/s/AKfycbylmNwunCsEZtYYLUA603-fr5MhioAfddmqcJkQraNv7OsI2p9ph0DsqF18LrlUmS4guA/exec?page=breathe" target="_blank" rel="noopener noreferrer" style="width: 100%; max-width: 380px; height: 52px; border-radius: 16px; background: #ffffff; color: #090c12; font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: all 0.2s ease;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span>Launch Standalone Companion</span>
+          </a>
+
+          <div style="font-size: 13px; color: var(--color-text-muted); display: flex; align-items: center; gap: 8px;">
+            <span>Current Habit Streak:</span>
+            <strong style="color: var(--color-text);" id="breathe-streak">0</strong> Days
+            <span id="lotus-ticker" style="display: none; align-items: center; gap: 4px; padding: 2px 8px; background: rgba(236, 72, 153, 0.1); color: #ec4899; border-radius: 12px; font-size: 12px; font-weight: 700;">🌸 <span id="lotus-count">0</span></span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. PHYSICAL HEALTH -->
+    <div id="sec-physical" class="section" style="padding-bottom: 100px;">
+      <div class="header-area" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Physical Health</h1>
+        <div style="display: flex; gap: 12px;">
+          <a href="https://calendar.google.com/" target="_blank" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center;">Calendar</a>
+          <a href="https://calendar.google.com/calendar/u/0/r/tasks" target="_blank" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center;">Tasks</a>
+        </div>
+      </div>
+      
+      <div class="dashboard-grid">
+        
+        <!-- Vitals Card -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Vitals Snapshot</h2>
+          </div>
+          <div class="dash-card-body" style="justify-content: center; align-items: center; flex-direction: row; gap: 24px; flex-wrap: wrap;">
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: bold; color: #3b82f6;" id="health-sleep">-</div>
+              <div style="font-size: 14px; color: var(--color-text-muted);">Avg Sleep (hrs)</div>
+            </div>
+            <div style="height: 50px; width: 1px; background: var(--color-border);"></div>
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: bold; color: #10b981;" id="health-active">-</div>
+              <div style="font-size: 14px; color: var(--color-text-muted);">Active Mins</div>
+            </div>
+            <div style="height: 50px; width: 1px; background: var(--color-border);"></div>
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: bold; color: #f43f5e;" id="health-hr">-</div>
+              <div style="font-size: 14px; color: var(--color-text-muted);">Heart Rate</div>
+            </div>
+            <div style="height: 50px; width: 1px; background: var(--color-border);"></div>
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: bold; color: #eab308;" id="health-steps">-</div>
+              <div style="font-size: 14px; color: var(--color-text-muted);">Steps</div>
+            </div>
+            <div style="height: 50px; width: 1px; background: var(--color-border);"></div>
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: bold; color: #8b5cf6;" id="health-calories">-</div>
+              <div style="font-size: 14px; color: var(--color-text-muted);">Calories</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workouts Card -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Recent Workouts</h2>
+          </div>
+          <div class="dash-card-body" id="workouts-container" style="overflow-y: auto; max-height: 250px;">
+             <!-- skeletons -->
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton" style="border-radius: 4px;"></div><div class="sk-sub skeleton" style="border-radius: 4px;"></div></div></div>
+          </div>
+        </div>
+
+        <!-- AI Insights Placeholder -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>AI Health Insights</h2>
+          </div>
+          <div class="dash-card-body" style="justify-content: center; align-items: center; text-align: center; color: var(--color-text-muted);">
+            <p>AI Insights Generation<br><small>(TBU / Future Update)</small></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 5. INTELLIGENCE SECTION -->
+    <div id="sec-intel" class="section" style="padding-bottom: 100px;">
+      <div class="header-area"><h1>Reflection</h1></div>
+      
+      <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 32px;">
+        <button class="btn btn-secondary" onclick="runPipeline('triggerVantage2Day')">▶ Trigger 2-Day Vantage (Raw/No AI)</button>
+        <button class="btn btn-secondary" onclick="runPipeline('triggerVantage7Day')">▶ Trigger 7-Day Vantage (Raw/No AI)</button>
+        <button class="btn btn-primary" onclick="runPipeline('triggerVantage7DayAudit')">▶ Trigger 7-Day Vantage AI Audit</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 24px; max-width: 600px; margin: 0 auto;">
+        <a href="https://gemini.google.com/gem/df2b821117f5" target="_blank" class="intel-card-link">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--color-icon-bg); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">A</div>
+            <div>
+              <div style="font-weight: 500; font-size: 18px;">Atlas</div>
+              <div style="font-size: 14px; color: var(--color-text-muted); margin-top: 4px; font-family: 'Inter', sans-serif;">Reflective AI Partner</div>
+            </div>
+          </div>
+          <div style="color: var(--color-text-muted); font-size: 24px;">→</div>
+        </a>
+
+        <a href="https://docs.google.com/spreadsheets/d/1pchhGyniJKiWRm6zNXy834SSeITh3BW4ogVJGImfvFM/edit?gid=0#gid=0" target="_blank" class="intel-card-link">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--color-icon-bg); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">J</div>
+            <div>
+              <div style="font-weight: 500; font-size: 18px;">Daily Journal</div>
+            </div>
+          </div>
+          <div style="color: var(--color-text-muted); font-size: 24px;">→</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- 6. ADMIN SECTION -->
+    <div id="sec-admin" class="section" style="padding-bottom: 100px;">
+      <div class="header-area" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <h1>System Administration</h1>
+        <a href="https://docs.google.com/spreadsheets/d/1iHcD1dbDiCsYZy6gGJ2k5by6NUtQS8re1J5mBCrUgb4/edit" target="_blank" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+          Master Spreadsheet ↗
+        </a>
+      </div>
+      <div class="dashboard-grid">
+        
+        <!-- Clerk Emails -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Clerk Emails Processed</h2>
+          </div>
+          <div class="dash-card-body" id="clerkEmails-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton" style="border-radius: 4px;"></div><div class="sk-sub skeleton" style="border-radius: 4px;"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="clerkEmails-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="clerkEmails-prev" onclick="changePage('clerkEmails', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="clerkEmails-next" onclick="changePage('clerkEmails', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clerk Tasks -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Clerk Tasks Processed</h2>
+          </div>
+          <div class="dash-card-body" id="clerkTasks-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton" style="border-radius: 4px;"></div><div class="sk-sub skeleton" style="border-radius: 4px;"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="clerkTasks-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="clerkTasks-prev" onclick="changePage('clerkTasks', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="clerkTasks-next" onclick="changePage('clerkTasks', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clerk Notes -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Clerk Notes Processed</h2>
+          </div>
+          <div class="dash-card-body" id="notes-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton" style="border-radius: 4px;"></div><div class="sk-sub skeleton" style="border-radius: 4px;"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="notes-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="notes-prev" onclick="changePage('notes', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="notes-next" onclick="changePage('notes', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modified Files -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h2>Modified Files</h2>
+          </div>
+          <div class="dash-card-body" id="files-container">
+             <div class="list-item"><div class="sk-icon skeleton"></div><div class="list-item-content"><div class="sk-title skeleton" style="border-radius: 4px;"></div><div class="sk-sub skeleton" style="border-radius: 4px;"></div></div></div>
+          </div>
+          <div class="pagination-footer">
+            <span class="page-info" id="files-info">Page 1</span>
+            <div>
+              <button class="page-btn" id="files-prev" onclick="changePage('files', -1)" disabled>&lt;</button>
+              <button class="page-btn" id="files-next" onclick="changePage('files', 1)" disabled>&gt;</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- System Controls -->
+      <h2 class="section-title" style="margin-top: 0;">System Controls & Pipelines</h2>
+      
+      <div class="legacy-card" style="margin-bottom: 24px;">
+        <div class="legacy-card-title">Task Management</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="runPipeline('runTaskMaster')">▶ Run Task Master Pipeline</button>
+          <button class="btn btn-primary" onclick="runPipeline('run1DayMaintenance')">▶ Run 1-Day Maintenance</button>
+          <button class="btn btn-primary" onclick="runPipeline('runHourlyReview')">↺ Generate 1-Day Plan (Hourly Review)</button>
+          <button class="btn btn-primary" onclick="runPipeline('executeTimeboxing')">▶ Sync Top 3 to Calendar</button>
+          <button class="btn btn-secondary" onclick="runPipeline('cleanupTodayTimeboxes')">🗑 Clean Today's Timeboxes</button>
+          <button class="btn btn-secondary" onclick="runPipeline('cleanupTomorrowTimeboxes')">🗑 Clean Tomorrow's Timeboxes</button>
+          <button class="btn btn-secondary" onclick="runPipeline('runTomorrowSimulation')">▶ Simulate Tomorrow's Hourly Review</button>
+          <button class="btn btn-secondary" onclick="runPipeline('runWeeklyReview')">↺ Generate 7-Day Roadmap</button>
+          <button class="btn btn-secondary" onclick="runPipeline('runMonthlyReview')">↺ Generate 28-Day Plan</button>
+        </div>
+      </div>
+
+      <div class="legacy-card" style="margin-bottom: 24px;">
+        <div class="legacy-card-title">The Clerk (Agent Pipelines)</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="runPipeline('runTheClerkEmailOngoing')">▶ Run The Clerk (Email)</button>
+          <button class="btn btn-secondary" onclick="runPipeline('runTheClerkNotes')">▶ Run The Clerk (Notes)</button>
+          <button class="btn btn-secondary" onclick="runPipeline('runTheClerkDriveOngoing')">▶ Run The Clerk (Drive)</button>
+        </div>
+      </div>
+
+      <div class="legacy-card" style="margin-bottom: 24px;">
+        <div class="legacy-card-title">System Administration</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="runPipeline('syncTaxonomyToSheet')">↺ Sync Taxonomy (MD → Sheet)</button>
+          <button class="btn btn-secondary" onclick="runPipeline('syncDriveFoldersFromTaxonomy')">▶ Build Missing Drive Folders</button>
+          <button class="btn btn-secondary" onclick="runPipeline('executeDoneReset')">Reset [DONE] Folders</button>
+        </div>
+        <div id="pipeline-status" style="margin-top: 16px; font-weight: 500; font-size: 14px; color: var(--color-primary);"></div>
+      </div>
+
+    </div>
+    
+    <!-- 7. MESSAGES SECTION -->
+    <div id="sec-messages" class="section" style="padding-bottom: 100px;">
+      <div class="header-area"><h1>Messages</h1></div>
+      <h2 class="section-title">Send a Sweet Message</h2>
+      <div class="dash-card" style="margin-bottom: 24px; padding: 16px;">
+        <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">Wifie Message Generator 💖</div>
+        <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 12px;">Generates a sweet and relevant message for Carry using the latest WhatsApp context and upcoming Family calendar events.</div>
+        <textarea id="wifie-message-box" style="width: 100%; height: 100px; resize: vertical; margin-bottom: 12px; padding: 8px; border: 1px solid var(--color-border); border-radius: 6px; font-family: inherit; font-size: 13px;" placeholder="Your message will appear here..."></textarea>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" onclick="generateWifieMessageBtn(this)">Generate Message</button>
+          <button class="btn btn-outline" onclick="copyWifieMessageBtn()">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FIXED / COLLAPSIBLE EXECUTION LOG -->
+  <div class="log-wrapper collapsed" id="log-wrapper">
+    <div class="log-header">
+      <div class="log-header-left" onclick="toggleLog()">
+        <span class="log-toggle-icon" id="log-toggle-icon">▲</span>
+        <span>Execution Log</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="log-clear" onclick="clearLog()">Clear</button>
+        <button class="log-toggle-btn" onclick="toggleLog()" id="log-toggle-text">Expand</button>
+      </div>
+    </div>
+    <div class="log-container" id="log-container">
+      <div class="log-entry"><span class="log-time">[Init]</span><span class="log-info">Dashboard loaded.</span></div>
+    </div>
+  </div>
+
+  <!-- APP MODAL DIALOG -->
+  <div id="app-modal-overlay" class="app-modal-overlay">
+    <div class="app-modal-box" id="app-modal-box">
+      <div class="app-modal-icon" id="app-modal-icon">🚀</div>
+      <h3 class="app-modal-title" id="app-modal-title">Confirm Action</h3>
+      <div class="app-modal-body" id="app-modal-body">Modal body text</div>
+      <div class="app-modal-actions" id="app-modal-actions">
+        <button class="btn btn-outline" id="app-modal-cancel-btn">Cancel</button>
+        <button class="btn btn-primary" id="app-modal-confirm-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script>
+    // Custom In-App Modal & Toast System
+    function showModal({ icon = 'ℹ️', title = '', message = '', confirmText = 'OK', cancelText = null, onConfirm = null, onCancel = null }) {
+      const overlay = document.getElementById('app-modal-overlay');
+      const iconEl = document.getElementById('app-modal-icon');
+      const titleEl = document.getElementById('app-modal-title');
+      const bodyEl = document.getElementById('app-modal-body');
+      const confirmBtn = document.getElementById('app-modal-confirm-btn');
+      const cancelBtn = document.getElementById('app-modal-cancel-btn');
+
+      if (!overlay) return;
+
+      iconEl.innerText = icon;
+      titleEl.innerText = title;
+      bodyEl.innerHTML = message;
+      confirmBtn.innerText = confirmText;
+
+      if (cancelText) {
+        cancelBtn.style.display = 'inline-flex';
+        cancelBtn.innerText = cancelText;
+      } else {
+        cancelBtn.style.display = 'none';
+      }
+
+      const onKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          if (confirmBtn && confirmBtn.disabled) return;
+          closeModal();
+          if (cancelText) {
+            if (onCancel) onCancel();
+          } else {
+            if (onConfirm) onConfirm();
+          }
+        }
+      };
+
+      const closeModal = () => {
+        overlay.classList.remove('active');
+        window.removeEventListener('keydown', onKeyDown);
+      };
+
+      window.addEventListener('keydown', onKeyDown);
+
+      confirmBtn.onclick = () => {
+        closeModal();
+        if (onConfirm) onConfirm();
+      };
+
+      cancelBtn.onclick = () => {
+        closeModal();
+        if (onCancel) onCancel();
+      };
+
+      overlay.onclick = (e) => {
+        if (e.target === overlay && cancelText) {
+          closeModal();
+          if (onCancel) onCancel();
+        }
+      };
+
+      overlay.classList.add('active');
+    }
+
+    function showToast(message, type = 'info', duration = 3500) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      const toast = document.createElement('div');
+      toast.className = `toast-item toast-${type}`;
+      toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${escapeHtml(message)}</span>`;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'fadeOutToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    const state = {
+      data: {
+        emails: [], tasks: [], recentTasks: [], workoutsTasks: [], workouts: [], files: [], notes: [], calendar: [], clerkEmails: [], clerkTasks: []
+      },
+      page: {
+        emails: 0, tasks: 0, recentTasks: 0, workoutsTasks: 0, workouts: 0, files: 0, notes: 0, calendar: 0, clerkEmails: 0, clerkTasks: 0
+      },
+      itemsPerPage: 5
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setGreeting();
+      loadSheets();
+      fetchDashboardData();
+      loadHarmonizeTaskLists();
+      if (window.innerWidth <= 768) {
+        const wrapper = document.getElementById('log-wrapper');
+        if (wrapper) wrapper.classList.add('collapsed');
+      }
+    });
+
+    function setGreeting() {
+      const hour = new Date().getHours();
+      let greeting = 'Good evening';
+      if (hour < 12) greeting = 'Good morning';
+      else if (hour < 18) greeting = 'Good afternoon';
+      document.getElementById('greeting').innerText = greeting;
+    }
+
+    function switchTab(id, el) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+      document.getElementById('sec-' + id).classList.add('active');
+      el.classList.add('active');
+      if (window.innerWidth <= 768 && el && typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
+
+    function renderMarkdown(mdText, elementId) {
+      try {
+        let html = marked.parse(mdText);
+        html = html.replace(/<a /g, '<a target="_blank" ');
+        document.getElementById(elementId).innerHTML = html;
+      } catch (e) {
+        console.error("Marked parse error:", e);
+      }
+    }
+
+    function renderStructuredMarkdown(mdText, elementId) {
+      try {
+        const container = document.getElementById(elementId);
+        if (!container) return;
+        if (!mdText) {
+        container.innerHTML = "<div style='color:var(--color-text-muted); text-align:center;'>No data found.</div>";
+        return;
+      }
+      
+      // Split the document into sections by headers (H1 or H2)
+      const lines = mdText.split('\n');
+      let sections = [];
+      let currentSection = { title: null, body: [] };
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.match(/^#{1,3}\s/)) {
+          if (currentSection.title !== null || currentSection.body.length > 0) {
+            sections.push(currentSection);
+          }
+          currentSection = { title: line.replace(/^#+\s*/, ''), body: [] };
+        } else {
+          currentSection.body.push(line);
+        }
+      }
+      sections.push(currentSection);
+      
+      let html = '<div style="display: flex; flex-direction: column; gap: 24px;">';
+      sections.forEach(sec => {
+        let bodyText = sec.body.join('\n').trim();
+        if (!sec.title && !bodyText) return;
+        
+        // Pre-process markdown checkboxes so marked doesn't escape them
+        bodyText = bodyText.replace(/^- \[\s*\] /gm, '- <input type="checkbox" disabled> ');
+        bodyText = bodyText.replace(/^- \[[xX\/]\] /gm, '- <input type="checkbox" disabled checked> ');
+        
+        html += `<div class="dash-card">`;
+        if (sec.title) {
+          html += `<div class="dash-card-header"><h2>${sec.title}</h2></div>`;
+        }
+        
+        if (bodyText) {
+          let parsedBody = marked.parse(bodyText);
+          
+          // Post-process HTML to style the lists perfectly without external CSS dependencies
+          parsedBody = parsedBody.replace(/<ul>(\s*<li[^>]*><input type="checkbox")/g, '<ul style="list-style:none; padding-left:0;">$1');
+          
+          parsedBody = parsedBody.replace(/<li>(\s*)<input type="checkbox" disabled( checked)?>/g, (match, p1, checked) => {
+            const isChecked = !!checked;
+            const textStyle = isChecked ? 'text-decoration:line-through; color:var(--color-text-muted);' : 'color:var(--color-text);';
+            return `<li style="list-style:none; display:flex; align-items:flex-start; margin-bottom:12px; line-height:1.5; ${textStyle}"><input type="checkbox" disabled ${isChecked ? 'checked' : ''} style="margin-top:4px; margin-right:12px; accent-color:var(--color-primary); flex-shrink:0;">`;
+          });
+          
+          html += `<div class="dash-card-body md-parsed-content" style="padding: 16px;">${parsedBody}</div>`;
+        }
+        html += `</div>`;
+      });
+        html += '</div>';
+        container.innerHTML = html;
+      } catch (err) {
+        console.error("renderStructuredMarkdown error:", err);
+        const container = document.getElementById(elementId);
+        if (container) container.innerHTML = `<div style="color: red; padding: 10px;">Error rendering content</div>`;
+      }
+    }
+
+    function switchIntelTab(key, el) {
+      try {
+        if (el) {
+        document.querySelectorAll('.intel-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+      }
+      
+      const content = state.data[key];
+      const container = document.getElementById('intel-article-content-2');
+      if (content) {
+        if (key === 'executionPlan' || key === 'vantageReport' || key === 'vantageReport7' || key === 'vantageReport14') {
+          renderStructuredMarkdown(content, 'intel-article-content-2');
+        } else {
+          renderMarkdown(content, 'intel-article-content-2');
+        }
+        } else {
+          container.innerHTML = `<div style='color: var(--color-text-muted); text-align: center; margin-top: 40px;'>No ${key} found.</div>`;
+        }
+      } catch(err) {
+        console.error("switchIntelTab error:", err);
+      }
+    }
+
+    function log(msg, type) {
+      const c = document.getElementById('log-container');
+      const t = new Date().toLocaleTimeString([], {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      const e = document.createElement('div');
+      e.className = 'log-entry';
+      e.innerHTML = `<span class="log-time">[${t}]</span><span class="log-${type||'info'}">${msg}</span>`;
+      c.appendChild(e);
+      c.scrollTop = c.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('log-container').innerHTML = '<div class="log-entry"><span class="log-time">[System]</span><span class="log-info">Log cleared.</span></div>';
+    }
+
+    function toggleLog() {
+      const wrapper = document.getElementById('log-wrapper');
+      const toggleIcon = document.getElementById('log-toggle-icon');
+      const toggleText = document.getElementById('log-toggle-text');
+      if (!wrapper) return;
+      const isCollapsed = wrapper.classList.toggle('collapsed');
+      if (toggleIcon) toggleIcon.innerText = isCollapsed ? '▲' : '▼';
+      if (toggleText) toggleText.innerText = isCollapsed ? 'Expand' : 'Collapse';
+    }
+
+    function setLoadingBtn(btn, on, origHTML) {
+      if (on) { btn.disabled = true; btn._origHTML = btn.innerHTML; btn.innerHTML = 'Running...'; }
+      else { btn.disabled = false; btn.innerHTML = btn._origHTML || origHTML || 'Run'; }
+    }
+
+    function generateWifieMessageBtn(btn) {
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Generating...';
+      const box = document.getElementById('wifie-message-box');
+      box.value = "Thinking of something sweet (this may take a few seconds)...";
+      
+      google.script.run.withSuccessHandler(function(res) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+        if (res.success) {
+          box.value = res.message;
+        } else {
+          box.value = 'Error: ' + res.message;
+        }
+      }).withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+        box.value = 'Execution failed: ' + err.message;
+      }).generateWifieMessage();
+    }
+    
+    function copyWifieMessageBtn() {
+      const box = document.getElementById('wifie-message-box');
+      if (!box.value) return;
+      box.select();
+      box.setSelectionRange(0, 99999); 
+      navigator.clipboard.writeText(box.value).then(() => {
+        showToast("Copied to clipboard! 📋", "success");
+      }).catch(err => {
+        showToast("Failed to copy: " + err, "error");
+      });
+    }
+
+    // DASHBOARD FETCHING
+    async function fetchDashboardData() {
+      try {
+        const loader = document.createElement('div');
+        loader.id = 'dashboard-loader';
+        loader.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--color-bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--color-text);"><div class="spinner" style="margin-bottom:20px;"></div><h2>Loading your workspace...</h2><p style="color:var(--color-text-muted);">Fetching concurrent API calls.</p></div>';
+        document.body.appendChild(loader);
+        
+        const pEmails = new Promise(res => google.script.run
+          .withSuccessHandler(res)
+          .withFailureHandler(err => {
+            console.error("Error loading emails:", err);
+            log("Failed to load emails: " + (err.message || err), "error");
+            res(null);
+          })
+          .getDashboardEmails()
+        );
+        const pCalendar = new Promise(res => google.script.run
+          .withSuccessHandler(res)
+          .withFailureHandler(err => {
+            console.error("Error loading calendar:", err);
+            log("Failed to load calendar: " + (err.message || err), "error");
+            res(null);
+          })
+          .getDashboardCalendar()
+        );
+        const pTasks = new Promise(res => google.script.run
+          .withSuccessHandler(res)
+          .withFailureHandler(err => {
+            console.error("Error loading tasks:", err);
+            log("Failed to load tasks: " + (err.message || err), "error");
+            res(null);
+          })
+          .getDashboardTasks()
+        );
+        const pFiles = new Promise(res => google.script.run
+          .withSuccessHandler(res)
+          .withFailureHandler(err => {
+            console.error("Error loading files:", err);
+            log("Failed to load files: " + (err.message || err), "error");
+            res(null);
+          })
+          .getDashboardFiles()
+        );
+        const pClerk = new Promise(res => google.script.run
+          .withSuccessHandler(res)
+          .withFailureHandler(err => {
+            console.error("Error loading Clerk logs:", err);
+            log("Failed to load Clerk logs: " + (err.message || err), "error");
+            res(null);
+          })
+          .getDashboardClerkLogs()
+        );
+        const pDocs = new Promise(res => google.script.run
+          .withSuccessHandler(res)
+          .withFailureHandler(err => {
+            console.error("Error loading docs:", err);
+            log("Failed to load docs/reviews: " + (err.message || err), "error");
+            res(null);
+          })
+          .getDashboardDocs()
+        );
+
+        const [emails, calendar, tasksData, files, clerkLogs, docs] = await Promise.all([pEmails, pCalendar, pTasks, pFiles, pClerk, pDocs]);
+        
+        state.data = {
+          emails: emails || [],
+          calendar: calendar || [],
+          tasks: (tasksData && tasksData.tasks) ? tasksData.tasks : [],
+          recentTasks: (tasksData && tasksData.recentTasks) ? tasksData.recentTasks : [],
+          workoutsTasks: (tasksData && tasksData.workoutsTasks) ? tasksData.workoutsTasks : [],
+          workouts: (tasksData && tasksData.workouts) ? tasksData.workouts : [],
+          files: files || [],
+          notes: (clerkLogs && clerkLogs.notes) ? clerkLogs.notes : [],
+          clerkEmails: (clerkLogs && clerkLogs.emails) ? clerkLogs.emails : [],
+          clerkTasks: (clerkLogs && clerkLogs.tasks) ? clerkLogs.tasks : [],
+          links: (docs && docs.links) ? docs.links : [],
+          executionPlan: (docs && docs.executionPlan) ? docs.executionPlan : "",
+          executionPlanData: (docs && docs.executionPlanData) ? docs.executionPlanData : null,
+          vantageReport: (docs && docs.vantageReport) ? docs.vantageReport : "",
+          vantageReport7: (docs && (docs.vantageReport7 || docs.vantageReport14)) ? (docs.vantageReport7 || docs.vantageReport14) : "",
+          vantageReport14: (docs && docs.vantageReport14) ? docs.vantageReport14 : "",
+          recentReflections: (docs && docs.recentReflections) ? docs.recentReflections : "",
+          roadmap: (docs && docs.roadmap) ? docs.roadmap : "",
+          monthlyReview: (docs && docs.monthlyReview) ? docs.monthlyReview : "",
+          completedTasksCount: (docs && docs.completedTasksCount) ? docs.completedTasksCount : 0,
+          manualReviewCount: (docs && docs.manualReviewCount) ? docs.manualReviewCount : 0,
+          activeMinutes: (docs && docs.activeMinutes) ? docs.activeMinutes : 0,
+          sleepHours: (docs && docs.sleepHours) ? docs.sleepHours : 0,
+          totalSteps: (docs && docs.totalSteps) ? docs.totalSteps : 0,
+          totalCalories: (docs && docs.totalCalories) ? docs.totalCalories : 0,
+          avgHeartRate: (docs && docs.avgHeartRate) ? docs.avgHeartRate : 0,
+          breatheStreak: (docs && docs.breatheStreak !== undefined) ? docs.breatheStreak : 0,
+          boxBreatheStreak: (docs && docs.boxBreatheStreak !== undefined) ? docs.boxBreatheStreak : 0
+        };
+        
+        const existingLoader = document.getElementById('dashboard-loader');
+        if (existingLoader) existingLoader.remove();
+        
+        renderAll();
+      } catch (err) {
+          console.error(err);
+          const loader = document.getElementById('dashboard-loader');
+          if (loader) loader.remove();
+          document.body.insertAdjacentHTML('beforeend', `<div class="error-state" style="position:fixed;bottom:20px;right:20px;background:red;color:white;padding:15px;border-radius:8px;z-index:10000;">Failed to load data: ${err.message}</div>`);
+      }
+    }
+    
+    function renderAll() {
+      if (!state.data) return;
+      
+      const linksHtml = state.data.links.map(l => 
+        `<a href="${l.url}" target="_blank" class="quick-link-chip">
+          ${l.name}
+        </a>`
+      ).join('');
+      document.getElementById('quick-links-container').innerHTML = linksHtml;
+      
+      if (document.getElementById('health-active')) {
+        document.getElementById('health-active').innerText = state.data.activeMinutes !== undefined ? state.data.activeMinutes : '-';
+      }
+      if (document.getElementById('health-sleep')) {
+        document.getElementById('health-sleep').innerText = state.data.sleepHours !== undefined ? state.data.sleepHours : '-';
+      }
+      if (document.getElementById('health-hr')) {
+        document.getElementById('health-hr').innerText = state.data.avgHeartRate !== undefined ? state.data.avgHeartRate : '-';
+      }
+      if (document.getElementById('health-steps')) {
+        document.getElementById('health-steps').innerText = state.data.totalSteps !== undefined ? state.data.totalSteps.toLocaleString() : '-';
+      }
+      if (document.getElementById('health-calories')) {
+        document.getElementById('health-calories').innerText = state.data.totalCalories !== undefined ? state.data.totalCalories.toLocaleString() : '-';
+      }
+      
+      if (document.getElementById('daily-plan-container')) {
+        if (state.data.executionPlanData) {
+          const d = state.data.executionPlanData;
+          
+          const renderSleekList = (items, themeColor) => {
+            if (!items || items.length === 0) return '<div style="color:var(--color-text-muted); font-size:14px; font-style: italic;">No tasks scheduled.</div>';
+            return '<div style="display:flex; flex-direction:column; gap:10px;">' + items.map(item => {
+              const bg = item.checked ? 'var(--color-hover)' : 'var(--color-surface)';
+              const textColor = item.checked ? 'var(--color-text-muted)' : 'var(--color-text)';
+              const textDecor = item.checked ? 'line-through' : 'none';
+              const indicatorColor = item.checked ? 'var(--color-border)' : themeColor;
+              
+              return `
+              <div style="background: ${bg}; border: 1px solid var(--color-border); border-left: 4px solid ${indicatorColor}; padding: 14px 18px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s;">
+                <span style="color: ${textColor}; font-weight: 500; text-decoration: ${textDecor}; line-height: 1.4;">${item.text}</span>
+                ${item.checked ? '<span style="color: var(--color-text-muted); font-size: 12px; font-weight: bold; letter-spacing: 0.5px;">DONE</span>' : ''}
+              </div>
+            `}).join('') + '</div>';
+          };
+          
+          let html = '';
+          if (d.bluf) html += `<div style="padding: 20px 24px; border-radius: 12px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--color-primary); margin-bottom: 36px; display: flex; flex-direction: column; gap: 8px;"><div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; color: #3b82f6;">Bottom Line Up Front</div><div style="font-size: 16px; line-height: 1.6; font-weight: 500;">${d.bluf}</div></div>`;
+          
+          const sectionTemplate = (title, workItems, personalItems, themeColor) => {
+             const hasWork = workItems && workItems.length > 0;
+             const hasPersonal = personalItems && personalItems.length > 0;
+             if (!hasWork && !hasPersonal) return '';
+             return `
+               <div style="margin-bottom: 40px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; overflow: hidden; box-shadow: var(--card-shadow); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);">
+                 <div style="background: var(--color-hover); padding: 16px 24px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 10px;">
+                   <span style="width: 10px; height: 10px; border-radius: 50%; background: ${themeColor};"></span>
+                   <h2 style="font-size: 18px; font-weight: 600; margin: 0; color: var(--color-text); font-family: 'Google Sans', sans-serif;">${title}</h2>
+                 </div>
+                 <div class="dashboard-grid" style="padding: 24px; gap: 32px;">
+                   <div>
+                     <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-text-muted); margin-bottom: 16px; font-weight: 600;">CE / Work</h3>
+                     ${renderSleekList(workItems, themeColor)}
+                   </div>
+                   <div>
+                     <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-text-muted); margin-bottom: 16px; font-weight: 600;">Personal</h3>
+                     ${renderSleekList(personalItems, themeColor)}
+                   </div>
+                 </div>
+               </div>
+             `;
+          };
+
+          const frogsCe = (d.frogs && (d.frogs.ce || d.frogs.work || d.frogs.pmt)) || [];
+          const frogsPersonal = (d.frogs && d.frogs.personal) || [];
+          const top3Ce = (d.top3 && (d.top3.ce || d.top3.work || d.top3.pmt)) || [];
+          const top3Personal = (d.top3 && d.top3.personal) || [];
+          const restCe = (d.rest && (d.rest.ce || d.rest.work || d.rest.pmt)) || [];
+          const restPersonal = (d.rest && d.rest.personal) || [];
+
+          html += sectionTemplate("EAT THE FROG", frogsCe, frogsPersonal, "#ef4444"); // Red
+          html += sectionTemplate("TODAY'S TOP 3", top3Ce, top3Personal, "#f59e0b"); // Amber
+          html += sectionTemplate("THE REST OF TODAY", restCe, restPersonal, "#3b82f6"); // Blue
+
+          if (d.alerts && d.alerts.length > 0) {
+            html += `<div style="margin-bottom: 40px; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 24px;">`;
+            html += `<h2 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #ef4444; font-family: 'Google Sans', sans-serif; display: flex; align-items: center; gap: 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> BOTTLENECKS & ALERTS</h2>`;
+            html += '<ul style="margin:0; padding-left:24px; color: #ef4444; font-size: 15px; line-height: 1.6;">' + d.alerts.map(a => `<li style="margin-bottom:8px;">${a}</li>`).join('') + '</ul>';
+            html += `</div>`;
+          }
+
+          if (html.trim().length > 0) {
+            document.getElementById('daily-plan-container').innerHTML = html;
+          } else if (state.data.executionPlan && typeof marked !== 'undefined') {
+            document.getElementById('daily-plan-container').innerHTML = `<div class="article-container"><div class="md-content">${marked.parse(state.data.executionPlan)}</div></div>`;
+          } else {
+            document.getElementById('daily-plan-container').innerHTML = "<div style='color:var(--color-text-muted); text-align:center;'>No execution plan found.</div>";
+          }
+        } else if (state.data.executionPlan && typeof marked !== 'undefined') {
+          document.getElementById('daily-plan-container').innerHTML = `<div class="article-container"><div class="md-content">${marked.parse(state.data.executionPlan)}</div></div>`;
+        } else {
+          document.getElementById('daily-plan-container').innerHTML = "<div style='color:var(--color-text-muted); text-align:center;'>No execution plan found.</div>";
+        }
+      }
+      
+      const activeTab = document.querySelector('.intel-tab.active');
+      if (activeTab) {
+        const key = activeTab.innerText.includes('2-Day') ? 'vantageReport' : 
+                    (activeTab.innerText.includes('7-Day') || activeTab.innerText.includes('14-Day')) ? 'vantageReport7' : 'recentReflections';
+        switchIntelTab(key, activeTab);
+      }
+
+      renderList('calendar', item => {
+        const timeStr = item.isAllDay ? "All Day" : `${new Date(item.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(item.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        return `
+        <a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="list-item">
+          <div class="list-item-icon">C</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.title}</div>
+            <div class="list-item-subtitle">${timeStr} ${item.location ? '• ' + item.location : ''}</div>
+          </div>
+        </a>
+      `}, "No events today.");
+
+      renderList('emails', item => `
+        <a href="${item.url}" target="_blank" class="list-item">
+          <div class="list-item-icon">M</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.subject}</div>
+            <div class="list-item-subtitle">${item.sender} • ${new Date(item.date).toLocaleDateString()}</div>
+          </div>
+        </a>
+      `, "No recent emails.");
+
+      renderList('tasks', item => `
+        <div class="list-item" style="cursor: default;">
+          <div class="list-item-icon">T</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.title}</div>
+            <div class="list-item-subtitle">Due: ${item.due ? new Date(item.due).toLocaleDateString() : 'None'}</div>
+          </div>
+        </div>
+      `, "No tasks due today.");
+
+      renderList('clerkEmails', item => `
+        <a href="${item.link}" target="_blank" class="list-item">
+          <div class="list-item-icon">E</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.subject}</div>
+            <div class="list-item-subtitle">${item.sender} • [${item.status}]</div>
+          </div>
+        </a>
+      `, "No Clerk emails processed recently.");
+
+      renderList('clerkTasks', item => `
+        <div class="list-item" style="cursor: default;">
+          <div class="list-item-icon">A</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.cleanedTitle || item.originalTitle}</div>
+            <div class="list-item-subtitle">${item.targetList} • [${item.status}]</div>
+          </div>
+        </div>
+      `, "No Clerk tasks processed recently.");
+
+      renderList('files', item => `
+        <a href="${item.url}" target="_blank" class="list-item">
+          <div class="list-item-icon">F</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.name}</div>
+            <div class="list-item-subtitle">Modified: ${new Date(item.date).toLocaleDateString()}</div>
+          </div>
+        </a>
+      `, "No recent files.");
+
+      renderList('workouts', item => {
+        const d = new Date(item.startTime);
+        const dateStr = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `
+        <div class="list-item" style="cursor: default;">
+          <div class="list-item-icon">W</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.title}</div>
+            <div class="list-item-subtitle">${dateStr} • ${timeStr}</div>
+          </div>
+        </div>
+      `}, "No recent workouts found.");
+
+      renderList('notes', item => `
+        <a href="${item.url}" target="_blank" class="list-item">
+          <div class="list-item-icon">N</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${item.name}</div>
+            <div class="list-item-subtitle">Tasks: ${item.tasksCount} • ${new Date(item.date).toLocaleDateString()}</div>
+          </div>
+        </a>
+      `, "No recent notes.");
+
+      // Initialize the breathing visualizer with the loaded streaks
+      switchBreatheMode();
+    }
+
+    function renderList(key, templateFn, emptyMsg) {
+      const dataItem = state.data[key];
+      if (dataItem && typeof dataItem === 'object' && dataItem.error) {
+        const container = document.getElementById(`${key}-container`);
+        if (container) {
+          container.innerHTML = `<div style="padding: 12px; color: var(--color-error, red)">Error: ${dataItem.error.message || dataItem.error}</div>`;
+        }
+        return;
+      }
+      
+      const items = Array.isArray(dataItem) ? dataItem : [];
+      const page = state.page[key];
+      const start = page * state.itemsPerPage;
+      const end = start + state.itemsPerPage;
+      const slice = items.slice(start, end);
+      
+      const container = document.getElementById(`${key}-container`);
+      if (!container) return; // Safely skip if container doesn't exist
+      
+      if (items.length === 0) {
+        container.innerHTML = `<div style="padding: 12px; color: var(--color-text-muted)">${emptyMsg}</div>`;
+      } else {
+        container.innerHTML = slice.map(templateFn).join('');
+      }
+
+      const totalPages = Math.ceil(items.length / state.itemsPerPage) || 1;
+      const infoEl = document.getElementById(`${key}-info`);
+      if (infoEl) infoEl.innerText = `Page ${page + 1} of ${totalPages}`;
+      
+      const prevEl = document.getElementById(`${key}-prev`);
+      if (prevEl) prevEl.disabled = page === 0;
+      
+      const nextEl = document.getElementById(`${key}-next`);
+      if (nextEl) nextEl.disabled = page >= totalPages - 1;
+    }
+
+    function changePage(key, delta) {
+      const dataItem = state.data[key];
+      const items = Array.isArray(dataItem) ? dataItem : [];
+      const totalPages = Math.ceil(items.length / state.itemsPerPage) || 1;
+      let newPage = state.page[key] + delta;
+      if (newPage < 0) newPage = 0;
+      if (newPage >= totalPages) newPage = totalPages - 1;
+      state.page[key] = newPage;
+      renderAll();
+    }
+
+    function loadSheets() {
+      google.script.run
+        .withSuccessHandler(function(sheets) {
+          const sel = document.getElementById('sheet-select');
+          if (sel) {
+            sel.innerHTML = '<option value="">Select a sheet...</option>';
+            sheets.forEach(function(s) { const o = document.createElement('option'); o.value = s.name; o.textContent = s.name; sel.appendChild(o); });
+          }
+        })
+        .withFailureHandler(function() { log('Failed to load sheet list.', 'error'); })
+        .getSheetsList();
+    }
+
+    function runPipeline(fn) {
+      const btn = event.target;
+      setLoadingBtn(btn, true);
+      log(`Running ${fn}...`, 'info');
+      google.script.run.withSuccessHandler(res => {
+        setLoadingBtn(btn, false);
+        log(res, 'success');
+      }).withFailureHandler(err => {
+        setLoadingBtn(btn, false);
+        log(err.message, 'error');
+      })[fn]();
+    }
+
+    // -----------------------------------------
+    // BREATHE APP LOGIC
+    // -----------------------------------------
+    let breatheInterval;
+    let breatheState = 0; // 1=inhale, 2=hold, 3=exhale
+    let breatheTicks = 0;
+    let cyclesCompleted = 0;
+        let breatheMode = '478';
+    let isBreathing = false;
+    let boxRotationX = 0;
+    let audioCtx;
+
+    function playTone(freq, durationStr) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = freq;
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        // Envelope
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
+        
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 2);
+      } catch(e) {}
+    }
+    function playTick() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 600;
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
+      } catch(e) {}
+    }
+    function renderLotus() {
+      const container = document.getElementById('breathe-lotus');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      let rawStreak = 0;
+      if (breatheMode === '478' && state.data && state.data.breatheStreak !== undefined) {
+          rawStreak = state.data.breatheStreak;
+      } else if (breatheMode === 'box' && state.data && state.data.boxBreatheStreak !== undefined) {
+          rawStreak = state.data.boxBreatheStreak;
+      }
+      
+      const lotusCount = Math.floor(rawStreak / 28);
+      const streak = rawStreak % 28;
+      const displayStreak = (rawStreak > 0 && streak === 0) ? 28 : streak;
+      
+      const ticker = document.getElementById('lotus-ticker');
+      const countEl = document.getElementById('lotus-count');
+      if (lotusCount > 0) {
+        ticker.style.display = 'inline-flex';
+        countEl.innerText = 'x' + lotusCount;
+      } else {
+        ticker.style.display = 'none';
+      }
+      
+      const map = [
+        [ 0,  0,  0,  0,  0, 28,  0,  0,  0,  0,  0],
+        [ 0,  0,  0,  0, 26, 25, 27,  0,  0,  0,  0],
+        [ 0,  0,  0, 23,  0, 22,  0, 24,  0,  0,  0],
+        [ 0,  0, 20, 16, 17, 15, 18, 19, 21,  0,  0],
+        [ 0, 13, 11,  0,  9,  8, 10,  0, 12, 14,  0],
+        [ 0,  0,  0,  6,  4,  0,  5,  7,  0,  0,  0],
+        [ 0,  0,  0,  0,  2,  1,  3,  0,  0,  0,  0]
+      ];
+      
+      for (let r = 0; r < map.length; r++) {
+        for (let c = 0; c < map[r].length; c++) {
+          const val = map[r][c];
+          const div = document.createElement('div');
+          
+          if (val === 0) {
+            div.style.background = 'transparent';
+          } else {
+            const isActive = displayStreak >= val;
+            if (isActive) {
+              let color = 'var(--color-primary)';
+              if (r === 6) color = '#10b981'; // Green stem (Week 1)
+              else if (r === 5) color = '#059669'; // Base leaves (Week 1)
+              else if (r === 4) color = '#d946ef'; // Deep fuchsia (Week 2)
+              else if (r === 3) color = '#f472b6'; // Pink (Week 3)
+              else color = '#fbcfe8'; // Light pink crown (Week 4 full bloom)
+              
+              div.style.background = color;
+              div.style.borderRadius = '2px';
+              div.style.transition = 'all 0.5s ease';
+              if (displayStreak === 28 || lotusCount > 0) {
+                div.style.boxShadow = `0 0 4px ${color}`;
+              }
+            } else {
+              div.style.background = 'var(--color-border)';
+              div.style.opacity = '0.4';
+              div.style.borderRadius = '2px';
+              div.style.transition = 'all 0.5s ease';
+            }
+          }
+          container.appendChild(div);
+        }
+      }
+    }
+
+    function switchBreatheMode() {
+      const modeSelect = document.getElementById('breathe-mode-select');
+      if (!modeSelect) return;
+      if (isBreathing) startBreathing(); // stop if running
+      breatheMode = modeSelect.value;
+      const streakEl = document.getElementById('breathe-streak');
+      const circle = document.getElementById('breathe-circle');
+      const origami = document.getElementById('origami-box');
+      const text = document.getElementById('breathe-text');
+      
+      if (breatheMode === '478') {
+        if (streakEl) streakEl.innerText = state.data && state.data.breatheStreak !== undefined ? state.data.breatheStreak : '0';
+        if (circle) circle.style.display = 'block';
+        if (origami) origami.style.display = 'none';
+        if (circle) circle.style.transform = 'scale(0.4)';
+        if (text) { text.style.top = ''; text.style.transform = ''; }
+      } else {
+        if (streakEl) streakEl.innerText = state.data && state.data.boxBreatheStreak !== undefined ? state.data.boxBreatheStreak : '0';
+        if (circle) circle.style.display = 'none';
+        if (origami) origami.style.display = 'flex';
+        if (text) text.style.top = '220px'; // Push it below the box
+        setOrigamiState('closed', '0.5s');
+      }
+      renderLotus();
+    }
+
+    function setOrigamiState(stateStr, dur = '4s', ease = 'cubic-bezier(0.34, 1.56, 0.64, 1)') {
+      const t = document.getElementById('flap-top');
+      const b = document.getElementById('flap-bottom');
+      const l = document.getElementById('flap-left');
+      const r = document.getElementById('flap-right');
+      
+      if (!t || !b || !l || !r) return;
+      
+      t.style.transition = `transform ${dur} ${ease}`;
+      b.style.transition = `transform ${dur} ${ease}`;
+      l.style.transition = `transform ${dur} ${ease}`;
+      r.style.transition = `transform ${dur} ${ease}`;
+      
+      if (stateStr === 'open') {
+        t.style.transform = 'rotateX(0deg)';
+        b.style.transform = 'rotateX(0deg)';
+        l.style.transform = 'rotateY(0deg)';
+        r.style.transform = 'rotateY(0deg)';
+      } else {
+        t.style.transform = 'rotateX(-90deg)';
+        b.style.transform = 'rotateX(90deg)';
+        l.style.transform = 'rotateY(90deg)';
+        r.style.transform = 'rotateY(-90deg)';
+      }
+    }
+
+    function startBreathing() {
+      const btn = document.getElementById('breathe-start-btn');
+      const text = document.getElementById('breathe-text');
+      const circle = document.getElementById('breathe-circle');
+      const origamiBase = document.getElementById('origami-base');
+      
+      if (isBreathing) {
+        clearInterval(breatheInterval);
+        isBreathing = false;
+        btn.innerText = 'Start';
+        btn.classList.remove('state-stop', 'state-done');
+        text.innerText = '4';
+        
+        if (breatheMode === '478') {
+          circle.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          circle.style.transform = 'scale(0.4)';
+        } else {
+          origamiBase.style.transition = 'transform 0.5s ease';
+          origamiBase.style.transform = 'scale(0.5) rotateX(60deg) rotateZ(45deg)';
+          setOrigamiState('closed', '0.5s');
+        }
+        return;
+      }
+      
+      isBreathing = true;
+      btn.innerText = 'Stop';
+      btn.classList.remove('state-done');
+      btn.classList.add('state-stop');
+      breatheState = 1;
+      breatheTicks = 0;
+      cyclesCompleted = 0;
+      document.getElementById('breathe-cycles-count').innerText = 4;
+      
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      doBreatheTick();
+      breatheInterval = setInterval(doBreatheTick, 1000);
+    }
+
+    function doBreatheTick() {
+      const circle = document.getElementById('breathe-circle');
+      const text = document.getElementById('breathe-text');
+      const origamiBase = document.getElementById('origami-base');
+      
+      if (breatheMode === '478') {
+        if (breatheState === 1) { // Inhale 4s
+          if (breatheTicks === 0) {
+            playTone(329.63, 4); // E4
+            circle.style.transition = 'transform 4s ease-in-out, border-radius 0.5s ease';
+            circle.style.transform = 'scale(1.2) rotateX(0deg)';
+          } else { playTick(); }
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { breatheState = 2; breatheTicks = 0; }
+        } else if (breatheState === 2) { // Hold 7s
+          if (breatheTicks === 0) { playTone(440.00, 7); } else { playTick(); }
+          const remaining = 7 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 7) { breatheState = 3; breatheTicks = 0; }
+        } else if (breatheState === 3) { // Exhale 8s
+          if (breatheTicks === 0) {
+            playTone(261.63, 8); // C4
+            circle.style.transition = 'transform 8s ease-in-out, border-radius 0.5s ease';
+            circle.style.transform = 'scale(0.4) rotateX(0deg)';
+          } else { playTick(); }
+          const remaining = 8 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 8) {
+            breatheState = 1; breatheTicks = 0; cyclesCompleted++;
+            document.getElementById('breathe-cycles-count').innerText = Math.max(0, 4 - cyclesCompleted);
+            if (cyclesCompleted === 4) { winBreatheStreak(); }
+          }
+        }
+      } else {
+        // Box Breathing (Origami)
+        const t = document.getElementById('flap-top');
+        const b = document.getElementById('flap-bottom');
+        const l = document.getElementById('flap-left');
+        const r = document.getElementById('flap-right');
+        const flapDur = '1s';
+        const ease = 'ease-in-out';
+
+        if (breatheState === 1) { // Inhale 4s
+          if (breatheTicks === 0) {
+            playTone(329.63, 4);
+            t.style.transition = `transform ${flapDur} ${ease}`; t.style.transform = 'rotateX(0deg)';
+          } else if (breatheTicks === 1) { r.style.transition = `transform ${flapDur} ${ease}`; r.style.transform = 'rotateY(0deg)'; playTick();
+          } else if (breatheTicks === 2) { b.style.transition = `transform ${flapDur} ${ease}`; b.style.transform = 'rotateX(0deg)'; playTick();
+          } else if (breatheTicks === 3) { l.style.transition = `transform ${flapDur} ${ease}`; l.style.transform = 'rotateY(0deg)'; playTick(); }
+          
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { breatheState = 2; breatheTicks = 0; }
+        } else if (breatheState === 2) { // Hold 4s
+          if (breatheTicks === 0) { playTone(440.00, 4); } else { playTick(); }
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { breatheState = 3; breatheTicks = 0; }
+        } else if (breatheState === 3) { // Exhale 4s
+          if (breatheTicks === 0) {
+            playTone(261.63, 4);
+            t.style.transition = `transform ${flapDur} ${ease}`; t.style.transform = 'rotateX(-90deg)';
+          } else if (breatheTicks === 1) { r.style.transition = `transform ${flapDur} ${ease}`; r.style.transform = 'rotateY(-90deg)'; playTick();
+          } else if (breatheTicks === 2) { b.style.transition = `transform ${flapDur} ${ease}`; b.style.transform = 'rotateX(90deg)'; playTick();
+          } else if (breatheTicks === 3) { l.style.transition = `transform ${flapDur} ${ease}`; l.style.transform = 'rotateY(90deg)'; playTick(); }
+          
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { breatheState = 4; breatheTicks = 0; }
+        } else if (breatheState === 4) { // Hold 4s
+          if (breatheTicks === 0) { playTone(440.00, 4); } else { playTick(); }
+          const remaining = 4 - breatheTicks;
+          text.innerText = remaining;
+          breatheTicks++;
+          if (breatheTicks >= 4) { 
+            breatheState = 1; breatheTicks = 0; cyclesCompleted++;
+            document.getElementById('breathe-cycles-count').innerText = Math.max(0, 4 - cyclesCompleted);
+            if (cyclesCompleted === 4) { winBreatheStreak(); }
+          }
+        }
+      }
+    }
+
+    function winBreatheStreak() {
+      clearInterval(breatheInterval);
+      isBreathing = false;
+      const btn = document.getElementById('breathe-start-btn');
+      const text = document.getElementById('breathe-text');
+      const circle = document.getElementById('breathe-circle');
+      const origamiBase = document.getElementById('origami-base');
+      
+      btn.innerText = 'Done!';
+      btn.classList.remove('state-stop');
+      btn.classList.add('state-done');
+      text.innerText = '✓';
+      
+      if (breatheMode === '478') {
+        circle.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        circle.style.transform = 'scale(0.4)';
+      } else {
+        origamiBase.style.transition = 'transform 0.5s ease';
+        origamiBase.style.transform = 'scale(0.5) rotateX(60deg) rotateZ(45deg)';
+        setOrigamiState('closed', '0.5s');
+      }
+      
+      const el = document.getElementById('breathe-streak');
+      const habitName = breatheMode === '478' ? '4-7-8 Breathing' : 'Box Breathing';
+      
+      // Determine baseline streak safely from state
+      let baseStreak = 0;
+      if (state.data) {
+        if (breatheMode === '478') {
+          state.data.breatheStreak = (state.data.breatheStreak || 0) + 1;
+          baseStreak = state.data.breatheStreak;
+        } else {
+          state.data.boxBreatheStreak = (state.data.boxBreatheStreak || 0) + 1;
+          baseStreak = state.data.boxBreatheStreak;
+        }
+      } else {
+        // Fallback to DOM if state is not available
+        baseStreak = (parseInt(el.innerText, 10) || 0) + 1;
+      }
+      
+      el.innerText = baseStreak + ' (Syncing...)';
+      renderLotus();
+      
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.success === false) {
+            console.error('Failed to log habit:', res.error);
+            el.innerText = (baseStreak - 1) + ' (Error)';
+            log(`Failed to log habit: ${habitName}. Error: ${res.error}`, 'error');
+            if (state.data) {
+              if (breatheMode === '478') state.data.breatheStreak = Math.max(0, (state.data.breatheStreak || 1) - 1);
+              else state.data.boxBreatheStreak = Math.max(0, (state.data.boxBreatheStreak || 1) - 1);
+            }
+          } else {
+            el.innerText = baseStreak + ' (Logged)';
+            log(`Successfully logged habit: ${habitName}`, 'success');
+          }
+        })
+        .withFailureHandler(function(err) {
+          console.error('Failed to log habit:', err);
+          el.innerText = (baseStreak - 1) + ' (Error)';
+          log(`Failed to log habit: ${habitName}. Error: ${err.message || err}`, 'error');
+          if (state.data) {
+            if (breatheMode === '478') state.data.breatheStreak = Math.max(0, (state.data.breatheStreak || 1) - 1);
+            else state.data.boxBreatheStreak = Math.max(0, (state.data.boxBreatheStreak || 1) - 1);
+          }
+        })
+        .withUserObject({})
+        .logHabit(habitName);
+      
+      let breathingTaskId = null;
+      if (state.data && Array.isArray(state.data.tasks)) {
+        for (let t of state.data.tasks) {
+          if (t && t.title && t.title.toLowerCase().includes(habitName.toLowerCase())) {
+            breathingTaskId = t.id;
+            break;
+          }
+        }
+      }
+      
+      if (breathingTaskId) {
+        google.script.run
+          .withSuccessHandler(function() {
+            log(`Successfully completed breathing task in Google Tasks.`, 'success');
+          })
+          .withFailureHandler(function(err) {
+            console.error('Failed to complete breathing task:', err);
+            log(`Failed to complete breathing task: ${err.message || err}`, 'error');
+          })
+          .completeTaskById(breathingTaskId);
+      }
+    }
+
+    // ============================================================
+    // TASK GROOMING & HARMONIZATION JAVASCRIPT
+    // ============================================================
+    const harmonizeState = {
+      lists: [],
+      auditData: null,
+      selectedActions: new Set(),
+      isAuditing: false,
+      isExecuting: false
+    };
+
+    function loadHarmonizeTaskLists() {
+      google.script.run
+        .withSuccessHandler(function(lists) {
+          if (Array.isArray(lists)) {
+            harmonizeState.lists = lists;
+            const selectEl = document.getElementById('harmonize-list-select');
+            if (selectEl) {
+              selectEl.innerHTML = '<option value="">All Active Task Lists</option>';
+              lists.forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.id;
+                opt.textContent = l.title;
+                selectEl.appendChild(opt);
+              });
+            }
+          }
+        })
+        .withFailureHandler(function(err) {
+          console.error("Failed to load harmonize task lists:", err);
+        })
+        .getHarmonizeTaskLists();
+    }
+
+    function onAuditEngineChange() {
+      const selectEl = document.getElementById('harmonize-engine-select');
+      const engine = selectEl ? selectEl.value : 'rule_based';
+      const btnText = document.getElementById('btn-audit-text');
+      const btnIcon = document.getElementById('btn-audit-icon');
+      if (!btnText || !btnIcon) return;
+      if (engine === 'rule_based') {
+        btnIcon.innerText = '⚡';
+        btnText.innerText = 'Run Instant Scan (No AI)';
+      } else {
+        btnIcon.innerText = '🤖';
+        btnText.innerText = 'Run AI Audit (Gemini 3.7 Flash)';
+      }
+    }
+
+    function runHarmonizeAudit() {
+      if (harmonizeState.isAuditing || harmonizeState.isExecuting) return;
+
+      const scope = document.getElementById('harmonize-scope-select').value;
+      const targetListId = document.getElementById('harmonize-list-select').value || null;
+      const engineSelect = document.getElementById('harmonize-engine-select');
+      const engine = engineSelect ? engineSelect.value : 'rule_based';
+
+      harmonizeState.isAuditing = true;
+      document.getElementById('btn-run-harmonize-audit').disabled = true;
+      document.getElementById('btn-audit-text').innerText = engine === 'rule_based' ? 'Scanning (Instant / No AI)...' : 'Auditing with Gemini 3.7 Flash...';
+      document.getElementById('harmonize-status-card').style.display = 'block';
+      document.getElementById('harmonize-status-text').innerText = engine === 'rule_based' ? 'Performing instant rule-based scan for 99 Done, 99 To be deleted, and Quarantined tasks...' : 'Ingesting Google Tasks and analyzing with Gemini 3.7 Flash...';
+      document.getElementById('harmonize-results-container').style.display = 'none';
+
+      log(`[TaskHarmonizer] Triggering task audit (Scope: ${scope}, Engine: ${engine})...`, 'info');
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          harmonizeState.isAuditing = false;
+          document.getElementById('btn-run-harmonize-audit').disabled = false;
+          onAuditEngineChange();
+          document.getElementById('harmonize-status-card').style.display = 'none';
+
+          if (!res || !res.success) {
+            const errMsg = res ? res.error : "Unknown error";
+            log(`[TaskHarmonizer] Audit failed: ${errMsg}`, 'error');
+            showModal({
+              icon: '❌',
+              title: 'Audit Failed',
+              message: `<div style="color: #ef4444; font-weight: 500;">${escapeHtml(errMsg)}</div>`,
+              confirmText: 'Dismiss'
+            });
+            return;
+          }
+
+          harmonizeState.auditData = res;
+          harmonizeState.selectedActions.clear();
+
+          renderHarmonizeDashboard(res);
+          const scanLabel = engine === 'rule_based' ? 'Instant Rule-Based Scan' : 'Gemini AI Audit';
+          showToast(`${scanLabel} completed (${res.summary.totalTasksAnalyzed} tasks analyzed)`, 'success');
+          log(`[TaskHarmonizer] ${scanLabel} completed successfully. Analyzed ${res.summary.totalTasksAnalyzed} tasks.`, 'success');
+        })
+        .withFailureHandler(function(err) {
+          harmonizeState.isAuditing = false;
+          document.getElementById('btn-run-harmonize-audit').disabled = false;
+          onAuditEngineChange();
+          document.getElementById('harmonize-status-card').style.display = 'none';
+
+          const errMsg = err.message || err;
+          log(`[TaskHarmonizer] API Error: ${errMsg}`, 'error');
+          showModal({
+            icon: '❌',
+            title: 'API Error',
+            message: `<div style="color: #ef4444; font-weight: 500;">${escapeHtml(errMsg)}</div>`,
+            confirmText: 'Dismiss'
+          });
+        })
+        .runTaskHarmonizeAudit({ scope: scope, targetListId: targetListId, engine: engine });
+    }
+
+    function renderHarmonizeDashboard(data) {
+      document.getElementById('harmonize-results-container').style.display = 'block';
+
+      const summary = data.summary || {};
+      const batches = data.batches || {};
+
+      const bA = batches.batchA_Duplicates || [];
+      const bB = batches.batchB_Zombies || [];
+      const bC = batches.batchC_Taxonomy || [];
+      const bD = batches.batchD_Metadata || [];
+      const totalIssues = bA.length + bB.length + bC.length + bD.length;
+
+      // Update KPI Cards
+      document.getElementById('kpi-total-issues').innerText = totalIssues;
+      document.getElementById('kpi-batch-a').innerText = bA.length;
+      document.getElementById('kpi-batch-b').innerText = bB.length;
+      document.getElementById('kpi-batch-c').innerText = bC.length;
+      document.getElementById('kpi-batch-d').innerText = bD.length;
+
+      // Update Badges on Tabs
+      document.getElementById('badge-count-all').innerText = totalIssues;
+      document.getElementById('badge-count-batchA').innerText = bA.length;
+      document.getElementById('badge-count-batchB').innerText = bB.length;
+      document.getElementById('badge-count-batchC').innerText = bC.length;
+      document.getElementById('badge-count-batchD').innerText = bD.length;
+
+      // Update BLUF
+      document.getElementById('harmonize-bluf-text').innerHTML = summary.executiveSummary ? marked.parse(summary.executiveSummary) : 'Audit complete.';
+
+      // Pre-select all proposed items by default
+      harmonizeState.selectedActions.clear();
+      bA.forEach((_, idx) => harmonizeState.selectedActions.add(`batchA_${idx}`));
+      bB.forEach((_, idx) => harmonizeState.selectedActions.add(`batchB_${idx}`));
+      bC.forEach((_, idx) => harmonizeState.selectedActions.add(`batchC_${idx}`));
+      bD.forEach((_, idx) => harmonizeState.selectedActions.add(`batchD_${idx}`));
+
+      // Render Combined "All Batches" list
+      const containerAll = document.getElementById('list-all-items');
+      if (containerAll) {
+        if (totalIssues === 0) {
+          containerAll.innerHTML = `<div style="padding: 28px; text-align: center; color: var(--color-text-muted); font-size: 15px; background: var(--color-surface); border-radius: 12px; border: 1px solid var(--color-border);">
+            🎉 No issues detected across any batch. Your task ecosystem is perfectly harmonized!
+          </div>`;
+        } else {
+          let allHtml = '';
+          bA.forEach((item, idx) => allHtml += buildTaskCardHtml(item, 'batchA', idx, true));
+          bB.forEach((item, idx) => allHtml += buildTaskCardHtml(item, 'batchB', idx, true));
+          bC.forEach((item, idx) => allHtml += buildTaskCardHtml(item, 'batchC', idx, true));
+          bD.forEach((item, idx) => allHtml += buildTaskCardHtml(item, 'batchD', idx, true));
+          containerAll.innerHTML = allHtml;
+        }
+      }
+
+      // Render items for each individual batch
+      renderBatchItems('batchA', bA);
+      renderBatchItems('batchB', bB);
+      renderBatchItems('batchC', bC);
+      renderBatchItems('batchD', bD);
+
+      switchHarmonizeBatchTab('all');
+      updateHarmonizeSelectionUI();
+    }
+
+    function buildTaskCardHtml(item, batchKey, idx, showBatchTag) {
+      const itemKey = `${batchKey}_${idx}`;
+      const isChecked = harmonizeState.selectedActions.has(itemKey);
+
+      let badgeClass = 'badge-blue';
+      let actionLabel = item.action || 'UPDATE';
+      if (item.action === 'DELETE_TASK') { badgeClass = 'badge-red'; actionLabel = '🗑️ DELETE / PURGE'; }
+      else if (item.action === 'MOVE_TO_QUARANTINE') { badgeClass = 'badge-amber'; actionLabel = '📦 MOVE TO QUARANTINE'; }
+      else if (item.action === 'MARK_COMPLETED') { badgeClass = 'badge-green'; actionLabel = '✅ MARK COMPLETED'; }
+      else if (item.action === 'UPDATE_TASK') { badgeClass = 'badge-purple'; actionLabel = '✏️ STANDARDIZE'; }
+
+      let batchTag = '';
+      if (showBatchTag) {
+        const batchTagMap = {
+          'batchA': { label: 'Batch A: Duplicates', color: '#d97706', bg: 'rgba(217, 119, 6, 0.12)' },
+          'batchB': { label: 'Batch B: Zombies', color: '#dc2626', bg: 'rgba(220, 38, 38, 0.12)' },
+          'batchC': { label: 'Batch C: Taxonomy', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.12)' },
+          'batchD': { label: 'Batch D: Metadata', color: '#7c3aed', bg: 'rgba(124, 58, 237, 0.12)' }
+        };
+        const bInfo = batchTagMap[batchKey] || { label: batchKey, color: 'var(--color-accent)', bg: 'rgba(99,102,241,0.1)' };
+        batchTag = `<span class="badge" style="background: ${bInfo.bg}; color: ${bInfo.color}; border: 1px solid ${bInfo.color}40; font-weight: 700;">${bInfo.label}</span>`;
+      }
+
+      return `
+        <div class="audit-card ${isChecked ? 'selected' : ''}" id="card-${itemKey}" onclick="handleCardClick(event, '${batchKey}', ${idx})">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px;">
+            <div style="display: flex; align-items: flex-start; gap: 14px; flex: 1;">
+              <div class="custom-checkbox" id="chk-${itemKey}">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
+                  ${batchTag}
+                  <span class="badge ${badgeClass}">${actionLabel}</span>
+                  <span class="badge badge-amber" style="background: rgba(100,116,139,0.1); color: var(--color-text-muted); border-color: var(--color-border);">📂 ${escapeHtml(item.listTitle || 'List')}</span>
+                  ${item.daysOverdue ? `<span class="badge badge-red">⏰ ${item.daysOverdue}d overdue</span>` : ''}
+                </div>
+                <div style="font-weight: 700; font-size: 16px; margin-bottom: 2px; line-height: 1.4;">${escapeHtml(item.originalTitle || 'Untitled')}</div>
+              </div>
+            </div>
+            <div class="select-pill ${isChecked ? 'pill-approved' : 'pill-excluded'}" id="pill-status-${itemKey}">
+              ${isChecked ? '✓ Approved' : 'Excluded'}
+            </div>
+          </div>
+
+          <table class="diff-table">
+            ${item.proposedTitle && item.proposedTitle !== item.originalTitle ? `
+              <tr>
+                <td class="diff-label">Title Fix:</td>
+                <td>
+                  <div class="diff-old"><s>${escapeHtml(item.originalTitle)}</s></div>
+                  <div class="diff-new" style="margin-top: 4px;"><strong>→ ${escapeHtml(item.proposedTitle)}</strong></div>
+                </td>
+              </tr>
+            ` : ''}
+            ${item.proposedMilestone ? `
+              <tr>
+                <td class="diff-label">Milestone Epic:</td>
+                <td><span class="diff-new">${escapeHtml(item.proposedMilestone)}</span></td>
+              </tr>
+            ` : ''}
+            ${item.proposedNotes ? `
+              <tr>
+                <td class="diff-label">Notes Update:</td>
+                <td><div class="diff-new" style="max-height: 80px; overflow-y: auto; white-space: pre-wrap;">${escapeHtml(item.proposedNotes)}</div></td>
+              </tr>
+            ` : ''}
+            ${item.survivorTitle ? `
+              <tr>
+                <td class="diff-label">Survivor Task:</td>
+                <td><span class="diff-new">🛡️ Retaining: ${escapeHtml(item.survivorTitle)}</span></td>
+              </tr>
+            ` : ''}
+          </table>
+
+          <div class="audit-reason">
+            💡 <strong>Auditor Rationale:</strong> ${escapeHtml(item.reasoning || 'Standard system hygiene enforcement.')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBatchItems(batchKey, items) {
+      const container = document.getElementById(`list-${batchKey}-items`);
+      if (!container) return;
+
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--color-text-muted); font-size: 14px; background: var(--color-surface); border-radius: 12px; border: 1px solid var(--color-border);">
+          ✅ No issues detected in this batch. All clean!
+        </div>`;
+        return;
+      }
+
+      let html = '';
+      items.forEach((item, idx) => {
+        html += buildTaskCardHtml(item, batchKey, idx, false);
+      });
+
+      container.innerHTML = html;
+    }
+
+    function syncCardUI(batchKey, index) {
+      const itemKey = `${batchKey}_${index}`;
+      const isSelected = harmonizeState.selectedActions.has(itemKey);
+
+      document.querySelectorAll(`[id="card-${itemKey}"]`).forEach(card => {
+        if (isSelected) {
+          card.classList.add('selected');
+        } else {
+          card.classList.remove('selected');
+        }
+      });
+
+      document.querySelectorAll(`[id="pill-status-${itemKey}"]`).forEach(pill => {
+        if (isSelected) {
+          pill.className = 'select-pill pill-approved';
+          pill.innerText = '✓ Approved';
+        } else {
+          pill.className = 'select-pill pill-excluded';
+          pill.innerText = 'Excluded';
+        }
+      });
+    }
+
+    function handleCardClick(event, batchKey, index) {
+      if (event.target.tagName === 'A') {
+        return;
+      }
+      const itemKey = `${batchKey}_${index}`;
+      if (harmonizeState.selectedActions.has(itemKey)) {
+        harmonizeState.selectedActions.delete(itemKey);
+      } else {
+        harmonizeState.selectedActions.add(itemKey);
+      }
+      syncCardUI(batchKey, index);
+      updateHarmonizeSelectionUI();
+    }
+
+    function switchHarmonizeBatchTab(batchKey) {
+      document.querySelectorAll('.batch-nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.harmonize-panel').forEach(p => p.style.display = 'none');
+
+      const btn = document.getElementById(`tab-btn-${batchKey}`);
+      if (btn) btn.classList.add('active');
+
+      const panel = document.getElementById(`panel-${batchKey}`);
+      if (panel) panel.style.display = 'block';
+    }
+
+    function toggleBatchSelection(batchKey, selectAll) {
+      if (!harmonizeState.auditData || !harmonizeState.auditData.batches) return;
+      const batches = harmonizeState.auditData.batches || {};
+
+      const batchList = (batchKey === 'all') 
+        ? ['batchA', 'batchB', 'batchC', 'batchD'] 
+        : [batchKey];
+
+      const batchMapping = {
+        'batchA': 'batchA_Duplicates',
+        'batchB': 'batchB_Zombies',
+        'batchC': 'batchC_Taxonomy',
+        'batchD': 'batchD_Metadata'
+      };
+
+      batchList.forEach(bKey => {
+        const keyName = batchMapping[bKey];
+        const items = batches[keyName] || [];
+        items.forEach((_, idx) => {
+          const itemKey = `${bKey}_${idx}`;
+          if (selectAll) {
+            harmonizeState.selectedActions.add(itemKey);
+          } else {
+            harmonizeState.selectedActions.delete(itemKey);
+          }
+          syncCardUI(bKey, idx);
+        });
+      });
+
+      updateHarmonizeSelectionUI();
+    }
+
+    function updateHarmonizeSelectionUI() {
+      const count = harmonizeState.selectedActions.size;
+      document.getElementById('harmonize-selected-count-text').innerText = `${count} actions approved across 4 batches`;
+      document.getElementById('btn-exec-text').innerText = `Execute Approved Actions (${count})`;
+      document.getElementById('btn-execute-harmonize').disabled = (count === 0 || harmonizeState.isExecuting);
+    }
+
+    function executeHarmonizeActions() {
+      if (harmonizeState.isExecuting || harmonizeState.selectedActions.size === 0) return;
+
+      // Extract approved action objects
+      const approvedItems = [];
+      const batches = harmonizeState.auditData.batches || {};
+      const batchMap = {
+        'batchA': batches.batchA_Duplicates || [],
+        'batchB': batches.batchB_Zombies || [],
+        'batchC': batches.batchC_Taxonomy || [],
+        'batchD': batches.batchD_Metadata || []
+      };
+
+      harmonizeState.selectedActions.forEach(key => {
+        const parts = key.split('_');
+        const bKey = parts[0];
+        const idx = parseInt(parts[1], 10);
+        if (batchMap[bKey] && batchMap[bKey][idx]) {
+          approvedItems.push(batchMap[bKey][idx]);
+        }
+      });
+
+      if (approvedItems.length === 0) return;
+
+      showModal({
+        icon: '🚀',
+        title: 'Execute Task Harmonization',
+        message: `You are about to execute <strong>${approvedItems.length} approved actions</strong> on your live Google Tasks ecosystem.<br><br>Quarantined tasks will be safely archived to <em>Triage Quarantine</em>, notes will be standardized, and titles updated.`,
+        confirmText: `Execute (${approvedItems.length})`,
+        cancelText: 'Cancel',
+        onConfirm: () => {
+          startHarmonizeExecution(approvedItems);
+        }
+      });
+    }
+
+    function startHarmonizeExecution(approvedItems) {
+      harmonizeState.isExecuting = true;
+      document.getElementById('btn-execute-harmonize').disabled = true;
+      document.getElementById('harmonize-exec-progress-container').style.display = 'block';
+
+      log(`[TaskHarmonizer] Beginning execution of ${approvedItems.length} task mutations in chunks...`, 'info');
+      showToast(`Beginning execution of ${approvedItems.length} task actions...`, 'info');
+
+      const chunkSize = 6;
+      const chunks = [];
+      for (let i = 0; i < approvedItems.length; i += chunkSize) {
+        chunks.push(approvedItems.slice(i, i + chunkSize));
+      }
+
+      let currentChunkIdx = 0;
+      let totalProcessed = 0;
+      let allErrors = [];
+
+      // Open a live in-modal Progress HUD in the center of the screen
+      showModal({
+        icon: '⚡',
+        title: 'Executing Task Mutations...',
+        message: `<div style="text-align: center; padding: 16px 0;">
+          <div id="modal-exec-status-text" style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Executing Batch 1 of ${chunks.length} (0/${approvedItems.length})...</div>
+          <div class="exec-progress-bar" style="height: 10px; background: rgba(255,255,255,0.08); border-radius: 6px; overflow: hidden; margin-bottom: 10px; border: 1px solid var(--color-border);">
+            <div id="modal-exec-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #6366f1, #10b981); transition: width 0.3s ease;"></div>
+          </div>
+          <div id="modal-exec-pct-text" style="font-size: 12px; color: var(--color-text-muted);">0% Complete</div>
+        </div>`,
+        confirmText: 'Executing...',
+        cancelText: null
+      });
+
+      const confirmBtn = document.getElementById('app-modal-confirm-btn');
+      if (confirmBtn) confirmBtn.disabled = true;
+
+      function runNextChunk() {
+        if (currentChunkIdx >= chunks.length) {
+          harmonizeState.isExecuting = false;
+          if (confirmBtn) confirmBtn.disabled = false;
+
+          document.getElementById('harmonize-exec-progress-fill').style.width = '100%';
+          document.getElementById('harmonize-exec-progress-pct').innerText = '100%';
+          document.getElementById('harmonize-exec-progress-label').innerText = 'Execution Complete!';
+
+          log(`[TaskHarmonizer] Successfully executed ${totalProcessed} task mutations. Errors: ${allErrors.length}`, totalErrorsMessage(allErrors));
+          showToast(`Successfully processed ${totalProcessed} tasks!`, 'success');
+
+          showModal({
+            icon: allErrors.length === 0 ? '🎉' : '⚠️',
+            title: 'Task Harmonization Complete!',
+            message: `<div style="text-align: left; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 16px; margin: 12px 0;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>✅ <strong>Processed Tasks:</strong></span>
+                <span style="font-weight: 700; color: #10b981;">${totalProcessed}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>${allErrors.length === 0 ? '✨' : '⚠️'} <strong>Errors Encountered:</strong></span>
+                <span style="font-weight: 700; color: ${allErrors.length > 0 ? '#ef4444' : 'var(--color-text-muted)'};">${allErrors.length}</span>
+              </div>
+            </div>
+            ${allErrors.length > 0 ? `<div style="font-size: 12px; color: #ef4444; margin-top: 8px; text-align: left; max-height: 80px; overflow-y: auto;">${escapeHtml(allErrors.map(e => e.error || e.message || e).join('\n'))}</div>` : ''}`,
+            confirmText: 'Done (Refresh Data)',
+            onConfirm: () => {
+              fetchDashboardData();
+              runHarmonizeAudit();
+            }
+          });
+
+          return;
+        }
+
+        const chunk = chunks[currentChunkIdx];
+        const progressPct = Math.round((currentChunkIdx / chunks.length) * 100);
+
+        // Update modal HUD
+        const modalStatus = document.getElementById('modal-exec-status-text');
+        const modalFill = document.getElementById('modal-exec-progress-fill');
+        const modalPct = document.getElementById('modal-exec-pct-text');
+        if (modalStatus) modalStatus.innerText = `Executing Batch ${currentChunkIdx + 1} of ${chunks.length} (${totalProcessed}/${approvedItems.length})...`;
+        if (modalFill) modalFill.style.width = `${progressPct}%`;
+        if (modalPct) modalPct.innerText = `${progressPct}% Complete`;
+
+        // Update page bar
+        const pageFill = document.getElementById('harmonize-exec-progress-fill');
+        const pagePct = document.getElementById('harmonize-exec-progress-pct');
+        const pageLabel = document.getElementById('harmonize-exec-progress-label');
+        if (pageFill) pageFill.style.width = `${progressPct}%`;
+        if (pagePct) pagePct.innerText = `${progressPct}%`;
+        if (pageLabel) pageLabel.innerText = `Executing Batch ${currentChunkIdx + 1} of ${chunks.length} (${totalProcessed}/${approvedItems.length})...`;
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res) {
+              totalProcessed += (res.processedCount || 0);
+              if (res.logs && res.logs.length > 0) {
+                res.logs.forEach(l => {
+                  if (l.type === 'delete') {
+                    log(`[Harmonizer] 🗑️ Deleted: "${l.title}" (${l.list})`, 'warning');
+                  } else if (l.type === 'complete') {
+                    log(`[Harmonizer] ✅ Completed: "${l.title}" (${l.list})`, 'success');
+                  } else if (l.type === 'quarantine') {
+                    log(`[Harmonizer] 📦 Quarantined: "${l.title}" (${l.list})`, 'info');
+                  } else {
+                    log(`[Harmonizer] ✏️ Updated: "${l.title}" (${l.list})`, 'info');
+                  }
+                });
+              }
+              if (res.errors && res.errors.length > 0) {
+                allErrors = allErrors.concat(res.errors);
+                res.errors.forEach(e => {
+                  log(`[Harmonizer] ❌ Error: ${e.error} on "${e.title || e.taskId}"`, 'error');
+                });
+              }
+            }
+            currentChunkIdx++;
+            runNextChunk();
+          })
+          .withFailureHandler(function(err) {
+            console.error(`Chunk execution error:`, err);
+            log(`[Harmonizer] ❌ Batch failure: ${err.message || err}`, 'error');
+            allErrors.push({ error: err.message || err });
+            currentChunkIdx++;
+            runNextChunk();
+          })
+          .executeTaskHarmonizeBatch(chunk);
+      }
+
+      runNextChunk();
+    }
+
+    function totalErrorsMessage(errors) {
+      return errors.length === 0 ? 'success' : 'warning';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+  </script>
+</body>
+</html>
+ 
+
+ 

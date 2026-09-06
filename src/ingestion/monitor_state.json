@@ -1,0 +1,20 @@
+{
+  "whatsapp-bridge": "online",
+  "telegram-bridge": "online",
+  "messenger-bridge": "online",
+  "antigravity-bridge": "online",
+  "beeper-bridge": "online",
+  "task-sync": "online",
+  "sheet-sync-maintenance": "online",
+  "github-sync": "online",
+  "TaskMasterEngine-Private": "online",
+  "trigger-jules-backend": "offline",
+  "trigger-jules-ui": "offline",
+  "trigger-jules-cleanup": "offline",
+  "local-gemini-backfill": "offline",
+  "telegram-bridge (heartbeat)": "online",
+  "TaskMasterEngine-Private_restarts": 0,
+  "task-sync_restarts": 0,
+  "antigravity-bridge_restarts": 0,
+  "sheet-sync-maintenance_restarts": 0
+}
