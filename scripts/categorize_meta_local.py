@@ -157,7 +157,7 @@ def analyze_with_gemini(media_objects):
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model='gemini-3.1-flash-lite',
+                model='gemini-flash-lite-latest',
                 contents=media_objects + [PROMPT],
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",

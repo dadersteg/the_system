@@ -1,6 +1,0 @@
-**/node_modules/**
-**/*.md
-**/*.py
-**/*.sh
-.tempmediaStorage/**
-ingestion/**

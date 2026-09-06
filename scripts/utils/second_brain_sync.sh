@@ -4,7 +4,7 @@
 # 1. Run consolidation script
 echo "[$(date)] Step 1: Running Daily Second Brain Sync..."
 cd "/Users/daniel/Documents/AGY/the_system" || exit 1
-/Users/daniel/Developer/AGY_caches/the_system/my_venv/bin/python3 scripts/utils/daily_second_brain_sync.py
+/Users/daniel/Developer/the_system/venv/bin/python3 scripts/utils/daily_second_brain_sync.py
 
 # 2. Sync Database to GitHub
 echo "[$(date)] Step 2: Synchronizing Second Brain DB to GitHub..."

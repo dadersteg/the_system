@@ -17,7 +17,20 @@ def get_sheets_service():
     return get_service('sheets', 'v4', SHEET_TOKEN_PATH, account_name="Sheets Log")
 
 def get_gemini_api_key():
-    return os.environ.get("SYSTEM_GEMINI_API_KEY")
+    val = os.environ.get("SYSTEM_GEMINI_API_KEY")
+    if val: return val
+    
+    env_paths = [
+        "/Users/daniel/Documents/AGY/the_system/.env",
+        "/Users/daniel/Developer/the_system/.env"
+    ]
+    for p in env_paths:
+        if os.path.exists(p):
+            with open(p, 'r') as f:
+                for line in f:
+                    if line.startswith("SYSTEM_GEMINI_API_KEY="):
+                        return line.split("=", 1)[1].strip().strip("'").strip('"')
+    return None
 
 def call_gemini_flash(prompt_text):
     api_key = get_gemini_api_key()
@@ -25,7 +38,7 @@ def call_gemini_flash(prompt_text):
         print("Missing SYSTEM_GEMINI_API_KEY")
         return ""
         
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={api_key}"
     payload = {
         "contents": [{"parts": [{"text": prompt_text}]}],
         "generationConfig": {
@@ -87,7 +100,7 @@ def process_brain(max_hours):
             print(f"[{i}/{total}] Skipping {c_id} (No transcript found)")
             continue
             
-        print(f"[{i}/{total}] Analyzing {c_id} with Gemini 3.1 Flash-Lite... ", end="", flush=True)
+        print(f"[{i}/{total}] Analyzing {c_id} with Gemini Flash-Lite... ", end="", flush=True)
         start_time = datetime.datetime.now()
         
         messages = []

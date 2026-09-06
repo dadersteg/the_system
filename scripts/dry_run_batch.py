@@ -21,7 +21,7 @@ if creds.expired and creds.refresh_token:
 drive_service = build('drive', 'v3', credentials=creds)
 
 gemini_client = Client(api_key=os.environ.get("SYSTEM_GEMINI_API_KEY"))
-RETRO_MODEL = os.environ.get("GEMINI_RETRO_MODEL", "gemini-3.5-flash")
+RETRO_MODEL = os.environ.get("GEMINI_RETRO_MODEL", "gemini-3.5-flash-lite")
 
 def check_ancestor(file_id, bad_folder='10OWXo6W88eB3P-yP_zq67vrEPHqtbuc1', cache=None):
     if cache is None: cache = {}

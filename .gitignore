@@ -1,43 +1,46 @@
-# Ignored Folders
-auth/
-exports/
-scratch/
-artifacts/
-chrome_profile/
-chrome_profile_backup/
-logs/
-data/
-
-node_modules/
-.DS_Store
-.clasp.json
-.clasp-work.json
-.clasp-private.json
-
-# Sensitive personal data
-context_personal_details.md
-
-# Python / Security
+# Secrets & Environment
 .env
 *.session
-__pycache__/
+*.session-journal
+auth/
+*.json.bak
+credentials.json
+token.json
+token_*.json
 
-# whatsapp-web.js
-.wwebjs_auth/
-.wwebjs_cache/
-
-tmp_logs*.txt
-
-# Python Virtual Environments
-.venv/
+# Dependencies & Environments
+node_modules/
 venv/
+.venv/
+__pycache__/
+*.pyc
 
-# Sync duplicates/conflict folders
-_archive/sync_duplicates/
-
-# Security and Local database backups/configs
-Fca_Database/
+# Local Databases, SQLite & Caches
 *.sqlite
-.clasp-*backup.json
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+chrome_profile_backup/
+data/
+Fca_Database/
+
+# Logs, Temp & Scratch
+*.log
+scratch/
+tmp/
+*.tmp
+
+# OS Metadata
+.DS_Store
+Icon
+Icon?
+Icon\r
+
+# Task Dumps & Sensitive Exports
 tasks_private.json
 tasks_pmt.json
+tasks_*.json
+
+# Clasp backups
+.clasp-*backup.json

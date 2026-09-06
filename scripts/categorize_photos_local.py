@@ -39,10 +39,13 @@ IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'}
 VIDEO_EXTENSIONS = {'.mp4', '.mov', '.m4v'}
 MAX_IMAGE_SIZE = (1024, 1024)
 
-client = genai.Client(
-    api_key=os.environ.get("SYSTEM_GEMINI_API_KEY"),
-    http_options=types.HttpOptions(timeout=60000)
-)
+client = None
+api_key = os.environ.get("SYSTEM_GEMINI_API_KEY")
+if api_key:
+    client = genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(timeout=60000)
+    )
 
 PhotoAnalysis = {
     "type": "OBJECT",
@@ -200,7 +203,7 @@ def analyze_with_gemini(media_objects):
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model='gemini-3.1-flash-lite',
+                model='gemini-flash-lite-latest',
                 contents=media_objects + [PROMPT],
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",

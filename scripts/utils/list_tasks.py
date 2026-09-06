@@ -2,12 +2,11 @@
 import os
 import sys
 import json
-import sys
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from lib.google_auth import get_service, get_credentials
 import argparse
 from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
 
 def get_service(token_path):
     if not os.path.exists(token_path):

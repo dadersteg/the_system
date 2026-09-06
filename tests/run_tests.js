@@ -198,7 +198,7 @@ const sandbox = {
   selectModelForPayload: () => 'gemini-1.5-pro',
   executeTimeboxing: () => {},
   processPromptText: (text) => text || "",
-  IS_PMT_ENV: false
+  IS_CE_ENV: false
 };
 
 vm.createContext(sandbox);

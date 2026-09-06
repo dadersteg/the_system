@@ -3,3 +3,6 @@ google-auth-httplib2
 google-auth-oauthlib
 telethon
 python-dotenv
+httpx
+websockets
+python-telegram-bot

@@ -15,6 +15,12 @@ from lib.google_auth import get_service
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
 
+# Master toggle for cross-environment task synchronization
+ENABLE_CROSS_ENV_SYNC = False
+
+# Master toggle to enable/disable the Work/Employer Account completely
+ENABLE_WORK_ACCOUNT = False
+
 # Work LOS context code to trigger local routing from Private -> Work Google Tasks
 WORK_LOS_CODE = '02 01 01'
 # Private LOS context code to trigger local routing from Work -> Private Google Tasks
@@ -122,61 +128,44 @@ def redact_text(text):
         cleaned = re.sub(pattern, replacement, cleaned)
     return cleaned
 
-def is_pmt_task(category_path, title, notes):
+def is_ce_task(category_path, title, notes):
     notes_upper = notes.upper() if notes else ""
-    if "DA: THIS IS NOT A PMT TASK" in notes_upper or "DA: PERSONAL" in notes_upper:
+    if "DA: THIS IS NOT A CE TASK" in notes_upper or "DA: PERSONAL" in notes_upper:
         return False
-    if "DA: THIS IS A PMT TASK" in notes_upper:
+    if "DA: THIS IS A CE TASK" in notes_upper:
         return True
 
     cat = category_path.strip() if category_path else ""
-    title = title if title else ""
     
-    if not cat and not title:
+    if not cat:
         return False
         
-    cat_upper = cat.upper()
-    title_upper = title.upper()
-    
-    # Explicit Private/Work LOS pointers to Playmetech
-    if "PLAYMETECH" in cat_upper or "Q21" in cat_upper:
-        return True
-    if "PLAYMETECH" in title_upper or "Q21" in title_upper:
+    # Standard CE categories in unified taxonomy:
+    # e.g. 02 Work/02 01 00 CE, 02 01 01 Humanoid
+    if cat.startswith("02 Work/02 01") or "02 01 00" in cat or "02 01 01" in cat or "Humanoid" in cat:
         return True
         
-    # Standard PMT categories in unified taxonomy:
-    # e.g. 02 Work/02 01 00 Playmetech or any subfolder starting with 02 Work/02 01
-    if cat.startswith("02 Work/02 01") or "02 01 00" in cat:
-        return True
-        
-    # PMTOS 2-digit native categories (e.g. "02 Team & Operations", "01 Playmetech Admin")
+    # CEOS 2-digit native categories (e.g. "02 Team & Operations", "01 Admin (Humanoid)")
     # Requires a 2-digit prefix followed by a space and a letter.
     if re.match(r'^0[1-5]\s+[A-Za-z]', cat):
         # Prevent collision with Private LOS root categories that share this pattern format
         if not re.match(r'^0[1-5]\s+(Private|Work|Relationships|Health|Other)\b', cat, re.IGNORECASE):
-            return True
-        
-    # Legacy context code check (e.g. Context: 02 01 01)
-    match = re.search(r'Context:\s*(\d{2}\s\d{2}\s\d{2})', notes)
-    if match:
-        code = match.group(1).strip()
-        if code.startswith("02 01 01") or code.startswith("02 01"):
             return True
 
     return False
 
 def is_private_task(category_path, title, notes):
     notes_upper = notes.upper() if notes else ""
-    if "DA: THIS IS NOT A PMT TASK" in notes_upper or "DA: PERSONAL" in notes_upper:
+    if "DA: THIS IS NOT A CE TASK" in notes_upper or "DA: PERSONAL" in notes_upper:
         return True
-    if "DA: THIS IS A PMT TASK" in notes_upper:
+    if "DA: THIS IS A CE TASK" in notes_upper:
         return False
 
     cat = category_path.strip() if category_path else ""
     if not cat or cat.upper() in ["INBOX", "TBD", "NONE", "N/A", "UNCLASSIFIED"]:
         return False # Do not route unclassified tasks to Private
 
-    if is_pmt_task(category_path, title, notes):
+    if is_ce_task(category_path, title, notes):
         return False
         
     return True
@@ -210,7 +199,7 @@ def check_and_route_tasks(private_service, work_service):
                 elif "[ROUTED_TO_WORK]" in notes:
                     needs_recovery = True
                 else:
-                    if is_pmt_task(category_path, title, notes):
+                    if is_ce_task(category_path, title, notes):
                         is_work = True
                         
                 if is_work or needs_recovery:
@@ -225,7 +214,7 @@ def check_and_route_tasks(private_service, work_service):
                             private_service.tasks().patch(tasklist=list_id, task=task['id'], body={'id': task['id'], 'notes': notes}).execute()
                             
                             # 2. Insert to dest
-                            constraint = "Must classify as Work/PMTOS. Do not use 01 or 02 01 99."
+                            constraint = "Must classify as Work/CEOS. Do not use 01 or 02 01 99."
                             dest_notes = notes
                             if "DA:" in dest_notes:
                                 dest_notes = re.sub(r'DA:(.*)$', lambda m: f"DA: {m.group(1).strip()} | {constraint}" if m.group(1).strip() else f"DA: {constraint}", dest_notes, flags=re.MULTILINE)
@@ -353,6 +342,30 @@ def write_combined_markdown(private_tasks, work_tasks, output_path, same_account
     """Writes the combined tasks list into a beautiful Markdown file."""
     now_str = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S")
     
+    # If work_tasks is empty (e.g. single account mode / work account disabled),
+    # partition CE tasks out of private_tasks so they appear under Work Tasks.
+    effective_work_tasks = dict(work_tasks) if work_tasks else {}
+    effective_private_tasks = {}
+    
+    if not work_tasks and private_tasks:
+        for list_title, tasks in private_tasks.items():
+            ce_in_list = []
+            priv_in_list = []
+            for t in tasks:
+                notes = t.get('notes', '')
+                title = t.get('title', '')
+                cat = get_los_code_from_metadata(notes)
+                if is_ce_task(cat, title, notes):
+                    ce_in_list.append(t)
+                else:
+                    priv_in_list.append(t)
+            if ce_in_list:
+                effective_work_tasks[list_title] = ce_in_list
+            if priv_in_list:
+                effective_private_tasks[list_title] = priv_in_list
+    else:
+        effective_private_tasks = private_tasks
+    
     with open(output_path, 'w') as f:
         f.write(f"# Google Tasks (Combined View)\n\n")
         f.write(f"*Last Aggregated: {now_str}*\n")
@@ -361,15 +374,15 @@ def write_combined_markdown(private_tasks, work_tasks, output_path, same_account
         f.write(f"> Work task descriptions and notes have been anonymized/redacted for local storage security.\n\n")
         
         # --- WORK SECTOR ---
-        f.write(f"## 💼 Work Tasks (Playmetech / Playmetech)\n\n")
+        f.write(f"## 💼 Work Tasks (Current Employer)\n\n")
         if same_account:
             f.write("> [!WARNING]\n")
             f.write("> Work OAuth token is currently authenticated to the same Google Account as Private Tasks.\n")
             f.write("> Work tasks are hidden here to prevent duplicate listing. Please re-authenticate your Work account token.\n\n")
-        elif not work_tasks:
+        elif not effective_work_tasks:
             f.write("*No active work tasks found.*\n\n")
         else:
-            for list_title, tasks in work_tasks.items():
+            for list_title, tasks in effective_work_tasks.items():
                 f.write(f"### {list_title}\n\n")
                 for task in tasks:
                     title = redact_text(task.get('title', 'Untitled Task'))
@@ -391,10 +404,10 @@ def write_combined_markdown(private_tasks, work_tasks, output_path, same_account
 
         # --- PERSONAL SECTOR ---
         f.write(f"## 🏠 Personal Tasks\n\n")
-        if not private_tasks:
+        if not effective_private_tasks:
             f.write("*No active personal tasks found.*\n\n")
         else:
-            for list_title, tasks in private_tasks.items():
+            for list_title, tasks in effective_private_tasks.items():
                 f.write(f"### {list_title}\n\n")
                 for task in tasks:
                     title = task.get('title', 'Untitled Task')
@@ -469,12 +482,16 @@ def main():
         print("Warning: Private Tasks API could not be connected. Skipping private sync.")
 
     # 3. Get Work API Service
-    print("\n[Auth] Fetching credentials for Work Account (Playmetech / Playmetech)...")
-    work_service = get_service('tasks', 'v1', WORK_TOKEN_PATH, None, "Work Account")
-    if work_service:
-        print("Work Google Tasks API Connected.")
+    work_service = None
+    if ENABLE_WORK_ACCOUNT:
+        print("\n[Auth] Fetching credentials for Work Account (Current Employer)...")
+        work_service = get_service('tasks', 'v1', WORK_TOKEN_PATH, None, "Work Account")
+        if work_service:
+            print("Work Google Tasks API Connected.")
+        else:
+            print("Warning: Work Tasks API could not be connected. Skipping work sync.")
     else:
-        print("Warning: Work Tasks API could not be connected. Skipping work sync.")
+        print("\n[Auth] Work Account sync is DISABLED via ENABLE_WORK_ACCOUNT toggle. Skipping...")
 
     # Check for same account token collision
     same_account = False
@@ -490,7 +507,9 @@ def main():
 
     # 4. Run Routing Gateway (Requires both services, only if they are different accounts)
     if private_service and work_service:
-        if not same_account:
+        if not ENABLE_CROSS_ENV_SYNC:
+            print("[Gateway] Cross-environment routing is currently PAUSED via ENABLE_CROSS_ENV_SYNC toggle.")
+        elif not same_account:
             check_and_route_tasks(private_service, work_service)
         else:
             print("[Gateway] Bypassing bi-directional routing to prevent infinite loops (Account collision).")

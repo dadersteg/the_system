@@ -13,10 +13,29 @@ DAILY_DIR = os.path.expanduser("~/Developer/second_brain_db/insights/daily/")
 WEEKLY_DIR = os.path.expanduser("~/Developer/second_brain_db/insights/weekly/")
 
 def get_api_key():
-    key = os.environ.get("SYSTEM_GEMINI_API_KEY")
-    if not key:
-        print("Error: SYSTEM_GEMINI_API_KEY not found in .env")
-    return key
+    env_paths = [
+        "/Users/daniel/Documents/AGY/the_system/.env",
+        "/Users/daniel/Developer/the_system/.env"
+    ]
+    
+    env_path = None
+    for p in env_paths:
+        if os.path.exists(p):
+            env_path = p
+            break
+            
+    if not env_path:
+        print(f"Could not find .env in any expected location.")
+        return None
+    
+    with open(env_path, 'r') as f:
+        for line in f:
+            if line.startswith("SYSTEM_GEMINI_API_KEY="):
+                val = line.split("=", 1)[1].strip()
+                return val.strip("'").strip('"')
+    
+    print("SYSTEM_GEMINI_API_KEY not found in .env")
+    return None
 
 def main():
     api_key = get_api_key()
@@ -54,7 +73,7 @@ def main():
             continue
 
     total_processed = 0
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={api_key}"
 
     for week_str in sorted(weeks_data.keys()):
         out_path = os.path.join(WEEKLY_DIR, f"{week_str}_insight.md")
@@ -104,9 +123,13 @@ def main():
             data = res.json()
             
             try:
-                insight_text = data["candidates"][0]["content"]["parts"][0]["text"]
-            except (KeyError, IndexError):
-                print(f" -> Unexpected API response format for {week_str}")
+                content_obj = data.get('candidates', [{}])[0].get('content', {})
+                if 'parts' in content_obj and len(content_obj['parts']) > 0 and 'text' in content_obj['parts'][0]:
+                    insight_text = content_obj['parts'][0]['text']
+                else:
+                    insight_text = "No new data to synthesize for this week."
+            except Exception as e:
+                print(f" -> Unexpected API response format for {week_str}: {data}")
                 continue
             
             with open(out_path, "w", encoding="utf-8") as f_out:

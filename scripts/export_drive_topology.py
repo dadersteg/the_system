@@ -16,7 +16,7 @@ from googleapiclient.discovery import build
 
 def main():
     print("Initializing Google Drive & Sheets Clients...")
-    token_path = 'token.json'
+    token_path = 'auth/token.json'
     if not os.path.exists(token_path):
         print(f"Error: Credentials file '{token_path}' not found. Please log in or generate token.json.")
         sys.exit(1)
@@ -35,7 +35,7 @@ def main():
     sheets_service = build('sheets', 'v4', credentials=creds)
 
     print("Loading workspace manifest...")
-    manifest_path = 'System_ID_Manifest.json'
+    manifest_path = '_archive/System_ID_Manifest.json'
     if not os.path.exists(manifest_path):
         print(f"Error: Manifest file '{manifest_path}' not found in current directory.")
         sys.exit(1)
@@ -69,7 +69,7 @@ def main():
     while True:
         try:
             response = drive_service.files().list(
-                q="mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+                q="(mimeType = 'application/vnd.google-apps.folder' or mimeType = 'application/vnd.google-apps.shortcut') and trashed = false",
                 fields="nextPageToken, files(id, name, parents)",
                 pageToken=page_token,
                 pageSize=1000
@@ -108,7 +108,8 @@ def main():
             name.startswith('.') or
             lower_name == 'node_modules' or
             lower_name == 'tempmediastorage' or
-            lower_name == 'ingestion'
+            lower_name == 'ingestion' or
+            lower_name.startswith('inbox (manual)')
         )
 
     # Recursive traversal in memory

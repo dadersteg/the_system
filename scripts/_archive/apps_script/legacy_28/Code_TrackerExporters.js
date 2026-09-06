@@ -1,0 +1,220 @@
+/**
+ * @file src/Code_TrackerExporters.js
+ * @description Exports the Email and Drive tracking logs to JSONL and CSV formats for LLM digestion.
+ * Exports are placed in the configured WORKSPACE_FOLDER_ID.
+ * @version 1.0.1
+ * @last_modified 2024-05-24
+ * @modified_by Jules
+ *
+ * @changelog
+ * - 1.0.1: Added JSDoc docstrings, aggressive type checking, and standardized variable names.
+ * - 1.0.0: Initial version.
+ */
+
+/**
+ * Exports the Email and Drive tracking logs to JSONL and CSV formats.
+ * It reads from the MASTER_SHEET_ID and saves the exports into the specified
+ * WORKSPACE_FOLDER_ID or override export folder depending on the environment.
+ *
+ * @returns {void}
+ */
+function exportTrackers() {
+  if (typeof SYSTEM_CONFIG === 'undefined' || !SYSTEM_CONFIG || !SYSTEM_CONFIG.ROOTS) {
+    console.error("exportTrackers failed: SYSTEM_CONFIG missing.");
+    return;
+  }
+
+  const spreadsheetId = SYSTEM_CONFIG.ROOTS.MASTER_SHEET_ID;
+  let exportFolderId = SYSTEM_CONFIG.ROOTS.WORKSPACE_FOLDER_ID;
+  
+  // For Private environment, override folder to the exports folder
+  const isCeEnv = (getEnvProp("ENV") === "WORK");
+  if (!isCeEnv) {
+    exportFolderId = "1ylbggzC_eIJAMu-_AwPj7YJL1Z_uuoOJ"; // Exports folder for Private
+  } else {
+    exportFolderId = "1MuDEjRgrh6l2wvtpdoi3Tiq_oRUjzBwx"; // Exports folder for CE
+  }
+
+  const ss = SpreadsheetApp.openById(spreadsheetId);
+
+  // Export Email Log
+  const emailLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.EMAIL_LOG);
+  if (emailLogSheet) {
+    _exportLogData(emailLogSheet, "Email", exportFolderId);
+  }
+
+  // Export Drive Log
+  const driveLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.DRIVE_LOG);
+  if (driveLogSheet) {
+    _exportLogData(driveLogSheet, "Drive", exportFolderId);
+  }
+
+  // Export Antigravity Log
+  const antigravityLogSheet = ss.getSheets().find(s => s.getSheetId().toString() === SYSTEM_CONFIG.SHEETS.ANTIGRAVITY_LOG);
+  if (antigravityLogSheet) {
+    _exportLogData(antigravityLogSheet, "Antigravity", exportFolderId);
+  }
+}
+
+/**
+ * Processes a tracking log sheet and exports the data to Drive as JSONL and CSV.
+ * It generates two variations for both formats: all data, and data from the last 14 days.
+ *
+ * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - The Google Sheet object containing log data.
+ * @param {string} typeName - The log type identifier, e.g., "Email" or "Drive".
+ * @param {string} folderId - The Google Drive Folder ID to save the exports into.
+ * @returns {void}
+ */
+function _exportLogData(sheet, typeName, folderId) {
+  if (!sheet || typeof sheet.getDataRange !== 'function') {
+    console.error(`_exportLogData failed: invalid sheet provided for ${typeName}`);
+    return;
+  }
+  if (!typeName || typeof typeName !== 'string') {
+    console.error(`_exportLogData failed: invalid typeName provided.`);
+    return;
+  }
+  if (!folderId || typeof folderId !== 'string') {
+    console.error(`_exportLogData failed: invalid folderId provided for ${typeName}`);
+    return;
+  }
+
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return;
+
+  const headerRowIdx = data[0].findIndex(h => h && (h.toString().toLowerCase().includes('link') || h.toString().toLowerCase().includes('original name') || h.toString().toLowerCase().includes('convo id'))) === -1 && data.length > 1 ? 1 : 0;
+  const headers = data[headerRowIdx].map(h => h.toString().trim().toLowerCase());
+  
+  let colMap;
+  if (typeName === "Email") {
+    colMap = {
+      timestamp: headers.findIndex(h => h === "timestamp"),
+      subject: headers.findIndex(h => h === "subject"),
+      sender: headers.findIndex(h => h === "sender"),
+      labels: headers.findIndex(h => h === "final label set"),
+      summary: headers.findIndex(h => h === "ai summary"),
+      actions: headers.findIndex(h => h === "ai action items"),
+      link: headers.findIndex(h => h === "link"),
+      status: headers.findIndex(h => h === "inbox status")
+    };
+  } else if (typeName === "Drive") {
+    colMap = {
+      timestamp: headers.findIndex(h => h === "timestamp"),
+      originalName: headers.findIndex(h => h === "original name"),
+      finalName: headers.findIndex(h => h === "final name"),
+      summary: headers.findIndex(h => h === "summary"),
+      targetPath: headers.findIndex(h => h === "target folder path"),
+      url: headers.findIndex(h => h === "url"),
+      status: headers.findIndex(h => h === "status"),
+      mappedTask: headers.findIndex(h => h === "mapped task")
+    };
+  } else if (typeName === "Antigravity") {
+    colMap = {
+      timestamp: headers.findIndex(h => h === "date"), // The sheet uses "Date" for timestamp
+      convoId: headers.findIndex(h => h === "convo id"),
+      type: headers.findIndex(h => h === "type"),
+      name: headers.findIndex(h => h === "name of convo"),
+      created: headers.findIndex(h => h === "convo created date"),
+      purpose: headers.findIndex(h => h === "purpose of convo"),
+      summary: headers.findIndex(h => h === "summary of work last 24 hours")
+    };
+  } else {
+    console.error(`_exportLogData failed: unknown typeName ${typeName}`);
+    return;
+  }
+
+  const tsIndex = colMap.timestamp !== -1 ? colMap.timestamp : 0; // Default to first column if missing
+  
+  const allLinesJSONL = [];
+  const allLinesCSV = [];
+  const recentLinesJSONL = [];
+  const recentLinesCSV = [];
+
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - 14);
+
+  // Build CSV Headers
+  const csvHeaders = Object.keys(colMap).map(k => `"${k}"`).join(",");
+  allLinesCSV.push(csvHeaders);
+  recentLinesCSV.push(csvHeaders);
+
+  for (let i = headerRowIdx + 1; i < data.length; i++) {
+    const row = data[i];
+    const rawDate = row[tsIndex];
+
+    let rowDate = null;
+    if (rawDate instanceof Date) rowDate = rawDate;
+    else if (rawDate) rowDate = new Date(rawDate.toString());
+
+    const entry = {};
+    const csvValues = [];
+    
+    for (const [key, idx] of Object.entries(colMap)) {
+      let val = idx !== -1 ? (row[idx] || "").toString() : "";
+      if (key === "timestamp" && rowDate && !isNaN(rowDate)) {
+        val = Utilities.formatDate(rowDate, "GMT", "yyyy-MM-dd HH:mm");
+      }
+      entry[key] = val;
+      csvValues.push(`"${val.replace(/"/g, '""').replace(/\n/g, ' ')}"`);
+    }
+
+    const jsonlStr = JSON.stringify(entry);
+    const csvStr = csvValues.join(",");
+
+    allLinesJSONL.push(jsonlStr);
+    allLinesCSV.push(csvStr);
+
+    if (rowDate && !isNaN(rowDate) && rowDate >= cutoffDate) {
+      recentLinesJSONL.push(jsonlStr);
+      recentLinesCSV.push(csvStr);
+    }
+  }
+
+  _writeFileToDrive(`${typeName}_Tracker_All.jsonl`, allLinesJSONL.join("\n"), "text/plain", folderId);
+  _writeFileToDrive(`${typeName}_Tracker_All.csv`, allLinesCSV.join("\n"), "text/csv", folderId);
+  _writeFileToDrive(`${typeName}_Tracker_14d.jsonl`, recentLinesJSONL.join("\n"), "text/plain", folderId);
+  _writeFileToDrive(`${typeName}_Tracker_14d.csv`, recentLinesCSV.join("\n"), "text/csv", folderId);
+}
+
+/**
+ * Helper function to create or update a file in Google Drive.
+ *
+ * @param {string} fileName - The name of the file to be saved.
+ * @param {string} content - The file content.
+ * @param {string} mimeType - The MIME type of the file.
+ * @param {string} folderId - The Google Drive Folder ID where the file should be located.
+ * @returns {void}
+ */
+function _writeFileToDrive(fileName, content, mimeType, folderId) {
+  if (!fileName || typeof fileName !== 'string') {
+    console.error(`_writeFileToDrive failed: invalid fileName.`);
+    return;
+  }
+  if (typeof content !== 'string') {
+    console.error(`_writeFileToDrive failed: invalid content for file ${fileName}.`);
+    return;
+  }
+  if (!mimeType || typeof mimeType !== 'string') {
+    console.error(`_writeFileToDrive failed: invalid mimeType for file ${fileName}.`);
+    return;
+  }
+  if (!folderId || typeof folderId !== 'string') {
+    console.error(`_writeFileToDrive failed: invalid folderId for file ${fileName}.`);
+    return;
+  }
+
+  try {
+    const blob = Utilities.newBlob(content, mimeType, fileName);
+    const q = "name = '" + fileName + "' and '" + folderId + "' in parents and trashed = false";
+    const existingFiles = Drive.Files.list({ q: q, fields: "files(id)" }).files;
+
+    if (existingFiles && existingFiles.length > 0) {
+      Drive.Files.update({}, existingFiles[0].id, blob);
+    } else {
+      Drive.Files.create({ name: fileName, mimeType: mimeType, parents: [folderId] }, blob);
+    }
+    console.log(`_writeFileToDrive: Wrote ${fileName}`);
+  } catch (e) {
+    console.error(`_writeFileToDrive failed for ${fileName}: ${e.message}`);
+  }
+}
