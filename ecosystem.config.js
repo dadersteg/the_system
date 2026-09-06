@@ -155,15 +155,6 @@ module.exports = {
       autorestart: false,
       out_file: "logs/local_gemini_periodic_sync_out.log",
       error_file: "logs/local_gemini_periodic_sync_err.log"
-    },
-    {
-      name: "jules-weekly",
-      script: "scripts/automation/jules_weekly.js",
-      cwd: "/Users/daniel/Documents/AGY/the_system",
-      cron_restart: "0 2 * * 3", // 2:00 AM Every Wednesday
-      autorestart: false,
-      out_file: "logs/jules_weekly_out.log",
-      error_file: "logs/jules_weekly_err.log"
     }
   ]
 };

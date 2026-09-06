@@ -1,3 +1,7 @@
+// DECOMMISSIONED: Automated weekly Jules sessions and PR generation are turned off.
+console.log("[Jules Weekly] Automation is disabled. Exiting without dispatching sessions.");
+process.exit(0);
+
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
