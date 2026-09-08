@@ -1070,7 +1070,10 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       const lines = textBlock.split('\n');
       lines.forEach(line => {
         const trimmed = line.trim();
-        if (trimmed.startsWith("[DEADLINE:") && trimmed.includes("[DURATION:")) return;
+        // Tag line: `[DEADLINE: ..] | [DURATION: ..] | [GOAL: ..]`. Match on the leading tag only, so a
+        // damaged variant (e.g. `[DEADLINE: ..] | [] | [GOAL: ..]`) is still dropped and rebuilt below instead
+        // of being carried into otherNotes and duplicated on every pass.
+        if (trimmed.startsWith("[DEADLINE:")) return;
         if (trimmed === topLink) return;
         if (trimmed.startsWith("Original Link:") || trimmed.startsWith("Link:")) return;
         if (trimmed.startsWith("--- Attached Links ---")) return;
@@ -1213,11 +1216,6 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
       finalNotes.push("---SYSTEM_METADATA---");
       
       const rawNotesStr = finalNotes.join('\n');
-      const currentHash = getStandardizedTaskHash(finalTitle, rawNotesStr, finalDue, u.routingTarget === "COMPLETE" ? "completed" : "needsAction", true);
-      existingMetadata.ai_hash = currentHash;
-      
-      finalNotes.push(JSON.stringify(existingMetadata));
-      const newNotesStr = finalNotes.join('\n');
       
       let finalStatus = task.status;
       if (u.routingTarget === "COMPLETE") {
@@ -1236,6 +1234,15 @@ function processTaskUpdates(updates, taskIdMap, importerListId, todoListId) {
            finalStatus = "completed"; // Mark completed so it doesn't show up in active tasks
         }
       }
+      
+      // The hash must describe the task exactly as the Tasks API will return it to the next sweep (both the
+      // cloud engine and the local primary layer compare against it): final title (after any 99 Done - /
+      // 99 To be deleted prefix), final notes, final due and final status. Computing it earlier left every
+      // STAGE_COMPLETE / DELETE task with a stale hash.
+      const currentHash = getStandardizedTaskHash(finalTitle, rawNotesStr, finalDue, finalStatus === "completed" ? "completed" : "needsAction", true);
+      existingMetadata.ai_hash = currentHash;
+      finalNotes.push(JSON.stringify(existingMetadata));
+      const newNotesStr = finalNotes.join('\n');
       
       let activeTaskId = u.taskId;
       if (targetListId !== listId) {
