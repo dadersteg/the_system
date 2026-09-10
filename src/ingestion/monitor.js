@@ -163,11 +163,48 @@ async function checkBridges() {
         }
     }
 
+    // ─── Active Ingestion Webhook Gateway Check ───────────────────────────────
+    try {
+        const accessToken = await getAccessToken();
+        const probeRes = await fetch(WEBAPP_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + accessToken
+            },
+            body: JSON.stringify({ secret: "MOW_BRIDGE_SECRET_2026" })
+        });
+        const probeJson = await probeRes.json();
+        const prevWebhookStatus = state['ingestion-webhook'] || 'online';
+        if (probeJson.error === "Unauthorized") {
+            console.error("❌ [System Monitor] Ingestion Webhook Gateway returned Unauthorized!");
+            state['ingestion-webhook'] = 'unauthorized';
+            stateChanged = true;
+            if (prevWebhookStatus !== 'unauthorized') {
+                await sendAlertEmail(
+                    "🚨 [System Monitor] Ingestion Webhook Gateway Unauthorized",
+                    `The Ingestion Webhook Gateway at ${WEBAPP_URL} rejected the bridge secret with "Unauthorized". Ingestion bridges cannot deliver messages to Gmail.`
+                );
+            }
+        } else {
+            if (prevWebhookStatus === 'unauthorized') {
+                state['ingestion-webhook'] = 'online';
+                stateChanged = true;
+                await sendAlertEmail(
+                    "✅ [System Monitor] Ingestion Webhook Gateway Recovered",
+                    `The Ingestion Webhook Gateway at ${WEBAPP_URL} has recovered and is accepting bridge authentication.`
+                );
+            }
+        }
+    } catch (probeErr) {
+        console.warn("[System Monitor] Could not probe Ingestion Webhook Gateway:", probeErr.message);
+    }
+
     // Check Cron Scripts and Daemons based on output/heartbeat files
     const cronChecks = [
         { name: 'telegram-bridge (heartbeat)', file: path.join(__dirname, '../../logs/telegram_bridge_heartbeat.txt'), maxAgeMs: 5 * 60 * 1000 },
+        { name: 'beeper-bridge (heartbeat)', file: path.join(__dirname, '../../logs/beeper_bridge_heartbeat.txt'), maxAgeMs: 5 * 60 * 1000 },
         { name: 'task-sync', file: path.join(__dirname, '../../auth/Google Tasks (Combined).md'), maxAgeMs: 30 * 60 * 1000 },
-        // { name: 'beeper-bridge (heartbeat)', file: path.join(__dirname, '../../logs/beeper_bridge_heartbeat.txt'), maxAgeMs: 5 * 60 * 1000 },
         // { name: 'github-sync', file: path.join(__dirname, '../../logs/github_sync_out.log'), maxAgeMs: 24 * 60 * 60 * 1000 },
         { name: 'sheet-sync-maintenance', file: path.join(__dirname, '../../logs/sheet_sync_maintenance_out.log'), maxAgeMs: 2 * 60 * 60 * 1000 },
         { name: 'check-bridges-daily', file: path.join(__dirname, '../../logs/check_bridges_daily_out.log'), maxAgeMs: 25 * 60 * 60 * 1000 },

@@ -404,6 +404,16 @@ function connectBeeperWS() {
     });
 }
 
+// --- HEARTBEAT WRITER ---
+const heartbeatPath = path.join(__dirname, '../../logs/beeper_bridge_heartbeat.txt');
+function updateHeartbeat() {
+    try {
+        fs.writeFileSync(heartbeatPath, String(Date.now()));
+    } catch (e) {}
+}
+updateHeartbeat();
+setInterval(updateHeartbeat, 60000);
+
 // Start bridge
 console.log('Starting Beeper-to-Gmail Ingestion Bridge...');
 connectBeeperWS();
