@@ -317,6 +317,11 @@ function setEnvToPrivate() {
   console.log("Successfully set ENV=PRIVATE in Script Properties.");
 }
 
+function setBridgeSecret() {
+  PropertiesService.getScriptProperties().setProperty("BRIDGE_SECRET", "MOW_BRIDGE_SECRET_2026");
+  console.log("Successfully set BRIDGE_SECRET in Script Properties.");
+}
+
 function NUKE_AND_FIX() {
   // Wipe all invisible User Properties
   PropertiesService.getUserProperties().deleteAllProperties();
@@ -324,9 +329,10 @@ function NUKE_AND_FIX() {
   // Wipe all Script Properties (the ones stuck in the UI)
   PropertiesService.getScriptProperties().deleteAllProperties();
   
-  // Set only the 2 required properties perfectly
+  // Set required properties perfectly
   PropertiesService.getScriptProperties().setProperty("ENV", "WORK");
   PropertiesService.getScriptProperties().setProperty("GEMINI_API_KEY", "INSERT_API_KEY_HERE");
+  PropertiesService.getScriptProperties().setProperty("BRIDGE_SECRET", "MOW_BRIDGE_SECRET_2026");
   
   console.log("SUCCESS: Completely wiped all ghosts and forced the new API key.");
 }
