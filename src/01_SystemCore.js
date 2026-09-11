@@ -109,6 +109,37 @@ function isLocalEngineActive(pipelineName = 'ALL', leaseMinutes = 30) {
 }
 
 /**
+ * Strict check: has the local engine (CE work laptop / Claude) published a fresh 1 Day plan?
+ * Reads ONLY the 'PLANNING' row in 'System_Status'. Unlike isLocalEngineActive(), it never falls back to the
+ * 'ALL' (B2) lease, so environments where nothing publishes a plan (e.g. Private today) are unaffected and the
+ * cloud keeps generating the plan as before. Returns true only when a PLANNING row exists and is recent.
+ *
+ * @param {number} [leaseMinutes=1200] Freshness window in minutes (default 20h: a plan published in the
+ *                                     morning stays primary all day; a stale one lets GAS regenerate as backup).
+ * @returns {boolean}
+ */
+function isLocalPlanFresh(leaseMinutes = 1200) {
+  try {
+    const ss = getMasterSpreadsheet();
+    const sheet = ss.getSheetByName("System_Status") || ss.getSheetByName("Status_Log");
+    if (!sheet) return false;
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === 'PLANNING' && data[i][1]) {
+        const ts = (data[i][1] instanceof Date) ? data[i][1].getTime() : new Date(data[i][1]).getTime();
+        if (isNaN(ts)) return false;
+        const elapsedMinutes = (Date.now() - ts) / (1000 * 60);
+        return elapsedMinutes >= 0 && elapsedMinutes < leaseMinutes;
+      }
+    }
+    return false; // no PLANNING row -> local has not published a plan; cloud generates as normal
+  } catch (e) {
+    console.error(`[PlanLease] Error checking PLANNING lease: ${e.message}. Cloud will generate the plan.`);
+    return false;
+  }
+}
+
+/**
  * Programmatically clears all existing triggers and provisions the master schedule.
  * Run this function once from the Apps Script editor to lock in the automated pipelines.
  * @returns {void}

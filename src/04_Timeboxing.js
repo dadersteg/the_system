@@ -29,6 +29,25 @@ function executeTimeboxing(targetDate, markdownContent) {
   console.log("Starting Timeboxing sync...");
   let markdown = (typeof markdownContent === 'string') ? markdownContent : null;
 
+  // Primary source: the plan the local engine (CE work laptop / Claude) published to the master sheet, used
+  // only while its PLANNING heartbeat is fresh. Falls through to the Drive Doc (the GAS-generated backup) when
+  // stale or absent, so Private and laptop-down cases behave exactly as before.
+  if (!markdown && typeof isLocalPlanFresh === "function" && isLocalPlanFresh()) {
+    try {
+      const ss = getMasterSpreadsheet();
+      const planSheet = ss.getSheetByName("5 Import - 1 Day Plan");
+      if (planSheet) {
+        const cell = planSheet.getRange("A1").getValue();
+        if (cell && String(cell).trim()) {
+          markdown = String(cell);
+          console.log("Timeboxing from the published local plan ('5 Import - 1 Day Plan'!A1), " + markdown.length + " chars.");
+        }
+      }
+    } catch (e) {
+      console.warn("Could not read the published local plan: " + e.message + ". Falling back to the Drive Doc.");
+    }
+  }
+
   if (!markdown) {
     const fileId = getExecutionPlanId();
     if (fileId) {
