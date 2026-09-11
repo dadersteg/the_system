@@ -6,9 +6,23 @@ import urllib.request
 from datetime import datetime, timezone
 from collections import defaultdict
 
-LOG_FILE = "/Users/daniel/.pm2/logs/beeper-bridge-out.log"
-BEEPER_API_URL = "http://localhost:23373"
-BEEPER_TOKEN = "bdapi_mc0-0UEpB6M64acrLF3eC1vcsRsFplvwHysCZaHkNm4"
+# Load environment variables from .env if present
+for env_candidate in [
+    os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '.env')),
+    "/Users/daniel/Developer/the_system/.env"
+]:
+    if os.path.exists(env_candidate):
+        with open(env_candidate, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    os.environ.setdefault(k.strip(), v.strip().strip('"\''))
+        break
+
+LOG_FILE = os.environ.get("BEEPER_LOG_FILE", "/Users/daniel/.pm2/logs/beeper-bridge-out.log")
+BEEPER_API_URL = os.environ.get("BEEPER_API_URL", "http://localhost:23373")
+BEEPER_TOKEN = os.environ.get("BEEPER_ACCESS_TOKEN", "")
 
 OUTAGE_START = datetime(2026, 9, 5, 19, 50, 0, tzinfo=timezone.utc)
 OUTAGE_END = datetime(2026, 9, 10, 13, 0, 0, tzinfo=timezone.utc)

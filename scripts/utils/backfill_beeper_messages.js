@@ -2,15 +2,30 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const url = require('url');
-const { getAccessToken } = require('/Users/daniel/Documents/AGY/the_system/src/ingestion/google_auth.js');
+const dotenv = require('dotenv');
+for (const envCandidate of [
+    path.join(__dirname, '../../.env'),
+    '/Users/daniel/Developer/the_system/.env'
+]) {
+    if (fs.existsSync(envCandidate)) {
+        dotenv.config({ path: envCandidate });
+        break;
+    }
+}
 
-const LOG_FILE = '/Users/daniel/.pm2/logs/beeper-bridge-out.log';
+const googleAuthPath = fs.existsSync(path.join(__dirname, '../../src/ingestion/google_auth.js'))
+    ? path.join(__dirname, '../../src/ingestion/google_auth.js')
+    : '/Users/daniel/Documents/AGY/the_system/src/ingestion/google_auth.js';
+const { getAccessToken } = require(googleAuthPath);
+
+const LOG_FILE = process.env.BEEPER_LOG_FILE || '/Users/daniel/.pm2/logs/beeper-bridge-out.log';
 const STATE_FILE = path.join(__dirname, '../../data/beeper_backfill_state.json');
 
-const GMAIL_USER = 'adersteg.daniel@gmail.com';
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbylmNwunCsEZtYYLUA603-fr5MhioAfddmqcJkQraNv7OsI2p9ph0DsqF18LrlUmS4guA/exec';
-const BEEPER_API_URL = 'http://localhost:23373';
-const BEEPER_ACCESS_TOKEN = 'bdapi_mc0-0UEpB6M64acrLF3eC1vcsRsFplvwHysCZaHkNm4';
+const GMAIL_USER = process.env.GMAIL_USER || 'adersteg.daniel@gmail.com';
+const WEBAPP_URL = process.env.WEBAPP_URL;
+const BEEPER_API_URL = process.env.BEEPER_API_URL || 'http://localhost:23373';
+const BEEPER_ACCESS_TOKEN = process.env.BEEPER_ACCESS_TOKEN;
+const BRIDGE_SECRET = process.env.BRIDGE_SECRET || 'MOW_BRIDGE_SECRET_2026';
 
 // Outage range: Sep 5, 2026 ~19:50 UTC -> Sep 10, 2026 13:00 UTC
 const OUTAGE_START = new Date('2026-09-05T19:50:00Z').getTime();
@@ -235,7 +250,7 @@ async function run() {
         const deterministicId = `<${threadHash}@beeper.bridge>`;
 
         const payload = {
-            secret: 'MOW_BRIDGE_SECRET_2026',
+            secret: BRIDGE_SECRET,
             to: GMAIL_USER,
             subject: Buffer.from(subject, 'utf-8').toString('base64'),
             body: Buffer.from(compiledText, 'utf-8').toString('base64'),
