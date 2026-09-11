@@ -547,6 +547,17 @@ function calculateAvailableTimeSlots(dayName, isCEEnv, todayEvents) {
  * and calls Gemini Pro to generate an active markdown execution report ("One-Pager").
  */
 function runHourlyReview(targetDate) {
+  // Local primary planner: the CE work laptop (Claude) publishes the approved 1 Day plan to the
+  // '5 Import - 1 Day Plan' tab and refreshes the PLANNING heartbeat. While that is fresh, skip Gemini plan
+  // generation and let the deterministic timeboxer run from the published plan. Only the automatic (no-arg)
+  // runs are gated; a manual run with an explicit targetDate still forces a fresh Gemini plan. When the laptop
+  // is down (stale/absent PLANNING lease) this whole block is skipped and GAS generates the plan as backup.
+  if (!(targetDate instanceof Date) && typeof isLocalPlanFresh === "function" && isLocalPlanFresh()) {
+    console.log("[HourlyReview] PLANNING lease fresh: local plan is primary. Skipping Gemini generation; timeboxing from the published plan.");
+    try { executeTimeboxing(); } catch (e) { console.error("[HourlyReview] Timeboxing from published plan failed: " + e.message); }
+    return;
+  }
+
   const importerListId = SYSTEM_CONFIG.TASKS.IMPORTER_LIST_ID;
   const todoListId = SYSTEM_CONFIG.TASKS.TODO_LIST_ID;
   const recurringListId = SYSTEM_CONFIG.TASKS.RECURRING_LIST_ID;
