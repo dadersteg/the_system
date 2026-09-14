@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# MIRROR of the_system_ce/scripts/plan_sync.py (canonical). Edit there, then copy here.
-# Present so the Private profile can run the engine on machines without the_system_ce.
+# CANONICAL Plan Sync engine (ruling 2026-09-14, TS - Plan Sync Protocol §1). The CE copy at
+# the_system_ce/scripts/plan_sync.py is a byte copy: edit here, then copy there. agy_agents holds a shim.
 """plan_sync.py - READ-ONLY reconciliation between a profile's Plan Sources and Google Tasks.
 
 Writes nothing. Produces the diff the plan_sync skill acts on after approval: tasks whose
@@ -15,8 +15,8 @@ from the registry `Plan_Sources.json` in the docs repo (Protocols §3.4;
 Runs on either side of the profile boundary (Protocol §3.3): the CE adapter uses this
 repository's `common.py`; the Private adapter shells out to the_system's task bridge
 (`scripts/utils/list_tasks.py`) and needs that profile's token on the machine. The file
-has no hard dependency on `common`, so a mirror copy can run where the_system_ce is
-absent (canonical copy: the_system_ce/scripts/plan_sync.py).
+has no hard dependency on `common`, so the same file runs on both machines. This copy is
+canonical; the_system_ce/scripts/plan_sync.py is a byte copy of it.
 
 Usage:
     plan_sync.py                                 # markdown report, profile ce
