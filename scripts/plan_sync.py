@@ -329,6 +329,17 @@ def route(reg: Dict[str, Any], sources: List[Dict[str, Any]], task: Dict[str, An
 
 
 # --- Reconcile --------------------------------------------------------------
+def _ref_source(ref: str, routed: Optional[str], srcs: Dict[str, Any]) -> Optional[str]:
+    """An explicit link names its own source (`SOURCE:ROW-ID`, Protocol §5/§6): that prefix wins over
+    keyword routing, so a confirmed link never reports as dangling merely because routing anchors
+    lag behind (e.g. a task still routing to Reward while linked to OC:OC-07)."""
+    if ref and ":" in ref:
+        pfx = ref.split(":", 1)[0]
+        if pfx in srcs:
+            return pfx
+    return routed
+
+
 def reconcile(reg: Dict[str, Any], profile: str) -> Dict[str, Any]:
     prof = profile_cfg(reg, profile)
     sources = prof.get("sources", [])
@@ -352,10 +363,11 @@ def reconcile(reg: Dict[str, Any], profile: str) -> Dict[str, Any]:
     for t in tasks:
         if t.get("staged_done"):
             staged_done_count += 1
-            key = t["routed"]
+            key = _ref_source(t["tracker_ref"], t["routed"], srcs)
             if not key:
                 staged_unlinked += 1
                 continue
+            t["routed"] = key
             rows, links = srcs[key]["rows"], srcs[key]["links"]
             row = None
             ref = t["tracker_ref"] or links.get(t["id"])
@@ -384,10 +396,11 @@ def reconcile(reg: Dict[str, Any], profile: str) -> Dict[str, Any]:
                 staged_unlinked += 1
             continue
 
-        key = t["routed"]
+        key = _ref_source(t["tracker_ref"], t["routed"], srcs)
         if not key:
             buckets["unrouted"].append(t)
             continue
+        t["routed"] = key
         rows, links = srcs[key]["rows"], srcs[key]["links"]
         row = None
         # 1) explicit link. A ref that resolves to no row is a defect (row split, renumbered
