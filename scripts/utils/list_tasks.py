@@ -52,6 +52,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="List active Google Tasks")
     parser.add_argument("--json", action="store_true", help="Output raw JSON instead of formatted text")
     parser.add_argument("--profile", choices=["private", "work"], help="Filter tasks by profile (private or work)")
+    parser.add_argument("--out", help="Write JSON or text output to specified file path")
     return parser.parse_args()
 
 def main():
@@ -88,6 +89,9 @@ def main():
             "private": tasks_p,
             "work": tasks_w if not same_account else {}
         }
+        if args.out:
+            with open(args.out, "w", encoding="utf-8") as f:
+                json.dump(output, f, indent=2)
         print(json.dumps(output, indent=2))
         return
 

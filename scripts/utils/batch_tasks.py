@@ -130,13 +130,20 @@ def stamp_ai_hash(title: str, notes: str, due: Optional[str], status: str) -> st
     return format_notes(head, meta)
 
 
+def is_recurring_list(list_title: str) -> bool:
+    return "recurring" in (list_title or "").lower()
+
+
 def parse_batch_payload(raw_data: Any) -> List[Dict[str, Any]]:
     """Normalizes both list-of-actions and dict-of-buckets into a flat list of operations."""
     if isinstance(raw_data, list):
+        for op in raw_data:
+            if "action" not in op and "op" in op:
+                op["action"] = op["op"]
         return raw_data
     if isinstance(raw_data, dict):
         ops = []
-        for action_name in ["stage_done", "redate", "create", "delete", "link_only", "link"]:
+        for action_name in ["stage_done", "complete", "redate", "create", "delete", "link_only", "link"]:
             for item in raw_data.get(action_name, []):
                 item_copy = dict(item)
                 item_copy["action"] = action_name
@@ -147,6 +154,7 @@ def parse_batch_payload(raw_data: Any) -> List[Dict[str, Any]]:
 
 def execute_batch(service, ops: List[Dict[str, Any]], dry_run: bool = False) -> Dict[str, int]:
     lists = load_tasklists(service)
+    id_to_title = {v: k for k, v in lists.items()}
     todo_lid = lists.get("ToDo") or lists.get("00 Todo") or lists.get("Todo")
     ai_review_lid = lists.get("AI Review")
     delete_lid = lists.get("To be Deleted")
@@ -162,17 +170,38 @@ def execute_batch(service, ops: List[Dict[str, Any]], dry_run: bool = False) -> 
         print(f"\n[{idx}/{len(ops)}] Action: {action.upper()}")
 
         if action == "stage_done":
-            if not ai_review_lid:
-                print("  ❌ Failed: 'AI Review' list not found in account.", file=sys.stderr)
-                counts["failed"] += 1
-                continue
             src_lid, task = find_task_by_id(service, tid, lists)
             if not task:
                 print(f"  ❌ Failed: Task {tid!r} not found.", file=sys.stderr)
                 counts["failed"] += 1
                 continue
 
+            src_title = id_to_title.get(src_lid, "")
             orig_title = task.get("title", "")
+
+            # RECURRING TASK GUARD:
+            # Moving recurring tasks across lists via delete-and-recreate permanently destroys
+            # Google Tasks recurrence. Intercept and complete in place instead.
+            if is_recurring_list(src_title):
+                print(f"  ⚡ Recurring task detected in '{src_title}'. Staging via delete-and-recreate would destroy recurrence schedule.")
+                print(f"  ⚡ Intercepting: completing in place ('status': 'completed') to preserve recurrence.")
+                if dry_run:
+                    print(f"  [DRY-RUN] Would mark completed in place: '{orig_title}' in list '{src_title}'")
+                    counts["applied"] += 1
+                    continue
+                try:
+                    service.tasks().patch(tasklist=src_lid, task=tid, body={"status": "completed"}).execute()
+                    print(f"  ✅ Completed in place: '{orig_title}' in '{src_title}' (recurrence preserved)")
+                    counts["applied"] += 1
+                except Exception as e:
+                    print(f"  ❌ Error completing recurring task {tid}: {e}", file=sys.stderr)
+                    counts["failed"] += 1
+                continue
+
+            if not ai_review_lid:
+                print("  ❌ Failed: 'AI Review' list not found in account.", file=sys.stderr)
+                counts["failed"] += 1
+                continue
             new_title = orig_title if orig_title.startswith("99 Done - ") else f"99 Done - {orig_title}"
             body, meta = split_notes_and_meta(task.get("notes", ""))
             
@@ -379,6 +408,29 @@ def execute_batch(service, ops: List[Dict[str, Any]], dry_run: bool = False) -> 
                 counts["applied"] += 1
             except Exception as e:
                 print(f"  ❌ Error linking task {tid}: {e}", file=sys.stderr)
+                counts["failed"] += 1
+
+        elif action == "complete":
+            src_lid, task = find_task_by_id(service, tid, lists)
+            if not task:
+                print(f"  ❌ Failed: Task {tid!r} not found.", file=sys.stderr)
+                counts["failed"] += 1
+                continue
+
+            src_title = id_to_title.get(src_lid, src_lid)
+            orig_title = task.get("title", "")
+
+            if dry_run:
+                print(f"  [DRY-RUN] Would mark completed in place: '{orig_title}' in list '{src_title}'")
+                counts["applied"] += 1
+                continue
+
+            try:
+                service.tasks().patch(tasklist=src_lid, task=tid, body={"status": "completed"}).execute()
+                print(f"  ✅ Completed in place: '{orig_title}' in '{src_title}'")
+                counts["applied"] += 1
+            except Exception as e:
+                print(f"  ❌ Error completing task {tid}: {e}", file=sys.stderr)
                 counts["failed"] += 1
         else:
             print(f"  ⚠️ Unknown action: {action!r}; skipped.")

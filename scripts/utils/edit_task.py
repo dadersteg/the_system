@@ -68,10 +68,12 @@ def main():
     parser.add_argument("--target-list", help="Target list name or ID to move the task to")
     parser.add_argument("--new-title", help="New title to rename the task to")
     parser.add_argument("--status", choices=["completed", "needsAction"], help="Set status ('completed' or 'needsAction')")
-    parser.add_argument("--notes", help="Replace the notes with this text")
-    parser.add_argument("--notes-file", help="Path to file containing notes to set")
-    parser.add_argument("--append-notes", help="Append this text to existing notes")
-    parser.add_argument("--append-notes-file", help="Path to file containing notes to append")
+    notes_group = parser.add_mutually_exclusive_group()
+    notes_group.add_argument("--notes", help="Replace the notes with this text")
+    notes_group.add_argument("--notes-file", help="Path to file containing notes to set")
+    append_notes_group = parser.add_mutually_exclusive_group()
+    append_notes_group.add_argument("--append-notes", help="Append this text to existing notes")
+    append_notes_group.add_argument("--append-notes-file", help="Path to file containing notes to append")
     parser.add_argument("--due", help="Due date (YYYY-MM-DD)")
     parser.add_argument("--profile", choices=["private", "work"], default="private", help="Which account to use")
     args = parser.parse_args()
@@ -223,6 +225,17 @@ def main():
         task[k] = v
 
     if target_list_id and target_list_id != list_id:
+        src_list_title = next((lst.get('title', '') for lst in lists if lst.get('id') == list_id), "")
+        if "recurring" in src_list_title.lower():
+            print(f"⚠️ Recurring task detected in '{src_list_title}'. Moving across lists via delete-and-recreate permanently destroys Google Tasks recurrence schedule.", file=sys.stderr)
+            if task.get('status') == 'completed' or (args.status and args.status == 'completed'):
+                print(f"⚡ Intercepting: completing task in place in '{src_list_title}' to preserve recurrence schedule.", file=sys.stderr)
+                updated = service.tasks().update(tasklist=list_id, task=task['id'], body=task).execute()
+                print(f"✅ Success: Task marked completed in place in '{src_list_title}' ({list_id}). Recurrence preserved.")
+                sys.exit(0)
+            else:
+                print(f"❌ Error: Cannot move recurring task from '{src_list_title}' to '{target_list_title}' without breaking recurrence.", file=sys.stderr)
+                sys.exit(1)
         try:
             new_task_body = {
                 'title': task.get('title'),
